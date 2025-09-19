@@ -1,0 +1,429 @@
+{
+  "@@locale": "en",
+  "email": "Email",
+  "password": "Password",
+  "signIn": "Sign In",
+  "register": "Register",
+  "createAccount": "Create a new account",
+  "alreadyHaveAccount": "I already have an account",
+  "orSignInWith": "Or sign in with",
+  "passwordTooShort": "Password must be at least 6 characters",
+  "invalidEmail": "Please enter a valid email",
+  "consentWelcomeTitle": "Welcome to Lifeline",
+  "consentWelcomeSubtitle": "Before you begin, please review and agree to our terms.",
+  "consentIAgreeTo": "I have read and agree to the ",
+  "consentTermsOfService": "Terms of Service",
+  "consentAnd": " and ",
+  "consentPrivacyPolicy": "Privacy Policy",
+  "consentContinue": "Continue",
+  "consentErrorSaving": "Error saving settings: {error}",
+  "@consentErrorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashMessageInitializing": "Initializing...",
+  "splashMessageCheckingSettings": "Checking settings...",
+  "splashMessageAuthenticating": "Authenticating...",
+  "splashMessageSyncing": "Syncing your timeline...",
+  "authGateLoadingMemories": "Loading memories...",
+  "authGateAuthenticating": "Authenticating...",
+  "authGateSomethingWentWrong": "Something went wrong",
+  "authGateCouldNotLoad": "We couldn't load your data. Please check your connection and try again.",
+  "authGateTryAgain": "Try Again",
+  "authGateEmptyState": "Your Lifeline is ready.\nTap the + button to add your first memory.",
+  "authGateUnsavedDraftTitle": "Unsaved Memory",
+  "authGateUnsavedDraftContent": "You have an unsaved memory draft. Do you want to continue editing it?",
+  "authGateDiscard": "Discard",
+  "authGateContinueEditing": "Continue Editing",
+  "verifyEmailTitle": "Email Verification",
+  "verifyEmailSentTo": "A verification email has been sent to:",
+  "verifyEmailInstructions": "Please click the link in the email to complete your registration.",
+  "verifyEmailResendButton": "Resend Email",
+  "verifyEmailCancelButton": "Cancel",
+  "profileTitle": "Profile & Settings",
+  "profileSectionProfile": "PROFILE",
+  "profileChangeNameTitle": "Change Name",
+  "profileEnterYourName": "Enter your name",
+  "profileSave": "Save",
+  "profileCancel": "Cancel",
+  "profileName": "Name",
+  "profileEmail": "Email",
+  "profileCountry": "Country",
+  "profileCountryNotSelected": "Not selected",
+  "profileLanguage": "Content Language",
+  "profileLanguageDefault": "English (Default)",
+  "profileSelectLanguage": "Select Language",
+  "profileSectionSettings": "SETTINGS",
+  "profileTheme": "Theme",
+  "profileThemeSystem": "System",
+  "profileThemeLight": "Light",
+  "profileThemeDark": "Dark",
+  "profileReauthTitle": "Re-authentication Required",
+  "profileReauthContent": "This is a sensitive operation. Please sign in again before proceeding.",
+  "profileReauthButton": "Sign In & Delete",
+  "profileReauthPasswordDialogTitle": "Confirm Action",
+  "profileReauthPasswordDialogContent": "To delete your account, please enter your current password.",
+  "profilePasswordCannotBeEmpty": "Password cannot be empty",
+  "profileChangePasswordSuccess": "Master password changed successfully!",
+  "profileChangePasswordErrorIncorrect": "The current password you entered is incorrect.",
+  "profileOldPasswordHint": "Old Password",
+  "profileNewPasswordHint": "New Password",
+  "profileDeleteAccountConfirmContent": "This action is irreversible. Your entire account, including all memories and settings, will be permanently deleted. To proceed, press and hold the delete button for 5 seconds.",
+  "profileChangePasswordCurrentPasswordHint": "Current Master Password",
+  "profileChangePasswordNewPasswordHint": "New Master Password",
+  "profileChangePasswordInfo": "Please enter your current master password to set a new one. This will re-encrypt your secret key.",
+  "profileGraphics": "Graphics Quality",
+  "profileGraphicsAuto": "Automatic",
+  "profileGraphicsLow": "Low",
+  "profileGraphicsMedium": "Medium",
+  "profileGraphicsHigh": "High",
+  "profileReminders": "Reflection Reminders",
+  "profileRemindersSubtitle": "Receive notifications for your action plans",
+  "profileSectionSecurity": "SECURITY",
+  "profileChangePassword": "Change Master Password",
+  "profileEncryptionActive": "End-to-end encryption is active",
+  "profileEnableEncryption": "Enable End-to-End Encryption",
+  "profileEnableEncryptionSubtitle": "Protect your sensitive memories with a master password.",
+  "profileCreateMasterPassword": "Create Master Password",
+  "profileMasterPasswordInfo": "This password will protect your memories. It cannot be recovered if you forget it. Please store it safely.",
+  "profileMasterPasswordHint": "Master Password",
+  "profileConfirmPasswordHint": "Confirm Password",
+  "profilePasswordMinLength": "Password must be at least 8 characters",
+  "profilePasswordsDoNotMatch": "Passwords do not match",
+  "profileEnable": "Enable",
+  "profileSectionHelp": "HELP",
+  "profileReplayTutorial": "Replay Tutorial",
+  "profileReplayTutorialConfirmTitle": "Replay Tutorial?",
+  "profileReplayTutorialConfirmContent": "Are you sure you want to restart the tutorial?",
+  "profileRestart": "Restart",
+  "profileSectionAccount": "ACCOUNT MANAGEMENT",
+  "profileSignOut": "Sign Out",
+  "profileDeleteAccount": "Delete Account",
+  "profileDeleteAccountConfirmTitle": "Delete Account?",
+  "profileDelete": "Delete",
+  "profileDeletingAccount": "Deleting your account...",
+  "profileErrorCouldNotFindProfile": "Could not find user profile.",
+  "memoryEditNewTitle": "New Memory",
+  "memoryEditEditTitle": "Edit Memory",
+  "memoryEditSave": "Save",
+  "memoryEditTitleHint": "Title",
+  "memoryEditTitleValidator": "Please enter a title",
+  "memoryEditDescriptionHint": "Description",
+  "memoryEditDateLabel": "Date:",
+  "memoryEditSelectDateButton": "Select Date",
+  "memoryEditAmbientSoundLabel": "Ambient Sound:",
+  "memoryEditAmbientSoundDropdownHint": "Select an ambient sound",
+  "memoryEditMusicAnchorLabel": "Music Anchor:",
+  "memoryEditAttachTrackButton": "Attach track from Spotify",
+  "memoryEditPhotosLabel": "Photos:",
+  "memoryEditNoPhotosSelected": "No photos selected",
+  "memoryEditAddPhotosButton": "Add Photos",
+  "memoryEditVideosLabel": "Videos:",
+  "memoryEditNoVideosSelected": "No videos selected",
+  "memoryEditAddVideoButton": "Add Video",
+  "memoryEditAudioNoteLabel": "Audio Note:",
+  "memoryEditAudioNoteSaved": "Audio note saved",
+  "memoryEditRecordButton": "Record",
+  "memoryEditStopRecordingButton": "Stop Recording",
+  "memoryEditRecordingIndicator": "Recording...",
+  "memoryEditReflectionSectionTitle": "Reflection",
+  "memoryEditEncryptLabel": "Encrypt",
+  "memoryEditEncryptionInfoTooltip": "What is encryption?",
+  "memoryEditImpactPrompt": "How did this event impact me?",
+  "memoryEditLessonPrompt": "What lesson did I learn?",
+  "memoryEditEmotionsLabel": "Emotions:",
+  "emotionJoy": "Joy",
+  "emotionNostalgia": "Nostalgia",
+  "emotionPride": "Pride",
+  "emotionSadness": "Sadness",
+  "emotionGratitude": "Gratitude",
+  "emotionLove": "Love",
+  "emotionFear": "Fear",
+  "emotionAnger": "Anger",
+  "memoryEditCbtHelperTitle": "Reflection Helper",
+  "memoryEditCbtStep1Title": "What was the first thought or belief?",
+  "memoryEditCbtStep1Subtitle": "e.g., 'I will fail' or 'I did everything right'.",
+  "memoryEditCbtStep2Title": "What supports this thought?",
+  "memoryEditCbtStep2Subtitle": "What facts or events prove this thought to be true?",
+  "memoryEditCbtStep3Title": "What is the view from the other side?",
+  "memoryEditCbtStep3Subtitle": "What facts or events might disprove or challenge the first thought?",
+  "memoryEditCbtStep4Title": "How can I look at this differently?",
+  "memoryEditCbtStep4Subtitle": "Based on the above, formulate a new, more balanced perspective.",
+  "memoryEditActionPlanTitle": "Action Plan",
+  "memoryEditActionPrompt": "What is one small step I can take?",
+  "memoryEditReminderLabel": "Reminder:",
+  "memoryEditReminderNotSet": "Not set",
+  "memoryEditSetReminderButton": "Set Date",
+  "memoryEditYourThoughtsHint": "Your thoughts here...",
+  "memoryEditDraftSavedMessage": "Draft saved",
+  "memoryEditErrorRepoUnavailable": "Error: Repository not available.",
+  "memoryEditErrorSaving": "Error saving memory: {error}",
+  "@memoryEditErrorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryEditUnlockDialogTitle": "Unlock to Save",
+  "memoryEditUnlockDialogContent": "Please enter your Master Password to save this encrypted memory.",
+  "memoryEditMasterPasswordHint": "Master Password",
+  "memoryEditUnlockButton": "Unlock",
+  "memoryEditEncryptionInfoDialogTitle": "End-to-End Encryption",
+  "memoryEditEncryptionInfoDialogContent": "When you encrypt a memory, its description and reflection fields are scrambled using a key derived from your Master Password.\n\nThe data is stored in an unreadable format in the cloud and can only be decrypted on your devices with your password.\n\nIMPORTANT: We cannot recover your Master Password. If you forget it, your encrypted data will be lost forever.",
+  "memoryEditOkButton": "OK",
+  "memoryEditPermissionDeniedSnackbar": "Permission for {permissionName} was denied. Please enable it in settings.",
+  "@memoryEditPermissionDeniedSnackbar": {
+    "placeholders": {
+      "permissionName": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryEditSettingsButton": "Settings",
+  "memoryEditNoInternetSnackbar": "Internet connection is required to search for music.",
+  "memoryEditEmotionIntensityDialogTitle": "Intensity for '{emotion}'",
+  "@memoryEditEmotionIntensityDialogTitle": {
+    "placeholders": {
+      "emotion": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewBackTooltip": "Back",
+  "memoryViewShareTooltip": "Share",
+  "memoryViewEditTooltip": "Edit",
+  "memoryViewDeleteTooltip": "Delete",
+  "memoryViewTabMemory": "Memory",
+  "memoryViewTabInTheWorld": "In the World",
+  "memoryViewEncryptedTitle": "Encrypted Memory",
+  "memoryViewReflectionTitle": "Reflection",
+  "memoryViewReflectionImpact": "Impact",
+  "memoryViewReflectionLesson": "Lesson Learned",
+  "memoryViewCbtStep1Title": "First Thought or Belief",
+  "memoryViewCbtStep2Title": "Evidence For This Thought",
+  "memoryViewCbtStep3Title": "Evidence Against This Thought",
+  "memoryViewCbtStep4Title": "New, Balanced Perspective (Reframe)",
+  "memoryViewActionReminder": "Reminder: {date}",
+  "@memoryViewActionReminder": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewMarkIncompleteTooltip": "Mark as incomplete",
+  "memoryViewMarkCompleteTooltip": "Mark as complete",
+  "memoryViewUnlockDialogTitle": "Unlock Memory",
+  "memoryViewUnlockDialogContent": "Enter your Master Password to view this content.",
+  "memoryViewIncorrectPassword": "Incorrect password.",
+  "memoryViewUnlockButton": "Unlock",
+  "memoryViewErrorCouldNotLoadProfile": "Could not load your profile to fetch historical data.",
+  "memoryViewErrorCouldNotLoadHistoricalData": "Could not load historical data for this day.",
+  "memoryViewNoHistoricalData": "No historical data available for this day.",
+  "memoryViewErrorCouldNotLoadTrack": "Could not load track",
+  "memoryViewTabNews": "News",
+  "memoryViewTabMusic": "Music",
+  "memoryViewNoDataForDay": "No data for this day.",
+  "memoryViewNoNewsForDay": "No historical news for this day.",
+  "memoryViewNewsSource": "Source: {source}",
+  "@memoryViewNewsSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewConfirmDeleteTitle": "Confirm Deletion",
+  "memoryViewConfirmDeleteContent": "This action is irreversible. To proceed, press and hold the delete button for 5 seconds.",
+  "memoryViewDeleteButton": "DELETE",
+  "memoryViewErrorLoadingProfile": "We couldn't load your profile. Please check your connection and try again.",
+  "memoryViewErrorLocalDb": "Error: Could not access local database.",
+  "memoryViewMemoryDeleted": "Memory deleted",
+  "memoryViewSharingNotImplemented": "Sharing functionality not yet implemented.",
+  "memoryViewActionCompleted": "Action marked as complete!",
+  "memoryViewActionIncomplete": "Action marked as incomplete.",
+  "memoryViewErrorUpdatingAction": "Error updating action: {error}",
+  "@memoryViewErrorUpdatingAction": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewContentEncrypted": "Content is Encrypted",
+  "memoryViewReflectionEncrypted": "Reflection is Encrypted",
+  "memoryViewMediaEncrypted": "Media is Encrypted",
+  "memoryViewAmbientSound": "Ambient Sound: {sound}",
+  "@memoryViewAmbientSound": {
+    "placeholders": {
+      "sound": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewAudioNote": "Audio Note",
+  "spotifySearchTitle": "Search Spotify Track",
+  "spotifySearchHint": "Song title or artist",
+  "documentErrorLoading": "Could not load document.",
+  "lifelineMemoriesCount": "Memories: {count}",
+  "@lifelineMemoriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelinePeriodRange": "Period: {startYear} - {endYear}",
+  "@lifelinePeriodRange": {
+    "placeholders": {
+      "startYear": {
+        "type": "int"
+      },
+      "endYear": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineSyncStatus": "{status} ({jobs} left)",
+  "@lifelineSyncStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      },
+      "jobs": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineCalculating": "Calculating...",
+  "lifelineScaleValue": "Scale: {scale}%",
+  "@lifelineScaleValue": {
+    "placeholders": {
+      "scale": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineFpsValue": "FPS: {fps}",
+  "@lifelineFpsValue": {
+    "placeholders": {
+      "fps": {
+        "type": "String"
+      }
+    }
+  },
+  "lifelineFramePaintValue": "Frame Paint: {ms} ms",
+  "@lifelineFramePaintValue": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineShowFullTimelineTooltip": "Show full timeline",
+  "lifelineVisualSettingsTooltip": "Visual settings",
+  "lifelineMenuProfile": "Profile",
+  "lifelineMenuDebugOn": "Debug On",
+  "lifelineMenuDebugOff": "Debug Off",
+  "lifelineMenuSignOut": "Sign Out",
+  "lifelineSearchHint": "Search...",
+  "lifelineMemoriesListTitle": "Memories",
+  "lifelineVisualSettingsDialogTitle": "Visual Settings",
+  "lifelineVisualSettingsSpeed": "Speed",
+  "lifelineVisualSettingsAmplitude": "Amplitude",
+  "lifelineVisualSettingsYearLine": "Year Line Position",
+  "lifelineVisualSettingsBranchDensity": "Branch Density",
+  "lifelineVisualSettingsBranchIntensity": "Branch Intensity",
+  "lifelineVisualSettingsAnimate": "Animate",
+  "lifelineVisualSettingsDoneButton": "Done",
+  "onboardingWelcomeTitle": "Welcome to Lifeline",
+  "onboardingWelcomeSubtitle": "Your personal journey, visualized. Let's take a quick tour to see how you can begin capturing your moments.",
+  "onboardingSkipButton": "Skip for now",
+  "onboardingBeginTourButton": "Begin Tour",
+  "onboardingGesturesTitle": "Navigate Your Timeline",
+  "onboardingGestureSwipe": "Swipe",
+  "onboardingGesturePinch": "Pinch to Zoom",
+  "onboardingGesturesSubtitle": "Your Lifeline will grow with you. Pinch to zoom out and see the bigger picture. Swipe left and right to navigate through time.",
+  "onboardingContinueButton": "Continue",
+  "onboardingFinalTitle": "You're All Set!",
+  "onboardingFinalSubtitle": "Your journey begins now. Start capturing the moments that matter.",
+  "onboardingStartJourneyButton": "Start My Journey",
+  "onboardingSkipTourButton": "Skip Tour",
+  "onboardingLifelineIntroText": "This is your Lifeline. Every memory you add will create a unique node on this path, forming a beautiful map of your life's journey.",
+  "onboardingLifelineIntroButton": "Next",
+  "onboardingAddMemoryText": "Tap here to add a new memory. A node will appear on your Lifeline for each moment you capture.",
+  "onboardingNavGesturesText": "Great! Now, let's learn how to navigate your timeline.",
+  "onboardingControlsPanelText": "Use these controls to manage your view. You can recenter the timeline, adjust visual effects, and access your profile.",
+  "onboardingControlsPanelButton": "Got It",
+  "onboardingStatsCardText": "This card shows a summary of your memories. Tap it to open a full, searchable list of your entire journey.",
+  "onboardingStatsCardButton": "Almost Done!",
+  "audioPlayerPreviousTooltip": "Previous Track",
+  "audioPlayerPlayTooltip": "Play",
+  "audioPlayerPauseTooltip": "Pause",
+  "audioPlayerNextTooltip": "Next Track",
+  "memoryEditCbtStepLabel": "Step {step}: ",
+  "@memoryEditCbtStepLabel": {
+    "description": "Label for a step in the CBT reflection helper",
+    "placeholders": {
+      "step": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "premiumBannerTitle": "Unlock Lifeline Premium",
+  "premiumBannerSubtitle": "Unlimited media, advanced reflection, historical context, and more!",
+  "premiumDialogTitle": "Upgrade to Premium",
+  "premiumDialogContent": "Unlock the ability to {feature} and get access to all premium features.",
+  "@premiumDialogContent": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumDialogGoPremium": "Go Premium",
+  "premiumFeaturePhotos": "add more photos",
+  "premiumFeatureVideos": "add a video",
+  "premiumFeatureAudio": "add an audio note",
+  "premiumFeatureSpotify": "add a Spotify track",
+  "premiumScreenTitle": "Lifeline Premium",
+  "premiumScreenHeaderTitle": "Unlock Your Full Potential",
+  "premiumScreenHeaderSubtitle": "Go beyond the limits with Lifeline Premium and get the most out of your journey of self-discovery.",
+  "premiumFeatureUnlimitedPhotos": "Unlimited Photos & Videos",
+  "premiumFeatureUnlimitedAudio": "Unlimited Audio Notes",
+  "premiumFeatureUnlimitedSpotify": "Unlimited Spotify Tracks",
+  "premiumFeatureAdvancedCbt": "Advanced Reflection Helper",
+  "premiumFeatureActionReminders": "Action Plan Reminders",
+  "premiumFeatureHistoricalContext": "Historical 'In the World' Context",
+  "premiumFeatureSoundLibrary": "Full Ambient Sound Library",
+  "premiumScreenYearlyPopular": "Most Popular & Best Value",
+  "premiumScreenRestore": "Restore Purchases",
+  "premiumScreenTerms": "Terms of Service",
+  "premiumScreenPrivacy": "Privacy Policy",
+  "premiumStatusTitle": "Premium Member",
+  "premiumStatusExpiresOn": "Expires on {date}",
+  "@premiumStatusExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingEncryptionTitle": "Your Memories, Secured",
+  "onboardingEncryptionSubtitle": "Lifeline offers end-to-end encryption. This means only you can read your private memories. Let's set up your Master Password to protect them.",
+  "onboardingEncryptionSetupButton": "Set Up Now",
+  "onboardingEncryptionLaterButton": "Maybe Later",
+  "onboardingEncryptionActiveTitle": "Encryption is Active",
+  "onboardingEncryptionActiveSubtitle": "Your memories are already protected. You can manage your master password in the profile settings.",
+  "onboardingEncryptionContinueButton": "Continue",
+  "memoryEditEncryptMemory": "Encrypt this memory",
+  "memoryEditSetupEncryptionTitle": "Enable Encryption?",
+  "memoryEditSetupEncryptionContent": "To protect this memory, you first need to create a Master Password. This will be your single key to all encrypted entries.",
+  "memoryEditCreatePasswordButton": "Create Master Password",
+  "memoryViewExportPdf": "Share as PDF"
+}

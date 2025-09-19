@@ -1,0 +1,951 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/material.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lifeline/l10n/app_localizations.dart';
+import 'package:lifeline/models/user_profile.dart';
+import 'package:lifeline/providers/application_providers.dart';
+import 'package:lifeline/services/encryption_service.dart';
+import 'package:lifeline/services/onboarding_service.dart';
+import 'package:lifeline/widgets/premium_upsell_widgets.dart';
+import 'package:collection/collection.dart';
+
+Future<bool> showCreateMasterPasswordDialog(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context)!;
+  final formKey = GlobalKey<FormState>();
+  final passwordController = TextEditingController();
+  final confirmController = TextEditingController();
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(l10n.profileCreateMasterPassword),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.profileMasterPasswordInfo),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: passwordController,
+                obscureText: true,
+                decoration:
+                    InputDecoration(labelText: l10n.profileMasterPasswordHint),
+                validator: (val) => (val?.length ?? 0) < 8
+                    ? l10n.profilePasswordMinLength
+                    : null,
+              ),
+              TextFormField(
+                controller: confirmController,
+                obscureText: true,
+                decoration:
+                    InputDecoration(labelText: l10n.profileConfirmPasswordHint),
+                validator: (val) =>
+                    val != passwordController.text ? l10n.profilePasswordsDoNotMatch : null,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.profileCancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState?.validate() ?? false) {
+                await ref
+                    .read(encryptionServiceProvider.notifier)
+                    .setupEncryption(passwordController.text);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Encryption enabled successfully!')),
+                  );
+                  Navigator.of(context).pop(true);
+                }
+              }
+            },
+            child: Text(l10n.profileEnable),
+          ),
+        ],
+      );
+    },
+  );
+  return confirmed ?? false;
+}
+
+class _ChangeMasterPasswordDialog extends ConsumerStatefulWidget {
+  final AppLocalizations l10n;
+  const _ChangeMasterPasswordDialog({required this.l10n});
+
+  @override
+  ConsumerState<_ChangeMasterPasswordDialog> createState() =>
+      __ChangeMasterPasswordDialogState();
+}
+
+class __ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswordDialog> {
+    final _formKey = GlobalKey<FormState>();
+    final _oldPasswordController = TextEditingController();
+    final _newPasswordController = TextEditingController();
+    final _confirmPasswordController = TextEditingController();
+    bool _isLoading = false;
+    String? _errorMessage;
+
+    @override
+    void dispose() {
+      _oldPasswordController.dispose();
+      _newPasswordController.dispose();
+      _confirmPasswordController.dispose();
+      super.dispose();
+    }
+
+    Future<void> _handleChangePassword() async {
+      if (!(_formKey.currentState?.validate() ?? false)) return;
+
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final success = await ref.read(encryptionServiceProvider.notifier)
+          .changeMasterPassword(
+              _oldPasswordController.text, _newPasswordController.text);
+      
+      if (!mounted) return;
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(widget.l10n.profileChangePasswordSuccess)),
+        );
+        Navigator.of(context).pop();
+      } else {
+        setState(() {
+          _errorMessage = widget.l10n.profileChangePasswordErrorIncorrect;
+          _isLoading = false;
+        });
+      }
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return AlertDialog(
+        title: Text(widget.l10n.profileChangePassword),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else ...[
+                Text(widget.l10n.profileChangePasswordInfo),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _oldPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: widget.l10n.profileChangePasswordCurrentPasswordHint,
+                    errorText: _errorMessage,
+                  ),
+                  validator: (val) => (val?.isEmpty ?? true) ? widget.l10n.profilePasswordCannotBeEmpty : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _newPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(labelText: widget.l10n.profileChangePasswordNewPasswordHint),
+                  validator: (val) => (val?.length ?? 0) < 8 ? widget.l10n.profilePasswordMinLength : null,
+                ),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(labelText: widget.l10n.profileConfirmPasswordHint),
+                  validator: (val) => val != _newPasswordController.text ? widget.l10n.profilePasswordsDoNotMatch : null,
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+            child: Text(widget.l10n.profileCancel),
+          ),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _handleChangePassword,
+            child: Text(widget.l10n.profileSave),
+          ),
+        ],
+      );
+    }
+}
+
+
+class ProfileScreen extends ConsumerStatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  late TextEditingController _displayNameController;
+  bool _isDeleting = false;
+
+  final Map<String, String> _supportedLanguages = {
+    'en': 'English',
+    'ru': 'Русский',
+    'de': 'Deutsch',
+    'es': 'Español',
+    'fr': 'Français',
+    'he': 'עברית',
+    'pt': 'Português',
+    'zh': '简体中文',
+    'ar': 'العربية',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _displayNameController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _displayNameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _changeAvatar(UserProfile profile) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User is not authenticated.')),
+        );
+      }
+      return;
+    }
+
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+      maxWidth: 800,
+    );
+
+    if (image != null) {
+      final userService = ref.read(userServiceProvider);
+      final String? photoUrl =
+          await userService.uploadAvatar(currentUser.uid, File(image.path));
+
+      if (photoUrl != null) {
+        final updatedProfile = profile.copyWith(photoUrl: photoUrl);
+        await userService.updateUserProfile(updatedProfile);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Failed to upload avatar. Please try again.')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _showEditDisplayNameDialog(UserProfile profile, AppLocalizations l10n) async {
+    _displayNameController.text = profile.displayName;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(l10n.profileChangeNameTitle),
+          content: TextField(
+            controller: _displayNameController,
+            decoration: InputDecoration(hintText: l10n.profileEnterYourName),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(l10n.profileCancel),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text(l10n.profileSave),
+              onPressed: () {
+                final newName = _displayNameController.text.trim();
+                if (newName.isNotEmpty) {
+                  final updatedProfile = profile.copyWith(displayName: newName);
+                  ref
+                      .read(userServiceProvider)
+                      .updateUserProfile(updatedProfile);
+                }
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCountryPicker(UserProfile profile) {
+    showCountryPicker(
+      context: context,
+      onSelect: (Country country) {
+        final updatedProfile =
+            profile.copyWith(countryCode: country.countryCode);
+        ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+      },
+    );
+  }
+
+  Future<void> _showLanguagePickerDialog(UserProfile profile, AppLocalizations l10n) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(l10n.profileSelectLanguage),
+          children: _supportedLanguages.entries.map((entry) {
+            return SimpleDialogOption(
+              onPressed: () {
+                final updatedProfile =
+                    profile.copyWith(languageCode: entry.key);
+                ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                ref.read(localeProvider.notifier).setLocale(Locale(entry.key));
+                Navigator.pop(context);
+              },
+              child: Text(entry.value),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+  
+  Future<void> _handleDeleteAccount(AppLocalizations l10n) async {
+    if (!mounted) return;
+    setState(() => _isDeleting = true);
+
+    // ИСПРАВЛЕНИЕ: Добавляем логирование в Crashlytics
+    FirebaseCrashlytics.instance.log('Starting account deletion process.');
+
+    await ref.read(audioPlayerProvider.notifier).stopAndReset();
+    final authService = ref.read(authServiceProvider);
+    final result = await authService.deleteAccount();
+
+    // Этот `if` блок важен, так как виджет может быть уже удален
+    // после асинхронной операции `deleteAccount`.
+    if (!mounted) {
+      FirebaseCrashlytics.instance.log('ProfileScreen unmounted during deleteAccount.');
+      return;
+    }
+
+    if (result == 'success') {
+      // УСПЕХ: Пользователь удален. AuthGate уже переключился на экран входа.
+      // Нам просто нужно убрать все экраны поверх него.
+      FirebaseCrashlytics.instance.log('Account deletion successful. Popping until first route.');
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return; // Выходим из функции, чтобы не выполнять лишний код.
+    }
+
+    if (result == 'requires-recent-login') {
+      FirebaseCrashlytics.instance.log('Account deletion requires re-authentication.');
+      final user = FirebaseAuth.instance.currentUser;
+      final providerId = user?.providerData.firstOrNull?.providerId;
+      bool reauthSuccess = false;
+
+      try {
+        if (providerId == 'password') {
+          // ИСПРАВЛЕНИЕ: Проверяем mounted после диалога
+          final didReauth = await _showPasswordReauthDialog(l10n);
+          if (!mounted) return;
+          reauthSuccess = didReauth ?? false;
+        } else {
+          // ИСПРАВЛЕНИЕ: Проверяем mounted после диалога
+          final didReauth = await _showSocialReauthDialog(l10n, providerId);
+          if (!mounted) return;
+          reauthSuccess = didReauth ?? false;
+        }
+
+        if (reauthSuccess) {
+          FirebaseCrashlytics.instance.log('Re-authentication successful. Retrying delete.');
+          final finalResult = await authService.deleteAccount();
+          if (!mounted) return; // Еще одна проверка
+
+          if (finalResult == 'success') {
+            // Также убираем все экраны после успешной повторной попытки.
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            return;
+          } else {
+            FirebaseCrashlytics.instance.recordError(
+              Exception('Account deletion failed after re-auth'),
+              null,
+              reason: finalResult,
+            );
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(finalResult)));
+          }
+        } else {
+           FirebaseCrashlytics.instance.log('Re-authentication was cancelled or failed.');
+        }
+      } catch (e, s) {
+        if (!mounted) return;
+        FirebaseCrashlytics.instance.recordError(e, s, reason: 'Error during re-authentication flow.');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+      }
+
+      // Если повторная аутентификация была отменена или не удалась, останавливаем загрузку.
+      if (mounted) {
+        setState(() => _isDeleting = false);
+      }
+    } else {
+      // Обрабатываем другие ошибки из первой попытки удаления.
+      FirebaseCrashlytics.instance.recordError(
+        Exception('Account deletion failed on first attempt'),
+        null,
+        reason: result,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
+      setState(() => _isDeleting = false);
+    }
+  }
+
+  Future<bool?> _showPasswordReauthDialog(AppLocalizations l10n) async {
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    String? errorMessage;
+    bool isLoading = false;
+
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: Text(l10n.profileReauthPasswordDialogTitle),
+            content: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                   if (isLoading)
+                    const Center(child: CircularProgressIndicator())
+                   else ...[
+                    Text(l10n.profileReauthPasswordDialogContent),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: passwordController,
+                      obscureText: true,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.password,
+                        errorText: errorMessage,
+                      ),
+                      validator: (val) => (val?.isEmpty ?? true) ? l10n.profilePasswordCannotBeEmpty : null,
+                    ),
+                  ]
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.of(context).pop(false),
+                child: Text(l10n.profileCancel),
+              ),
+              ElevatedButton(
+                onPressed: isLoading ? null : () async {
+                  if (formKey.currentState?.validate() ?? false) {
+                    setState(() => isLoading = true);
+                    try {
+                      await ref.read(authServiceProvider).reauthenticateWithPassword(passwordController.text);
+                      if (context.mounted) Navigator.of(context).pop(true);
+                    } on FirebaseAuthException catch(e) {
+                       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+                          setState(() {
+                            errorMessage = l10n.profileChangePasswordErrorIncorrect;
+                          });
+                       } else {
+                          setState(() {
+                             errorMessage = e.message;
+                          });
+                       }
+                    } finally {
+                      if(mounted) setState(() => isLoading = false);
+                    }
+                  }
+                },
+                child: Text(l10n.profileSave),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  Future<bool?> _showSocialReauthDialog(AppLocalizations l10n, String? providerId) async {
+    final authService = ref.read(authServiceProvider);
+    
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, 
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.profileReauthTitle),
+          content: Text(l10n.profileReauthContent),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.profileCancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  if (providerId == 'google.com') {
+                    await authService.reauthenticateWithGoogle();
+                  } else if (providerId == 'apple.com') {
+                    await authService.reauthenticateWithApple();
+                  }
+                  if (context.mounted) Navigator.of(context).pop(true);
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.of(context).pop(false);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Re-authentication failed: $e')));
+                  }
+                }
+              },
+              child: Text(l10n.profileReauthButton),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Future<void> _showDeleteAccountDialog(AppLocalizations l10n) async {
+     final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return _HoldToDeleteAccountDialog(l10n: l10n);
+      },
+    );
+    if(confirmed == true) {
+      _handleDeleteAccount(l10n);
+    }
+  }
+
+  Future<void> _replayOnboarding(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.profileReplayTutorialConfirmTitle),
+        content: Text(l10n.profileReplayTutorialConfirmContent),
+        actions: [
+          TextButton(
+            child: Text(l10n.profileCancel),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          ElevatedButton(
+            child: Text(l10n.profileRestart),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final notifier = ref.read(onboardingServiceProvider.notifier);
+      await notifier.reset();
+      notifier.startOnAppLaunch();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+  
+  void _showChangeMasterPasswordDialog(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (_) => _ChangeMasterPasswordDialog(l10n: l10n),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProfileAsyncValue = ref.watch(userProfileProvider);
+    final currentUser = ref.watch(authStateChangesProvider).asData?.value;
+    final isPremium = ref.watch(isPremiumProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.profileTitle),
+      ),
+      body: _isDeleting
+          ? _DeletingScreen(l10n: l10n)
+          : userProfileAsyncValue.when(
+              loading: () => const _LoadingScreen(),
+              error: (err, stack) =>
+                  _ErrorScreen(l10n: l10n, onRetry: () => ref.refresh(userProfileProvider)),
+              data: (profile) {
+                if (profile == null) {
+                  if (currentUser != null) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      ref
+                          .read(userServiceProvider)
+                          .ensureUserProfileExists(currentUser, context);
+                    });
+                    return const _LoadingScreen();
+                  }
+                  return _ErrorScreen(
+                    l10n: l10n,
+                    message: l10n.profileErrorCouldNotFindProfile,
+                    onRetry: () => ref.refresh(userProfileProvider),
+                  );
+                }
+
+                return ListView(
+                  padding: const EdgeInsets.all(16.0),
+                  children: [
+                    _buildSectionTitle(l10n.profileSectionProfile, context),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundImage: profile.photoUrl != null
+                                ? CachedNetworkImageProvider(profile.photoUrl!)
+                                : null,
+                            child: profile.photoUrl == null
+                                ? const Icon(Icons.person, size: 50)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      width: 2)),
+                              child: IconButton(
+                                icon: const Icon(Icons.edit,
+                                    color: Colors.white, size: 20),
+                                onPressed: () => _changeAvatar(profile),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (isPremium)
+                      PremiumStatusCard(premiumUntil: profile.premiumUntil)
+                    else
+                      const PremiumBannerCard(),
+                    _buildInfoTile(
+                      icon: Icons.person_outline,
+                      title: l10n.profileName,
+                      subtitle: profile.displayName,
+                      onTap: () => _showEditDisplayNameDialog(profile, l10n),
+                    ),
+                    _buildInfoTile(
+                      icon: Icons.email_outlined,
+                      title: l10n.profileEmail,
+                      subtitle: profile.email,
+                    ),
+                    _buildInfoTile(
+                      icon: Icons.public_outlined,
+                      title: l10n.profileCountry,
+                      subtitle: profile.countryCode ?? l10n.profileCountryNotSelected,
+                      onTap: () => _showCountryPicker(profile),
+                    ),
+                    _buildInfoTile(
+                      icon: Icons.language_outlined,
+                      title: l10n.profileLanguage,
+                      subtitle: _supportedLanguages[profile.languageCode] ??
+                          l10n.profileLanguageDefault,
+                      onTap: () => _showLanguagePickerDialog(profile, l10n),
+                    ),
+                    const Divider(height: 40),
+                    _buildSectionTitle(l10n.profileSectionSettings, context),
+                    _buildNotificationsSetting(profile, l10n),
+                    const Divider(height: 40),
+                    _buildSectionTitle(l10n.profileSectionSecurity, context),
+                    _buildEncryptionSetting(profile, l10n),
+                    const Divider(height: 40),
+                    _buildSectionTitle(l10n.profileSectionHelp, context),
+                    ListTile(
+                      leading: const Icon(Icons.school_outlined),
+                      title: Text(l10n.profileReplayTutorial),
+                      onTap: () => _replayOnboarding(l10n),
+                    ),
+                    const Divider(height: 40),
+                    _buildSectionTitle(l10n.profileSectionAccount, context),
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: Text(l10n.profileSignOut),
+                      onTap: () {
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+                        ref.read(audioPlayerProvider.notifier).stopAndReset();
+                        ref
+                            .read(encryptionServiceProvider.notifier)
+                            .lockSession();
+                        ref.read(authServiceProvider).signOut();
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.delete_forever,
+                          color: Colors.red.shade400),
+                      title: Text(l10n.profileDeleteAccount,
+                          style: TextStyle(color: Colors.red.shade400)),
+                      onTap: () => _showDeleteAccountDialog(l10n),
+                    ),
+                  ],
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildEncryptionSetting(UserProfile profile, AppLocalizations l10n) {
+    if (profile.isEncryptionEnabled) {
+      return ListTile(
+        leading: const Icon(Icons.password),
+        title: Text(l10n.profileChangePassword),
+        subtitle: Text(l10n.profileEncryptionActive),
+        onTap: () => _showChangeMasterPasswordDialog(l10n),
+      );
+    } else {
+      return ListTile(
+        leading: const Icon(Icons.enhanced_encryption_outlined),
+        title: Text(l10n.profileEnableEncryption),
+        subtitle: Text(l10n.profileEnableEncryptionSubtitle),
+        onTap: () => showCreateMasterPasswordDialog(context, ref),
+      );
+    }
+  }
+
+  Widget _buildSectionTitle(String title, BuildContext context) {
+    return Text(
+      title.toUpperCase(),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.primary,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildInfoTile(
+      {required IconData icon,
+      required String title,
+      required String subtitle,
+      VoidCallback? onTap}) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      subtitle: Text(subtitle, style: const TextStyle(color: Colors.white70)),
+      trailing:
+          onTap != null ? const Icon(Icons.edit_outlined, size: 20) : null,
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildNotificationsSetting(UserProfile profile, AppLocalizations l10n) {
+    return SwitchListTile(
+      title:
+          Text(l10n.profileReminders, style: const TextStyle(fontSize: 16)),
+      subtitle: Text(l10n.profileRemindersSubtitle),
+      value: profile.notificationsEnabled,
+      onChanged: (bool value) {
+        final updatedProfile = profile.copyWith(notificationsEnabled: value);
+        ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+      },
+    );
+  }
+}
+
+class _LoadingScreen extends StatelessWidget {
+  const _LoadingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
+  }
+}
+
+class _ErrorScreen extends StatelessWidget {
+  final String? message;
+  final VoidCallback onRetry;
+  final AppLocalizations l10n;
+
+  const _ErrorScreen({this.message, required this.onRetry, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline,
+                color: Colors.redAccent.shade100, size: 60),
+            const SizedBox(height: 20),
+            Text(
+              l10n.authGateSomethingWentWrong,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message ?? l10n.authGateCouldNotLoad,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withAlpha(179)),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.authGateTryAgain),
+              onPressed: onRetry,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeletingScreen extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _DeletingScreen({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 20),
+          Text(l10n.profileDeletingAccount),
+        ],
+      ),
+    );
+  }
+}
+
+class _HoldToDeleteAccountDialog extends StatefulWidget {
+  final AppLocalizations l10n;
+  const _HoldToDeleteAccountDialog({required this.l10n});
+
+  @override
+  State<_HoldToDeleteAccountDialog> createState() => __HoldToDeleteAccountDialogState();
+}
+
+class __HoldToDeleteAccountDialogState extends State<_HoldToDeleteAccountDialog> with SingleTickerProviderStateMixin {
+  late AnimationController _progressController;
+  Timer? _deleteTimer;
+  static const int _holdDurationSeconds = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _progressController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: _holdDurationSeconds),
+    );
+  }
+
+  @override
+  void dispose() {
+    _progressController.dispose();
+    _deleteTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startHold() {
+    _deleteTimer?.cancel();
+    _progressController.forward();
+    _deleteTimer = Timer(const Duration(seconds: _holdDurationSeconds), () {
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    });
+  }
+
+  void _cancelHold() {
+    _deleteTimer?.cancel();
+    _progressController.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.l10n.profileDeleteAccountConfirmTitle),
+      content: Text(widget.l10n.profileDeleteAccountConfirmContent),
+      actions: <Widget>[
+        TextButton(
+          child: Text(widget.l10n.profileCancel),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        Listener(
+          onPointerDown: (_) => _startHold(),
+          onPointerUp: (_) => _cancelHold(),
+          child: AnimatedBuilder(
+            animation: _progressController,
+            builder: (context, child) {
+              return SizedBox(
+                width: 100,
+                height: 40,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: _progressController.value,
+                        backgroundColor: Colors.red.withAlpha((255 * 0.2).round()),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.red),
+                      ),
+                    ),
+                    Text(
+                      widget.l10n.profileDelete,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+

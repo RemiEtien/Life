@@ -1,0 +1,429 @@
+{
+  "@@locale": "ru",
+  "email": "Электронная почта",
+  "password": "Пароль",
+  "signIn": "Войти",
+  "register": "Зарегистрироваться",
+  "createAccount": "Создать новый аккаунт",
+  "alreadyHaveAccount": "У меня уже есть аккаунт",
+  "orSignInWith": "Или войдите с помощью",
+  "passwordTooShort": "Пароль должен содержать не менее 6 символов",
+  "invalidEmail": "Пожалуйста, введите действительный адрес электронной почты",
+  "consentWelcomeTitle": "Добро пожаловать в Lifeline",
+  "consentWelcomeSubtitle": "Прежде чем начать, пожалуйста, ознакомьтесь и согласитесь с нашими условиями.",
+  "consentIAgreeTo": "Я прочитал(а) и согласен(на) с ",
+  "consentTermsOfService": "Условиями обслуживания",
+  "consentAnd": " и ",
+  "consentPrivacyPolicy": "Политикой конфиденциальности",
+  "consentContinue": "Продолжить",
+  "consentErrorSaving": "Ошибка сохранения настроек: {error}",
+  "@consentErrorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashMessageInitializing": "Инициализация...",
+  "splashMessageCheckingSettings": "Проверка настроек...",
+  "splashMessageAuthenticating": "Аутентификация...",
+  "splashMessageSyncing": "Синхронизация вашей линии жизни...",
+  "authGateLoadingMemories": "Загрузка воспоминаний...",
+  "authGateAuthenticating": "Аутентификация...",
+  "authGateSomethingWentWrong": "Что-то пошло не так",
+  "authGateCouldNotLoad": "Не удалось загрузить ваши данные. Пожалуйста, проверьте соединение и попробуйте снова.",
+  "authGateTryAgain": "Попробовать снова",
+  "authGateEmptyState": "Ваша линия жизни готова.\nНажмите кнопку +, чтобы добавить первое воспоминание.",
+  "authGateUnsavedDraftTitle": "Несохраненное воспоминание",
+  "authGateUnsavedDraftContent": "У вас есть несохраненный черновик воспоминания. Хотите продолжить редактирование?",
+  "authGateDiscard": "Удалить",
+  "authGateContinueEditing": "Продолжить",
+  "verifyEmailTitle": "Подтверждение почты",
+  "verifyEmailSentTo": "Письмо с подтверждением было отправлено на адрес:",
+  "verifyEmailInstructions": "Пожалуйста, перейдите по ссылке в письме, чтобы завершить регистрацию.",
+  "verifyEmailResendButton": "Отправить письмо еще раз",
+  "verifyEmailCancelButton": "Отмена",
+  "profileTitle": "Профиль и настройки",
+  "profileSectionProfile": "ПРОФИЛЬ",
+  "profileChangeNameTitle": "Изменить имя",
+  "profileEnterYourName": "Введите ваше имя",
+  "profileSave": "Сохранить",
+  "profileReauthTitle": "Требуется повторная аутентификация",
+  "profileReauthContent": "Это конфиденциальная операция. Пожалуйста, войдите в аккаунт еще раз, прежде чем продолжить.",
+  "profileReauthButton": "Войти и удалить",
+  "profileReauthPasswordDialogTitle": "Подтвердите действие",
+  "profileReauthPasswordDialogContent": "Чтобы удалить аккаунт, пожалуйста, введите ваш текущий пароль.",
+  "profilePasswordCannotBeEmpty": "Пароль не может быть пустым",
+  "profileChangePasswordSuccess": "Мастер-пароль успешно изменен!",
+  "profileChangePasswordErrorIncorrect": "Введенный текущий пароль неверен.",
+  "profileOldPasswordHint": "Старый пароль",
+  "profileNewPasswordHint": "Новый пароль",
+  "profileDeleteAccountConfirmContent": "Это действие необратимо. Весь ваш аккаунт, включая все воспоминания и настройки, будет удален навсегда. Чтобы продолжить, нажмите и удерживайте кнопку удаления в течение 5 секунд.",
+  "profileChangePasswordCurrentPasswordHint": "Текущий мастер-пароль",
+  "profileChangePasswordNewPasswordHint": "Новый мастер-пароль",
+  "profileChangePasswordInfo": "Пожалуйста, введите ваш текущий мастер-пароль, чтобы установить новый. Это перешифрует ваш секретный ключ.",
+  "profileCancel": "Отмена",
+  "profileName": "Имя",
+  "profileEmail": "Электронная почта",
+  "profileCountry": "Страна",
+  "profileCountryNotSelected": "Не выбрана",
+  "profileLanguage": "Язык контента",
+  "profileLanguageDefault": "Английский (по умолчанию)",
+  "profileSelectLanguage": "Выберите язык",
+  "profileSectionSettings": "НАСТРОЙКИ",
+  "profileTheme": "Тема",
+  "profileThemeSystem": "Системная",
+  "profileThemeLight": "Светлая",
+  "profileThemeDark": "Темная",
+  "profileGraphics": "Качество графики",
+  "profileGraphicsAuto": "Автоматически",
+  "profileGraphicsLow": "Низкое",
+  "profileGraphicsMedium": "Среднее",
+  "profileGraphicsHigh": "Высокое",
+  "profileReminders": "Напоминания о рефлексии",
+  "profileRemindersSubtitle": "Получайте уведомления о ваших планах действий",
+  "profileSectionSecurity": "БЕЗОПАСНОСТЬ",
+  "profileChangePassword": "Изменить мастер-пароль",
+  "profileEncryptionActive": "Сквозное шифрование активно",
+  "profileEnableEncryption": "Включить сквозное шифрование",
+  "profileEnableEncryptionSubtitle": "Защитите свои личные воспоминания мастер-паролем.",
+  "profileCreateMasterPassword": "Создать мастер-пароль",
+  "profileMasterPasswordInfo": "Этот пароль защитит ваши воспоминания. Его невозможно восстановить, если вы его забудете. Пожалуйста, храните его в безопасном месте.",
+  "profileMasterPasswordHint": "Мастер-пароль",
+  "profileConfirmPasswordHint": "Подтвердите пароль",
+  "profilePasswordMinLength": "Пароль должен содержать не менее 8 символов",
+  "profilePasswordsDoNotMatch": "Пароли не совпадают",
+  "profileEnable": "Включить",
+  "profileSectionHelp": "ПОМОЩЬ",
+  "profileReplayTutorial": "Повторить обучение",
+  "profileReplayTutorialConfirmTitle": "Повторить обучение?",
+  "profileReplayTutorialConfirmContent": "Вы уверены, что хотите перезапустить обучение?",
+  "profileRestart": "Перезапустить",
+  "profileSectionAccount": "УПРАВЛЕНИЕ АККАУНТОМ",
+  "profileSignOut": "Выйти",
+  "profileDeleteAccount": "Удалить аккаунт",
+  "profileDeleteAccountConfirmTitle": "Удалить аккаунт?",
+  "profileDelete": "Удалить",
+  "profileDeletingAccount": "Удаление вашего аккаунта...",
+  "profileErrorCouldNotFindProfile": "Не удалось найти профиль пользователя.",
+  "memoryEditNewTitle": "Новое воспоминание",
+  "memoryEditEditTitle": "Редактировать воспоминание",
+  "memoryEditSave": "Сохранить",
+  "memoryEditTitleHint": "Название",
+  "memoryEditTitleValidator": "Пожалуйста, введите название",
+  "memoryEditDescriptionHint": "Описание",
+  "memoryEditDateLabel": "Дата:",
+  "memoryEditSelectDateButton": "Выбрать дату",
+  "memoryEditAmbientSoundLabel": "Фоновый звук:",
+  "memoryEditAmbientSoundDropdownHint": "Выберите фоновый звук",
+  "memoryEditMusicAnchorLabel": "Музыкальный якорь:",
+  "memoryEditAttachTrackButton": "Прикрепить трек из Spotify",
+  "memoryEditPhotosLabel": "Фотографии:",
+  "memoryEditNoPhotosSelected": "Фото не выбраны",
+  "memoryEditAddPhotosButton": "Добавить фото",
+  "memoryEditVideosLabel": "Видео:",
+  "memoryEditNoVideosSelected": "Видео не выбраны",
+  "memoryEditAddVideoButton": "Добавить видео",
+  "memoryEditAudioNoteLabel": "Аудиозаметка:",
+  "memoryEditAudioNoteSaved": "Аудиозаметка сохранена",
+  "memoryEditRecordButton": "Запись",
+  "memoryEditStopRecordingButton": "Остановить запись",
+  "memoryEditRecordingIndicator": "Запись...",
+  "memoryEditReflectionSectionTitle": "Рефлексия",
+  "memoryEditEncryptLabel": "Зашифровать",
+  "memoryEditEncryptionInfoTooltip": "Что такое шифрование?",
+  "memoryEditImpactPrompt": "Как это событие повлияло на меня?",
+  "memoryEditLessonPrompt": "Какой урок я извлек(ла)?",
+  "memoryEditEmotionsLabel": "Эмоции:",
+  "emotionJoy": "Радость",
+  "emotionNostalgia": "Ностальгия",
+  "emotionPride": "Гордость",
+  "emotionSadness": "Грусть",
+  "emotionGratitude": "Благодарность",
+  "emotionLove": "Любовь",
+  "emotionFear": "Страх",
+  "emotionAnger": "Злость",
+  "memoryEditCbtHelperTitle": "Помощник по рефлексии",
+  "memoryEditCbtStep1Title": "Какой была первая мысль или убеждение?",
+  "memoryEditCbtStep1Subtitle": "например, 'У меня ничего не получится' или 'Я все сделал(а) правильно'.",
+  "memoryEditCbtStep2Title": "Что подтверждает эту мысль?",
+  "memoryEditCbtStep2Subtitle": "Какие факты или события доказывают, что эта мысль верна?",
+  "memoryEditCbtStep3Title": "Каков взгляд с другой стороны?",
+  "memoryEditCbtStep3Subtitle": "Какие факты или события могут опровергнуть или оспорить первую мысль?",
+  "memoryEditCbtStep4Title": "Как я могу посмотреть на это иначе?",
+  "memoryEditCbtStep4Subtitle": "Основываясь на вышесказанном, сформулируйте новую, более сбалансированную точку зрения.",
+  "memoryEditActionPlanTitle": "План действий",
+  "memoryEditActionPrompt": "Какой один маленький шаг я могу предпринять?",
+  "memoryEditReminderLabel": "Напоминание:",
+  "memoryEditReminderNotSet": "Не установлено",
+  "memoryEditSetReminderButton": "Установить дату",
+  "memoryEditYourThoughtsHint": "Ваши мысли здесь...",
+  "memoryEditDraftSavedMessage": "Черновик сохранен",
+  "memoryEditErrorRepoUnavailable": "Ошибка: Хранилище недоступно.",
+  "memoryEditErrorSaving": "Ошибка сохранения воспоминания: {error}",
+  "@memoryEditErrorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryEditUnlockDialogTitle": "Разблокировать для сохранения",
+  "memoryEditUnlockDialogContent": "Пожалуйста, введите ваш мастер-пароль, чтобы сохранить это зашифрованное воспоминание.",
+  "memoryEditMasterPasswordHint": "Мастер-пароль",
+  "memoryEditUnlockButton": "Разблокировать",
+  "memoryEditEncryptionInfoDialogTitle": "Сквозное шифрование",
+  "memoryEditEncryptionInfoDialogContent": "Когда вы шифруете воспоминание, его описание и поля рефлексии кодируются с помощью ключа, полученного из вашего мастер-пароля.\n\nДанные хранятся в облаке в нечитаемом формате и могут быть расшифрованы только на ваших устройствах с помощью вашего пароля.\n\nВАЖНО: Мы не можем восстановить ваш мастер-пароль. Если вы его забудете, ваши зашифрованные данные будут утеряны навсегда.",
+  "memoryEditOkButton": "OK",
+  "memoryEditPermissionDeniedSnackbar": "Разрешение на {permissionName} было отклонено. Пожалуйста, включите его в настройках.",
+  "@memoryEditPermissionDeniedSnackbar": {
+    "placeholders": {
+      "permissionName": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryEditSettingsButton": "Настройки",
+  "memoryEditNoInternetSnackbar": "Для поиска музыки требуется подключение к Интернету.",
+  "memoryEditEmotionIntensityDialogTitle": "Интенсивность для '{emotion}'",
+  "@memoryEditEmotionIntensityDialogTitle": {
+    "placeholders": {
+      "emotion": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewBackTooltip": "Назад",
+  "memoryViewShareTooltip": "Поделиться",
+  "memoryViewEditTooltip": "Редактировать",
+  "memoryViewDeleteTooltip": "Удалить",
+  "memoryViewTabMemory": "Воспоминание",
+  "memoryViewTabInTheWorld": "В мире",
+  "memoryViewEncryptedTitle": "Зашифрованное воспоминание",
+  "memoryViewReflectionTitle": "Рефлексия",
+  "memoryViewReflectionImpact": "Влияние",
+  "memoryViewReflectionLesson": "Извлеченный урок",
+  "memoryViewCbtStep1Title": "Первая мысль или убеждение",
+  "memoryViewCbtStep2Title": "Доказательства в пользу этой мысли",
+  "memoryViewCbtStep3Title": "Доказательства против этой мысли",
+  "memoryViewCbtStep4Title": "Новый, сбалансированный взгляд (переосмысление)",
+  "memoryViewActionReminder": "Напоминание: {date}",
+  "@memoryViewActionReminder": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewMarkIncompleteTooltip": "Отметить как невыполненное",
+  "memoryViewMarkCompleteTooltip": "Отметить как выполненное",
+  "memoryViewUnlockDialogTitle": "Разблокировать воспоминание",
+  "memoryViewUnlockDialogContent": "Введите ваш мастер-пароль для просмотра этого контента.",
+  "memoryViewIncorrectPassword": "Неверный пароль.",
+  "memoryViewUnlockButton": "Разблокировать",
+  "memoryViewErrorCouldNotLoadProfile": "Не удалось загрузить ваш профиль для получения исторических данных.",
+  "memoryViewErrorCouldNotLoadHistoricalData": "Не удалось загрузить исторические данные за этот день.",
+  "memoryViewNoHistoricalData": "Нет доступных исторических данных за этот день.",
+  "memoryViewErrorCouldNotLoadTrack": "Не удалось загрузить трек",
+  "memoryViewTabNews": "Новости",
+  "memoryViewTabMusic": "Музыка",
+  "memoryViewNoDataForDay": "Нет данных за этот день.",
+  "memoryViewNoNewsForDay": "Нет исторических новостей за этот день.",
+  "memoryViewNewsSource": "Источник: {source}",
+  "@memoryViewNewsSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewConfirmDeleteTitle": "Подтвердите удаление",
+  "memoryViewConfirmDeleteContent": "Это действие необратимо. Чтобы продолжить, нажмите и удерживайте кнопку удаления в течение 5 секунд.",
+  "memoryViewDeleteButton": "УДАЛИТЬ",
+  "memoryViewErrorLoadingProfile": "Не удалось загрузить ваш профиль. Пожалуйста, проверьте соединение и попробуйте снова.",
+  "memoryViewErrorLocalDb": "Ошибка: не удалось получить доступ к локальной базе данных.",
+  "memoryViewMemoryDeleted": "Воспоминание удалено",
+  "memoryViewSharingNotImplemented": "Функция «Поделиться» еще не реализована.",
+  "memoryViewActionCompleted": "Действие отмечено как выполненное!",
+  "memoryViewActionIncomplete": "Действие отмечено как невыполненное.",
+  "memoryViewErrorUpdatingAction": "Ошибка обновления действия: {error}",
+  "@memoryViewErrorUpdatingAction": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewContentEncrypted": "Содержимое зашифровано",
+  "memoryViewReflectionEncrypted": "Рефлексия зашифрована",
+  "memoryViewMediaEncrypted": "Медиа зашифрованы",
+  "memoryViewAmbientSound": "Фоновый звук: {sound}",
+  "@memoryViewAmbientSound": {
+    "placeholders": {
+      "sound": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewAudioNote": "Аудиозаметка",
+  "spotifySearchTitle": "Найти трек в Spotify",
+  "spotifySearchHint": "Название песни или исполнитель",
+  "documentErrorLoading": "Не удалось загрузить документ.",
+  "lifelineMemoriesCount": "Воспоминаний: {count}",
+  "@lifelineMemoriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelinePeriodRange": "Период: {startYear} - {endYear}",
+  "@lifelinePeriodRange": {
+    "placeholders": {
+      "startYear": {
+        "type": "int"
+      },
+      "endYear": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineSyncStatus": "{status} (осталось {jobs})",
+  "@lifelineSyncStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      },
+      "jobs": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineCalculating": "Вычисление...",
+  "lifelineScaleValue": "Масштаб: {scale}%",
+  "@lifelineScaleValue": {
+    "placeholders": {
+      "scale": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineFpsValue": "FPS: {fps}",
+  "@lifelineFpsValue": {
+    "placeholders": {
+      "fps": {
+        "type": "String"
+      }
+    }
+  },
+  "lifelineFramePaintValue": "Рендер кадра: {ms} мс",
+  "@lifelineFramePaintValue": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineShowFullTimelineTooltip": "Показать всю линию жизни",
+  "lifelineVisualSettingsTooltip": "Визуальные настройки",
+  "lifelineMenuProfile": "Профиль",
+  "lifelineMenuDebugOn": "Отладка вкл.",
+  "lifelineMenuDebugOff": "Отладка выкл.",
+  "lifelineMenuSignOut": "Выйти",
+  "lifelineSearchHint": "Поиск...",
+  "lifelineMemoriesListTitle": "Воспоминания",
+  "lifelineVisualSettingsDialogTitle": "Визуальные настройки",
+  "lifelineVisualSettingsSpeed": "Скорость",
+  "lifelineVisualSettingsAmplitude": "Амплитуда",
+  "lifelineVisualSettingsYearLine": "Положение линии года",
+  "lifelineVisualSettingsBranchDensity": "Плотность ветвей",
+  "lifelineVisualSettingsBranchIntensity": "Интенсивность ветвей",
+  "lifelineVisualSettingsAnimate": "Анимация",
+  "lifelineVisualSettingsDoneButton": "Готово",
+  "onboardingWelcomeTitle": "Добро пожаловать в Lifeline",
+  "onboardingWelcomeSubtitle": "Ваше личное путешествие, визуализированное. Давайте проведем небольшой тур, чтобы вы узнали, как начать.",
+  "onboardingSkipButton": "Пропустить",
+  "onboardingBeginTourButton": "Начать тур",
+  "onboardingGesturesTitle": "Навигация по линии жизни",
+  "onboardingGestureSwipe": "Свайп",
+  "onboardingGesturePinch": "Масштабирование",
+  "onboardingGesturesSubtitle": "Ваша линия жизни будет расти вместе с вами. Масштабируйте, чтобы увидеть общую картину. Проводите пальцем влево и вправо для навигации по времени.",
+  "onboardingContinueButton": "Продолжить",
+  "onboardingFinalTitle": "Все готово!",
+  "onboardingFinalSubtitle": "Ваше путешествие начинается сейчас. Начните запечатлевать важные моменты.",
+  "onboardingStartJourneyButton": "Начать мое путешествие",
+  "onboardingSkipTourButton": "Пропустить тур",
+  "onboardingLifelineIntroText": "Это ваша линия жизни. Каждое добавленное воспоминание создаст уникальный узел на этом пути, формируя красивую карту вашего жизненного пути.",
+  "onboardingLifelineIntroButton": "Далее",
+  "onboardingAddMemoryText": "Нажмите здесь, чтобы добавить новое воспоминание. Для каждого запечатленного момента на вашей линии жизни появится узел.",
+  "onboardingNavGesturesText": "Отлично! Теперь давайте научимся навигации по вашей временной шкале.",
+  "onboardingControlsPanelText": "Используйте эти элементы управления для управления просмотром. Вы можете центрировать линию жизни, настраивать визуальные эффекты и получать доступ к своему профилю.",
+  "onboardingControlsPanelButton": "Понятно",
+  "onboardingStatsCardText": "Эта карточка показывает сводку ваших воспоминаний. Нажмите на нее, чтобы открыть полный, доступный для поиска список всего вашего путешествия.",
+  "onboardingStatsCardButton": "Почти готово!",
+  "audioPlayerPreviousTooltip": "Предыдущий трек",
+  "audioPlayerPlayTooltip": "Воспроизвести",
+  "audioPlayerPauseTooltip": "Пауза",
+  "audioPlayerNextTooltip": "Следующий трек",
+  "memoryEditCbtStepLabel": "Шаг {step}: ",
+  "@memoryEditCbtStepLabel": {
+    "description": "Label for a step in the CBT reflection helper",
+    "placeholders": {
+      "step": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "premiumBannerTitle": "Разблокируйте Lifeline Premium",
+  "premiumBannerSubtitle": "Безлимитные медиа, продвинутая рефлексия, исторический контекст и многое другое!",
+  "premiumDialogTitle": "Перейдите на Premium",
+  "premiumDialogContent": "Разблокируйте возможность {feature} и получите доступ ко всем премиум-функциям.",
+  "@premiumDialogContent": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumDialogGoPremium": "Перейти на Premium",
+  "premiumFeaturePhotos": "добавлять больше фото",
+  "premiumFeatureVideos": "добавлять видео",
+  "premiumFeatureAudio": "добавлять аудиозаметки",
+  "premiumFeatureSpotify": "добавлять треки из Spotify",
+  "premiumScreenTitle": "Lifeline Premium",
+  "premiumScreenHeaderTitle": "Раскройте свой полный потенциал",
+  "premiumScreenHeaderSubtitle": "Преодолейте границы с Lifeline Premium и извлеките максимум из своего путешествия к самопознанию.",
+  "premiumFeatureUnlimitedPhotos": "Безлимитные фото и видео",
+  "premiumFeatureUnlimitedAudio": "Безлимитные аудиозаметки",
+  "premiumFeatureUnlimitedSpotify": "Безлимитные треки из Spotify",
+  "premiumFeatureAdvancedCbt": "Продвинутый помощник по рефлексии",
+  "premiumFeatureActionReminders": "Напоминания о планах действий",
+  "premiumFeatureHistoricalContext": "Исторический контекст 'В мире'",
+  "premiumFeatureSoundLibrary": "Полная библиотека фоновых звуков",
+  "premiumScreenYearlyPopular": "Самый популярный и выгодный",
+  "premiumScreenRestore": "Восстановить покупки",
+  "premiumScreenTerms": "Условия обслуживания",
+  "premiumScreenPrivacy": "Политика конфиденциальности",
+  "premiumStatusTitle": "Премиум-пользователь",
+  "premiumStatusExpiresOn": "Истекает {date}",
+  "@premiumStatusExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingEncryptionTitle": "Ваши воспоминания, защищены",
+  "onboardingEncryptionSubtitle": "Lifeline предлагает сквозное шифрование. Это означает, что только вы можете читать ваши личные воспоминания. Давайте настроим ваш Мастер-пароль, чтобы защитить их.",
+  "onboardingEncryptionSetupButton": "Настроить сейчас",
+  "onboardingEncryptionLaterButton": "Может быть, позже",
+  "onboardingEncryptionActiveTitle": "Шифрование активно",
+  "onboardingEncryptionActiveSubtitle": "Ваши воспоминания уже защищены. Вы можете управлять своим мастер-паролем в настройках профиля.",
+  "onboardingEncryptionContinueButton": "Продолжить",
+  "memoryEditEncryptMemory": "Зашифровать это воспоминание",
+  "memoryEditSetupEncryptionTitle": "Включить шифрование?",
+  "memoryEditSetupEncryptionContent": "Чтобы защитить это воспоминание, вам сначала нужно создать Мастер-пароль. Это будет ваш единственный ключ ко всем зашифрованным записям.",
+  "memoryEditCreatePasswordButton": "Создать Мастер-пароль",
+  "memoryViewExportPdf": "Поделиться как PDF"
+}

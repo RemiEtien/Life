@@ -1,0 +1,117 @@
+name: lifeline
+description: Lifeline MVP
+publish_to: "none"
+version: 1.0.18+21
+
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # --- FIREBASE & AUTH ---
+  firebase_core: ^3.1.1
+  firebase_auth: ^5.1.1
+  cloud_firestore: ^5.0.2
+  firebase_storage: ^12.1.1
+  firebase_crashlytics: ^4.0.2
+  firebase_analytics: ^11.1.1
+  firebase_app_check: ^0.3.0+2
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.1
+  cloud_functions: ^5.0.1
+
+  # --- LOCAL DATABASE ---
+  isar: 3.1.0+1
+  isar_flutter_libs: 3.1.0+1
+  path_provider: ^2.1.4
+
+  # --- MEDIA & UTILS ---
+  image_picker: ^1.1.2
+  audioplayers: ^5.2.1
+  record: ^4.4.4
+  video_player: ^2.8.3
+  flutter_local_notifications: ^17.2.1
+  timezone: ^0.9.4
+  
+  # --- API & NETWORKING ---
+  spotify: ^0.13.7
+  http: ^1.2.1
+  
+  # --- UI & HELPERS ---
+  intl: ^0.20.2
+  google_fonts: ^6.2.1
+  url_launcher: ^6.3.0
+  device_info_plus: ^10.1.0
+  collection: ^1.17.0
+  country_picker: ^2.0.20
+  path: ^1.8.3
+  provider: ^6.0.0  
+  html: ^0.15.4
+  flutter_dotenv: ^5.1.0
+  flutter_riverpod: ^2.5.1
+  shared_preferences: ^2.2.2
+  flutter_markdown: ^0.6.18
+  encrypt: ^5.0.3
+  flutter_secure_storage: ^9.0.0
+  pointycastle: ^3.7.4
+  uuid: ^4.3.3
+  connectivity_plus: ^5.0.2
+  in_app_purchase: ^3.1.13
+
+  # --- НОВЫЕ ЗАВИСИМОСТИ ---
+  permission_handler: ^11.3.1       # Для запроса разрешений
+  cached_network_image: ^3.3.1     # Для кэширования изображений
+  flutter_cache_manager: ^3.3.1
+  
+  # --- НОВЫЕ ЗАВИСИМОСТИ ДЛЯ ЭКСПОРТА ---
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  qr_flutter: ^4.1.0
+  share_plus: ^9.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.11
+  isar_generator: 3.1.0+1
+  mockito: ^5.4.4
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+
+flutter:
+  generate: true # This line enables the l10n code generator
+
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/logo.png
+    - assets/google_logo.png
+    - assets/apple_logo.png
+    - assets/fonts/
+    - assets/sounds/
+    - assets/music/
+    - assets/legal/
+
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron-Regular.ttf
+        - asset: assets/fonts/Orbitron-Bold.ttf
+          weight: 700
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+
