@@ -29,9 +29,13 @@ class DocumentScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              return Markdown(
-                data: snapshot.data!,
+              // ИСПРАВЛЕНИЕ: У виджета Markdown убран параметр padding.
+              // Вместо этого, он обернут в стандартный виджет Padding.
+              return Padding(
                 padding: const EdgeInsets.all(16.0),
+                child: Markdown(
+                  data: snapshot.data!,
+                ),
               );
             }
             return Center(child: Text(l10n.documentErrorLoading));
@@ -42,3 +46,4 @@ class DocumentScreen extends StatelessWidget {
     );
   }
 }
+

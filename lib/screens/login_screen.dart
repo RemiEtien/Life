@@ -34,16 +34,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           await authService.signInWithEmailAndPassword(
             _emailController.text.trim(),
             _passwordController.text.trim(),
-            context, // Передаем контекст
+            context,
           );
         } else {
           await authService.createUserWithEmailAndPassword(
             _emailController.text.trim(),
             _passwordController.text.trim(),
-            context, // Передаем контекст
+            context,
           );
         }
+        // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует после асинхронной операции
+        if (!mounted) return;
       } on FirebaseAuthException catch (e) {
+        // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
+        if (!mounted) return;
         setState(() {
           _errorMessage = e.message ?? "An unknown error occurred";
         });
@@ -61,7 +65,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _errorMessage = null;
     });
     try {
-      await ref.read(authServiceProvider).signInWithGoogle(context); // Передаем контекст
+      final authService = ref.read(authServiceProvider);
+      await authService.signInWithGoogle(context);
+      // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
+      if (!mounted) return;
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -81,7 +88,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _errorMessage = null;
     });
     try {
-      await ref.read(authServiceProvider).signInWithApple(context); // Передаем контекст
+      final authService = ref.read(authServiceProvider);
+      await authService.signInWithApple(context);
+      // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
+      if (!mounted) return;
     } catch (e) {
       if (mounted) {
         setState(() {

@@ -73,7 +73,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   bool _isEncrypted = false;
   late DateTime? _followUpDate;
 
-  final _audioRecorder = Record();
+  // ИСПРАВЛЕНО: Используем AudioRecorder вместо Record
+  final _audioRecorder = AudioRecorder();
   bool _isRecording = false;
   bool _isSaving = false;
 
@@ -206,6 +207,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     _evidenceAgainstCtrl.dispose();
     _reframeCtrl.dispose();
     _actionCtrl.dispose();
+    // ИСПРАВЛЕНО: API пакета record изменился
     _audioRecorder.dispose();
     super.dispose();
   }
@@ -229,7 +231,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     if (pickedFiles.isNotEmpty) {
       if (!isPremium && (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
-        await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+        if (context.mounted) {
+          await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+        }
         return;
       }
       setState(() {
@@ -243,7 +247,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium && _videoItems.length >= _freeVideoLimit) {
-      await showPremiumDialog(context, l10n.premiumFeatureVideos);
+      if (context.mounted) {
+        await showPremiumDialog(context, l10n.premiumFeatureVideos);
+      }
       return;
     }
 
@@ -265,7 +271,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium && _audioNoteItems.length >= _freeAudioLimit) {
-      await showPremiumDialog(context, l10n.premiumFeatureAudio);
+       if (context.mounted) {
+        await showPremiumDialog(context, l10n.premiumFeatureAudio);
+       }
       return;
     }
 
@@ -273,6 +281,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     if (status.isGranted) {
       await ref.read(audioPlayerProvider.notifier).pauseGlobalPlayer();
       if (_isRecording) {
+        // ИСПРАВЛЕНО: API пакета record изменился
         final path = await _audioRecorder.stop();
         if (path != null) {
           setState(() { 
@@ -284,7 +293,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       } else {
         final dir = await getTemporaryDirectory();
         final path = '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
-        await _audioRecorder.start(path: path, encoder: AudioEncoder.aacLc);
+        // ИСПРАВЛЕНО: API пакета record изменился
+        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.aacLc), path: path);
         setState(() => _isRecording = true);
       }
     } else if (status.isPermanentlyDenied) {
@@ -312,7 +322,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium) {
-      await showPremiumDialog(context, l10n.premiumFeatureActionReminders);
+      if (context.mounted) {
+        await showPremiumDialog(context, l10n.premiumFeatureActionReminders);
+      }
       return;
     }
 
@@ -331,12 +343,15 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium && _spotifyTrackIds.length >= _freeSpotifyLimit) {
-      await showPremiumDialog(context, l10n.premiumFeatureSpotify);
+      if (context.mounted) {
+        await showPremiumDialog(context, l10n.premiumFeatureSpotify);
+      }
       return;
     }
 
     final connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
+    // ИСПРАВЛЕНО: Проверяем, что в списке результатов нет активного соединения
+    if (connectivityResult.contains(ConnectivityResult.none) && !connectivityResult.contains(ConnectivityResult.wifi) && !connectivityResult.contains(ConnectivityResult.mobile)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.memoryEditNoInternetSnackbar)),
@@ -627,7 +642,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Widget _buildEncryptionControl(AppLocalizations l10n, bool isEncryptionGloballyEnabled) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withAlpha((255 * 0.05).round()),
         borderRadius: BorderRadius.circular(8),
       ),
       child: SwitchListTile(
@@ -829,7 +844,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
             )
           ),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+          Text(subtitle, style: TextStyle(color: Colors.white.withAlpha((255 * 0.6).round()), fontSize: 12)),
           const SizedBox(height: 12),
           _AutosavingTextField(
             controller: controller, 
@@ -845,12 +860,12 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   
   Widget _buildMediaGrid(AppLocalizations l10n) {
     if (_mediaItems.isEmpty) {
-      return Text(l10n.memoryEditNoPhotosSelected, style: TextStyle(color: Colors.white.withOpacity(0.6)));
+      return Text(l10n.memoryEditNoPhotosSelected, style: TextStyle(color: Colors.white.withAlpha((255 * 0.6).round())));
     }
     return Container(
       height: 100,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withAlpha((255 * 0.05).round()),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ReorderableListView.builder(
@@ -912,7 +927,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
   Widget _buildVideoGrid(AppLocalizations l10n) { 
     if (_videoItems.isEmpty) { 
-      return Text(l10n.memoryEditNoVideosSelected, style: TextStyle(color: Colors.white.withOpacity(0.6))); 
+      return Text(l10n.memoryEditNoVideosSelected, style: TextStyle(color: Colors.white.withAlpha((255 * 0.6).round()))); 
     } 
     return GridView.builder(
       shrinkWrap: true, 
@@ -938,7 +953,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4), 
+                  color: Colors.black.withAlpha((255 * 0.4).round()), 
                   borderRadius: BorderRadius.circular(8)
                 ), 
                 child: const Icon(Icons.play_circle_fill, color: Colors.white, size: 36)

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,12 +16,65 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService {
   final Ref _ref;
+  bool _isInitialized = false;
+  GoogleSignInAccount? _currentUser;
+  Completer<GoogleSignInAccount?>? _signInCompleter;
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _authEventSubscription;
+  
   AuthService(this._ref);
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  
   UserService get _userService => _ref.read(userServiceProvider);
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+
+  // ИСПРАВЛЕНО: Правильная инициализация для v7.2.0 с ожиданием событий
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (!_isInitialized) {
+      try {
+        await GoogleSignIn.instance.initialize();
+        
+        // ИСПРАВЛЕНО: Подписываемся на события и правильно обрабатываем состояние
+        _authEventSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
+          switch (event) {
+            case GoogleSignInAuthenticationEventSignIn():
+              _currentUser = event.user;
+              // Завершаем Completer если ждем результата
+              if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
+                _signInCompleter!.complete(event.user);
+              }
+              break;
+            case GoogleSignInAuthenticationEventSignOut():
+              _currentUser = null;
+              // Завершаем Completer если ждем результата выхода
+              if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
+                _signInCompleter!.complete(null);
+              }
+              break;
+          }
+        });
+        
+        // Обрабатываем ошибки отдельно
+        _authEventSubscription!.onError((error) {
+          if (kDebugMode) {
+            print('Google Sign-In error: $error');
+          }
+          // Завершаем Completer с ошибкой
+          if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
+            _signInCompleter!.completeError(error);
+          }
+        });
+        
+        _isInitialized = true;
+      } catch (e) {
+        if (kDebugMode) {
+          print('Failed to initialize Google Sign-In: $e');
+        }
+        throw Exception('Failed to initialize Google Sign-In: $e');
+      }
+    }
+  }
 
   Future<UserCredential> signInWithEmailAndPassword(
       String email, String password, BuildContext context) async {
@@ -29,7 +83,10 @@ class AuthService {
         email: email,
         password: password,
       );
-      await _userService.ensureUserProfileExists(userCredential.user!, context);
+      if (context.mounted) {
+        await _userService.ensureUserProfileExists(
+            userCredential.user!, context);
+      }
       return userCredential;
     } on FirebaseAuthException {
       rethrow;
@@ -46,7 +103,9 @@ class AuthService {
       );
 
       await userCredential.user?.sendEmailVerification();
-      await _userService.createUserProfile(userCredential.user!, context);
+      if (context.mounted) {
+        await _userService.createUserProfile(userCredential.user!, context);
+      }
       return userCredential;
     } on FirebaseAuthException {
       rethrow;
@@ -54,46 +113,103 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    // ИСПРАВЛЕНИЕ: Заменяем disconnect() на signOut() для более мягкого выхода.
-    // Это предотвращает требование повторного запроса разрешений.
-    if (await GoogleSignIn().isSignedIn()) {
-      try {
-        await GoogleSignIn().signOut();
-      } catch (e, stackTrace) {
-        FirebaseCrashlytics.instance.recordError(e, stackTrace,
-            reason: 'Google Sign-Out failed during general sign-out');
-        if (kDebugMode) {
-          print("Error during Google Sign-Out: $e");
-        }
-      }
+    // ОПТИМИЗИРОВАНО: Максимально быстрый выход без лишних операций
+    
+    // Очищаем состояние Google Sign-In синхронно
+    _currentUser = null;
+    if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
+      _signInCompleter!.complete(null);
+      _signInCompleter = null;
     }
-
-    await _firebaseAuth.signOut();
-    await IsarService.close();
+    
+    // Запускаем операции параллельно для ускорения
+    final futures = <Future>[];
+    
+    // 1. Google Sign-Out (если нужен)
+    if (_isInitialized) {
+      futures.add(
+        GoogleSignIn.instance.signOut().catchError((e) {
+          // Игнорируем ошибки Google signOut - не критично
+          if (kDebugMode) print("Google signOut error (ignored): $e");
+        })
+      );
+    }
+    
+    // 2. Firebase Sign-Out (критично)
+    futures.add(_firebaseAuth.signOut());
+    
+    // 3. Isar close (может быть медленным, делаем неблокирующим)
+    unawaited(IsarService.close().catchError((e) {
+      if (kDebugMode) print("IsarService close error (ignored): $e");
+    }));
+    
+    // Ждем только критичные операции (Google + Firebase)
+    try {
+      await Future.wait(futures, eagerError: false);
+    } catch (e) {
+      // Даже если что-то пошло не так, продолжаем
+      if (kDebugMode) print("SignOut error (continuing): $e");
+    }
   }
 
   Future<UserCredential?> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        return null;
+      await _ensureGoogleSignInInitialized();
+      
+      // ИСПРАВЛЕНО: Создаем Completer для ожидания результата аутентификации
+      _signInCompleter = Completer<GoogleSignInAccount?>();
+      
+      // Запускаем аутентификацию
+      if (GoogleSignIn.instance.supportsAuthenticate()) {
+        await GoogleSignIn.instance.authenticate();
+      } else {
+        throw UnsupportedError('Google Sign-In authentication not supported on this platform');
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      // ИСПРАВЛЕНО: Ждем событие аутентификации с таймаутом
+      final GoogleSignInAccount? googleUser = await _signInCompleter!.future.timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          if (kDebugMode) {
+            print("Google Sign-In timeout");
+          }
+          return null;
+        },
+      );
+      
+      _signInCompleter = null;
+      
+      if (googleUser == null) {
+        return null; // Пользователь отменил вход или таймаут
+      }
 
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+      // ИСПРАВЛЕНО: Получаем токены через новый API authorizationClient
+      const scopes = ['email', 'profile', 'openid'];
+      
+      // Пробуем получить существующую авторизацию
+      var authorization = await googleUser.authorizationClient
+          .authorizationForScopes(scopes);
+      
+      // Если нет существующей авторизации, запрашиваем новую
+      authorization ??= await googleUser.authorizationClient
+          .authorizeScopes(scopes);
+
+      // Создаем credential только с accessToken (idToken недоступен в v7.2.0)
+      final credential = GoogleAuthProvider.credential(
+        accessToken: authorization.accessToken,
       );
 
       final userCredential =
           await _firebaseAuth.signInWithCredential(credential);
 
-      await _userService.ensureUserProfileExists(userCredential.user!, context);
+      if (context.mounted) {
+        await _userService.ensureUserProfileExists(
+            userCredential.user!, context);
+      }
 
       return userCredential;
     } catch (e, stackTrace) {
+      _signInCompleter = null;
       if (kDebugMode) {
         print('Error during Google sign-in: $e');
       }
@@ -126,8 +242,10 @@ class AuthService {
 
       final userCredential =
           await _firebaseAuth.signInWithCredential(oAuthCredential);
-
-      await _userService.ensureUserProfileExists(userCredential.user!, context);
+      
+      if(context.mounted) {
+        await _userService.ensureUserProfileExists(userCredential.user!, context);
+      }
 
       return userCredential;
     } catch (e, stackTrace) {
@@ -154,22 +272,18 @@ class AuthService {
     try {
       await user.delete();
 
-      // --- ИСПРАВЛЕНИЕ: Принудительный выход из Google Sign-In ---
-      // Это необходимо, чтобы при следующем входе Google предложил выбор аккаунта,
-      // а не входил автоматически в только что удаленный.
-      if (await GoogleSignIn().isSignedIn()) {
+      // --- ИСПРАВЛЕНИЕ: Принудительный выход из Google Sign-In v7.x ---
+      await _ensureGoogleSignInInitialized();
+      if (_currentUser != null) {
         try {
-          await GoogleSignIn().signOut();
+          await GoogleSignIn.instance.signOut();
         } catch (e, stackTrace) {
           FirebaseCrashlytics.instance.recordError(e, stackTrace,
               reason: 'Google Sign-Out failed after account deletion');
         }
       }
-      // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
-
 
       // --- NEW: Clean up local data after successful deletion ---
-      // Close any open database connection immediately.
       await IsarService.close();
 
       // Delete the local database file to prevent conflicts on re-registration.
@@ -181,7 +295,6 @@ class AuthService {
           print("[AuthService] Deleted local database file for user $uid.");
         }
       }
-      // --- END OF NEW CODE ---
 
       return 'success';
     } on FirebaseAuthException catch (e) {
@@ -208,7 +321,6 @@ class AuthService {
       password: password,
     );
     
-    // This will throw FirebaseAuthException on failure (e.g. wrong password)
     await user.reauthenticateWithCredential(credential);
   }
 
@@ -217,13 +329,36 @@ class AuthService {
     final user = _firebaseAuth.currentUser;
     if (user == null) throw Exception('No user to reauthenticate.');
 
-    final googleUser = await GoogleSignIn().signIn();
+    await _ensureGoogleSignInInitialized();
+    
+    // ИСПРАВЛЕНО: Используем тот же механизм ожидания событий
+    _signInCompleter = Completer<GoogleSignInAccount?>();
+    
+    if (GoogleSignIn.instance.supportsAuthenticate()) {
+      await GoogleSignIn.instance.authenticate();
+    } else {
+      throw UnsupportedError('Google authentication not supported');
+    }
+
+    final GoogleSignInAccount? googleUser = await _signInCompleter!.future.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => throw Exception('Google reauthentication timeout'),
+    );
+    
+    _signInCompleter = null;
+    
     if (googleUser == null) throw Exception('User cancelled sign in.');
 
-    final googleAuth = await googleUser.authentication;
+    // Получаем токены
+    const scopes = ['email', 'profile', 'openid'];
+    var authorization = await googleUser.authorizationClient
+        .authorizationForScopes(scopes);
+    
+    authorization ??= await googleUser.authorizationClient
+        .authorizeScopes(scopes);
+
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+      accessToken: authorization.accessToken,
     );
     await user.reauthenticateWithCredential(credential);
   }
@@ -242,5 +377,12 @@ class AuthService {
     );
     await user.reauthenticateWithCredential(credential);
   }
-}
 
+  // ВАЖНО: Освобождаем ресурсы при уничтожении сервиса
+  void dispose() {
+    _authEventSubscription?.cancel();
+    if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
+      _signInCompleter!.complete(null);
+    }
+  }
+}

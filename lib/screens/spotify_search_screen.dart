@@ -24,16 +24,18 @@ class _SpotifySearchScreenState extends ConsumerState<SpotifySearchScreen> {
       _isLoading = true;
     });
 
-    final results = await ref
-        .read(spotifyServiceProvider)
+    // ИСПРАВЛЕНИЕ: Сначала получаем сервис, потом выполняем асинхронный вызов
+    final spotifyService = ref.read(spotifyServiceProvider);
+    final results = await spotifyService
         .searchTracks(_searchController.text.trim());
 
-    if (mounted) {
-      setState(() {
-        _searchResults = results;
-        _isLoading = false;
-      });
-    }
+    // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует после асинхронной операции
+    if (!mounted) return;
+
+    setState(() {
+      _searchResults = results;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -67,7 +69,6 @@ class _SpotifySearchScreenState extends ConsumerState<SpotifySearchScreen> {
                     itemBuilder: (context, index) {
                       final track = _searchResults[index];
                       return ListTile(
-                        // ИЗМЕНЕНО: Используем CachedNetworkImage
                         leading: track.albumArtUrl != null
                             ? CachedNetworkImage(
                                 imageUrl: track.albumArtUrl!,

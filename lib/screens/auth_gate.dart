@@ -28,8 +28,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   void initState() {
     super.initState();
+    FirebaseCrashlytics.instance.log('AuthGate: initState');
     _notificationSubscription = onNotificationTap.stream.listen((payload) {
-      // Add mounted check before handling tap
       if (mounted) {
         _handleNotificationTap(payload);
       }
@@ -37,23 +37,26 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _checkForDrafts();
+        final l10n = AppLocalizations.of(context);
+        if (l10n != null) {
+          _checkForDrafts(l10n);
+        }
       }
     });
   }
 
   @override
   void dispose() {
+    FirebaseCrashlytics.instance.log('AuthGate: dispose');
     _notificationSubscription?.cancel();
     super.dispose();
   }
 
-  void _checkForDrafts() async {
-    // Check if the widget is still mounted before proceeding.
+  void _checkForDrafts(AppLocalizations l10n) async {
     if (!mounted) return;
+    FirebaseCrashlytics.instance.log('AuthGate: Checking for drafts.');
     final repo = ref.read(memoryRepositoryProvider);
 
-    // This delay can be risky, so another mounted check is good practice.
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) {
       FirebaseCrashlytics.instance
@@ -63,17 +66,16 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
     if (repo != null) {
       final draft = await repo.findDraft();
-      // Crucial check after the await call for findDraft.
       if (!mounted) {
         FirebaseCrashlytics.instance
             .log('AuthGate: Unmounted after finding draft in _checkForDrafts.');
         return;
       }
       if (draft != null) {
-        final l10n = AppLocalizations.of(context);
-        if (l10n != null) {
-          _showDraftDialog(draft, l10n);
-        }
+        FirebaseCrashlytics.instance.log('AuthGate: Found draft ${draft.id}. Showing dialog.');
+        _showDraftDialog(draft, l10n);
+      } else {
+         FirebaseCrashlytics.instance.log('AuthGate: No drafts found.');
       }
     }
   }
@@ -90,7 +92,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             child: Text(l10n.authGateDiscard,
                 style: const TextStyle(color: Colors.redAccent)),
             onPressed: () {
-              // It's safe to use ref here as it's not in an async gap.
+              FirebaseCrashlytics.instance.log('AuthGate: Discarding draft ${draft.id}.');
               ref.read(memoryRepositoryProvider)?.delete(draft.id);
               Navigator.of(context).pop();
             },
@@ -98,6 +100,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
           ElevatedButton(
             child: Text(l10n.authGateContinueEditing),
             onPressed: () {
+              FirebaseCrashlytics.instance.log('AuthGate: Continuing to edit draft ${draft.id}.');
               Navigator.of(context).pop();
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -113,20 +116,22 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   Future<void> _handleNotificationTap(String? payload) async {
+    FirebaseCrashlytics.instance.log('AuthGate: Handling notification tap with payload: $payload');
     if (!mounted || payload == null) return;
 
     final memoryId = int.tryParse(payload);
-
-    // Add another mounted check here for safety, though less critical.
+    
     if (!mounted) return;
 
     final memoryRepo = ref.read(memoryRepositoryProvider);
 
-    if (memoryId == null || memoryRepo == null) return;
+    if (memoryId == null || memoryRepo == null) {
+      FirebaseCrashlytics.instance.log('AuthGate: Invalid payload or repo not ready for notification.');
+      return;
+    }
 
     final memory = await memoryRepo.getById(memoryId);
 
-    // Crucial check after awaiting the memory from the repository.
     if (!mounted) {
       FirebaseCrashlytics.instance.log(
           'AuthGate: Unmounted after getting memory by ID in _handleNotificationTap.');
@@ -134,11 +139,14 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
 
     if (memory != null && navigatorKey.currentContext != null) {
+      FirebaseCrashlytics.instance.log('AuthGate: Navigating to MemoryViewScreen for memory ${memory.id}.');
       Navigator.of(navigatorKey.currentContext!).push(
         MaterialPageRoute(
             builder: (_) =>
                 MemoryViewScreen(memory: memory, userId: memoryRepo.userId)),
       );
+    } else {
+       FirebaseCrashlytics.instance.log('AuthGate: Memory with id $memoryId not found for notification.');
     }
   }
 
@@ -148,34 +156,49 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     final l10n = AppLocalizations.of(context)!;
 
     return authState.when(
-      loading: () => _LoadingScreen(message: l10n.authGateAuthenticating),
-      error: (error, stack) => _ErrorScreen(
-        l10n: l10n,
-        error: error.toString(),
-        onRetry: () => ref.refresh(authStateChangesProvider),
-      ),
+      loading: () {
+        FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.loading');
+        return _LoadingScreen(message: l10n.authGateAuthenticating);
+      },
+      error: (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, reason: 'AuthGate: authState.error');
+        return _ErrorScreen(
+          l10n: l10n,
+          error: error.toString(),
+          onRetry: () => ref.refresh(authStateChangesProvider),
+        );
+      },
       data: (user) {
         if (user == null) {
+          FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user is null). Navigating to LoginScreen.');
           return const LoginScreen();
         }
 
         final isEmailPasswordProvider =
             user.providerData.any((userInfo) => userInfo.providerId == 'password');
         if (isEmailPasswordProvider && !user.emailVerified) {
+          FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user not verified). Navigating to VerifyEmailScreen.');
           return const VerifyEmailScreen();
         }
 
+        FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user is authenticated). Watching memories...');
         final memoriesState = ref.watch(memoriesStreamProvider);
         return memoriesState.when(
-          loading: () =>
-              _LoadingScreen(message: l10n.authGateLoadingMemories),
-          error: (error, stack) => _ErrorScreen(
-            l10n: l10n,
-            error: error.toString(),
-            onRetry: () => ref.refresh(memoriesStreamProvider),
-          ),
+          loading: () {
+            FirebaseCrashlytics.instance.log('AuthGate: Build state is memoriesState.loading');
+            return _LoadingScreen(message: l10n.authGateLoadingMemories);
+          },
+          error: (error, stack) {
+             FirebaseCrashlytics.instance.recordError(error, stack, reason: 'AuthGate: memoriesState.error');
+            return _ErrorScreen(
+              l10n: l10n,
+              error: error.toString(),
+              onRetry: () => ref.refresh(memoriesStreamProvider),
+            );
+          },
           data: (memories) {
             if (memories.isEmpty) {
+              FirebaseCrashlytics.instance.log('AuthGate: Build state is memoriesState.data (memories are empty).');
               return Scaffold(
                 body: Stack(
                   children: [
@@ -185,7 +208,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                 ),
               );
             }
-
+            FirebaseCrashlytics.instance.log('AuthGate: Build state is memoriesState.data (showing ${memories.length} memories).');
             return Scaffold(
               body: SafeArea(
                 child: LifelineWidget(key: ValueKey(user.uid)),

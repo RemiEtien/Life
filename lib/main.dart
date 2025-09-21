@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // ИМПОРТ ДЛЯ SystemChrome
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,12 +23,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  // ИСПРАВЛЕНИЕ: Оборачиваем все приложение в runZonedGuarded для перехвата
-  // всех асинхронных ошибок, которые не были пойманы ранее.
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Load the saved locale before the app starts
+    // ИСПРАВЛЕНИЕ (Google Play / Android 15): Включаем режим "от края до края"
+    // и делаем иконки системных панелей видимыми на прозрачном фоне.
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      statusBarColor: Colors.transparent, // Это поле теперь игнорируется в edge-to-edge, но оставляем для совместимости
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+    ));
+
     final prefs = await SharedPreferences.getInstance();
     final savedLocaleCode = prefs.getString('appLocale');
     final initialLocale =
@@ -60,11 +68,7 @@ void main() async {
 
     await DevicePerformanceDetector.initialize();
 
-    // ИСПРАВЛЕНИЕ: Настраиваем разные обработчики ошибок для debug и release режимов.
-    // В debug режиме мы хотим видеть ошибки в консоли.
-    // В release режиме — отправлять их в Crashlytics.
     if (kIsWeb) {
-       // Для веба пока оставляем стандартное поведение
        FlutterError.onError = (details) {
          FlutterError.dumpErrorToConsole(details);
        };
@@ -89,7 +93,6 @@ void main() async {
 
     runApp(
       ProviderScope(
-        // Override the provider with the pre-loaded value
         overrides: [
           localeProvider
               .overrideWith((ref) => LocaleNotifier(ref, initialLocale)),
@@ -98,7 +101,6 @@ void main() async {
       ),
     );
   }, (error, stack) {
-    // Этот блок перехватит любые ошибки, не пойманные Flutter.
     if (!kDebugMode) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     } else {

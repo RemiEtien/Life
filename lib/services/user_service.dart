@@ -10,7 +10,6 @@ import 'package:lifeline/models/user_profile.dart';
 import 'package:path_provider/path_provider.dart';
 
 class UserService {
-  // ИСПРАВЛЕНИЕ: _ref не использовался и был удален.
   UserService(Ref ref);
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -26,7 +25,6 @@ class UserService {
       final doc = _usersCollection.doc(user.uid);
       final snapshot = await doc.get();
 
-      // Check if the context is still valid after the async operation.
       if (!context.mounted) return;
 
       if (!snapshot.exists) {
@@ -50,7 +48,6 @@ class UserService {
       }
       FirebaseCrashlytics.instance.setCustomKey('user_language_on_creation', currentLocale.languageCode);
 
-      // FIX: Safely access user.email with a fallback.
       final userEmail = user.email;
       if (userEmail == null) {
         FirebaseCrashlytics.instance.recordError(
@@ -59,7 +56,6 @@ class UserService {
           reason: "UserService:createUserProfile user.email is null",
           fatal: true,
         );
-        // Throw an exception to be caught by the UI layer.
         throw Exception("Email is required for registration.");
       }
 
@@ -136,6 +132,7 @@ class UserService {
   }
 
   Future<void> deleteUserAccountData(String uid) async {
+    FirebaseCrashlytics.instance.log('UserService: Deleting all data for user $uid.');
     try {
       final userFolderRef = _storage.ref('users/$uid');
       await _deleteFolderContents(userFolderRef);
@@ -165,6 +162,7 @@ class UserService {
       if (await dbFile.exists()) {
         await dbFile.delete();
       }
+      FirebaseCrashlytics.instance.log('UserService: Successfully deleted data for user $uid.');
     } catch(e, stackTrace) {
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: deleteUserAccountData failed');
        rethrow;

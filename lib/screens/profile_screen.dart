@@ -216,11 +216,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    FirebaseCrashlytics.instance.log('ProfileScreen: initState');
     _displayNameController = TextEditingController();
   }
 
   @override
   void dispose() {
+    FirebaseCrashlytics.instance.log('ProfileScreen: dispose');
     _displayNameController.dispose();
     super.dispose();
   }
@@ -335,54 +337,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!mounted) return;
     setState(() => _isDeleting = true);
 
-    // ИСПРАВЛЕНИЕ: Добавляем логирование в Crashlytics
-    FirebaseCrashlytics.instance.log('Starting account deletion process.');
+    FirebaseCrashlytics.instance.log('ProfileScreen: Starting account deletion process.');
 
     await ref.read(audioPlayerProvider.notifier).stopAndReset();
     final authService = ref.read(authServiceProvider);
     final result = await authService.deleteAccount();
 
-    // Этот `if` блок важен, так как виджет может быть уже удален
-    // после асинхронной операции `deleteAccount`.
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('ProfileScreen unmounted during deleteAccount.');
+      FirebaseCrashlytics.instance.log('ProfileScreen: Unmounted during deleteAccount.');
       return;
     }
 
     if (result == 'success') {
-      // УСПЕХ: Пользователь удален. AuthGate уже переключился на экран входа.
-      // Нам просто нужно убрать все экраны поверх него.
-      FirebaseCrashlytics.instance.log('Account deletion successful. Popping until first route.');
+      FirebaseCrashlytics.instance.log('ProfileScreen: Account deletion successful. Popping until first route.');
       Navigator.of(context).popUntil((route) => route.isFirst);
-      return; // Выходим из функции, чтобы не выполнять лишний код.
+      return;
     }
 
     if (result == 'requires-recent-login') {
-      FirebaseCrashlytics.instance.log('Account deletion requires re-authentication.');
+      FirebaseCrashlytics.instance.log('ProfileScreen: Account deletion requires re-authentication.');
       final user = FirebaseAuth.instance.currentUser;
       final providerId = user?.providerData.firstOrNull?.providerId;
       bool reauthSuccess = false;
+      
+      FirebaseCrashlytics.instance.log('ProfileScreen: Re-auth needed for provider: $providerId');
 
       try {
         if (providerId == 'password') {
-          // ИСПРАВЛЕНИЕ: Проверяем mounted после диалога
           final didReauth = await _showPasswordReauthDialog(l10n);
           if (!mounted) return;
           reauthSuccess = didReauth ?? false;
         } else {
-          // ИСПРАВЛЕНИЕ: Проверяем mounted после диалога
           final didReauth = await _showSocialReauthDialog(l10n, providerId);
           if (!mounted) return;
           reauthSuccess = didReauth ?? false;
         }
 
+        FirebaseCrashlytics.instance.log('ProfileScreen: Re-authentication success status: $reauthSuccess');
         if (reauthSuccess) {
-          FirebaseCrashlytics.instance.log('Re-authentication successful. Retrying delete.');
+          FirebaseCrashlytics.instance.log('ProfileScreen: Retrying delete after successful re-auth.');
           final finalResult = await authService.deleteAccount();
-          if (!mounted) return; // Еще одна проверка
+          if (!mounted) return;
 
           if (finalResult == 'success') {
-            // Также убираем все экраны после успешной повторной попытки.
+             FirebaseCrashlytics.instance.log('ProfileScreen: Second deletion attempt successful.');
             Navigator.of(context).popUntil((route) => route.isFirst);
             return;
           } else {
@@ -395,7 +393,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 .showSnackBar(SnackBar(content: Text(finalResult)));
           }
         } else {
-           FirebaseCrashlytics.instance.log('Re-authentication was cancelled or failed.');
+           FirebaseCrashlytics.instance.log('ProfileScreen: Re-authentication was cancelled or failed.');
         }
       } catch (e, s) {
         if (!mounted) return;
@@ -404,12 +402,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             .showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
       }
 
-      // Если повторная аутентификация была отменена или не удалась, останавливаем загрузку.
       if (mounted) {
         setState(() => _isDeleting = false);
       }
     } else {
-      // Обрабатываем другие ошибки из первой попытки удаления.
       FirebaseCrashlytics.instance.recordError(
         Exception('Account deletion failed on first attempt'),
         null,

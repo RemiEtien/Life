@@ -45,17 +45,22 @@ class NotificationService {
   }
 
   Future<bool> _requestPermissions() async {
-    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    // Для Android 13+ требуется явное разрешение на уведомления
+    if (defaultTargetPlatform == TargetPlatform.android) {
+        final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+            _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>();
 
-    final bool? notificationPermissionGranted =
-        await androidImplementation?.requestNotificationsPermission();
-    if (notificationPermissionGranted == false) return false;
+        final bool? notificationPermissionGranted =
+            await androidImplementation?.requestNotificationsPermission();
+        if (notificationPermissionGranted == false) return false;
 
-    final bool? exactAlarmPermissionGranted =
-        await androidImplementation?.requestExactAlarmsPermission();
-    return exactAlarmPermissionGranted ?? false;
+        final bool? exactAlarmPermissionGranted =
+            await androidImplementation?.requestExactAlarmsPermission();
+        return exactAlarmPermissionGranted ?? false;
+    }
+    // Для iOS разрешения запрашиваются при инициализации
+    return true;
   }
 
   // ИЗМЕНЕНО: Метод теперь принимает payload
@@ -94,8 +99,9 @@ class NotificationService {
         ),
         payload: payload, // Передаем payload
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
+        // ИСПРАВЛЕНО: Этот параметр устарел и удален в новой версии пакета
+        // uiLocalNotificationDateInterpretation:
+        //     UILocalNotificationDateInterpretation.absoluteTime,
       );
       return true;
     } catch (e) {

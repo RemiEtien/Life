@@ -22,7 +22,9 @@ import 'package:lifeline/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // 0. Provider to track network state
-final connectivityStreamProvider = StreamProvider<ConnectivityResult>((ref) {
+// ИСПРАВЛЕНО: Тип изменен на Stream<List<ConnectivityResult>> в соответствии с новой версией пакета connectivity_plus
+final connectivityStreamProvider =
+    StreamProvider<List<ConnectivityResult>>((ref) {
   return Connectivity().onConnectivityChanged;
 });
 
@@ -56,7 +58,6 @@ final purchaseServiceProvider =
 // 1.5. User Service and Auth Service that depend on Ref
 final userServiceProvider = Provider((ref) => UserService(ref));
 final authServiceProvider = Provider((ref) => AuthService(ref));
-
 
 // 1.6. Sync Service Provider (depends on other providers)
 final syncServiceProvider = Provider<SyncService>((ref) {
@@ -229,6 +230,7 @@ class LocaleNotifier extends StateNotifier<Locale?> {
           state = Locale(savedCode);
         }
       } else {
+        // ИСПРАВЛЕНО: `window` устарело. Используем `platformDispatcher`.
         if (state == null) {
           state = WidgetsBinding.instance.platformDispatcher.locale;
         }

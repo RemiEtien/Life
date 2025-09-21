@@ -54,6 +54,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       }
     }
 
+    // ИСПРАВЛЕНИЕ: Получаем сервисы до асинхронных операций
+    final authService = ref.read(authServiceProvider);
+    final localeNotifier = ref.read(localeProvider.notifier);
+    final syncService = ref.read(syncServiceProvider);
+
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) {
       FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after 3s delay.');
@@ -61,7 +66,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
 
     FirebaseCrashlytics.instance.log('SplashScreen: Checking consent.');
-    // Check mounted before and after the await call.
     if (mounted) {
       setState(() => _statusMessage = l10n.splashMessageCheckingSettings);
     }
@@ -98,7 +102,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
     
     FirebaseCrashlytics.instance.log('SplashScreen: Awaiting first auth state.');
-    final user = await ref.read(authServiceProvider).authStateChanges.first;
+    final user = await authService.authStateChanges.first;
     if (!mounted) {
       FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after awaiting auth state.');
       return;
@@ -115,7 +119,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
 
     FirebaseCrashlytics.instance.log('SplashScreen: User found. Syncing locale with profile.');
-    await ref.read(localeProvider.notifier).syncLocaleWithUserProfile();
+    await localeNotifier.syncLocaleWithUserProfile();
     if (!mounted) {
       FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after syncing locale.');
       return;
@@ -127,9 +131,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     
     FirebaseCrashlytics.instance.log('SplashScreen: Starting initial sync from cloud.');
     try {
-      await ref
-          .read(syncServiceProvider)
-          .syncFromCloudToLocal(isInitialSync: true);
+      await syncService.syncFromCloudToLocal(isInitialSync: true);
     } catch (e, stack) {
       if (kDebugMode) {
         print("[SplashScreen] Initial sync failed, proceeding with local data. Error: $e");
@@ -187,4 +189,3 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 }
-
