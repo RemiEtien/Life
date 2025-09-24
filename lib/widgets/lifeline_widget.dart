@@ -138,23 +138,34 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   static const double kTapRadiusOnScreen = 40.0;
 
   final _performanceMonitor = PerformanceMonitor();
-  bool _isInitialLayoutDone = false;
+  bool _centerOnNextLayout = false;
   bool _isDisposed = false;
+  
+  // НОВОЕ: Флаг для управления готовностью онбординга
+  bool _isOnboardingPending = false;
 
   final ValueNotifier<PaintTimings?> _paintTimingsNotifier =
       ValueNotifier(null);
 
   final String _adminUid = 'BGnE9FuIasfIOj5ln3rQHIBiulv2';
 
-  // --- NEW: GlobalKeys for Onboarding ---
   final _fabKey = GlobalKey();
   final _statsCardKey = GlobalKey();
   final _controlsPanelKey = GlobalKey();
+
+  ProviderSubscription<AsyncValue<List<Memory>>>? _memoriesSubscription;
+  ProviderSubscription<AsyncValue<UserProfile?>>? _profileSubscription;
+  ProviderSubscription<SyncState>? _syncSubscription;
+
+  List<Memory> _currentMemories = [];
+
+  late VoidCallback _geometryAnimationListener;
 
   @override
   void initState() {
     super.initState();
     _isDisposed = false;
+    _centerOnNextLayout = true; // Запрашиваем центрирование при первой загрузке
     WidgetsBinding.instance.addObserver(this);
 
     _initializeVisualSettings();
@@ -176,21 +187,87 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           ..repeat();
 
     _mainController.addListener(() {
-      if (mounted && _debugMode) {
+      if (mounted && _debugMode && !_isDisposed) {
         _performanceMonitor.tick();
       }
     });
 
+    _geometryAnimationListener = () {
+      if (!_isDisposed && mounted) {
+        _geometryAnimationTick();
+      }
+    };
+
     final geometryAndBranchListener =
         Listenable.merge([_geometryController, _branchController]);
-    geometryAndBranchListener.addListener(_geometryAnimationTick);
+    geometryAndBranchListener.addListener(_geometryAnimationListener);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
+      if (mounted && !_isDisposed) {
+        _setupListeners();
         ref.read(onboardingServiceProvider.notifier).startOnAppLaunch();
         ref.read(syncServiceProvider).syncFromCloudToLocal();
       }
     });
+  }
+
+  void _setupListeners() {
+    _memoriesSubscription = ref.listenManual<AsyncValue<List<Memory>>>(
+        memoriesStreamProvider, _onMemoriesChanged,
+        fireImmediately: true);
+
+    _profileSubscription = ref.listenManual<AsyncValue<UserProfile?>>(
+      userProfileProvider,
+      (previous, next) {
+        if (_isDisposed || !mounted) return;
+
+        final profile = next.asData?.value;
+        if (profile != null) {
+          if (profile.visualAnimationEnabled != _animationEnabled ||
+              profile.visualSpeed != _geometrySpeed ||
+              profile.visualAmplitude != _geometryAmplitude ||
+              profile.visualYearLinePosition != _yearLineYPosition ||
+              profile.visualBranchDensity != _branchDensity ||
+              profile.visualBranchIntensity != _branchIntensity) {
+            setState(() {
+              _animationEnabled = profile.visualAnimationEnabled;
+              _geometrySpeed = profile.visualSpeed;
+              _geometryAmplitude = profile.visualAmplitude;
+              _yearLineYPosition = profile.visualYearLinePosition;
+              _branchDensity = profile.visualBranchDensity;
+              _branchIntensity = profile.visualBranchIntensity;
+            });
+          }
+        }
+      },
+    );
+    _syncSubscription = ref.listenManual<SyncState>(
+      syncNotifierProvider,
+      (previous, next) {
+        if (_isDisposed || !mounted) return;
+
+        if (previous != null) {
+          if (!previous.isSyncing &&
+              next.isSyncing &&
+              next.currentStatus != "Idle") {
+            ref
+                .read(messageProvider.notifier)
+                .addMessage("Sync started...", type: MessageType.info);
+          } else if (previous.isSyncing && !next.isSyncing) {
+            if (next.currentStatus.contains("failed")) {
+              ref
+                  .read(messageProvider.notifier)
+                  .addMessage("Sync failed. Will retry later.",
+                      type: MessageType.error);
+            } else {
+              ref
+                  .read(messageProvider.notifier)
+                  .addMessage("Sync complete!", type: MessageType.success);
+            }
+          }
+        }
+      },
+    );
   }
 
   void _initializeVisualSettings() {
@@ -239,17 +316,26 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _geometryAnimationTick() {
-    if (_cachedLayoutResult != null) {
-      final memories = ref.read(memoriesStreamProvider).asData?.value ?? [];
-      _requestGeometryUpdate(_cachedLayoutResult!, memories);
+    if (_isDisposed || !mounted) return;
+
+    try {
+      if (_cachedLayoutResult != null) {
+        _requestGeometryUpdate(_cachedLayoutResult!, _currentMemories);
+      }
+    } catch (e) {
+      if (mounted && !_isDisposed) {
+        debugPrint('Error in _geometryAnimationTick: $e');
+      }
     }
   }
 
   void _onMemoriesChanged(
       AsyncValue<List<Memory>>? previous, AsyncValue<List<Memory>> next) {
+    if (_isDisposed || !mounted) return;
+
     if (next is AsyncData<List<Memory>>) {
       final memories = next.value;
-      if (mounted && !_lastKnownSize.isEmpty) {
+      if (mounted && !_isDisposed && !_lastKnownSize.isEmpty) {
         _loadMemoryImages(memories);
         _updateParagraphs(memories);
         _requestFullRecalculation(memories);
@@ -257,30 +343,39 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     }
   }
 
-  // --- ИЗМЕНЕНО: Логика загрузки и кэширования изображений ---
   Future<void> _loadMemoryImages(List<Memory> memories) async {
+    if (_isDisposed || !mounted) return;
+
     for (final memory in memories) {
+      if (_isDisposed || !mounted) break;
+
       final coverPath = memory.coverPath;
       if (coverPath != null &&
           coverPath.isNotEmpty &&
           !_cachedImages.containsKey(coverPath)) {
-        // Создаем провайдер в зависимости от типа пути (локальный или сетевой)
-        ImageProvider provider = coverPath.startsWith('http')
-            ? CachedNetworkImageProvider(coverPath)
-            : FileImage(File(coverPath));
+        final thumbPath = memory.coverThumbPath;
+        if (thumbPath == null) continue;
 
-        _getUiImageFromProvider(provider).then((image) {
-          if (image != null && mounted) {
+        ImageProvider provider = thumbPath.startsWith('http')
+            ? CachedNetworkImageProvider(thumbPath)
+            : FileImage(File(thumbPath));
+
+        try {
+          final image = await _getUiImageFromProvider(provider);
+          if (image != null && mounted && !_isDisposed) {
             setState(() {
               _cachedImages[coverPath] = image;
             });
           }
-        });
+        } catch (e) {
+          if (mounted && !_isDisposed) {
+            debugPrint('Error loading image: $e');
+          }
+        }
       }
     }
   }
 
-  // --- НОВЫЙ МЕТОД: Конвертирует ImageProvider в ui.Image для CustomPainter ---
   Future<ui.Image?> _getUiImageFromProvider(ImageProvider provider) async {
     final completer = Completer<ui.Image?>();
     final stream = provider.resolve(const ImageConfiguration());
@@ -303,7 +398,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     stream.addListener(listener);
     final result = await completer.future;
-    stream.removeListener(listener); // Обязательно удаляем слушатель
+    stream.removeListener(listener);
     return result;
   }
 
@@ -336,18 +431,32 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   void dispose() {
     _isDisposed = true;
     WidgetsBinding.instance.removeObserver(this);
-    _mainController.dispose();
-    _pulseController.dispose();
+
+    _memoriesSubscription?.close();
+    _profileSubscription?.close();
+    _syncSubscription?.close();
+
+    _mainController.stop();
+    _pulseController.stop();
+    _geometryController.stop();
+    _backgroundController.stop();
+    _branchController.stop();
+
     final geometryAndBranchListener =
         Listenable.merge([_geometryController, _branchController]);
-    geometryAndBranchListener.removeListener(_geometryAnimationTick);
+    geometryAndBranchListener.removeListener(_geometryAnimationListener);
+
+    _mainController.dispose();
+    _pulseController.dispose();
     _geometryController.dispose();
     _backgroundController.dispose();
     _branchController.dispose();
+
     _transformationController.dispose();
     _structureCache?.dispose();
     _performanceMonitor.dispose();
     _paintTimingsNotifier.dispose();
+
     super.dispose();
   }
 
@@ -357,8 +466,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     path.moveTo(points[0], points[1]);
     for (int i = 2; i < points.length; i += 6) {
-      path.cubicTo(
-          points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5]);
+      path.cubicTo(points[i], points[i + 1], points[i + 2], points[i + 3],
+          points[i + 4], points[i + 5]);
     }
     return path;
   }
@@ -375,9 +484,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _updateParagraphs(List<Memory> memories) {
-    if (!mounted || _lastKnownSize.isEmpty) return;
+    if (!mounted || _lastKnownSize.isEmpty || _isDisposed) return;
     _cachedParagraphs.clear();
     for (final memory in memories) {
+      if (_isDisposed) break;
       final key = memory.universalId;
       _cachedParagraphs[key] = _createTextParagraph(memory, _lastKnownSize);
     }
@@ -421,8 +531,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     final sortedMemories = List<Memory>.from(memories)
       ..sort((a, b) => a.date.compareTo(b.date));
-    final groupedByDay = groupBy(
-        sortedMemories, (m) => DateTime(m.date.year, m.date.month, m.date.day));
+    final groupedByDay = groupBy(sortedMemories,
+        (m) => DateTime(m.date.year, m.date.month, m.date.day));
 
     final newPlacementResults = <dynamic>[];
     final sortedEntries = groupedByDay.entries.sortedBy((entry) => entry.key);
@@ -588,11 +698,12 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _requestFullRecalculation(List<Memory> memories) {
-    if (_isCalculating || !mounted || _lastKnownSize.isEmpty) return;
+    if (_isCalculating || !mounted || _lastKnownSize.isEmpty || _isDisposed)
+      return;
 
     final layoutResult = _calculateLayout(_lastKnownSize, memories);
 
-    if (mounted) {
+    if (mounted && !_isDisposed) {
       setState(() {
         _cachedLayoutResult = layoutResult;
       });
@@ -600,10 +711,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     }
   }
 
-  void _requestGeometryUpdate(LayoutResult layoutResult, List<Memory> memories) {
-    if (_isCalculating || !mounted) return;
+  void _requestGeometryUpdate(
+      LayoutResult layoutResult, List<Memory> memories) {
+    if (_isCalculating || !mounted || _isDisposed) return;
 
-    if (mounted) setState(() => _isCalculating = true);
+    if (mounted && !_isDisposed) setState(() => _isCalculating = true);
 
     final totalWidth = layoutResult.totalWidth;
 
@@ -619,13 +731,20 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     );
 
     receivePort.listen((message) {
+      if (_isDisposed || !mounted) {
+        receivePort.close();
+        return;
+      }
+
       if (message is CalculationOutput) {
         final mainPath = _buildCubicPathFromPoints(message.mainPathPoints);
-        final branches =
-            message.branchPoints.map((p) => _buildLinePathFromPoints(p)).toList();
+        final branches = message.branchPoints
+            .map((p) => _buildLinePathFromPoints(p))
+            .toList();
         final roots =
             message.rootPoints.map((p) => _buildCubicPathFromPoints(p)).toList();
-        final yearPath = _createFlatYearLine(totalWidth, _lastKnownSize.height);
+        final yearPath =
+            _createFlatYearLine(totalWidth, _lastKnownSize.height);
 
         final finalPlacementResults =
             _updateYCoordinates(layoutResult.placementResults, mainPath);
@@ -639,17 +758,19 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           yearPositions: layoutResult.yearPositions,
         );
 
-        if (mounted) {
+        if (mounted && !_isDisposed) {
           setState(() {
             _renderData = newRenderData;
             _updateStructureCache(newRenderData,
                 Size(totalWidth, _lastKnownSize.height), memories);
             _isCalculating = false;
 
-            if (!_isInitialLayoutDone) {
-              _isInitialLayoutDone = true;
+            if (_centerOnNextLayout) {
+              _centerOnNextLayout = false; // Сбрасываем флаг
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) _showFullTimeline();
+                if (mounted && !_isDisposed) {
+                  _animateToFullTimeline();
+                }
               });
             }
           });
@@ -678,7 +799,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   void _updateStructureCache(
       RenderData data, Size size, List<Memory> memories) {
-    if (!mounted || size.isEmpty) return;
+    if (!mounted || size.isEmpty || _isDisposed) return;
 
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
@@ -711,7 +832,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     });
 
     final newCache = recorder.endRecording();
-    if (mounted) {
+    if (mounted && !_isDisposed) {
       setState(() {
         _structureCache?.dispose();
         _structureCache = newCache;
@@ -861,6 +982,36 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _showFullTimeline() {
+    if (!mounted || _isDisposed) return;
+    
+    // Всегда устанавливаем флаг, чтобы показать намерение центрировать
+    setState(() {
+      _centerOnNextLayout = true;
+    });
+
+    // Пытаемся запустить анимацию сразу, если данные уже готовы
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_isDisposed && _centerOnNextLayout) {
+        if (_cachedLayoutResult != null && _renderData != null) {
+          // Данные готовы - центрируем сразу
+          _animateToFullTimeline();
+          setState(() {
+            _centerOnNextLayout = false;
+          });
+        } else {
+          // ИСПРАВЛЕНИЕ: Данные еще не готовы, но запрашиваем пересчет
+          // Флаг _centerOnNextLayout остается true и центрирование произойдет
+          // после готовности данных в _requestGeometryUpdate
+          if (kDebugMode) {
+            print("[LifelineWidget] Data not ready for centering, requesting recalculation");
+          }
+          _requestFullRecalculation(_currentMemories);
+        }
+      }
+    });
+  }
+
+  void _animateToFullTimeline() {
     if (_cachedLayoutResult == null ||
         _lastKnownSize.isEmpty ||
         _renderData == null) {
@@ -888,13 +1039,24 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         vsync: this, duration: const Duration(milliseconds: 800));
     final animation =
         Matrix4Tween(begin: _transformationController.value, end: targetMatrix)
-            .animate(
-                CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic));
+            .animate(CurvedAnimation(
+                parent: controller, curve: Curves.easeInOutCubic));
     animation
         .addListener(() => _transformationController.value = animation.value);
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         controller.dispose();
+        
+        // ИСПРАВЛЕНИЕ: После завершения анимации центрирования, запускаем онбординг, если он ожидает
+        if (_isOnboardingPending) {
+          _isOnboardingPending = false;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && !_isDisposed) {
+              // Используем новый метод startTour, который не проверяет, был ли онбординг завершен.
+              ref.read(onboardingServiceProvider.notifier).startTour();
+            }
+          });
+        }
       }
     });
     controller.forward();
@@ -1041,58 +1203,12 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     _nodePositions.clear();
     _dailyClusterData.clear();
 
-    ref.listen<AsyncValue<List<Memory>>>(
-        memoriesStreamProvider, _onMemoriesChanged);
-
-    ref.listen<AsyncValue<UserProfile?>>(userProfileProvider, (previous, next) {
-      final profile = next.asData?.value;
-      if (profile != null) {
-        // Compare with current state to avoid unnecessary rebuilds
-        if (profile.visualAnimationEnabled != _animationEnabled ||
-            profile.visualSpeed != _geometrySpeed ||
-            profile.visualAmplitude != _geometryAmplitude ||
-            profile.visualYearLinePosition != _yearLineYPosition ||
-            profile.visualBranchDensity != _branchDensity ||
-            profile.visualBranchIntensity != _branchIntensity) {
-          setState(() {
-            _animationEnabled = profile.visualAnimationEnabled;
-            _geometrySpeed = profile.visualSpeed;
-            _geometryAmplitude = profile.visualAmplitude;
-            _yearLineYPosition = profile.visualYearLinePosition;
-            _branchDensity = profile.visualBranchDensity;
-            _branchIntensity = profile.visualBranchIntensity;
-          });
-        }
-      }
-    });
-
-    ref.listen<SyncState>(syncNotifierProvider, (previous, next) {
-      if (previous != null) {
-        if (!previous.isSyncing &&
-            next.isSyncing &&
-            next.currentStatus != "Idle") {
-          ref
-              .read(messageProvider.notifier)
-              .addMessage("Sync started...", type: MessageType.info);
-        } else if (previous.isSyncing && !next.isSyncing) {
-          if (next.currentStatus.contains("failed")) {
-            ref
-                .read(messageProvider.notifier)
-                .addMessage("Sync failed. Will retry later.",
-                    type: MessageType.error);
-          } else {
-            ref
-                .read(messageProvider.notifier)
-                .addMessage("Sync complete!", type: MessageType.success);
-          }
-        }
-      }
-    });
-
     final memoriesAsyncValue = ref.watch(memoriesStreamProvider);
+    _currentMemories = memoriesAsyncValue.asData?.value ?? [];
     final syncState = ref.watch(syncNotifierProvider);
     final userId = ref.watch(authStateChangesProvider).asData?.value?.uid;
     final onboardingState = ref.watch(onboardingServiceProvider);
+
     final isTimelineInteractionDisabled = onboardingState.isActive &&
         onboardingState.currentStep == OnboardingStep.addFirstMemory;
 
@@ -1102,13 +1218,12 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       final newSize = Size(constraints.maxWidth, constraints.maxHeight);
       if (newSize.isFinite &&
           newSize != _lastKnownSize &&
-          newSize.width > 0) {
+          newSize.width > 0 &&
+          !_isDisposed) {
         _lastKnownSize = newSize;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            final memories = memoriesAsyncValue.asData?.value ?? [];
-            _updateParagraphs(memories);
-            _requestFullRecalculation(memories);
+          if (mounted && !_isDisposed) {
+            _requestFullRecalculation(_currentMemories);
           }
         });
       }
@@ -1120,7 +1235,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       final minScale = _calculateMinScale(totalWidth, screenWidth);
       const double kBaseContentWidth = 1200.0;
       final baseScale = _calculateMinScale(kBaseContentWidth, screenWidth);
-      const zoomFactor = 5.0;
+      const zoomFactor = 6.0;
       final desiredMaxScale = baseScale * zoomFactor;
       final maxScale = max(minScale, desiredMaxScale);
       final contentHeight = constraints.maxHeight;
@@ -1303,8 +1418,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
               decoration: BoxDecoration(
                   color: Colors.black.withAlpha((255 * 0.6).round()),
                   borderRadius: BorderRadius.circular(25),
-                  border:
-                      Border.all(color: Colors.white.withAlpha((255 * 0.2).round()))),
+                  border: Border.all(
+                      color: Colors.white.withAlpha((255 * 0.2).round()))),
               child: IconButton(
                 icon: const Icon(Icons.fit_screen, color: Colors.white),
                 onPressed: _showFullTimeline,
@@ -1315,8 +1430,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
               decoration: BoxDecoration(
                   color: Colors.black.withAlpha((255 * 0.6).round()),
                   borderRadius: BorderRadius.circular(25),
-                  border:
-                      Border.all(color: Colors.white.withAlpha((255 * 0.2).round()))),
+                  border: Border.all(
+                      color: Colors.white.withAlpha((255 * 0.2).round()))),
               child: IconButton(
                 icon: const Icon(Icons.tune, color: Colors.white),
                 onPressed: () => _showVisualSettings(l10n),
@@ -1326,18 +1441,24 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
               decoration: BoxDecoration(
                   color: Colors.black.withAlpha((255 * 0.6).round()),
                   borderRadius: BorderRadius.circular(25),
-                  border:
-                      Border.all(color: Colors.white.withAlpha((255 * 0.2).round()))),
+                  border: Border.all(
+                      color: Colors.white.withAlpha((255 * 0.2).round()))),
               child: PopupMenuButton<String>(
                   icon: const Icon(Icons.more_vert, color: Colors.white),
-                  onSelected: (value) {
+                  onSelected: (value) async {
                     switch (value) {
                       case 'toggle_debug':
                         _toggleDebugMode();
                         break;
                       case 'profile_settings':
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const ProfileScreen()));
+                        // ИСПРАВЛЕНИЕ: Ожидаем результат от экрана профиля.
+                        final result = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => const ProfileScreen()));
+                        if (result == 'replay_onboarding' && mounted) {
+                          _isOnboardingPending = true;
+                          _showFullTimeline();
+                        }
                         break;
                       case 'sign_out':
                         ref.read(audioPlayerProvider.notifier).stopAndReset();
@@ -1376,6 +1497,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   Widget _buildStatsOverlay(
       SyncState syncState, List<Memory> memories, AppLocalizations l10n) {
+    final memoriesCount = memories.length;
+    final startYear = memoriesCount > 0 ? memories.last.date.year : 0;
+    final endYear = memoriesCount > 0 ? memories.first.date.year : 0;
+
     return Positioned(
         left: 16,
         bottom: 16,
@@ -1398,11 +1523,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w500)),
-                      if (memories.isNotEmpty) ...[
+                      if (memoriesCount > 0) ...[
                         const SizedBox(height: 4),
                         Text(
-                            l10n.lifelinePeriodRange(
-                                memories.first.date.year, memories.last.date.year),
+                            l10n.lifelinePeriodRange(startYear, endYear),
                             style: const TextStyle(
                                 color: Colors.white70, fontSize: 10))
                       ],
@@ -1452,8 +1576,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                         ValueListenableBuilder<Matrix4>(
                           valueListenable: _transformationController,
                           builder: (context, value, child) {
-                            final totalWidth = _cachedLayoutResult?.totalWidth ??
-                                _lastKnownSize.width;
+                            final totalWidth =
+                                _cachedLayoutResult?.totalWidth ??
+                                    _lastKnownSize.width;
                             final minScale = _calculateMinScale(
                                 totalWidth, _lastKnownSize.width);
                             final rawScale = value.getMaxScaleOnAxis();
@@ -1532,8 +1657,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                       Colors.blueAccent),
                                   timingRow('Structure', timings.structure,
                                       Colors.redAccent),
-                                  timingRow(
-                                      'Nodes', timings.nodes, Colors.orangeAccent),
+                                  timingRow('Nodes', timings.nodes,
+                                      Colors.orangeAccent),
                                   timingRow('Labels', timings.labels,
                                       Colors.purpleAccent),
                                   timingRow('Macro View', timings.macroView,
@@ -1589,7 +1714,8 @@ class _MemoriesListPopupState extends State<MemoriesListPopup> {
     }
     final filtered = widget.memories.where((memory) {
       final titleMatch = memory.title.toLowerCase().contains(query);
-      final contentMatch = memory.content?.toLowerCase().contains(query) ?? false;
+      final contentMatch =
+          memory.content?.toLowerCase().contains(query) ?? false;
       final dateMatch =
           DateFormat.yMMMd().format(memory.date).toLowerCase().contains(query);
       return titleMatch || contentMatch || dateMatch;
@@ -1614,8 +1740,8 @@ class _MemoriesListPopupState extends State<MemoriesListPopup> {
                   decoration: InputDecoration(
                       hintText: widget.l10n.lifelineSearchHint,
                       hintStyle: TextStyle(color: Colors.white.withAlpha(128)),
-                      prefixIcon:
-                          Icon(Icons.search, color: Colors.white.withAlpha(178)),
+                      prefixIcon: Icon(Icons.search,
+                          color: Colors.white.withAlpha(178)),
                       filled: true,
                       fillColor: Colors.black.withAlpha(76),
                       border: OutlineInputBorder(
@@ -1794,23 +1920,19 @@ class _SelectionItem extends StatelessWidget {
 
 class PerformanceMonitor {
   int _frameCount = 0;
-  DateTime? _fpsStartTime;
-  final ValueNotifier<double> fpsNotifier = ValueNotifier<double>(0.0);
+  final Stopwatch _stopwatch = Stopwatch()..start();
+  final ValueNotifier<double> fpsNotifier = ValueNotifier(0.0);
+
+  double get fps => fpsNotifier.value;
 
   void tick() {
-    final currentTime = DateTime.now();
-
-    _fpsStartTime ??= currentTime;
-
     _frameCount++;
-    final elapsedTime = currentTime.difference(_fpsStartTime!).inMilliseconds;
-
-    if (elapsedTime >= 1000) {
-      final fps = (_frameCount * 1000 / elapsedTime);
-      fpsNotifier.value = fps;
-
+    if (_stopwatch.elapsedMilliseconds >= 1000) {
+      final elapsedSeconds = _stopwatch.elapsedMilliseconds / 1000.0;
+      fpsNotifier.value = _frameCount / elapsedSeconds;
       _frameCount = 0;
-      _fpsStartTime = currentTime;
+      _stopwatch.reset();
+      _stopwatch.start();
     }
   }
 

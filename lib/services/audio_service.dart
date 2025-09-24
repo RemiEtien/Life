@@ -140,6 +140,8 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
     if (state.isPlaying && state.isGlobalPlayerActive) {
       pauseGlobalPlayer();
     } else {
+      // ИСПРАВЛЕНИЕ: При возобновлении плеера, останавливаем любой другой звук (например, эмбиент)
+      _player.stop();
       _playCurrentGlobalTrack();
     }
   }
@@ -149,6 +151,12 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
       await _player.pause();
       state = state.copyWith(isPlaying: false);
     }
+  }
+  
+  // ИСПРАВЛЕНО: Метод переименован для ясности и теперь полностью останавливает плеер.
+  Future<void> pauseAllAudio() async {
+    await _player.pause();
+    state = state.copyWith(isPlaying: false);
   }
   
   Future<void> stopAndReset() async {

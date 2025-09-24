@@ -12,6 +12,7 @@ import 'package:lifeline/services/encryption_service.dart';
 import 'package:lifeline/services/export_service.dart';
 import 'package:lifeline/services/firestore_service.dart';
 import 'package:lifeline/services/historical_data_service.dart';
+import 'package:lifeline/services/image_processing_service.dart';
 import 'package:lifeline/services/memory_repository.dart';
 import 'package:lifeline/services/notification_service.dart';
 import 'package:lifeline/services/onboarding_service.dart';
@@ -22,16 +23,21 @@ import 'package:lifeline/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // 0. Provider to track network state
-// ИСПРАВЛЕНО: Тип изменен на Stream<List<ConnectivityResult>> в соответствии с новой версией пакета connectivity_plus
 final connectivityStreamProvider =
-    StreamProvider<List<ConnectivityResult>>((ref) {
-  return Connectivity().onConnectivityChanged;
+    StreamProvider.autoDispose<List<ConnectivityResult>>((ref) {
+  final stream = Connectivity().onConnectivityChanged;
+  return stream.handleError((error) {
+    debugPrint('Connectivity error: $error');
+    return <ConnectivityResult>[ConnectivityResult.none];
+  });
 });
 
 // 1. Service providers (simple)
 final firestoreServiceProvider = Provider((ref) => FirestoreService());
 final notificationServiceProvider = Provider((ref) => NotificationService());
 final exportServiceProvider = Provider((ref) => ExportService());
+
+final imageProcessingServiceProvider = Provider((ref) => ImageProcessingService());
 
 final historicalDataServiceProvider = Provider<HistoricalDataService>((ref) {
   final spotifyService = ref.watch(spotifyServiceProvider);
@@ -47,11 +53,8 @@ final spotifyServiceProvider = Provider<SpotifyService>((ref) {
   return SpotifyService(functions);
 });
 
-// --- NEW: Purchase Service Provider ---
 final purchaseServiceProvider =
     StateNotifierProvider<PurchaseService, PurchaseState>((ref) {
-  // ИСПРАВЛЕНИЕ: Provider теперь зависит от authServiceProvider, а не напрямую от authState.
-  // Это более стабильный подход, так как сервис доступен всегда.
   return PurchaseService(ref);
 });
 
@@ -77,47 +80,46 @@ final onboardingServiceProvider =
 });
 
 // 2. Authentication state provider
-final authStateChangesProvider = StreamProvider<User?>(
-  (ref) {
-    // ИСПРАВЛЕНИЕ: Убираем listenSelf, так как он устарел.
-    // Логика блокировки сессии теперь будет управляться внутри самого EncryptionService,
-    // который уже слушает изменения в userProfileProvider, что более надежно.
-    return ref.watch(authServiceProvider).authStateChanges;
-  },
-);
+final authStateChangesProvider = StreamProvider.autoDispose<User?>((ref) {
+  final authService = ref.watch(authServiceProvider);
+
+  return authService.authStateChanges.handleError((error) {
+    debugPrint('Auth state error: $error');
+    return null;
+  });
+});
 
 // 3. User-dependent providers
-final memoryRepositoryProvider = Provider<MemoryRepository?>((ref) {
+final memoryRepositoryProvider = Provider.autoDispose<MemoryRepository?>((ref) {
   final user = ref.watch(authStateChangesProvider).asData?.value;
   if (user != null) {
     final encryptionService = ref.watch(encryptionServiceProvider.notifier);
+    ref.keepAlive();
     return MemoryRepository(
         userId: user.uid, encryptionService: encryptionService);
   }
   return null;
 });
 
-final userProfileProvider = StreamProvider<UserProfile?>((ref) {
+final userProfileProvider = StreamProvider.autoDispose<UserProfile?>((ref) {
   final user = ref.watch(authStateChangesProvider).asData?.value;
   if (user != null) {
+    ref.keepAlive();
     return ref.watch(userServiceProvider).getUserProfileStream(user.uid);
   }
   return Stream.value(null);
 });
 
-// --- NEW: Convenience provider for premium status ---
 final isPremiumProvider = Provider<bool>((ref) {
   final profile = ref.watch(userProfileProvider).asData?.value;
   if (profile == null) return false;
 
-  // Logic for trial period
   if (profile.trialStartedAt != null && !profile.isPremium) {
     if (DateTime.now().difference(profile.trialStartedAt!).inDays < 7) {
-      return true; // User is in trial
+      return true;
     }
   }
 
-  // Logic for active subscription
   if (profile.isPremium && profile.premiumUntil != null) {
     return profile.premiumUntil!.isAfter(DateTime.now());
   }
@@ -126,9 +128,10 @@ final isPremiumProvider = Provider<bool>((ref) {
 });
 
 // 4. Memories stream provider
-final memoriesStreamProvider = StreamProvider<List<Memory>>((ref) {
+final memoriesStreamProvider = StreamProvider.autoDispose<List<Memory>>((ref) {
   final memoryRepo = ref.watch(memoryRepositoryProvider);
   if (memoryRepo != null) {
+    ref.keepAlive();
     return memoryRepo.watchAllSortedByDate();
   }
   return Stream.value([]);
@@ -160,7 +163,7 @@ final syncNotifierProvider =
 
 // 6. Async providers for data with parameters
 final spotifyTrackDetailsProvider =
-    FutureProvider.family<SpotifyTrackDetails?, String>(
+    FutureProvider.autoDispose.family<SpotifyTrackDetails?, String>(
   (ref, trackId) async {
     return ref.watch(spotifyServiceProvider).getTrackDetails(trackId);
   },
@@ -188,7 +191,7 @@ class AnchorProviderArgs {
 }
 
 final emotionalAnchorProvider =
-    FutureProvider.family<EmotionalAnchorBundle?, AnchorProviderArgs>(
+    FutureProvider.autoDispose.family<EmotionalAnchorBundle?, AnchorProviderArgs>(
   (ref, args) {
     return ref.watch(historicalDataServiceProvider).getEmotionalAnchor(
           args.date,
@@ -204,44 +207,77 @@ final audioPlayerProvider =
 
 // 8. Provider for managing the application's locale
 class LocaleNotifier extends StateNotifier<Locale?> {
-  final Ref ref;
-  LocaleNotifier(this.ref, [Locale? initialLocale]) : super(initialLocale);
+  final Ref _ref;
+  bool _disposed = false;
+
+  LocaleNotifier(this._ref, [Locale? initialLocale]) : super(initialLocale);
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 
   Future<void> syncLocaleWithUserProfile() async {
-    final user = ref.read(authStateChangesProvider).asData?.value;
-    if (user == null) {
-      return;
-    }
+    if (_disposed) return;
 
-    final userProfile =
-        await ref.read(userServiceProvider).getUserProfile(user.uid);
-    final prefs = await SharedPreferences.getInstance();
+    try {
+      // Читаем все провайдеры до первого await
+      final authValue = _ref.read(authStateChangesProvider);
+      final userService = _ref.read(userServiceProvider);
+      final user = authValue.asData?.value;
 
-    if (userProfile?.languageCode != null) {
-      final newLocale = Locale(userProfile!.languageCode!);
-      if (state != newLocale) {
-        state = newLocale;
+      if (user == null || _disposed) {
+        return;
       }
-      await prefs.setString('appLocale', userProfile.languageCode!);
-    } else {
-      final savedCode = prefs.getString('appLocale');
-      if (savedCode != null) {
-        if (state?.languageCode != savedCode) {
-          state = Locale(savedCode);
+
+      final userProfile = await userService.getUserProfile(user.uid);
+      if (_disposed) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      if (_disposed) return;
+
+      if (userProfile?.languageCode != null) {
+        final newLocale = Locale(userProfile!.languageCode!);
+        if (!_disposed && state != newLocale) {
+          state = newLocale;
+        }
+        if (!_disposed) {
+          await prefs.setString('appLocale', userProfile.languageCode!);
         }
       } else {
-        // ИСПРАВЛЕНО: `window` устарело. Используем `platformDispatcher`.
-        if (state == null) {
-          state = WidgetsBinding.instance.platformDispatcher.locale;
+        final savedCode = prefs.getString('appLocale');
+        if (savedCode != null && !_disposed) {
+          if (state?.languageCode != savedCode) {
+            state = Locale(savedCode);
+          }
+        } else {
+          if (!_disposed && state == null) {
+            state = WidgetsBinding.instance.platformDispatcher.locale;
+          }
         }
+      }
+    } catch (e) {
+      if (!_disposed) {
+        debugPrint('Error in syncLocaleWithUserProfile: $e');
       }
     }
   }
 
   void setLocale(Locale newLocale) async {
-    state = newLocale;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('appLocale', newLocale.languageCode);
+    if (_disposed) return;
+
+    try {
+      state = newLocale;
+      final prefs = await SharedPreferences.getInstance();
+      if (!_disposed) {
+        await prefs.setString('appLocale', newLocale.languageCode);
+      }
+    } catch (e) {
+      if (!_disposed) {
+        debugPrint('Error in setLocale: $e');
+      }
+    }
   }
 }
 

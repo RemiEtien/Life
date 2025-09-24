@@ -980,4 +980,28 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get memoryViewExportPdf => 'שתף כ-PDF';
+
+  @override
+  String get shareActionTitle => 'הוסף ל-Lifeline';
+
+  @override
+  String get shareActionSubtitle => 'מה תרצה לעשות עם קבצים אלה?';
+
+  @override
+  String get shareCreateNewMemory => 'צור זיכרון חדש';
+
+  @override
+  String get shareAddToExisting => 'הוסף לזיכרון קיים';
+
+  @override
+  String get selectMemoryTitle => 'בחר זיכרון';
+
+  @override
+  String get selectMemorySearchHint => 'חפש לפי כותרת או תוכן...';
+
+  @override
+  String get selectMemoryEmpty => 'לא נמצאו זיכרונות';
+
+  @override
+  String get memoryUpdatedSuccess => 'הזיכרון עודכן בהצלחה!';
 }

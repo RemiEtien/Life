@@ -404,7 +404,7 @@ class LifelinePainter extends CustomPainter {
         stopwatch.start();
         _drawMemoryLabels(
             canvas,
-            Size(mainPath.getBounds().width, size.height),
+            size, // ИСПРАВЛЕНО: Используем полный размер холста, а не границы пути
             singleNodeInfos,
             visibleRect,
             detailOpacity * labelsOpacity);
@@ -533,17 +533,19 @@ class LifelinePainter extends CustomPainter {
       const horizontalPadding = 10.0;
       final nodePos = info.nodePosition;
 
-      double calculateTextX(Offset nodePosition, {bool isLast = false}) {
+      // ИСПРАВЛЕНО: Убрана специальная логика для последнего элемента, используется полный размер холста.
+      double calculateTextX(Offset nodePosition) {
         double x = nodePosition.dx - paragraph.width / 2;
+        // Проверяем левую границу
         if (x < 5.0) x = 5.0;
-        if (!isLast && x + paragraph.width > size.width - 5.0) {
+        // Проверяем правую границу для ВСЕХ элементов
+        if (x + paragraph.width > size.width - 5.0) {
           x = size.width - 5.0 - paragraph.width;
         }
         return x;
       }
 
-      final bool isLastElement = i == sortedInfos.length - 1;
-      final textX = calculateTextX(nodePos, isLast: isLastElement);
+      final textX = calculateTextX(nodePos);
 
       final topRect = Rect.fromLTWH(textX,
           nodePos.dy - verticalOffset - paragraph.height, paragraph.width, paragraph.height);

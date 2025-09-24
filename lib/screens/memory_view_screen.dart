@@ -63,6 +63,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   List<String> _displayImagePaths = [];
   List<String> _displayVideoPaths = [];
+  List<String> _displayThumbPaths = [];
 
   @override
   void initState() {
@@ -70,11 +71,23 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     _currentMemory = widget.memory;
     _startAmbientSound();
     _initializeMedia();
+  }
 
-    _pageController = PageController(initialPage: _infiniteScrollInitialPage);
+  void _initializeMedia() {
+    _displayImagePaths = _currentMemory.displayableMediaPaths;
+    _displayVideoPaths = _currentMemory.displayableVideoPaths;
+    _displayThumbPaths = _currentMemory.displayableThumbPaths;
+
+    final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
+    int initialPage = _infiniteScrollInitialPage;
+    if(allMedia.isNotEmpty) {
+      // Рассчитываем начальную страницу так, чтобы реальный индекс был 0
+      initialPage = _infiniteScrollInitialPage - (_infiniteScrollInitialPage % allMedia.length);
+    }
+    
+    _pageController = PageController(initialPage: initialPage);
     _pageController.addListener(() {
       if (_pageController.hasClients && _pageController.page != null) {
-        final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
         if (allMedia.isEmpty) return;
 
         final page = _pageController.page!.round();
@@ -90,11 +103,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         }
       }
     });
-  }
 
-  void _initializeMedia() {
-    _displayImagePaths = _currentMemory.displayableMediaPaths;
-    _displayVideoPaths = _currentMemory.displayableVideoPaths;
 
     _initializeVideoControllers();
   }
@@ -578,6 +587,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       builder: (context) {
         return _MediaViewerPopup(
           allMedia: allMedia,
+          allThumbnails: [..._displayThumbPaths, ..._displayVideoPaths],
           initialIndex: initialIndex,
           videoControllers: _videoControllers,
           displayImagePathsCount: _displayImagePaths.length,
@@ -599,13 +609,16 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
     final String? coverPath =
         _displayImagePaths.isNotEmpty ? _displayImagePaths.first : null;
-    final bool hasCover = coverPath != null;
+    final String? coverThumbPath =
+        _displayThumbPaths.isNotEmpty ? _displayThumbPaths.first : null;
+
+    final bool hasCover = coverThumbPath != null;
     Widget coverImageWidget = const SizedBox.shrink();
 
     if (hasCover) {
-      coverImageWidget = coverPath!.startsWith('http')
+      coverImageWidget = coverThumbPath!.startsWith('http')
           ? CachedNetworkImage(
-              imageUrl: coverPath,
+              imageUrl: coverThumbPath,
               fit: BoxFit.cover,
               color: Colors.black.withAlpha((255 * 0.3).round()),
               colorBlendMode: BlendMode.darken,
@@ -615,7 +628,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   Container(color: Colors.black.withAlpha((255 * 0.3).round())),
             )
           : Image.file(
-              File(coverPath),
+              File(coverThumbPath),
               fit: BoxFit.cover,
               color: Colors.black.withAlpha((255 * 0.3).round()),
               colorBlendMode: BlendMode.darken,
@@ -1278,6 +1291,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   Widget _buildMediaGallery() {
     final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
+    final allThumbnails = [..._displayThumbPaths, ..._displayVideoPaths];
 
     return PageView.builder(
       controller: _pageController,
@@ -1289,16 +1303,32 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         Widget mediaWidget;
 
         if (realIndex < _displayImagePaths.length) {
-          mediaWidget = path.startsWith('http')
-              ? CachedNetworkImage(
-                  imageUrl: path,
-                  fit: BoxFit.contain,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) =>
-                      const Center(child: Icon(Icons.error)),
-                )
-              : Image.file(File(path), fit: BoxFit.contain);
+           final thumbPath = allThumbnails.length > realIndex ? allThumbnails[realIndex] : path;
+          
+          final thumbProvider = thumbPath.startsWith('http')
+              ? CachedNetworkImageProvider(thumbPath)
+              : FileImage(File(thumbPath)) as ImageProvider;
+
+          final fullImageProvider = path.startsWith('http')
+              ? CachedNetworkImageProvider(path)
+              : FileImage(File(path)) as ImageProvider;
+
+          mediaWidget = Image(
+            image: fullImageProvider,
+            fit: BoxFit.contain,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded) return child;
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: frame != null
+                    ? child
+                    : Image(image: thumbProvider, fit: BoxFit.contain),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) =>
+                Container(color: Colors.grey.shade800),
+          );
+
         } else {
           final controller = _videoControllers[path];
           if (controller != null && controller.value.isInitialized) {
@@ -1495,12 +1525,14 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
 class _MediaViewerPopup extends StatefulWidget {
   final List<String> allMedia;
+  final List<String> allThumbnails;
   final int initialIndex;
   final Map<String, VideoPlayerController> videoControllers;
   final int displayImagePathsCount;
 
   const _MediaViewerPopup({
     required this.allMedia,
+    required this.allThumbnails,
     required this.initialIndex,
     required this.videoControllers,
     required this.displayImagePathsCount,
@@ -1550,11 +1582,13 @@ class _MediaViewerPopupState extends State<_MediaViewerPopup> {
               final realIndex = index % widget.allMedia.length;
               final path = widget.allMedia[realIndex];
               final isImage = realIndex < widget.displayImagePathsCount;
+              final thumbPath = widget.allThumbnails[realIndex];
 
               if (isImage) {
                 return _ZoomableImage(
                   key: ValueKey(path),
                   imagePath: path,
+                  thumbnailPath: thumbPath,
                   onScaleChanged: (scale) {
                     if (mounted) {
                       setState(() {
@@ -1614,11 +1648,13 @@ class _MediaViewerPopupState extends State<_MediaViewerPopup> {
 
 class _ZoomableImage extends StatefulWidget {
   final String imagePath;
+  final String thumbnailPath;
   final ValueChanged<double> onScaleChanged;
 
   const _ZoomableImage({
     super.key,
     required this.imagePath,
+    required this.thumbnailPath,
     required this.onScaleChanged,
   });
 
@@ -1650,9 +1686,9 @@ class _ZoomableImageState extends State<_ZoomableImage> {
 
   @override
   Widget build(BuildContext context) {
-    final imageProvider = widget.imagePath.startsWith('http')
-        ? CachedNetworkImageProvider(widget.imagePath)
-        : FileImage(File(widget.imagePath)) as ImageProvider;
+    final thumbProvider = widget.thumbnailPath.startsWith('http')
+        ? CachedNetworkImageProvider(widget.thumbnailPath)
+        : FileImage(File(widget.thumbnailPath)) as ImageProvider;
 
     return InteractiveViewer(
       transformationController: _transformationController,
@@ -1661,13 +1697,23 @@ class _ZoomableImageState extends State<_ZoomableImage> {
       minScale: 1.0,
       maxScale: 5.0,
       child: Center(
-        child: Image(
-          image: imageProvider,
-          loadingBuilder: (context, child, progress) {
-            if (progress == null) return child;
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
+        child: widget.imagePath.startsWith('http')
+            ? CachedNetworkImage(
+                imageUrl: widget.imagePath,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => Image(
+                  image: thumbProvider,
+                  fit: BoxFit.contain,
+                ),
+                errorWidget: (context, url, error) =>
+                    const Center(child: Icon(Icons.error)),
+              )
+            : Image.file(
+                File(widget.imagePath),
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Center(child: Icon(Icons.error)),
+              ),
       ),
     );
   }

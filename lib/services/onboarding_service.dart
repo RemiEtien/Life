@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,6 +72,18 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
       state = state.copyWith(isActive: true, currentStep: OnboardingStep.welcome);
     }
   }
+
+  // ИСПРАВЛЕНИЕ: Новый метод для принудительного запуска обучения, например, из профиля.
+  /// Force-starts the onboarding tour, regardless of completion status.
+  /// This is used for replaying the tutorial.
+  void startTour() {
+    if (kDebugMode) {
+      print("[OnboardingService] Forcing tour to start.");
+    }
+    // Этот метод намеренно не проверяет hasCompleted, чтобы позволить повторный запуск.
+    state = state.copyWith(isActive: true, currentStep: OnboardingStep.welcome);
+  }
+
 
   /// Advances the onboarding to the next step in the sequence.
   void nextStep() {

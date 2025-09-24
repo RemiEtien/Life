@@ -34,7 +34,7 @@ class FirestoreService {
       return null;
     }
   }
-  
+
   /// Sets or overwrites a memory document in Firestore using a transaction
   /// to prevent race conditions and resolve sync conflicts.
   /// The memory object is expected to be ALREADY encrypted if needed.
@@ -66,10 +66,10 @@ class FirestoreService {
             transaction.set(docRef, memory.toFirestore());
             return;
           }
-          
+
           // --- ИСПРАВЛЕНИЕ: Добавлена проверка на null ---
           final remoteLastModified = (remoteData['lastModified'] as Timestamp?)?.toDate() ?? (remoteData['date'] as Timestamp).toDate();
-          
+
           if (memory.lastModified.isAfter(remoteLastModified)) {
             // Local version is newer, so we overwrite the remote document.
             transaction.set(docRef, memory.toFirestore());
@@ -121,7 +121,7 @@ class FirestoreService {
           }
           // --- ИСПРАВЛЕНИЕ: Добавлена проверка на null ---
           final remoteLastModified = (remoteData['lastModified'] as Timestamp?)?.toDate() ?? (remoteData['date'] as Timestamp).toDate();
-          
+
           if (memory.lastModified.isAfter(remoteLastModified)) {
             // Local changes are newer, so apply the update.
             transaction.update(docRef, memory.toFirestore());
@@ -165,7 +165,8 @@ class FirestoreService {
     final List<String> urlsToDelete = [
       ...memory.mediaUrls,
       ...memory.videoUrls,
-      ...memory.audioUrls, // CORRECTED: Now uses audioUrls list
+      ...memory.audioUrls,
+      ...memory.mediaThumbUrls, // ДОБАВЛЕНО: Удаление миниатюр
     ];
 
     for (final url in urlsToDelete) {
@@ -184,7 +185,7 @@ class FirestoreService {
       }
     }
   }
-  
+
   Future<List<String>> uploadFiles(
       String userId, String memoryId, List<String> paths, String type) async {
     final uploadedUrls = <String>[];

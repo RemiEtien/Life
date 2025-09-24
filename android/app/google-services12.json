@@ -58,14 +58,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "325668503094-2j6ot6mdcaq2oids9kk24632lmpdn5dd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.momentic.lifeline",
-            "certificate_hash": "828ca43179c1e43fa018ace0a9a3aea9172f6098"
-          }
-        },
-        {
           "client_id": "325668503094-lk6g0nkogme113ura5b11t2r1mndh1ig.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

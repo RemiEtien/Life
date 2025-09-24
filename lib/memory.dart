@@ -9,29 +9,21 @@ part 'memory.g.dart';
 // flutter pub run build_runner build --delete-conflicting-outputs
 // ---------------------------------------------------------------------------
 
-/// Helper function to de-duplicate media files, prioritizing local paths.
-Map<String, String> _getUniqueMediaMap(List<String> localPaths, List<String> remoteUrls) {
-    final mediaMap = <String, String>{};
-    
-    String getKey(String path) {
-        String filename = path.split('/').last.split('?').first;
-        // Removes timestamp like '1725798993883_' from synced files
-        return filename.replaceAll(RegExp(r'^\d{13}_'), ''); 
-    }
 
-    // Prioritize local, valid files
-    for (var path in localPaths) {
-        if (File(path).existsSync()) {
-            mediaMap[getKey(path)] = path;
-        }
+// Вспомогательный метод для получения ключа файла (имя файла без временной метки)
+String _getFileKey(String path) {
+  String filename = path.split('/').last.split('?').first;
+  // Removes timestamp like '1725798993883_' from synced files
+  return filename.replaceAll(RegExp(r'^\d{13}_'), '');
+}
+
+// Вспомогательный метод для получения ключа миниатюры
+String _getThumbKey(String path) {
+    String filename = _getFileKey(path);
+    if (filename.startsWith('thumb_')) {
+        return filename;
     }
-    
-    // Add remote urls if no local file with the same key exists
-    for (var url in remoteUrls) {
-        mediaMap.putIfAbsent(getKey(url), () => url);
-    }
-    
-    return mediaMap;
+    return 'thumb_$filename';
 }
 
 
@@ -58,13 +50,16 @@ class Memory {
   List<String> mediaUrls = [];
   List<String> videoUrls = [];
   
+  List<String> mediaThumbPaths = [];
+  List<String> mediaThumbUrls = [];
+
+
   @ignore
   bool get isSynced => syncStatus == 'synced';
   
   @Index()
   String syncStatus = 'pending';
 
-  // NEW: Changed to a list
   List<String> spotifyTrackIds = [];
   String? ambientSound;
 
@@ -80,12 +75,36 @@ class Memory {
 
   bool isEncrypted = false;
 
-  // NEW: Changed to lists
   List<String> audioNotePaths = [];
   List<String> audioUrls = [];
 
+  List<String> mediaKeysOrder = [];
+  List<String> videoKeysOrder = [];
+  List<String> audioKeysOrder = [];
+
+  // ИСПРАВЛЕНИЕ: Это поле теперь будет хранить эмоции в формате, понятном для Isar
+  List<String> emotionsData = [];
+
   @ignore
-  Map<String, int> emotions = {};
+  Map<String, int> get emotions {
+    final map = <String, int>{};
+    for (final entry in emotionsData) {
+      final parts = entry.split(':');
+      if (parts.length == 2) {
+        final key = parts[0];
+        final value = int.tryParse(parts[1]);
+        if (value != null) {
+          map[key] = value;
+        }
+      }
+    }
+    return map;
+  }
+
+  @ignore
+  set emotions(Map<String, int> newEmotions) {
+    emotionsData = newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
+  }
 
   Memory() {
     lastModified = DateTime.now().toUtc();
@@ -100,17 +119,112 @@ class Memory {
 
   @ignore
   List<String> get displayableMediaPaths {
-    return _getUniqueMediaMap(mediaPaths, mediaUrls).values.toList();
+    if (mediaKeysOrder.isEmpty) {
+      final combinedPaths = mediaPaths.where((path) => File(path).existsSync()).toList();
+      final localKeys = combinedPaths.map((path) => _getFileKey(path)).toSet();
+      for (var url in mediaUrls) {
+        final key = _getFileKey(url);
+        if (!localKeys.contains(key)) {
+          combinedPaths.add(url);
+        }
+      }
+      return combinedPaths;
+    }
+
+    final allPaths = [...mediaPaths, ...mediaUrls];
+    final pathMap = { for (var p in allPaths) _getFileKey(p) : p };
+
+    final orderedPaths = <String>[];
+    for (var key in mediaKeysOrder) {
+      if (pathMap.containsKey(key)) {
+        final path = pathMap[key]!;
+        if (path.startsWith('http') || File(path).existsSync()) {
+            orderedPaths.add(path);
+        }
+      }
+    }
+    return orderedPaths;
   }
+  
+  @ignore
+  List<String> get displayableThumbPaths {
+    if (mediaKeysOrder.isEmpty) {
+        return displayableMediaPaths; // Fallback для старых данных
+    }
+    
+    final allThumbs = [...mediaThumbPaths, ...mediaThumbUrls];
+    final thumbMap = { for (var p in allThumbs) _getThumbKey(p) : p };
+
+    final orderedThumbs = <String>[];
+    for (var key in mediaKeysOrder) {
+        final thumbKey = 'thumb_$key';
+        if (thumbMap.containsKey(thumbKey)) {
+            final path = thumbMap[thumbKey]!;
+            if (path.startsWith('http') || File(path).existsSync()) {
+                orderedThumbs.add(path);
+            }
+        }
+    }
+    return orderedThumbs;
+  }
+
 
   @ignore
   List<String> get displayableVideoPaths {
-    return _getUniqueMediaMap(videoPaths, videoUrls).values.toList();
+     if (videoKeysOrder.isEmpty) {
+      final combinedPaths = videoPaths.where((path) => File(path).existsSync()).toList();
+      final localKeys = combinedPaths.map((path) => _getFileKey(path)).toSet();
+      for (var url in videoUrls) {
+        final key = _getFileKey(url);
+        if (!localKeys.contains(key)) {
+          combinedPaths.add(url);
+        }
+      }
+      return combinedPaths;
+    }
+
+    final allPaths = [...videoPaths, ...videoUrls];
+    final pathMap = { for (var p in allPaths) _getFileKey(p) : p };
+
+    final orderedPaths = <String>[];
+    for (var key in videoKeysOrder) {
+      if (pathMap.containsKey(key)) {
+         final path = pathMap[key]!;
+        if (path.startsWith('http') || File(path).existsSync()) {
+            orderedPaths.add(path);
+        }
+      }
+    }
+    return orderedPaths;
   }
   
   @ignore
   List<String> get displayableAudioPaths {
-    return _getUniqueMediaMap(audioNotePaths, audioUrls).values.toList();
+     if (audioKeysOrder.isEmpty) {
+      final combinedPaths = audioNotePaths.where((path) => File(path).existsSync()).toList();
+      final localKeys = combinedPaths.map((path) => _getFileKey(path)).toSet();
+      for (var url in audioUrls) {
+        final key = _getFileKey(url);
+        if (!localKeys.contains(key)) {
+          combinedPaths.add(url);
+        }
+      }
+      return combinedPaths;
+    }
+
+    final allPaths = [...audioNotePaths, ...audioUrls];
+    final pathMap = { for (var p in allPaths) _getFileKey(p) : p };
+
+    final orderedPaths = <String>[];
+    for (var key in audioKeysOrder) {
+      if (pathMap.containsKey(key)) {
+        final path = pathMap[key]!;
+        if (path.startsWith('http') || File(path).existsSync()) {
+            orderedPaths.add(path);
+        }
+      }
+    }
+    return orderedPaths;
   }
 
   @ignore
@@ -118,6 +232,13 @@ class Memory {
     final paths = displayableMediaPaths;
     return paths.isNotEmpty ? paths.first : null;
   }
+  
+  @ignore
+  String? get coverThumbPath {
+      final paths = displayableThumbPaths;
+      return paths.isNotEmpty ? paths.first : null;
+  }
+
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -129,6 +250,7 @@ class Memory {
       'mediaUrls': mediaUrls,
       'videoUrls': videoUrls,
       'audioUrls': audioUrls,
+      'mediaThumbUrls': mediaThumbUrls, 
       'syncStatus': syncStatus,
       'spotifyTrackIds': spotifyTrackIds,
       'ambientSound': ambientSound,
@@ -144,10 +266,10 @@ class Memory {
           : null,
       'isEncrypted': isEncrypted, 
       'reflectionActionCompleted': reflectionActionCompleted,
-      'emotions': emotions,
-      // Deprecated fields for backward compatibility if needed, but not written for new memories
-      // 'spotifyTrackId': spotifyTrackIds.isNotEmpty ? spotifyTrackIds.first : null,
-      // 'audioUrl': audioUrls.isNotEmpty ? audioUrls.first : null,
+      'emotions': emotions, // Firestore/JSON can handle maps directly
+      'mediaKeysOrder': mediaKeysOrder,
+      'videoKeysOrder': videoKeysOrder,
+      'audioKeysOrder': audioKeysOrder,
     };
   }
 
@@ -162,9 +284,10 @@ class Memory {
       ..lastModified = (data['lastModified'] as Timestamp? ?? data['date'] as Timestamp).toDate()
       ..mediaUrls = List<String>.from(data['mediaUrls'] ?? [])
       ..videoUrls = List<String>.from(data['videoUrls'] ?? [])
-      ..audioUrls = List<String>.from(data['audioUrls'] ?? (data['audioUrl'] != null ? [data['audioUrl']] : [])) // Backward compatibility for audio
+      ..audioUrls = List<String>.from(data['audioUrls'] ?? (data['audioUrl'] != null ? [data['audioUrl']] : []))
+      ..mediaThumbUrls = List<String>.from(data['mediaThumbUrls'] ?? [])
       ..syncStatus = data['syncStatus'] ?? 'synced'
-      ..spotifyTrackIds = List<String>.from(data['spotifyTrackIds'] ?? (data['spotifyTrackId'] != null ? [data['spotifyTrackId']] : [])) // Backward compatibility for spotify
+      ..spotifyTrackIds = List<String>.from(data['spotifyTrackIds'] ?? (data['spotifyTrackId'] != null ? [data['spotifyTrackId']] : []))
       ..ambientSound = data['ambientSound']
       ..reflectionImpact = data['reflectionImpact']
       ..reflectionLesson = data['reflectionLesson']
@@ -178,9 +301,12 @@ class Memory {
           : null
       ..isEncrypted = data['isEncrypted'] ?? data['reflectionPrivate'] ?? false
       ..reflectionActionCompleted = data['reflectionActionCompleted'] ?? false
-      ..emotions = Map<String, int>.from(data['emotions'] ?? {});
+      ..emotions = Map<String, int>.from(data['emotions'] ?? {}) // Setter will convert this
+      ..mediaKeysOrder = List<String>.from(data['mediaKeysOrder'] ?? [])
+      ..videoKeysOrder = List<String>.from(data['videoKeysOrder'] ?? [])
+      ..audioKeysOrder = List<String>.from(data['audioKeysOrder'] ?? []);
       
-      // Manually handle old single audio path fields for backward compatibility
+      
       if (data.containsKey('audioNotePath') && data['audioNotePath'] != null) {
           memory.audioNotePaths.add(data['audioNotePath']);
       }
@@ -214,4 +340,3 @@ class Memory {
     return score;
   }
 }
-

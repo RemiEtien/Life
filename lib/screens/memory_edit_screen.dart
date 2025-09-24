@@ -14,6 +14,8 @@ import 'package:lifeline/screens/profile_screen.dart';
 import 'package:lifeline/screens/spotify_search_screen.dart';
 import 'package:lifeline/services/audio_service.dart';
 import 'package:lifeline/services/encryption_service.dart';
+// НОВЫЙ ИМПОРТ
+import 'package:lifeline/services/image_processing_service.dart';
 import 'package:lifeline/services/message_service.dart';
 import 'package:lifeline/widgets/premium_upsell_widgets.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,9 +25,10 @@ import 'package:record/record.dart';
 // Helper class to distinguish between local files and network URLs
 class MediaItem {
   final String path;
+  final String thumbPath; // Путь к миниатюре
   final bool isLocal;
 
-  MediaItem({required this.path, required this.isLocal});
+  MediaItem({required this.path, required this.thumbPath, required this.isLocal});
 
   @override
   bool operator ==(Object other) =>
@@ -35,13 +38,37 @@ class MediaItem {
   @override
   int get hashCode => path.hashCode;
 }
+class AudioMediaItem {
+  final String path;
+  final bool isLocal;
+  AudioMediaItem({required this.path, required this.isLocal});
+}
+class VideoMediaItem {
+  final String path;
+  final bool isLocal;
+  VideoMediaItem({required this.path, required this.isLocal});
+}
+
+
+// Вспомогательный метод для получения ключа файла (имя файла без временной метки)
+String _getFileKey(String path) {
+  String filename = path.split('/').last.split('?').first;
+  return filename.replaceAll(RegExp(r'^\d{13}_'), '');
+}
 
 
 class MemoryEditScreen extends ConsumerStatefulWidget {
   final Memory? initial;
   final String userId;
+  // ИЗМЕНЕНО: Добавлен параметр для приема медиа извне
+  final List<MediaItem>? initialMedia;
 
-  const MemoryEditScreen({super.key, this.initial, required this.userId});
+  const MemoryEditScreen({
+    super.key, 
+    this.initial, 
+    required this.userId,
+    this.initialMedia, // ИЗМЕНЕНО
+  });
 
   @override
   ConsumerState<MemoryEditScreen> createState() => _MemoryEditScreenState();
@@ -57,8 +84,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   DateTime _date = DateTime.now();
   
   final List<MediaItem> _mediaItems = [];
-  final List<MediaItem> _videoItems = [];
-  final List<MediaItem> _audioNoteItems = [];
+  final List<VideoMediaItem> _videoItems = [];
+  final List<AudioMediaItem> _audioNoteItems = [];
 
   List<String> _spotifyTrackIds = [];
   final Map<String, SpotifyTrackDetails> _spotifyTrackDetailsMap = {};
@@ -73,7 +100,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   bool _isEncrypted = false;
   late DateTime? _followUpDate;
 
-  // ИСПРАВЛЕНО: Используем AudioRecorder вместо Record
   final _audioRecorder = AudioRecorder();
   bool _isRecording = false;
   bool _isSaving = false;
@@ -81,7 +107,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Timer? _autosaveTimer;
   Memory? _draftMemory;
 
-  // --- Лимиты для Freemium-модели ---
   static const int _freePhotoLimit = 3;
   static const int _freeVideoLimit = 1;
   static const int _freeAudioLimit = 1;
@@ -113,9 +138,22 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     _selectedEmotionsWithIntensity = Map.from(_draftMemory?.emotions ?? {});
 
     if (_draftMemory != null) {
-      _mediaItems.addAll(_draftMemory!.displayableMediaPaths.map((p) => MediaItem(path: p, isLocal: !p.startsWith('http'))));
-      _videoItems.addAll(_draftMemory!.displayableVideoPaths.map((p) => MediaItem(path: p, isLocal: !p.startsWith('http'))));
-      _audioNoteItems.addAll(_draftMemory!.displayableAudioPaths.map((p) => MediaItem(path: p, isLocal: !p.startsWith('http'))));
+      final fullImages = _draftMemory!.displayableMediaPaths;
+      final thumbnails = _draftMemory!.displayableThumbPaths;
+      for (int i = 0; i < fullImages.length; i++) {
+        final fullPath = fullImages[i];
+        // Если для полного изображения есть миниатюра, используем ее. Иначе - само полное изображение.
+        final thumbPath = i < thumbnails.length ? thumbnails[i] : fullPath;
+        _mediaItems.add(MediaItem(path: fullPath, thumbPath: thumbPath, isLocal: !fullPath.startsWith('http')));
+      }
+
+      _videoItems.addAll(_draftMemory!.displayableVideoPaths.map((p) => VideoMediaItem(path: p, isLocal: !p.startsWith('http'))));
+      _audioNoteItems.addAll(_draftMemory!.displayableAudioPaths.map((p) => AudioMediaItem(path: p, isLocal: !p.startsWith('http'))));
+    }
+
+    // ИЗМЕНЕНО: Добавляем медиа, переданные извне
+    if (widget.initialMedia != null) {
+      _mediaItems.insertAll(0, widget.initialMedia!);
     }
 
     _initializeAutosave();
@@ -167,6 +205,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final memoryToSave = _draftMemory!;
       memoryToSave.mediaPaths = _mediaItems.where((i) => i.isLocal).map((i) => i.path).toList();
       memoryToSave.mediaUrls = _mediaItems.where((i) => !i.isLocal).map((i) => i.path).toList();
+      memoryToSave.mediaThumbPaths = _mediaItems.where((i) => i.isLocal).map((i) => i.thumbPath).toList();
+      memoryToSave.mediaThumbUrls = _mediaItems.where((i) => !i.isLocal).map((i) => i.thumbPath).toList();
+      
       memoryToSave.videoPaths = _videoItems.where((i) => i.isLocal).map((i) => i.path).toList();
       memoryToSave.videoUrls = _videoItems.where((i) => !i.isLocal).map((i) => i.path).toList();
       memoryToSave.audioNotePaths = _audioNoteItems.where((i) => i.isLocal).map((i) => i.path).toList();
@@ -186,6 +227,11 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       memoryToSave.reflectionFollowUpAt = _followUpDate;
       memoryToSave.isEncrypted = _isEncrypted;
       memoryToSave.emotions = _selectedEmotionsWithIntensity;
+      
+      // --- ИСПРАВЛЕНИЕ: Сохраняем порядок ---
+      memoryToSave.mediaKeysOrder = _mediaItems.map((item) => _getFileKey(item.path)).toList();
+      memoryToSave.videoKeysOrder = _videoItems.map((item) => _getFileKey(item.path)).toList();
+      memoryToSave.audioKeysOrder = _audioNoteItems.map((item) => _getFileKey(item.path)).toList();
     
     await repo.update(memoryToSave);
 
@@ -207,7 +253,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     _evidenceAgainstCtrl.dispose();
     _reframeCtrl.dispose();
     _actionCtrl.dispose();
-    // ИСПРАВЛЕНО: API пакета record изменился
     _audioRecorder.dispose();
     super.dispose();
   }
@@ -227,7 +272,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final l10n = AppLocalizations.of(context)!;
     
     final picker = ImagePicker();
-    final pickedFiles = await picker.pickMultiImage(imageQuality: 80, maxWidth: 2200);
+    final pickedFiles = await picker.pickMultiImage();
 
     if (pickedFiles.isNotEmpty) {
       if (!isPremium && (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
@@ -236,9 +281,20 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         }
         return;
       }
-      setState(() {
-        for (var file in pickedFiles) { _mediaItems.add(MediaItem(path: file.path, isLocal: true)); }
-      });
+
+      final imageProcessor = ref.read(imageProcessingServiceProvider);
+      for (final file in pickedFiles) {
+        final result = await imageProcessor.processPickedImage(file);
+        if (result != null) {
+          setState(() {
+            _mediaItems.add(MediaItem(
+              path: result.compressedImagePath,
+              thumbPath: result.thumbnailPath,
+              isLocal: true,
+            ));
+          });
+        }
+      }
       _autoSaveDraft();
     }
   }
@@ -258,7 +314,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       final picker = ImagePicker();
       final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
       if (pickedFile != null) {
-        setState(() => _videoItems.add(MediaItem(path: pickedFile.path, isLocal: true)));
+        setState(() => _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
         _autoSaveDraft();
       }
     } else if (status.isPermanentlyDenied) {
@@ -281,19 +337,17 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     if (status.isGranted) {
       await ref.read(audioPlayerProvider.notifier).pauseGlobalPlayer();
       if (_isRecording) {
-        // ИСПРАВЛЕНО: API пакета record изменился
         final path = await _audioRecorder.stop();
         if (path != null) {
           setState(() { 
             _isRecording = false; 
-            _audioNoteItems.add(MediaItem(path: path, isLocal: true));
+            _audioNoteItems.add(AudioMediaItem(path: path, isLocal: true));
           });
           _autoSaveDraft();
         }
       } else {
         final dir = await getTemporaryDirectory();
         final path = '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
-        // ИСПРАВЛЕНО: API пакета record изменился
         await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.aacLc), path: path);
         setState(() => _isRecording = true);
       }
@@ -350,7 +404,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     }
 
     final connectivityResult = await (Connectivity().checkConnectivity());
-    // ИСПРАВЛЕНО: Проверяем, что в списке результатов нет активного соединения
     if (connectivityResult.contains(ConnectivityResult.none) && !connectivityResult.contains(ConnectivityResult.wifi) && !connectivityResult.contains(ConnectivityResult.mobile)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -561,7 +614,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                   ],
                 ),
               const SizedBox(height: 16),
-              // --- ИЗМЕНЕНИЕ: Блок шифрования теперь здесь ---
               _buildEncryptionControl(l10n, isEncryptionGloballyEnabled),
               const SizedBox(height: 16),
               _AutosavingTextField(
@@ -625,7 +677,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 16),
-                // --- ИЗМЕНЕНИЕ: Убрали замок отсюда ---
                 Text(l10n.memoryEditReflectionSectionTitle,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold)),
@@ -638,7 +689,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     );
   }
 
-  // --- НОВЫЙ МЕТОД: для создания виджета шифрования ---
   Widget _buildEncryptionControl(AppLocalizations l10n, bool isEncryptionGloballyEnabled) {
     return Container(
       decoration: BoxDecoration(
@@ -658,7 +708,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     );
   }
 
-  // --- НОВЫЙ МЕТОД: логика при переключении шифрования ---
   void _onEncryptionToggle(bool value, bool isEncryptionGloballyEnabled, AppLocalizations l10n) {
     if (isEncryptionGloballyEnabled) {
       setState(() => _isEncrypted = value);
@@ -668,7 +717,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     }
   }
 
-  // --- НОВЫЙ МЕТОД: диалог для предложения создать пароль ---
   Future<void> _showSetupEncryptionDialog(AppLocalizations l10n) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -873,6 +921,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         itemCount: _mediaItems.length,
         itemBuilder: (context, index) {
           final item = _mediaItems[index];
+          // ИСПОЛЬЗУЕМ THUMBPATH ДЛЯ ОТОБРАЖЕНИЯ
+          final displayPath = item.thumbPath;
           return Card(
             key: ValueKey(item.path),
             margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
@@ -885,9 +935,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: item.isLocal
-                        ? Image.file(File(item.path), fit: BoxFit.cover)
+                        ? Image.file(File(displayPath), fit: BoxFit.cover)
                         : CachedNetworkImage(
-                            imageUrl: item.path,
+                            imageUrl: displayPath,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator()),
@@ -1252,4 +1302,3 @@ class _AutosavingTextFieldState extends State<_AutosavingTextField> {
     );
   }
 }
-

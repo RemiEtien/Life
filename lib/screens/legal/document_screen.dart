@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:lifeline/l10n/app_localizations.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 
 class DocumentScreen extends StatelessWidget {
   final String documentPath;
@@ -29,12 +29,33 @@ class DocumentScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              // ИСПРАВЛЕНИЕ: У виджета Markdown убран параметр padding.
-              // Вместо этого, он обернут в стандартный виджет Padding.
-              return Padding(
+              // ИЗМЕНЕНИЕ: Заменен Markdown на MarkdownWidget из нового пакета.
+              // Виджет обернут в SingleChildScrollView для поддержки прокрутки.
+              return SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
-                child: Markdown(
+                child: MarkdownWidget(
                   data: snapshot.data!,
+                  // Базовая конфигурация для улучшения внешнего вида
+                  config: MarkdownConfig(
+                    configs: [
+                      PConfig(
+                        textStyle: Theme.of(context).textTheme.bodyMedium ??
+                            const TextStyle(),
+                      ),
+                      H1Config(
+                        style: Theme.of(context).textTheme.headlineSmall ??
+                            const TextStyle(),
+                      ),
+                      H2Config(
+                        style: Theme.of(context).textTheme.titleLarge ??
+                            const TextStyle(),
+                      ),
+                      H3Config(
+                        style: Theme.of(context).textTheme.titleMedium ??
+                            const TextStyle(),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }

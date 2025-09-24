@@ -24,19 +24,30 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// ДОБАВЛЕНО: JVM Toolchain конфигурация для решения проблемы совместимости
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace "com.momentic.lifeline"
     compileSdk 36 
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125" // ИСПРАВЛЕНИЕ: Указываем конкретную версию NDK
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17  // ОБНОВЛЕНО: было VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_17  // ОБНОВЛЕНО: было VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'  // ОБНОВЛЕНО: было '1.8'
     }
 
     sourceSets {
@@ -50,6 +61,19 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        
+        // ИСПРАВЛЕНИЕ: Поддержка 16KB страниц памяти
+        ndk {
+            // Убираем old ABI, добавляем поддержку новых архитектур
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+        }
+    }
+
+    // ИСПРАВЛЕНИЕ: Упрощенные настройки packaging
+    packaging {
+        jniLibs {
+            useLegacyPackaging false
+        }
     }
 
     signingConfigs {
@@ -71,7 +95,6 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            // ИСПРАВЛЕНИЕ: Используем старую стабильную конфигурацию для Crashlytics 2.9.9
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
             }
@@ -92,4 +115,7 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0"
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+    
+    // ИСПРАВЛЕНИЕ: Добавляем поддержку AndroidX для Edge-to-Edge
+    implementation 'androidx.core:core-ktx:1.10.1'
 }

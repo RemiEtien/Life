@@ -174,11 +174,14 @@ class SyncService {
 
       try {
         final notifier = _ref.read(syncNotifierProvider.notifier);
-        notifier.updateState(currentStatus: "Uploading photos...", progress: 0.2);
         
+        notifier.updateState(currentStatus: "Uploading thumbnails...", progress: 0.1);
+        final newThumbUrls = await firestore.uploadFiles(userId, memory.universalId, memory.mediaThumbPaths, 'thumbs');
+
+        notifier.updateState(currentStatus: "Uploading photos...", progress: 0.3);
         final newPhotoUrls = await firestore.uploadFiles(userId, memory.universalId, memory.mediaPaths, 'photos');
         
-        notifier.updateState(currentStatus: "Uploading videos...", progress: 0.5);
+        notifier.updateState(currentStatus: "Uploading videos...", progress: 0.6);
         final newVideoUrls = await firestore.uploadFiles(userId, memory.universalId, memory.videoPaths, 'videos');
         
         notifier.updateState(currentStatus: "Uploading audio...", progress: 0.8);
@@ -189,6 +192,8 @@ class SyncService {
         memoryToSaveInCloud
           ..mediaUrls = [...memory.mediaUrls, ...newPhotoUrls].toSet().toList()
           ..mediaPaths = []
+          ..mediaThumbUrls = [...memory.mediaThumbUrls, ...newThumbUrls].toSet().toList() // НОВОЕ ПОЛЕ
+          ..mediaThumbPaths = [] // НОВОЕ ПОЛЕ
           ..videoUrls = [...memory.videoUrls, ...newVideoUrls].toSet().toList()
           ..videoPaths = []
           ..audioUrls = [...memory.audioUrls, ...newAudioUrls].toSet().toList()

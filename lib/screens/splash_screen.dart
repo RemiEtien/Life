@@ -24,6 +24,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // BREADCRUMB: Log when this widget is created.
     FirebaseCrashlytics.instance.log('SplashScreen: initState');
     _audioPlayer = AudioPlayer();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -50,18 +51,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       _audioPlayer.play(AssetSource('sounds/intro_phrase.mp3'));
     } catch (e) {
       if (kDebugMode) {
-        print("Could not play intro sound: $e");
+        debugPrint("Could not play intro sound: $e");
       }
     }
 
-    // ИСПРАВЛЕНИЕ: Получаем сервисы до асинхронных операций
-    final authService = ref.read(authServiceProvider);
-    final localeNotifier = ref.read(localeProvider.notifier);
-    final syncService = ref.read(syncServiceProvider);
-
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after 3s delay.');
+      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after 3s sound delay.');
       return;
     }
 
@@ -76,33 +72,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
 
     await prefs.reload();
-    if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after reloading SharedPreferences.');
-      return;
-    }
-
     final bool hasConsented = prefs.getBool('hasConsented') ?? false;
 
-    if (kDebugMode) {
-      print("[SplashScreen] Has user consented? -> $hasConsented");
+    if (!mounted) {
+      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after checking consent.');
+      return;
     }
 
     if (!hasConsented) {
-      FirebaseCrashlytics.instance.log('SplashScreen: No consent found. Navigating to ConsentScreen.');
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ConsentScreen()),
-        );
-      }
+      FirebaseCrashlytics.instance.log('SplashScreen: No consent. Navigating to ConsentScreen.');
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const ConsentScreen()),
+      );
       return;
     }
 
+    FirebaseCrashlytics.instance.log('SplashScreen: Consent found. Awaiting first auth state.');
     if (mounted) {
       setState(() => _statusMessage = l10n.splashMessageAuthenticating);
     }
     
-    FirebaseCrashlytics.instance.log('SplashScreen: Awaiting first auth state.');
-    final user = await authService.authStateChanges.first;
+    // Using ref.read for one-time read
+    final user = await ref.read(authStateChangesProvider.future);
     if (!mounted) {
       FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after awaiting auth state.');
       return;
@@ -110,16 +101,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (user == null) {
       FirebaseCrashlytics.instance.log('SplashScreen: User is null. Navigating to AuthGate (Login).');
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AuthGate()),
-        );
-      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AuthGate()),
+      );
       return;
     }
 
     FirebaseCrashlytics.instance.log('SplashScreen: User found. Syncing locale with profile.');
-    await localeNotifier.syncLocaleWithUserProfile();
+    await ref.read(localeProvider.notifier).syncLocaleWithUserProfile();
     if (!mounted) {
       FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after syncing locale.');
       return;
@@ -131,7 +120,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     
     FirebaseCrashlytics.instance.log('SplashScreen: Starting initial sync from cloud.');
     try {
-      await syncService.syncFromCloudToLocal(isInitialSync: true);
+      await ref.read(syncServiceProvider).syncFromCloudToLocal(isInitialSync: true);
     } catch (e, stack) {
       if (kDebugMode) {
         print("[SplashScreen] Initial sync failed, proceeding with local data. Error: $e");
@@ -152,6 +141,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   void dispose() {
+    // BREADCRUMB: Log when this widget is destroyed.
     FirebaseCrashlytics.instance.log('SplashScreen: dispose');
     _audioPlayer.dispose();
     super.dispose();
@@ -180,7 +170,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               child: Text(
                 _statusMessage,
                 key: ValueKey(_statusMessage),
-                style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                style: TextStyle(color: Colors.white.withAlpha((255 * 0.7).round())),
               ),
             ),
           ],
@@ -189,3 +179,5 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 }
+
+

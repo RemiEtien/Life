@@ -949,4 +949,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get memoryViewExportPdf => '以 PDF 格式分享';
+
+  @override
+  String get shareActionTitle => '添加到 Lifeline';
+
+  @override
+  String get shareActionSubtitle => '您想如何处理这些文件？';
+
+  @override
+  String get shareCreateNewMemory => '创建新的记忆';
+
+  @override
+  String get shareAddToExisting => '添加到现有记忆';
+
+  @override
+  String get selectMemoryTitle => '选择一个记忆';
+
+  @override
+  String get selectMemorySearchHint => '按标题或内容搜索...';
+
+  @override
+  String get selectMemoryEmpty => '未找到记忆';
+
+  @override
+  String get memoryUpdatedSuccess => '记忆更新成功！';
 }

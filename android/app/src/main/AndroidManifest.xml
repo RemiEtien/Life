@@ -10,12 +10,11 @@
     <!-- Permission for microphone -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     
-    <!-- ДОБАВЛЕНО: Разрешение на точные уведомления -->
+    <!-- Разрешение на точные уведомления -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <!-- ДОБАВЛЕНО: Разрешение на показ уведомлений (для Android 13+) -->
+    <!-- Разрешение на показ уведомлений (для Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-    <!-- START OF CHANGES: Added queries for external app interaction -->
     <queries>
         <!-- Allows opening HTTPS links in browsers or other apps -->
         <intent>
@@ -26,8 +25,7 @@
         <!-- Specifically allows interaction with the Spotify app -->
         <package android:name="com.spotify.music" />
     </queries>
-    <!-- END OF CHANGES -->
-
+    
     <application
         android:label="Lifeline"
         android:name="${applicationName}"
@@ -36,11 +34,12 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask" 
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+            
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
@@ -49,9 +48,29 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
         </activity>
 
-        <!-- ДОБАВЛЕНО: Конфигурация для плагина уведомлений -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
@@ -59,10 +78,10 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
-        <!-- КОНЕЦ КОНФИГУРАЦИИ -->
-
+        
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
 </manifest>
+

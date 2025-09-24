@@ -994,4 +994,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get memoryViewExportPdf => 'Compartilhar como PDF';
+
+  @override
+  String get shareActionTitle => 'Adicionar ao Lifeline';
+
+  @override
+  String get shareActionSubtitle =>
+      'O que você gostaria de fazer com estes arquivos?';
+
+  @override
+  String get shareCreateNewMemory => 'Criar uma Nova Memória';
+
+  @override
+  String get shareAddToExisting => 'Adicionar a uma Memória Existente';
+
+  @override
+  String get selectMemoryTitle => 'Selecionar uma Memória';
+
+  @override
+  String get selectMemorySearchHint => 'Pesquisar por título ou conteúdo...';
+
+  @override
+  String get selectMemoryEmpty => 'Nenhuma memória encontrada';
+
+  @override
+  String get memoryUpdatedSuccess => 'Memória atualizada com sucesso!';
 }

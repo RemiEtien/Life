@@ -4,17 +4,58 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:lifeline/l10n/app_localizations.dart';
 import 'package:lifeline/providers/application_providers.dart';
 import 'package:lifeline/services/purchase_service.dart';
-import 'package:url_launcher/url_launcher.dart';
+// ИСПРАВЛЕНИЕ: Добавляем импорты для работы с локальными файлами и экраном документов
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:lifeline/screens/legal/document_screen.dart';
+
 
 class PremiumScreen extends ConsumerWidget {
   const PremiumScreen({super.key});
 
+  // ИСПРАВЛЕНИЕ: Добавляем вспомогательный метод для открытия локальных документов
+  void _openDocument(BuildContext context, WidgetRef ref, String title, String docName) async {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = ref.read(localeProvider) ?? Localizations.localeOf(context);
+    final languageCode = locale.languageCode;
+
+    final specificPath = 'assets/legal/${docName}_$languageCode.md';
+    final fallbackPath = 'assets/legal/${docName}_en.md';
+    String finalPath = fallbackPath;
+    bool fileExists = false;
+
+    try {
+      await rootBundle.loadString(specificPath);
+      finalPath = specificPath;
+      fileExists = true;
+    } catch (_) {
+      try {
+        await rootBundle.loadString(fallbackPath);
+        fileExists = true;
+      } catch (e) {
+          fileExists = false;
+      }
+    }
+    
+    if (!context.mounted) return;
+
+    if (fileExists) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DocumentScreen(title: title, documentPath: finalPath),
+        ),
+      );
+    } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.documentErrorLoading)),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    // ИСПРАВЛЕНИЕ 1: Слушаем состояние (PurchaseState), а не сам сервис.
     final purchaseState = ref.watch(purchaseServiceProvider);
-    // Получаем notifier для вызова методов (buyProduct, restorePurchases).
     final purchaseNotifier = ref.read(purchaseServiceProvider.notifier);
 
     return Scaffold(
@@ -33,7 +74,6 @@ class PremiumScreen extends ConsumerWidget {
               const SizedBox(height: 32),
               _buildFeatureList(context, l10n),
               const SizedBox(height: 32),
-              // ИСПРАВЛЕНИЕ 1 (продолжение): Используем purchaseState для отображения UI.
               if (purchaseState.isLoading)
                 const Center(child: CircularProgressIndicator())
               else if (!purchaseState.isAvailable)
@@ -56,7 +96,8 @@ class PremiumScreen extends ConsumerWidget {
                 ...purchaseState.products.map((p) =>
                     _buildProductCard(context, p, purchaseNotifier, l10n)),
               const SizedBox(height: 24),
-              _buildFooter(context, purchaseNotifier, l10n),
+              // ИСПРАВЛЕНИЕ: Передаем ref в _buildFooter
+              _buildFooter(context, ref, purchaseNotifier, l10n),
             ],
           ),
         ),
@@ -164,8 +205,8 @@ class PremiumScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFooter(
-      BuildContext context, PurchaseService service, AppLocalizations l10n) {
+  // ИСПРАВЛЕНИЕ: Метод теперь принимает WidgetRef
+  Widget _buildFooter(BuildContext context, WidgetRef ref, PurchaseService service, AppLocalizations l10n) {
     return Column(
       children: [
         TextButton(
@@ -179,12 +220,12 @@ class PremiumScreen extends ConsumerWidget {
           runSpacing: 8.0,
           children: [
             TextButton(
-                onPressed: () =>
-                    launchUrl(Uri.parse("https://lifeline-ai.web.app/terms.html")),
+                // ИСПРАВЛЕНИЕ: Вызываем _openDocument вместо launchUrl
+                onPressed: () => _openDocument(context, ref, l10n.premiumScreenTerms, 'terms_of_service'),
                 child: Text(l10n.premiumScreenTerms)),
             TextButton(
-                onPressed: () => launchUrl(
-                    Uri.parse("https://lifeline-ai.web.app/privacy.html")),
+                // ИСПРАВЛЕНИЕ: Вызываем _openDocument вместо launchUrl
+                onPressed: () => _openDocument(context, ref, l10n.premiumScreenPrivacy, 'privacy_policy'),
                 child: Text(l10n.premiumScreenPrivacy)),
           ],
         )

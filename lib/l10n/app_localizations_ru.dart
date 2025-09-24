@@ -991,4 +991,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get memoryViewExportPdf => 'Поделиться как PDF';
+
+  @override
+  String get shareActionTitle => 'Добавить в Lifeline';
+
+  @override
+  String get shareActionSubtitle => 'Что вы хотите сделать с этими файлами?';
+
+  @override
+  String get shareCreateNewMemory => 'Создать новое воспоминание';
+
+  @override
+  String get shareAddToExisting => 'Дополнить существующее';
+
+  @override
+  String get selectMemoryTitle => 'Выберите воспоминание';
+
+  @override
+  String get selectMemorySearchHint => 'Поиск по названию или содержанию...';
+
+  @override
+  String get selectMemoryEmpty => 'Воспоминания не найдены';
+
+  @override
+  String get memoryUpdatedSuccess => 'Воспоминание успешно дополнено!';
 }

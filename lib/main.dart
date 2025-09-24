@@ -8,7 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // ИМПОРТ ДЛЯ SystemChrome
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,14 +26,17 @@ void main() async {
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // ИСПРАВЛЕНИЕ (Google Play / Android 15): Включаем режим "от края до края"
-    // и делаем иконки системных панелей видимыми на прозрачном фоне.
+    // ИСПРАВЛЕНИЕ: Современная настройка Edge-to-Edge без устаревших API
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    
+    // ИСПРАВЛЕНИЕ: Убираем statusBarColor и systemNavigationBarColor 
+    // для избежания вызова устаревших API в Android 15+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent,
-      statusBarColor: Colors.transparent, // Это поле теперь игнорируется в edge-to-edge, но оставляем для совместимости
+      // Не устанавливаем statusBarColor и systemNavigationBarColor
+      // чтобы избежать вызова Window.setStatusBarColor()
       systemNavigationBarIconBrightness: Brightness.light,
       statusBarIconBrightness: Brightness.light,
+      systemNavigationBarDividerColor: Colors.transparent,
     ));
 
     final prefs = await SharedPreferences.getInstance();
@@ -50,11 +53,10 @@ void main() async {
     );
     
     if (kDebugMode) {
-      print('⚠️ App Check is using DEBUG providers.');
+      debugPrint('⚠️ App Check is using DEBUG providers.');
     } else {
-      print('App Check activated with Play Integrity / App Attest.');
+      debugPrint('App Check activated with Play Integrity / App Attest.');
     }
-
 
     await NotificationService().init();
     await initializeDateFormatting('ru', null);
@@ -65,6 +67,7 @@ void main() async {
     await initializeDateFormatting('he', null);
     await initializeDateFormatting('pt', null);
     await initializeDateFormatting('zh', null);
+    await initializeDateFormatting('ar', null);
 
     await DevicePerformanceDetector.initialize();
 
@@ -74,11 +77,11 @@ void main() async {
        };
     } else if (kDebugMode) {
       FlutterError.onError = (details) {
-        print('Flutter error: $details');
+        debugPrint('Flutter error: $details');
       };
       PlatformDispatcher.instance.onError = (error, stack) {
-        print('Platform error: $error');
-        print('Stack: $stack');
+        debugPrint('Platform error: $error');
+        debugPrint('Stack: $stack');
         return true;
       };
     } else {
@@ -104,17 +107,45 @@ void main() async {
     if (!kDebugMode) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     } else {
-      print('Caught async error in Zone: $error');
-      print('Stack: $stack');
+      debugPrint('Caught async error in Zone: $error');
+      debugPrint('Stack: $stack');
     }
   });
 }
 
-class LifelineApp extends ConsumerWidget {
+class LifelineApp extends ConsumerStatefulWidget {
   const LifelineApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LifelineApp> createState() => _LifelineAppState();
+}
+
+class _LifelineAppState extends ConsumerState<LifelineApp> with WidgetsBindingObserver {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (!mounted) return;
+    
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      ref.read(audioPlayerProvider.notifier).pauseAllAudio();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFFFF3B3B),

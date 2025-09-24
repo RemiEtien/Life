@@ -1,429 +1,437 @@
 {
-  "@@locale": "ar",
-  "email": "البريد الإلكتروني",
-  "password": "كلمة المرور",
-  "signIn": "تسجيل الدخول",
-  "register": "التسجيل",
-  "createAccount": "إنشاء حساب جديد",
-  "alreadyHaveAccount": "لدي حساب بالفعل",
-  "orSignInWith": "أو سجل الدخول باستخدام",
-  "passwordTooShort": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
-  "invalidEmail": "الرجاء إدخال بريد إلكتروني صالح",
-  "consentWelcomeTitle": "مرحباً بك في Lifeline",
-  "consentWelcomeSubtitle": "قبل أن تبدأ، يرجى مراجعة شروطنا والموافقة عليها.",
-  "consentIAgreeTo": "لقد قرأت ووافقت على ",
-  "consentTermsOfService": "شروط الخدمة",
-  "consentAnd": " و ",
-  "consentPrivacyPolicy": "سياسة الخصوصية",
-  "consentContinue": "متابعة",
-  "consentErrorSaving": "خطأ في حفظ الإعدادات: {error}",
-  "@consentErrorSaving": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "splashMessageInitializing": "جاري التهيئة...",
-  "splashMessageCheckingSettings": "جاري التحقق من الإعدادات...",
-  "splashMessageAuthenticating": "جاري المصادقة...",
-  "splashMessageSyncing": "جاري مزامنة خطك الزمني...",
-  "authGateLoadingMemories": "جاري تحميل الذكريات...",
-  "authGateAuthenticating": "جاري المصادقة...",
-  "authGateSomethingWentWrong": "حدث خطأ ما",
-  "authGateCouldNotLoad": "لم نتمكن من تحميل بياناتك. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
-  "authGateTryAgain": "المحاولة مرة أخرى",
-  "authGateEmptyState": "خط Lifeline الخاص بك جاهز.\nاضغط على زر + لإضافة ذاكرتك الأولى.",
-  "authGateUnsavedDraftTitle": "ذاكرة غير محفوظة",
-  "authGateUnsavedDraftContent": "لديك مسودة ذاكرة غير محفوظة. هل تريد متابعة تحريرها؟",
-  "authGateDiscard": "تجاهل",
-  "authGateContinueEditing": "متابعة التحرير",
-  "verifyEmailTitle": "تأكيد البريد الإلكتروني",
-  "verifyEmailSentTo": "تم إرسال بريد إلكتروني للتحقق إلى:",
-  "verifyEmailInstructions": "الرجاء النقر على الرابط في البريد الإلكتروني لإكمال تسجيلك.",
-  "verifyEmailResendButton": "إعادة إرسال البريد الإلكتروني",
-  "verifyEmailCancelButton": "إلغاء",
-  "profileTitle": "الملف الشخصي والإعدادات",
-  "profileSectionProfile": "الملف الشخصي",
-  "profileChangeNameTitle": "تغيير الاسم",
-  "profileEnterYourName": "أدخل اسمك",
-  "profileSave": "حفظ",
-  "profileCancel": "إلغاء",
-  "profileName": "الاسم",
-  "profileReauthTitle": "إعادة المصادقة مطلوبة",
-  "profileReauthContent": "هذه عملية حساسة. يرجى تسجيل الدخول مرة أخرى قبل المتابعة.",
-  "profileReauthButton": "تسجيل الدخول والحذف",
-  "profileReauthPasswordDialogTitle": "تأكيد الإجراء",
-  "profileReauthPasswordDialogContent": "لحذف حسابك، يرجى إدخال كلمة المرور الحالية.",
-  "profilePasswordCannotBeEmpty": "لا يمكن أن تكون كلمة المرور فارغة",
-  "profileChangePasswordSuccess": "تم تغيير كلمة المرور الرئيسية بنجاح!",
-  "profileChangePasswordErrorIncorrect": "كلمة المرور الرئيسية الحالية التي أدخلتها غير صحيحة.",
-  "profileOldPasswordHint": "كلمة المرور القديمة",
-  "profileNewPasswordHint": "كلمة المرور الجديدة",
-  "profileChangePasswordCurrentPasswordHint": "كلمة المرور الرئيسية الحالية",
-  "profileChangePasswordNewPasswordHint": "كلمة المرور الرئيسية الجديدة",
-  "profileChangePasswordInfo": "الرجاء إدخال كلمة المرور الرئيسية الحالية لتعيين كلمة مرور جديدة. سيؤدي هذا إلى إعادة تشفير مفتاحك السري.",
-  "profileEmail": "البريد الإلكتروني",
-  "profileCountry": "البلد",
-  "profileCountryNotSelected": "لم يتم الاختيار",
-  "profileLanguage": "لغة المحتوى",
-  "profileLanguageDefault": "الإنجليزية (الافتراضية)",
-  "profileSelectLanguage": "اختر اللغة",
-  "profileSectionSettings": "الإعدادات",
-  "profileTheme": "المظهر",
-  "profileThemeSystem": "النظام",
-  "profileThemeLight": "فاتح",
-  "profileThemeDark": "داكن",
-  "profileGraphics": "جودة الرسومات",
-  "profileGraphicsAuto": "تلقائي",
-  "profileGraphicsLow": "منخفضة",
-  "profileGraphicsMedium": "متوسطة",
-  "profileGraphicsHigh": "عالية",
-  "profileReminders": "تذكيرات بالتأمل",
-  "profileRemindersSubtitle": "تلقي إشعارات لخطط العمل الخاصة بك",
-  "profileDeleteAccountConfirmContent": "هذا الإجراء لا رجعة فيه. سيتم حذف حسابك بالكامل، بما في ذلك جميع الذكريات والإعدادات، بشكل دائم. للمتابعة، اضغط مع الاستمرار على زر الحذف لمدة 5 ثوانٍ.",
-  "profileSectionSecurity": "الأمان",
-  "profileChangePassword": "تغيير كلمة المرور الرئيسية",
-  "profileEncryptionActive": "التشفير من طرف إلى طرف نشط",
-  "profileEnableEncryption": "تمكين التشفير من طرف إلى طرف",
-  "profileEnableEncryptionSubtitle": "احمِ ذكرياتك الحساسة بكلمة مرور رئيسية.",
-  "profileCreateMasterPassword": "إنشاء كلمة مرور رئيسية",
-  "profileMasterPasswordInfo": "ستحمي كلمة المرور هذه ذكرياتك. لا يمكن استعادتها إذا نسيتها. يرجى تخزينها بأمان.",
-  "profileMasterPasswordHint": "كلمة المرور الرئيسية",
-  "profileConfirmPasswordHint": "تأكيد كلمة المرور",
-  "profilePasswordMinLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
-  "profilePasswordsDoNotMatch": "كلمات المرور غير متطابقة",
-  "profileEnable": "تمكين",
-  "profileSectionHelp": "المساعدة",
-  "profileReplayTutorial": "إعادة تشغيل البرنامج التعليمي",
-  "profileReplayTutorialConfirmTitle": "إعادة تشغيل البرنامج التعليمي؟",
-  "profileReplayTutorialConfirmContent": "هل أنت متأكد من أنك تريد إعادة تشغيل البرنامج التعليمي؟",
-  "profileRestart": "إعادة التشغيل",
-  "profileSectionAccount": "إدارة الحساب",
-  "profileSignOut": "تسجيل الخروج",
-  "profileDeleteAccount": "حذف الحساب",
-  "profileDeleteAccountConfirmTitle": "حذف الحساب؟",
-  "profileDelete": "حذف",
-  "profileDeletingAccount": "جاري حذف حسابك...",
-  "profileErrorCouldNotFindProfile": "تعذر العثور على ملف تعريف المستخدم.",
-  "memoryEditNewTitle": "ذاكرة جديدة",
-  "memoryEditEditTitle": "تحرير الذاكرة",
-  "memoryEditSave": "حفظ",
-  "memoryEditTitleHint": "العنوان",
-  "memoryEditTitleValidator": "الرجاء إدخال عنوان",
-  "memoryEditDescriptionHint": "الوصف",
-  "memoryEditDateLabel": "التاريخ:",
-  "memoryEditSelectDateButton": "اختيار التاريخ",
-  "memoryEditAmbientSoundLabel": "الصوت المحيط:",
-  "memoryEditAmbientSoundDropdownHint": "اختر صوتاً محيطاً",
-  "memoryEditMusicAnchorLabel": "مرساة الموسيقى:",
-  "memoryEditAttachTrackButton": "إرفاق مسار من Spotify",
-  "memoryEditPhotosLabel": "الصور:",
-  "memoryEditNoPhotosSelected": "لم يتم اختيار صور",
-  "memoryEditAddPhotosButton": "إضافة صور",
-  "memoryEditVideosLabel": "مقاطع الفيديو:",
-  "memoryEditNoVideosSelected": "لم يتم اختيار مقاطع فيديو",
-  "memoryEditAddVideoButton": "إضافة فيديو",
-  "memoryEditAudioNoteLabel": "ملاحظة صوتية:",
-  "memoryEditAudioNoteSaved": "تم حفظ الملاحظة الصوتية",
-  "memoryEditRecordButton": "تسجيل",
-  "memoryEditStopRecordingButton": "إيقاف التسجيل",
-  "memoryEditRecordingIndicator": "جاري التسجيل...",
-  "memoryEditReflectionSectionTitle": "تأمل",
-  "memoryEditEncryptLabel": "تشفير",
-  "memoryEditEncryptionInfoTooltip": "ما هو التشفير؟",
-  "memoryEditImpactPrompt": "كيف أثر هذا الحدث علي؟",
-  "memoryEditLessonPrompt": "ما الدرس الذي تعلمته؟",
-  "memoryEditEmotionsLabel": "المشاعر:",
-  "emotionJoy": "فرح",
-  "emotionNostalgia": "حنين",
-  "emotionPride": "فخر",
-  "emotionSadness": "حزن",
-  "emotionGratitude": "امتنان",
-  "emotionLove": "حب",
-  "emotionFear": "خوف",
-  "emotionAnger": "غضب",
-  "memoryEditCbtHelperTitle": "مساعد التأمل",
-  "memoryEditCbtStep1Title": "ما هو أول فكرة أو اعتقاد؟",
-  "memoryEditCbtStep1Subtitle": "مثال: 'سأفشل' أو 'فعلت كل شيء بشكل صحيح'.",
-  "memoryEditCbtStep2Title": "ما الذي يدعم هذه الفكرة؟",
-  "memoryEditCbtStep2Subtitle": "ما هي الحقائق أو الأحداث التي تثبت صحة هذه الفكرة؟",
-  "memoryEditCbtStep3Title": "ما هي وجهة النظر من الجانب الآخر؟",
-  "memoryEditCbtStep3Subtitle": "ما هي الحقائق أو الأحداث التي قد تدحض أو تتحدى الفكرة الأولى؟",
-  "memoryEditCbtStep4Title": "كيف يمكنني أن أنظر إلى هذا بشكل مختلف؟",
-  "memoryEditCbtStep4Subtitle": "بناءً على ما سبق، قم بصياغة منظور جديد أكثر توازناً.",
-  "memoryEditActionPlanTitle": "خطة العمل",
-  "memoryEditActionPrompt": "ما هي الخطوة الصغيرة التي يمكنني اتخاذها؟",
-  "memoryEditReminderLabel": "تذكير:",
-  "memoryEditReminderNotSet": "غير محدد",
-  "memoryEditSetReminderButton": "تحديد التاريخ",
-  "memoryEditYourThoughtsHint": "أفكارك هنا...",
-  "memoryEditDraftSavedMessage": "تم حفظ المسودة",
-  "memoryEditErrorRepoUnavailable": "خطأ: المستودع غير متوفر.",
-  "memoryEditErrorSaving": "خطأ في حفظ الذاكرة: {error}",
-  "@memoryEditErrorSaving": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryEditUnlockDialogTitle": "فتح للحفظ",
-  "memoryEditUnlockDialogContent": "الرجاء إدخال كلمة المرور الرئيسية لحفظ هذه الذاكرة المشفرة.",
-  "memoryEditMasterPasswordHint": "كلمة المرور الرئيسية",
-  "memoryEditUnlockButton": "فتح",
-  "memoryEditEncryptionInfoDialogTitle": "التشفير من طرف إلى طرف",
-  "memoryEditEncryptionInfoDialogContent": "عند تشفير ذاكرة، يتم تشويش حقلي الوصف والتأمل باستخدام مفتاح مشتق من كلمة المرور الرئيسية الخاصة بك.\n\nيتم تخزين البيانات بتنسيق غير قابل للقراءة في السحابة ولا يمكن فك تشفيرها إلا على أجهزتك باستخدام كلمة المرور الخاصة بك.\n\nهام: لا يمكننا استعادة كلمة المرور الرئيسية الخاصة بك. إذا نسيتها، فستفقد بياناتك المشفرة إلى الأبد.",
-  "memoryEditOkButton": "موافق",
-  "memoryEditPermissionDeniedSnackbar": "تم رفض الإذن لـ {permissionName}. يرجى تمكينه في الإعدادات.",
-  "@memoryEditPermissionDeniedSnackbar": {
-    "placeholders": {
-      "permissionName": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryEditSettingsButton": "الإعدادات",
-  "memoryEditNoInternetSnackbar": "مطلوب اتصال بالإنترنت للبحث عن الموسيقى.",
-  "memoryEditEmotionIntensityDialogTitle": "شدة '{emotion}'",
-  "@memoryEditEmotionIntensityDialogTitle": {
-    "placeholders": {
-      "emotion": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewBackTooltip": "رجوع",
-  "memoryViewShareTooltip": "مشاركة",
-  "memoryViewEditTooltip": "تحرير",
-  "memoryViewDeleteTooltip": "حذف",
-  "memoryViewTabMemory": "الذاكرة",
-  "memoryViewTabInTheWorld": "في العالم",
-  "memoryViewEncryptedTitle": "ذاكرة مشفرة",
-  "memoryViewReflectionTitle": "تأمل",
-  "memoryViewReflectionImpact": "التأثير",
-  "memoryViewReflectionLesson": "الدرس المستفاد",
-  "memoryViewCbtStep1Title": "أول فكرة أو اعتقاد",
-  "memoryViewCbtStep2Title": "دليل على هذه الفكرة",
-  "memoryViewCbtStep3Title": "دليل ضد هذه الفكرة",
-  "memoryViewCbtStep4Title": "منظور جديد ومتوازن (إعادة صياغة)",
-  "memoryViewActionReminder": "تذكير: {date}",
-  "@memoryViewActionReminder": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewMarkIncompleteTooltip": "وضع علامة كغير مكتمل",
-  "memoryViewMarkCompleteTooltip": "وضع علامة كمكتمل",
-  "memoryViewUnlockDialogTitle": "فتح الذاكرة",
-  "memoryViewUnlockDialogContent": "أدخل كلمة المرور الرئيسية لعرض هذا المحتوى.",
-  "memoryViewIncorrectPassword": "كلمة المرور غير صحيحة.",
-  "memoryViewUnlockButton": "فتح",
-  "memoryViewErrorCouldNotLoadProfile": "تعذر تحميل ملف التعريف الخاص بك لجلب البيانات التاريخية.",
-  "memoryViewErrorCouldNotLoadHistoricalData": "تعذر تحميل البيانات التاريخية لهذا اليوم.",
-  "memoryViewNoHistoricalData": "لا توجد بيانات تاريخية متاحة لهذا اليوم.",
-  "memoryViewErrorCouldNotLoadTrack": "تعذر تحميل المسار",
-  "memoryViewTabNews": "الأخبار",
-  "memoryViewTabMusic": "الموسيقى",
-  "memoryViewNoDataForDay": "لا توجد بيانات لهذا اليوم.",
-  "memoryViewNoNewsForDay": "لا توجد أخبار تاريخية لهذا اليوم.",
-  "memoryViewNewsSource": "المصدر: {source}",
-  "@memoryViewNewsSource": {
-    "placeholders": {
-      "source": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewConfirmDeleteTitle": "تأكيد الحذف",
-  "memoryViewConfirmDeleteContent": "هذا الإجراء لا رجعة فيه. للمتابعة، اضغط مع الاستمرار على زر الحذف لمدة 5 ثوان.",
-  "memoryViewDeleteButton": "حذف",
-  "memoryViewErrorLoadingProfile": "لم نتمكن من تحميل ملف التعريف الخاص بك. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
-  "memoryViewErrorLocalDb": "خطأ: تعذر الوصول إلى قاعدة البيانات المحلية.",
-  "memoryViewMemoryDeleted": "تم حذف الذاكرة",
-  "memoryViewSharingNotImplemented": "لم يتم تنفيذ وظيفة المشاركة بعد.",
-  "memoryViewActionCompleted": "تم وضع علامة على الإجراء كمكتمل!",
-  "memoryViewActionIncomplete": "تم وضع علامة على الإجراء كغير مكتمل.",
-  "memoryViewErrorUpdatingAction": "خطأ في تحديث الإجراء: {error}",
-  "@memoryViewErrorUpdatingAction": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewContentEncrypted": "المحتوى مشفر",
-  "memoryViewReflectionEncrypted": "التأمل مشفر",
-  "memoryViewMediaEncrypted": "الوسائط مشفرة",
-  "memoryViewAmbientSound": "الصوت المحيط: {sound}",
-  "@memoryViewAmbientSound": {
-    "placeholders": {
-      "sound": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewAudioNote": "ملاحظة صوتية",
-  "spotifySearchTitle": "البحث عن مسار Spotify",
-  "spotifySearchHint": "عنوان الأغنية أو الفنان",
-  "documentErrorLoading": "تعذر تحميل المستند.",
-  "lifelineMemoriesCount": "الذكريات: {count}",
-  "@lifelineMemoriesCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelinePeriodRange": "الفترة: {startYear} - {endYear}",
-  "@lifelinePeriodRange": {
-    "placeholders": {
-      "startYear": {
-        "type": "int"
-      },
-      "endYear": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineSyncStatus": "{status} ({jobs} متبقية)",
-  "@lifelineSyncStatus": {
-    "placeholders": {
-      "status": {
-        "type": "String"
-      },
-      "jobs": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineCalculating": "جاري الحساب...",
-  "lifelineScaleValue": "المقياس: {scale}%",
-  "@lifelineScaleValue": {
-    "placeholders": {
-      "scale": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineFpsValue": "معدل الإطارات: {fps}",
-  "@lifelineFpsValue": {
-    "placeholders": {
-      "fps": {
-        "type": "String"
-      }
-    }
-  },
-  "lifelineFramePaintValue": "رسم الإطار: {ms} مللي ثانية",
-  "@lifelineFramePaintValue": {
-    "placeholders": {
-      "ms": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineShowFullTimelineTooltip": "عرض الخط الزمني الكامل",
-  "lifelineVisualSettingsTooltip": "الإعدادات المرئية",
-  "lifelineMenuProfile": "الملف الشخصي",
-  "lifelineMenuDebugOn": "تشغيل التصحيح",
-  "lifelineMenuDebugOff": "إيقاف التصحيح",
-  "lifelineMenuSignOut": "تسجيل الخروج",
-  "lifelineSearchHint": "بحث...",
-  "lifelineMemoriesListTitle": "الذكريات",
-  "lifelineVisualSettingsDialogTitle": "الإعدادات المرئية",
-  "lifelineVisualSettingsSpeed": "السرعة",
-  "lifelineVisualSettingsAmplitude": "السعة",
-  "lifelineVisualSettingsYearLine": "موضع خط السنة",
-  "lifelineVisualSettingsBranchDensity": "كثافة الفروع",
-  "lifelineVisualSettingsBranchIntensity": "شدة الفروع",
-  "lifelineVisualSettingsAnimate": "تحريك",
-  "lifelineVisualSettingsDoneButton": "تم",
-  "onboardingWelcomeTitle": "مرحباً بك في Lifeline",
-  "onboardingWelcomeSubtitle": "رحلتك الشخصية، مصورة. لنأخذ جولة سريعة لنرى كيف يمكنك البدء في التقاط لحظاتك.",
-  "onboardingSkipButton": "تخطي الآن",
-  "onboardingBeginTourButton": "بدء الجولة",
-  "onboardingGesturesTitle": "تنقل في خطك الزمني",
-  "onboardingGestureSwipe": "اسحب",
-  "onboardingGesturePinch": "اضغط للتكبير",
-  "onboardingGesturesSubtitle": "سينمو خط Lifeline الخاص بك معك. اضغط للتصغير ورؤية الصورة الأكبر. اسحب لليسار واليمين للتنقل عبر الزمن.",
-  "onboardingContinueButton": "متابعة",
-  "onboardingFinalTitle": "أنت جاهز تماماً!",
-  "onboardingFinalSubtitle": "رحلتك تبدأ الآن. ابدأ في التقاط اللحظات المهمة.",
-  "onboardingStartJourneyButton": "بدء رحلتي",
-  "onboardingSkipTourButton": "تخطي الجولة",
-  "onboardingLifelineIntroText": "هذا هو خط Lifeline الخاص بك. كل ذاكرة تضيفها ستنشئ عقدة فريدة على هذا المسار، لتشكل خريطة جميلة لرحلة حياتك.",
-  "onboardingLifelineIntroButton": "التالي",
-  "onboardingAddMemoryText": "اضغط هنا لإضافة ذاكرة جديدة. ستظهر عقدة على خط Lifeline الخاص بك لكل لحظة تلتقطها.",
-  "onboardingNavGesturesText": "عظيم! الآن، لنتعلم كيفية التنقل في خطك الزمني.",
-  "onboardingControlsPanelText": "استخدم هذه الضوابط لإدارة عرضك. يمكنك إعادة توسيط الخط الزمني، وضبط التأثيرات المرئية، والوصول إلى ملفك الشخصي.",
-  "onboardingControlsPanelButton": "فهمت",
-  "onboardingStatsCardText": "تعرض هذه البطاقة ملخصاً لذكرياتك. اضغط عليها لفتح قائمة كاملة وقابلة للبحث لرحلتك بأكملها.",
-  "onboardingStatsCardButton": "أوشكنا على الانتهاء!",
-  "audioPlayerPreviousTooltip": "المسار السابق",
-  "audioPlayerPlayTooltip": "تشغيل",
-  "audioPlayerPauseTooltip": "إيقاف مؤقت",
-  "audioPlayerNextTooltip": "المسار التالي",
-  "memoryEditCbtStepLabel": "الخطوة {step}: ",
-  "@memoryEditCbtStepLabel": {
-    "description": "Label for a step in the CBT reflection helper",
-    "placeholders": {
-      "step": {
-        "type": "int",
-        "example": "1"
-      }
-    }
-  },
-  "premiumBannerTitle": "افتح Lifeline Premium",
-  "premiumBannerSubtitle": "وسائط غير محدودة، تأمل متقدم، سياق تاريخي، والمزيد!",
-  "premiumDialogTitle": "الترقية إلى Premium",
-  "premiumDialogContent": "افتح القدرة على {feature} واحصل على وصول إلى جميع ميزات Premium.",
-  "@premiumDialogContent": {
-    "placeholders": {
-      "feature": {
-        "type": "String"
-      }
-    }
-  },
-  "premiumDialogGoPremium": "اذهب إلى Premium",
-  "premiumFeaturePhotos": "إضافة المزيد من الصور",
-  "premiumFeatureVideos": "إضافة فيديو",
-  "premiumFeatureAudio": "إضافة ملاحظة صوتية",
-  "premiumFeatureSpotify": "إضافة مسار Spotify",
-  "premiumScreenTitle": "Lifeline Premium",
-  "premiumScreenHeaderTitle": "أطلق العنان لإمكانياتك الكاملة",
-  "premiumScreenHeaderSubtitle": "تجاوز الحدود مع Lifeline Premium واستفد إلى أقصى حد من رحلتك لاكتشاف الذات.",
-  "premiumFeatureUnlimitedPhotos": "صور وفيديوهات غير محدودة",
-  "premiumFeatureUnlimitedAudio": "ملاحظات صوتية غير محدودة",
-  "premiumFeatureUnlimitedSpotify": "مسارات Spotify غير محدودة",
-  "premiumFeatureAdvancedCbt": "مساعد تأمل متقدم",
-  "premiumFeatureActionReminders": "تذكيرات خطة العمل",
-  "premiumFeatureHistoricalContext": "سياق تاريخي 'في العالم'",
-  "premiumFeatureSoundLibrary": "مكتبة أصوات محيطة كاملة",
-  "premiumScreenYearlyPopular": "الأكثر شيوعًا وأفضل قيمة",
-  "premiumScreenRestore": "استعادة المشتريات",
-  "premiumScreenTerms": "شروط الخدمة",
-  "premiumScreenPrivacy": "سياسة الخصوصية",
-  "premiumStatusTitle": "عضو مميز",
-  "premiumStatusExpiresOn": "ينتهي في {date}",
-  "@premiumStatusExpiresOn": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
-  "onboardingEncryptionTitle": "ذكرياتك، آمنة",
-  "onboardingEncryptionSubtitle": "يقدم Lifeline تشفيراً من طرف إلى طرف. هذا يعني أنك أنت فقط من يمكنه قراءة ذكرياتك الخاصة. لنقم بإعداد كلمة المرور الرئيسية الخاصة بك لحمايتها.",
-  "onboardingEncryptionSetupButton": "الإعداد الآن",
-  "onboardingEncryptionLaterButton": "ربما لاحقًا",
-  "onboardingEncryptionActiveTitle": "التشفير نشط",
-  "onboardingEncryptionActiveSubtitle": "ذكرياتك محمية بالفعل. يمكنك إدارة كلمة المرور الرئيسية في إعدادات الملف الشخصي.",
-  "onboardingEncryptionContinueButton": "متابعة",
-  "memoryEditEncryptMemory": "تشفير هذا الذاكرة",
-  "memoryEditSetupEncryptionTitle": "تمكين التشفير؟",
-  "memoryEditSetupEncryptionContent": "لحماية هذه الذاكرة، تحتاج أولاً إلى إنشاء كلمة مرور رئيسية. ستكون هذه مفتاحك الوحيد لجميع الإدخالات المشفرة.",
-  "memoryEditCreatePasswordButton": "إنشاء كلمة مرور رئيسية",
-  "memoryViewExportPdf": "مشاركة كملف PDF"
+"@@locale": "ar",
+"email": "البريد الإلكتروني",
+"password": "كلمة المرور",
+"signIn": "تسجيل الدخول",
+"register": "التسجيل",
+"createAccount": "إنشاء حساب جديد",
+"alreadyHaveAccount": "لدي حساب بالفعل",
+"orSignInWith": "أو سجل الدخول باستخدام",
+"passwordTooShort": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+"invalidEmail": "الرجاء إدخال بريد إلكتروني صالح",
+"consentWelcomeTitle": "مرحباً بك في Lifeline",
+"consentWelcomeSubtitle": "قبل أن تبدأ، يرجى مراجعة شروطنا والموافقة عليها.",
+"consentIAgreeTo": "لقد قرأت ووافقت على ",
+"consentTermsOfService": "شروط الخدمة",
+"consentAnd": " و ",
+"consentPrivacyPolicy": "سياسة الخصوصية",
+"consentContinue": "متابعة",
+"consentErrorSaving": "خطأ في حفظ الإعدادات: {error}",
+"@consentErrorSaving": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+"splashMessageInitializing": "جاري التهيئة...",
+"splashMessageCheckingSettings": "جاري التحقق من الإعدادات...",
+"splashMessageAuthenticating": "جاري المصادقة...",
+"splashMessageSyncing": "جاري مزامنة خطك الزمني...",
+"authGateLoadingMemories": "جاري تحميل الذكريات...",
+"authGateAuthenticating": "جاري المصادقة...",
+"authGateSomethingWentWrong": "حدث خطأ ما",
+"authGateCouldNotLoad": "لم نتمكن من تحميل بياناتك. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+"authGateTryAgain": "المحاولة مرة أخرى",
+"authGateEmptyState": "خط Lifeline الخاص بك جاهز.\nاضغط على زر + لإضافة ذاكرتك الأولى.",
+"authGateUnsavedDraftTitle": "ذاكرة غير محفوظة",
+"authGateUnsavedDraftContent": "لديك مسودة ذاكرة غير محفوظة. هل تريد متابعة تحريرها؟",
+"authGateDiscard": "تجاهل",
+"authGateContinueEditing": "متابعة التحرير",
+"verifyEmailTitle": "تأكيد البريد الإلكتروني",
+"verifyEmailSentTo": "تم إرسال بريد إلكتروني للتحقق إلى:",
+"verifyEmailInstructions": "الرجاء النقر على الرابط في البريد الإلكتروني لإكمال تسجيلك.",
+"verifyEmailResendButton": "إعادة إرسال البريد الإلكتروني",
+"verifyEmailCancelButton": "إلغاء",
+"profileTitle": "الملف الشخصي والإعدادات",
+"profileSectionProfile": "الملف الشخصي",
+"profileChangeNameTitle": "تغيير الاسم",
+"profileEnterYourName": "أدخل اسمك",
+"profileSave": "حفظ",
+"profileCancel": "إلغاء",
+"profileName": "الاسم",
+"profileReauthTitle": "إعادة المصادقة مطلوبة",
+"profileReauthContent": "هذه عملية حساسة. يرجى تسجيل الدخول مرة أخرى قبل المتابعة.",
+"profileReauthButton": "تسجيل الدخول والحذف",
+"profileReauthPasswordDialogTitle": "تأكيد الإجراء",
+"profileReauthPasswordDialogContent": "لحذف حسابك، يرجى إدخال كلمة المرور الحالية.",
+"profilePasswordCannotBeEmpty": "لا يمكن أن تكون كلمة المرور فارغة",
+"profileChangePasswordSuccess": "تم تغيير كلمة المرور الرئيسية بنجاح!",
+"profileChangePasswordErrorIncorrect": "كلمة المرور الرئيسية الحالية التي أدخلتها غير صحيحة.",
+"profileOldPasswordHint": "كلمة المرور القديمة",
+"profileNewPasswordHint": "كلمة المرور الجديدة",
+"profileChangePasswordCurrentPasswordHint": "كلمة المرور الرئيسية الحالية",
+"profileChangePasswordNewPasswordHint": "كلمة المرور الرئيسية الجديدة",
+"profileChangePasswordInfo": "الرجاء إدخال كلمة المرور الرئيسية الحالية لتعيين كلمة مرور جديدة. سيؤدي هذا إلى إعادة تشفير مفتاحك السري.",
+"profileEmail": "البريد الإلكتروني",
+"profileCountry": "البلد",
+"profileCountryNotSelected": "لم يتم الاختيار",
+"profileLanguage": "لغة المحتوى",
+"profileLanguageDefault": "الإنجليزية (الافتراضية)",
+"profileSelectLanguage": "اختر اللغة",
+"profileSectionSettings": "الإعدادات",
+"profileTheme": "المظهر",
+"profileThemeSystem": "النظام",
+"profileThemeLight": "فاتح",
+"profileThemeDark": "داكن",
+"profileGraphics": "جودة الرسومات",
+"profileGraphicsAuto": "تلقائي",
+"profileGraphicsLow": "منخفضة",
+"profileGraphicsMedium": "متوسطة",
+"profileGraphicsHigh": "عالية",
+"profileReminders": "تذكيرات بالتأمل",
+"profileRemindersSubtitle": "تلقي إشعارات لخطط العمل الخاصة بك",
+"profileDeleteAccountConfirmContent": "هذا الإجراء لا رجعة فيه. سيتم حذف حسابك بالكامل، بما في ذلك جميع الذكريات والإعدادات، بشكل دائم. للمتابعة، اضغط مع الاستمرار على زر الحذف لمدة 5 ثوانٍ.",
+"profileSectionSecurity": "الأمان",
+"profileChangePassword": "تغيير كلمة المرور الرئيسية",
+"profileEncryptionActive": "التشفير من طرف إلى طرف نشط",
+"profileEnableEncryption": "تمكين التشفير من طرف إلى طرف",
+"profileEnableEncryptionSubtitle": "احمِ ذكرياتك الحساسة بكلمة مرور رئيسية.",
+"profileCreateMasterPassword": "إنشاء كلمة مرور رئيسية",
+"profileMasterPasswordInfo": "ستحمي كلمة المرور هذه ذكرياتك. لا يمكن استعادتها إذا نسيتها. يرجى تخزينها بأمان.",
+"profileMasterPasswordHint": "كلمة المرور الرئيسية",
+"profileConfirmPasswordHint": "تأكيد كلمة المرور",
+"profilePasswordMinLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+"profilePasswordsDoNotMatch": "كلمات المرور غير متطابقة",
+"profileEnable": "تمكين",
+"profileSectionHelp": "المساعدة",
+"profileReplayTutorial": "إعادة تشغيل البرنامج التعليمي",
+"profileReplayTutorialConfirmTitle": "إعادة تشغيل البرنامج التعليمي؟",
+"profileReplayTutorialConfirmContent": "هل أنت متأكد من أنك تريد إعادة تشغيل البرنامج التعليمي؟",
+"profileRestart": "إعادة التشغيل",
+"profileSectionAccount": "إدارة الحساب",
+"profileSignOut": "تسجيل الخروج",
+"profileDeleteAccount": "حذف الحساب",
+"profileDeleteAccountConfirmTitle": "حذف الحساب؟",
+"profileDelete": "حذف",
+"profileDeletingAccount": "جاري حذف حسابك...",
+"profileErrorCouldNotFindProfile": "تعذر العثور على ملف تعريف المستخدم.",
+"memoryEditNewTitle": "ذاكرة جديدة",
+"memoryEditEditTitle": "تحرير الذاكرة",
+"memoryEditSave": "حفظ",
+"memoryEditTitleHint": "العنوان",
+"memoryEditTitleValidator": "الرجاء إدخال عنوان",
+"memoryEditDescriptionHint": "الوصف",
+"memoryEditDateLabel": "التاريخ:",
+"memoryEditSelectDateButton": "اختيار التاريخ",
+"memoryEditAmbientSoundLabel": "الصوت المحيط:",
+"memoryEditAmbientSoundDropdownHint": "اختر صوتاً محيطاً",
+"memoryEditMusicAnchorLabel": "مرساة الموسيقى:",
+"memoryEditAttachTrackButton": "إرفاق مسار من Spotify",
+"memoryEditPhotosLabel": "الصور:",
+"memoryEditNoPhotosSelected": "لم يتم اختيار صور",
+"memoryEditAddPhotosButton": "إضافة صور",
+"memoryEditVideosLabel": "مقاطع الفيديو:",
+"memoryEditNoVideosSelected": "لم يتم اختيار مقاطع فيديو",
+"memoryEditAddVideoButton": "إضافة فيديو",
+"memoryEditAudioNoteLabel": "ملاحظة صوتية:",
+"memoryEditAudioNoteSaved": "تم حفظ الملاحظة الصوتية",
+"memoryEditRecordButton": "تسجيل",
+"memoryEditStopRecordingButton": "إيقاف التسجيل",
+"memoryEditRecordingIndicator": "جاري التسجيل...",
+"memoryEditReflectionSectionTitle": "تأمل",
+"memoryEditEncryptLabel": "تشفير",
+"memoryEditEncryptionInfoTooltip": "ما هو التشفير؟",
+"memoryEditImpactPrompt": "كيف أثر هذا الحدث علي؟",
+"memoryEditLessonPrompt": "ما الدرس الذي تعلمته؟",
+"memoryEditEmotionsLabel": "المشاعر:",
+"emotionJoy": "فرح",
+"emotionNostalgia": "حنين",
+"emotionPride": "فخر",
+"emotionSadness": "حزن",
+"emotionGratitude": "امتنان",
+"emotionLove": "حب",
+"emotionFear": "خوف",
+"emotionAnger": "غضب",
+"memoryEditCbtHelperTitle": "مساعد التأمل",
+"memoryEditCbtStep1Title": "ما هو أول فكرة أو اعتقاد؟",
+"memoryEditCbtStep1Subtitle": "مثال: 'سأفشل' أو 'فعلت كل شيء بشكل صحيح'.",
+"memoryEditCbtStep2Title": "ما الذي يدعم هذه الفكرة؟",
+"memoryEditCbtStep2Subtitle": "ما هي الحقائق أو الأحداث التي تثبت صحة هذه الفكرة؟",
+"memoryEditCbtStep3Title": "ما هي وجهة النظر من الجانب الآخر؟",
+"memoryEditCbtStep3Subtitle": "ما هي الحقائق أو الأحداث التي قد تدحض أو تتحدى الفكرة الأولى؟",
+"memoryEditCbtStep4Title": "كيف يمكنني أن أنظر إلى هذا بشكل مختلف؟",
+"memoryEditCbtStep4Subtitle": "بناءً على ما سبق، قم بصياغة منظور جديد أكثر توازناً.",
+"memoryEditActionPlanTitle": "خطة العمل",
+"memoryEditActionPrompt": "ما هي الخطوة الصغيرة التي يمكنني اتخاذها؟",
+"memoryEditReminderLabel": "تذكير:",
+"memoryEditReminderNotSet": "غير محدد",
+"memoryEditSetReminderButton": "تحديد التاريخ",
+"memoryEditYourThoughtsHint": "أفكارك هنا...",
+"memoryEditDraftSavedMessage": "تم حفظ المسودة",
+"memoryEditErrorRepoUnavailable": "خطأ: المستودع غير متوفر.",
+"memoryEditErrorSaving": "خطأ في حفظ الذاكرة: {error}",
+"@memoryEditErrorSaving": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+"memoryEditUnlockDialogTitle": "فتح للحفظ",
+"memoryEditUnlockDialogContent": "الرجاء إدخال كلمة المرور الرئيسية لحفظ هذه الذاكرة المشفرة.",
+"memoryEditMasterPasswordHint": "كلمة المرور الرئيسية",
+"memoryEditUnlockButton": "فتح",
+"memoryEditEncryptionInfoDialogTitle": "التشفير من طرف إلى طرف",
+"memoryEditEncryptionInfoDialogContent": "عند تشفير ذاكرة، يتم تشويش حقلي الوصف والتأمل باستخدام مفتاح مشتق من كلمة المرور الرئيسية الخاصة بك.\n\nيتم تخزين البيانات بتنسيق غير قابل للقراءة في السحابة ولا يمكن فك تشفيرها إلا على أجهزتك باستخدام كلمة المرور الخاصة بك.\n\nهام: لا يمكننا استعادة كلمة المرور الرئيسية الخاصة بك. إذا نسيتها، فستفقد بياناتك المشفرة إلى الأبد.",
+"memoryEditOkButton": "موافق",
+"memoryEditPermissionDeniedSnackbar": "تم رفض الإذن لـ {permissionName}. يرجى تمكينه في الإعدادات.",
+"@memoryEditPermissionDeniedSnackbar": {
+"placeholders": {
+"permissionName": {
+"type": "String"
+}
+}
+},
+"memoryEditSettingsButton": "الإعدادات",
+"memoryEditNoInternetSnackbar": "مطلوب اتصال بالإنترنت للبحث عن الموسيقى.",
+"memoryEditEmotionIntensityDialogTitle": "شدة '{emotion}'",
+"@memoryEditEmotionIntensityDialogTitle": {
+"placeholders": {
+"emotion": {
+"type": "String"
+}
+}
+},
+"memoryViewBackTooltip": "رجوع",
+"memoryViewShareTooltip": "مشاركة",
+"memoryViewEditTooltip": "تحرير",
+"memoryViewDeleteTooltip": "حذف",
+"memoryViewTabMemory": "الذاكرة",
+"memoryViewTabInTheWorld": "في العالم",
+"memoryViewEncryptedTitle": "ذاكرة مشفرة",
+"memoryViewReflectionTitle": "تأمل",
+"memoryViewReflectionImpact": "التأثير",
+"memoryViewReflectionLesson": "الدرس المستفاد",
+"memoryViewCbtStep1Title": "أول فكرة أو اعتقاد",
+"memoryViewCbtStep2Title": "دليل على هذه الفكرة",
+"memoryViewCbtStep3Title": "دليل ضد هذه الفكرة",
+"memoryViewCbtStep4Title": "منظور جديد ومتوازن (إعادة صياغة)",
+"memoryViewActionReminder": "تذكير: {date}",
+"@memoryViewActionReminder": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"memoryViewMarkIncompleteTooltip": "وضع علامة كغير مكتمل",
+"memoryViewMarkCompleteTooltip": "وضع علامة كمكتمل",
+"memoryViewUnlockDialogTitle": "فتح الذاكرة",
+"memoryViewUnlockDialogContent": "أدخل كلمة المرور الرئيسية لعرض هذا المحتوى.",
+"memoryViewIncorrectPassword": "كلمة المرور غير صحيحة.",
+"memoryViewUnlockButton": "فتح",
+"memoryViewErrorCouldNotLoadProfile": "تعذر تحميل ملف التعريف الخاص بك لجلب البيانات التاريخية.",
+"memoryViewErrorCouldNotLoadHistoricalData": "تعذر تحميل البيانات التاريخية لهذا اليوم.",
+"memoryViewNoHistoricalData": "لا توجد بيانات تاريخية متاحة لهذا اليوم.",
+"memoryViewErrorCouldNotLoadTrack": "تعذر تحميل المسار",
+"memoryViewTabNews": "الأخبار",
+"memoryViewTabMusic": "الموسيقى",
+"memoryViewNoDataForDay": "لا توجد بيانات لهذا اليوم.",
+"memoryViewNoNewsForDay": "لا توجد أخبار تاريخية لهذا اليوم.",
+"memoryViewNewsSource": "المصدر: {source}",
+"@memoryViewNewsSource": {
+"placeholders": {
+"source": {
+"type": "String"
+}
+}
+},
+"memoryViewConfirmDeleteTitle": "تأكيد الحذف",
+"memoryViewConfirmDeleteContent": "هذا الإجراء لا رجعة فيه. للمتابعة، اضغط مع الاستمرار على زر الحذف لمدة 5 ثوان.",
+"memoryViewDeleteButton": "حذف",
+"memoryViewErrorLoadingProfile": "لم نتمكن من تحميل ملف التعريف الخاص بك. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+"memoryViewErrorLocalDb": "خطأ: تعذر الوصول إلى قاعدة البيانات المحلية.",
+"memoryViewMemoryDeleted": "تم حذف الذاكرة",
+"memoryViewSharingNotImplemented": "لم يتم تنفيذ وظيفة المشاركة بعد.",
+"memoryViewActionCompleted": "تم وضع علامة على الإجراء كمكتمل!",
+"memoryViewActionIncomplete": "تم وضع علامة على الإجراء كغير مكتمل.",
+"memoryViewErrorUpdatingAction": "خطأ في تحديث الإجراء: {error}",
+"@memoryViewErrorUpdatingAction": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+"memoryViewContentEncrypted": "المحتوى مشفر",
+"memoryViewReflectionEncrypted": "التأمل مشفر",
+"memoryViewMediaEncrypted": "الوسائط مشفرة",
+"memoryViewAmbientSound": "الصوت المحيط: {sound}",
+"@memoryViewAmbientSound": {
+"placeholders": {
+"sound": {
+"type": "String"
+}
+}
+},
+"memoryViewAudioNote": "ملاحظة صوتية",
+"spotifySearchTitle": "البحث عن مسار Spotify",
+"spotifySearchHint": "عنوان الأغنية أو الفنان",
+"documentErrorLoading": "تعذر تحميل المستند.",
+"lifelineMemoriesCount": "الذكريات: {count}",
+"@lifelineMemoriesCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelinePeriodRange": "الفترة: {startYear} - {endYear}",
+"@lifelinePeriodRange": {
+"placeholders": {
+"startYear": {
+"type": "int"
+},
+"endYear": {
+"type": "int"
+}
+}
+},
+"lifelineSyncStatus": "{status} ({jobs} متبقية)",
+"@lifelineSyncStatus": {
+"placeholders": {
+"status": {
+"type": "String"
+},
+"jobs": {
+"type": "int"
+}
+}
+},
+"lifelineCalculating": "جاري الحساب...",
+"lifelineScaleValue": "المقياس: {scale}%",
+"@lifelineScaleValue": {
+"placeholders": {
+"scale": {
+"type": "int"
+}
+}
+},
+"lifelineFpsValue": "معدل الإطارات: {fps}",
+"@lifelineFpsValue": {
+"placeholders": {
+"fps": {
+"type": "String"
+}
+}
+},
+"lifelineFramePaintValue": "رسم الإطار: {ms} مللي ثانية",
+"@lifelineFramePaintValue": {
+"placeholders": {
+"ms": {
+"type": "int"
+}
+}
+},
+"lifelineShowFullTimelineTooltip": "عرض الخط الزمني الكامل",
+"lifelineVisualSettingsTooltip": "الإعدادات المرئية",
+"lifelineMenuProfile": "الملف الشخصي",
+"lifelineMenuDebugOn": "تشغيل التصحيح",
+"lifelineMenuDebugOff": "إيقاف التصحيح",
+"lifelineMenuSignOut": "تسجيل الخروج",
+"lifelineSearchHint": "بحث...",
+"lifelineMemoriesListTitle": "الذكريات",
+"lifelineVisualSettingsDialogTitle": "الإعدادات المرئية",
+"lifelineVisualSettingsSpeed": "السرعة",
+"lifelineVisualSettingsAmplitude": "السعة",
+"lifelineVisualSettingsYearLine": "موضع خط السنة",
+"lifelineVisualSettingsBranchDensity": "كثافة الفروع",
+"lifelineVisualSettingsBranchIntensity": "شدة الفروع",
+"lifelineVisualSettingsAnimate": "تحريك",
+"lifelineVisualSettingsDoneButton": "تم",
+"onboardingWelcomeTitle": "مرحباً بك في Lifeline",
+"onboardingWelcomeSubtitle": "رحلتك الشخصية، مصورة. لنأخذ جولة سريعة لنرى كيف يمكنك البدء في التقاط لحظاتك.",
+"onboardingSkipButton": "تخطي الآن",
+"onboardingBeginTourButton": "بدء الجولة",
+"onboardingGesturesTitle": "تنقل في خطك الزمني",
+"onboardingGestureSwipe": "اسحب",
+"onboardingGesturePinch": "اضغط للتكبير",
+"onboardingGesturesSubtitle": "سينمو خط Lifeline الخاص بك معك. اضغط للتصغير ورؤية الصورة الأكبر. اسحب لليسار واليمين للتنقل عبر الزمن.",
+"onboardingContinueButton": "متابعة",
+"onboardingFinalTitle": "أنت جاهز تماماً!",
+"onboardingFinalSubtitle": "رحلتك تبدأ الآن. ابدأ في التقاط اللحظات المهمة.",
+"onboardingStartJourneyButton": "بدء رحلتي",
+"onboardingSkipTourButton": "تخطي الجولة",
+"onboardingLifelineIntroText": "هذا هو خط Lifeline الخاص بك. كل ذاكرة تضيفها ستنشئ عقدة فريدة على هذا المسار، لتشكل خريطة جميلة لرحلة حياتك.",
+"onboardingLifelineIntroButton": "التالي",
+"onboardingAddMemoryText": "اضغط هنا لإضافة ذاكرة جديدة. ستظهر عقدة على خط Lifeline الخاص بك لكل لحظة تلتقطها.",
+"onboardingNavGesturesText": "عظيم! الآن، لنتعلم كيفية التنقل في خطك الزمني.",
+"onboardingControlsPanelText": "استخدم هذه الضوابط لإدارة عرضك. يمكنك إعادة توسيط الخط الزمني، وضبط التأثيرات المرئية، والوصول إلى ملفك الشخصي.",
+"onboardingControlsPanelButton": "فهمت",
+"onboardingStatsCardText": "تعرض هذه البطاقة ملخصاً لذكرياتك. اضغط عليها لفتح قائمة كاملة وقابلة للبحث لرحلتك بأكملها.",
+"onboardingStatsCardButton": "أوشكنا على الانتهاء!",
+"audioPlayerPreviousTooltip": "المسار السابق",
+"audioPlayerPlayTooltip": "تشغيل",
+"audioPlayerPauseTooltip": "إيقاف مؤقت",
+"audioPlayerNextTooltip": "المسار التالي",
+"memoryEditCbtStepLabel": "الخطوة {step}: ",
+"@memoryEditCbtStepLabel": {
+"description": "Label for a step in the CBT reflection helper",
+"placeholders": {
+"step": {
+"type": "int",
+"example": "1"
+}
+}
+},
+"premiumBannerTitle": "افتح Lifeline Premium",
+"premiumBannerSubtitle": "وسائط غير محدودة، تأمل متقدم، سياق تاريخي، والمزيد!",
+"premiumDialogTitle": "الترقية إلى Premium",
+"premiumDialogContent": "افتح القدرة على {feature} واحصل على وصول إلى جميع ميزات Premium.",
+"@premiumDialogContent": {
+"placeholders": {
+"feature": {
+"type": "String"
+}
+}
+},
+"premiumDialogGoPremium": "اذهب إلى Premium",
+"premiumFeaturePhotos": "إضافة المزيد من الصور",
+"premiumFeatureVideos": "إضافة فيديو",
+"premiumFeatureAudio": "إضافة ملاحظة صوتية",
+"premiumFeatureSpotify": "إضافة مسار Spotify",
+"premiumScreenTitle": "Lifeline Premium",
+"premiumScreenHeaderTitle": "أطلق العنان لإمكانياتك الكاملة",
+"premiumScreenHeaderSubtitle": "تجاوز الحدود مع Lifeline Premium واستفد إلى أقصى حد من رحلتك لاكتشاف الذات.",
+"premiumFeatureUnlimitedPhotos": "صور وفيديوهات غير محدودة",
+"premiumFeatureUnlimitedAudio": "ملاحظات صوتية غير محدودة",
+"premiumFeatureUnlimitedSpotify": "مسارات Spotify غير محدودة",
+"premiumFeatureAdvancedCbt": "مساعد تأمل متقدم",
+"premiumFeatureActionReminders": "تذكيرات خطة العمل",
+"premiumFeatureHistoricalContext": "سياق تاريخي 'في العالم'",
+"premiumFeatureSoundLibrary": "مكتبة أصوات محيطة كاملة",
+"premiumScreenYearlyPopular": "الأكثر شيوعًا وأفضل قيمة",
+"premiumScreenRestore": "استعادة المشتريات",
+"premiumScreenTerms": "شروط الخدمة",
+"premiumScreenPrivacy": "سياسة الخصوصية",
+"premiumStatusTitle": "عضو مميز",
+"premiumStatusExpiresOn": "ينتهي في {date}",
+"@premiumStatusExpiresOn": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"onboardingEncryptionTitle": "ذكرياتك، آمنة",
+"onboardingEncryptionSubtitle": "يقدم Lifeline تشفيراً من طرف إلى طرف. هذا يعني أنك أنت فقط من يمكنه قراءة ذكرياتك الخاصة. لنقم بإعداد كلمة المرور الرئيسية الخاصة بك لحمايتها.",
+"onboardingEncryptionSetupButton": "الإعداد الآن",
+"onboardingEncryptionLaterButton": "ربما لاحقًا",
+"onboardingEncryptionActiveTitle": "التشفير نشط",
+"onboardingEncryptionActiveSubtitle": "ذكرياتك محمية بالفعل. يمكنك إدارة كلمة المرور الرئيسية في إعدادات الملف الشخصي.",
+"onboardingEncryptionContinueButton": "متابعة",
+"memoryEditEncryptMemory": "تشفير هذا الذاكرة",
+"memoryEditSetupEncryptionTitle": "تمكين التشفير؟",
+"memoryEditSetupEncryptionContent": "لحماية هذه الذاكرة، تحتاج أولاً إلى إنشاء كلمة مرور رئيسية. ستكون هذه مفتاحك الوحيد لجميع الإدخالات المشفرة.",
+"memoryEditCreatePasswordButton": "إنشاء كلمة مرور رئيسية",
+"memoryViewExportPdf": "مشاركة كملف PDF",
+"shareActionTitle": "إضافة إلى Lifeline",
+"shareActionSubtitle": "ماذا تود أن تفعل بهذه الملفات؟",
+"shareCreateNewMemory": "إنشاء ذاكرة جديدة",
+"shareAddToExisting": "إضافة إلى ذاكرة موجودة",
+"selectMemoryTitle": "تحديد ذاكرة",
+"selectMemorySearchHint": "البحث حسب العنوان أو المحتوى...",
+"selectMemoryEmpty": "لم يتم العثور على ذكريات",
+"memoryUpdatedSuccess": "تم تحديث الذاكرة بنجاح!"
 }

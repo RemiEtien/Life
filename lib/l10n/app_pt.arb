@@ -1,429 +1,437 @@
 {
-  "@@locale": "pt",
-  "email": "E-mail",
-  "password": "Senha",
-  "signIn": "Entrar",
-  "register": "Registrar",
-  "createAccount": "Criar uma nova conta",
-  "alreadyHaveAccount": "Já tenho uma conta",
-  "orSignInWith": "Ou entre com",
-  "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
-  "invalidEmail": "Por favor, insira um e-mail válido",
-  "consentWelcomeTitle": "Bem-vindo ao Lifeline",
-  "consentWelcomeSubtitle": "Antes de começar, por favor, revise e concorde com nossos termos.",
-  "consentIAgreeTo": "Eu li e concordo com os ",
-  "consentTermsOfService": "Termos de Serviço",
-  "consentAnd": " e a ",
-  "consentPrivacyPolicy": "Política de Privacidade",
-  "consentContinue": "Continuar",
-  "consentErrorSaving": "Erro ao salvar as configurações: {error}",
-  "@consentErrorSaving": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "splashMessageInitializing": "Inicializando...",
-  "splashMessageCheckingSettings": "Verificando configurações...",
-  "splashMessageAuthenticating": "Autenticando...",
-  "splashMessageSyncing": "Sincronizando sua linha do tempo...",
-  "authGateLoadingMemories": "Carregando memórias...",
-  "authGateAuthenticating": "Autenticando...",
-  "authGateSomethingWentWrong": "Algo deu errado",
-  "authGateCouldNotLoad": "Não foi possível carregar seus dados. Verifique sua conexão e tente novamente.",
-  "authGateTryAgain": "Tentar Novamente",
-  "authGateEmptyState": "Sua Lifeline está pronta.\nToque no botão + para adicionar sua primeira memória.",
-  "authGateUnsavedDraftTitle": "Memória não salva",
-  "authGateUnsavedDraftContent": "Você tem um rascunho de memória não salvo. Deseja continuar editando?",
-  "authGateDiscard": "Descartar",
-  "authGateContinueEditing": "Continuar Editando",
-  "verifyEmailTitle": "Verificação de E-mail",
-  "verifyEmailSentTo": "Um e-mail de verificação foi enviado para:",
-  "verifyEmailInstructions": "Por favor, clique no link do e-mail para completar o seu registo.",
-  "verifyEmailResendButton": "Reenviar E-mail",
-  "verifyEmailCancelButton": "Cancelar",
-  "profileTitle": "Perfil e Configurações",
-  "profileSectionProfile": "PERFIL",
-  "profileChangeNameTitle": "Alterar Nome",
-  "profileEnterYourName": "Digite seu nome",
-  "profileSave": "Salvar",
-  "profileCancel": "Cancelar",
-  "profileName": "Nome",
-  "profileEmail": "E-mail",
-  "profileCountry": "País",
-  "profileCountryNotSelected": "Não selecionado",
-  "profileLanguage": "Idioma do Conteúdo",
-  "profileLanguageDefault": "Inglês (Padrão)",
-  "profileSelectLanguage": "Selecionar Idioma",
-  "profileSectionSettings": "CONFIGURAÇÕES",
-  "profileTheme": "Tema",
-  "profileThemeSystem": "Sistema",
-  "profileThemeLight": "Claro",
-  "profileThemeDark": "Escuro",
-  "profileGraphics": "Qualidade Gráfica",
-  "profileGraphicsAuto": "Automático",
-  "profileGraphicsLow": "Baixa",
-  "profileGraphicsMedium": "Média",
-  "profileGraphicsHigh": "Alta",
-  "profileReauthTitle": "Reautenticação Necessária",
-  "profileReauthContent": "Esta é uma operação sensível. Por favor, faça login novamente antes de prosseguir.",
-  "profileReauthButton": "Entrar e Excluir",
-  "profileReauthPasswordDialogTitle": "Confirmar Ação",
-  "profileReauthPasswordDialogContent": "Para excluir sua conta, digite sua senha atual.",
-  "profilePasswordCannotBeEmpty": "A senha não pode estar vazia",
-  "profileChangePasswordSuccess": "Senha mestre alterada com sucesso!",
-  "profileChangePasswordErrorIncorrect": "A senha mestra atual que você inseriu está incorreta.",
-  "profileOldPasswordHint": "Senha Antiga",
-  "profileNewPasswordHint": "Nova Senha",
-  "profileChangePasswordCurrentPasswordHint": "Senha Mestra Atual",
-  "profileChangePasswordNewPasswordHint": "Nova Senha Mestra",
-  "profileChangePasswordInfo": "Por favor, insira sua senha mestra atual para definir uma nova. Isso irá criptografar novamente sua chave secreta.",
-  "profileReminders": "Lembretes de Reflexão",
-  "profileRemindersSubtitle": "Receba notificações para seus planos de ação",
-  "profileSectionSecurity": "SEGURANÇA",
-  "profileChangePassword": "Alterar Senha Mestra",
-  "profileEncryptionActive": "A criptografia de ponta a ponta está ativa",
-  "profileEnableEncryption": "Ativar Criptografia de Ponta a Ponta",
-  "profileEnableEncryptionSubtitle": "Proteja suas memórias sensíveis com uma senha mestra.",
-  "profileCreateMasterPassword": "Criar Senha Mestra",
-  "profileMasterPasswordInfo": "Esta senha protegerá suas memórias. Ela não pode ser recuperada se você a esquecer. Por favor, guarde-a em um local seguro.",
-  "profileMasterPasswordHint": "Senha Mestra",
-  "profileConfirmPasswordHint": "Confirmar Senha",
-  "profilePasswordMinLength": "A senha deve ter pelo menos 8 caracteres",
-  "profilePasswordsDoNotMatch": "As senhas não coincidem",
-  "profileEnable": "Ativar",
-  "profileSectionHelp": "AJUDA",
-  "profileReplayTutorial": "Repetir Tutorial",
-  "profileReplayTutorialConfirmTitle": "Repetir Tutorial?",
-  "profileReplayTutorialConfirmContent": "Tem certeza de que deseja reiniciar o tutorial?",
-  "profileRestart": "Reiniciar",
-  "profileSectionAccount": "GERENCIAMENTO DA CONTA",
-  "profileSignOut": "Sair",
-  "profileDeleteAccount": "Excluir Conta",
-  "profileDeleteAccountConfirmTitle": "Excluir Conta?",
-  "profileDeleteAccountConfirmContent": "Esta ação é irreversível. Toda a sua conta, incluindo todas as memórias e configurações, será excluída permanentemente. Para prosseguir, pressione e segure o botão de exclusão por 5 segundos.",
-  "profileDelete": "Excluir",
-  "profileDeletingAccount": "Excluindo sua conta...",
-  "profileErrorCouldNotFindProfile": "Não foi possível encontrar o perfil do usuário.",
-  "memoryEditNewTitle": "Nova Memória",
-  "memoryEditEditTitle": "Editar Memória",
-  "memoryEditSave": "Salvar",
-  "memoryEditTitleHint": "Título",
-  "memoryEditTitleValidator": "Por favor, insira um título",
-  "memoryEditDescriptionHint": "Descrição",
-  "memoryEditDateLabel": "Data:",
-  "memoryEditSelectDateButton": "Selecionar Data",
-  "memoryEditAmbientSoundLabel": "Som Ambiente:",
-  "memoryEditAmbientSoundDropdownHint": "Selecione um som ambiente",
-  "memoryEditMusicAnchorLabel": "Âncora Musical:",
-  "memoryEditAttachTrackButton": "Anexar faixa do Spotify",
-  "memoryEditPhotosLabel": "Fotos:",
-  "memoryEditNoPhotosSelected": "Nenhuma foto selecionada",
-  "memoryEditAddPhotosButton": "Adicionar Fotos",
-  "memoryEditVideosLabel": "Vídeos:",
-  "memoryEditNoVideosSelected": "Nenhum vídeo selecionado",
-  "memoryEditAddVideoButton": "Adicionar Vídeo",
-  "memoryEditAudioNoteLabel": "Nota de Áudio:",
-  "memoryEditAudioNoteSaved": "Nota de áudio salva",
-  "memoryEditRecordButton": "Gravar",
-  "memoryEditStopRecordingButton": "Parar Gravação",
-  "memoryEditRecordingIndicator": "Gravando...",
-  "memoryEditReflectionSectionTitle": "Reflexão",
-  "memoryEditEncryptLabel": "Criptografar",
-  "memoryEditEncryptionInfoTooltip": "O que é criptografia?",
-  "memoryEditImpactPrompt": "Como este evento me impactou?",
-  "memoryEditLessonPrompt": "Que lição eu aprendi?",
-  "memoryEditEmotionsLabel": "Emoções:",
-  "emotionJoy": "Alegria",
-  "emotionNostalgia": "Nostalgia",
-  "emotionPride": "Orgulho",
-  "emotionSadness": "Tristeza",
-  "emotionGratitude": "Gratidão",
-  "emotionLove": "Amor",
-  "emotionFear": "Medo",
-  "emotionAnger": "Raiva",
-  "memoryEditCbtHelperTitle": "Assistente de Reflexão",
-  "memoryEditCbtStep1Title": "Qual foi o primeiro pensamento ou crença?",
-  "memoryEditCbtStep1Subtitle": "ex: 'Vou falhar' ou 'Fiz tudo certo'.",
-  "memoryEditCbtStep2Title": "O que apoia esse pensamento?",
-  "memoryEditCbtStep2Subtitle": "Quais fatos ou eventos provam que esse pensamento é verdadeiro?",
-  "memoryEditCbtStep3Title": "Qual é a visão do outro lado?",
-  "memoryEditCbtStep3Subtitle": "Quais fatos ou eventos podem refutar ou desafiar o primeiro pensamento?",
-  "memoryEditCbtStep4Title": "Como posso ver isso de forma diferente?",
-  "memoryEditCbtStep4Subtitle": "Com base no exposto, formule uma perspectiva nova e mais equilibrada.",
-  "memoryEditActionPlanTitle": "Plano de Ação",
-  "memoryEditActionPrompt": "Qual é um pequeno passo que posso dar?",
-  "memoryEditReminderLabel": "Lembrete:",
-  "memoryEditReminderNotSet": "Não definido",
-  "memoryEditSetReminderButton": "Definir Data",
-  "memoryEditYourThoughtsHint": "Seus pensamentos aqui...",
-  "memoryEditDraftSavedMessage": "Rascunho salvo",
-  "memoryEditErrorRepoUnavailable": "Erro: Repositório não disponível.",
-  "memoryEditErrorSaving": "Erro ao salvar memória: {error}",
-  "@memoryEditErrorSaving": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryEditUnlockDialogTitle": "Desbloquear para Salvar",
-  "memoryEditUnlockDialogContent": "Por favor, insira sua Senha Mestra para salvar esta memória criptografada.",
-  "memoryEditMasterPasswordHint": "Senha Mestra",
-  "memoryEditUnlockButton": "Desbloquear",
-  "memoryEditEncryptionInfoDialogTitle": "Criptografia de Ponta a Ponta",
-  "memoryEditEncryptionInfoDialogContent": "Quando você criptografa uma memória, seus campos de descrição e reflexão são embaralhados usando uma chave derivada de sua Senha Mestra.\n\nOs dados são armazenados em um formato ilegível na nuvem e só podem ser descriptografados em seus dispositivos com sua senha.\n\nIMPORTANTE: Não podemos recuperar sua Senha Mestra. Se você a esquecer, seus dados criptografados serão perdidos para sempre.",
-  "memoryEditOkButton": "OK",
-  "memoryEditPermissionDeniedSnackbar": "A permissão para {permissionName} foi negada. Por favor, ative-a nas configurações.",
-  "@memoryEditPermissionDeniedSnackbar": {
-    "placeholders": {
-      "permissionName": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryEditSettingsButton": "Configurações",
-  "memoryEditNoInternetSnackbar": "É necessária conexão com a internet para pesquisar músicas.",
-  "memoryEditEmotionIntensityDialogTitle": "Intensidade para '{emotion}'",
-  "@memoryEditEmotionIntensityDialogTitle": {
-    "placeholders": {
-      "emotion": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewBackTooltip": "Voltar",
-  "memoryViewShareTooltip": "Compartilhar",
-  "memoryViewEditTooltip": "Editar",
-  "memoryViewDeleteTooltip": "Excluir",
-  "memoryViewTabMemory": "Memória",
-  "memoryViewTabInTheWorld": "No Mundo",
-  "memoryViewEncryptedTitle": "Memória Criptografada",
-  "memoryViewReflectionTitle": "Reflexão",
-  "memoryViewReflectionImpact": "Impacto",
-  "memoryViewReflectionLesson": "Lição Aprendida",
-  "memoryViewCbtStep1Title": "Primeiro Pensamento ou Crença",
-  "memoryViewCbtStep2Title": "Evidências para Este Pensamento",
-  "memoryViewCbtStep3Title": "Evidências Contra Este Pensamento",
-  "memoryViewCbtStep4Title": "Perspectiva Nova e Equilibrada (Reenquadramento)",
-  "memoryViewActionReminder": "Lembrete: {date}",
-  "@memoryViewActionReminder": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewMarkIncompleteTooltip": "Marcar como incompleto",
-  "memoryViewMarkCompleteTooltip": "Marcar como completo",
-  "memoryViewUnlockDialogTitle": "Desbloquear Memória",
-  "memoryViewUnlockDialogContent": "Digite sua Senha Mestra para ver este conteúdo.",
-  "memoryViewIncorrectPassword": "Senha incorreta.",
-  "memoryViewUnlockButton": "Desbloquear",
-  "memoryViewErrorCouldNotLoadProfile": "Não foi possível carregar seu perfil para buscar dados históricos.",
-  "memoryViewErrorCouldNotLoadHistoricalData": "Não foi possível carregar dados históricos para este dia.",
-  "memoryViewNoHistoricalData": "Não há dados históricos disponíveis para este dia.",
-  "memoryViewErrorCouldNotLoadTrack": "Não foi possível carregar a faixa",
-  "memoryViewTabNews": "Notícias",
-  "memoryViewTabMusic": "Música",
-  "memoryViewNoDataForDay": "Sem dados para este dia.",
-  "memoryViewNoNewsForDay": "Sem notícias históricas para este dia.",
-  "memoryViewNewsSource": "Fonte: {source}",
-  "@memoryViewNewsSource": {
-    "placeholders": {
-      "source": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewConfirmDeleteTitle": "Confirmar Exclusão",
-  "memoryViewConfirmDeleteContent": "Esta ação é irreversível. Para prosseguir, pressione e segure o botão de exclusão por 5 segundos.",
-  "memoryViewDeleteButton": "EXCLUIR",
-  "memoryViewErrorLoadingProfile": "Não foi possível carregar seu perfil. Verifique sua conexão e tente novamente.",
-  "memoryViewErrorLocalDb": "Erro: Não foi possível acessar o banco de dados local.",
-  "memoryViewMemoryDeleted": "Memória excluída",
-  "memoryViewSharingNotImplemented": "A funcionalidade de compartilhamento ainda não foi implementada.",
-  "memoryViewActionCompleted": "Ação marcada como concluída!",
-  "memoryViewActionIncomplete": "Ação marcada como incompleta.",
-  "memoryViewErrorUpdatingAction": "Erro ao atualizar ação: {error}",
-  "@memoryViewErrorUpdatingAction": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewContentEncrypted": "Conteúdo Criptografado",
-  "memoryViewReflectionEncrypted": "Reflexão Criptografada",
-  "memoryViewMediaEncrypted": "Mídia Criptografada",
-  "memoryViewAmbientSound": "Som Ambiente: {sound}",
-  "@memoryViewAmbientSound": {
-    "placeholders": {
-      "sound": {
-        "type": "String"
-      }
-    }
-  },
-  "memoryViewAudioNote": "Nota de Áudio",
-  "spotifySearchTitle": "Pesquisar Faixa no Spotify",
-  "spotifySearchHint": "Título da música ou artista",
-  "documentErrorLoading": "Não foi possível carregar o documento.",
-  "lifelineMemoriesCount": "Memórias: {count}",
-  "@lifelineMemoriesCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelinePeriodRange": "Período: {startYear} - {endYear}",
-  "@lifelinePeriodRange": {
-    "placeholders": {
-      "startYear": {
-        "type": "int"
-      },
-      "endYear": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineSyncStatus": "{status} (faltam {jobs})",
-  "@lifelineSyncStatus": {
-    "placeholders": {
-      "status": {
-        "type": "String"
-      },
-      "jobs": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineCalculating": "Calculando...",
-  "lifelineScaleValue": "Escala: {scale}%",
-  "@lifelineScaleValue": {
-    "placeholders": {
-      "scale": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineFpsValue": "FPS: {fps}",
-  "@lifelineFpsValue": {
-    "placeholders": {
-      "fps": {
-        "type": "String"
-      }
-    }
-  },
-  "lifelineFramePaintValue": "Pintura do Quadro: {ms} ms",
-  "@lifelineFramePaintValue": {
-    "placeholders": {
-      "ms": {
-        "type": "int"
-      }
-    }
-  },
-  "lifelineShowFullTimelineTooltip": "Mostrar linha do tempo completa",
-  "lifelineVisualSettingsTooltip": "Configurações visuais",
-  "lifelineMenuProfile": "Perfil",
-  "lifelineMenuDebugOn": "Depuração Ativada",
-  "lifelineMenuDebugOff": "Depuração Desativada",
-  "lifelineMenuSignOut": "Sair",
-  "lifelineSearchHint": "Pesquisar...",
-  "lifelineMemoriesListTitle": "Memórias",
-  "lifelineVisualSettingsDialogTitle": "Configurações Visuais",
-  "lifelineVisualSettingsSpeed": "Velocidade",
-  "lifelineVisualSettingsAmplitude": "Amplitude",
-  "lifelineVisualSettingsYearLine": "Posição da Linha do Ano",
-  "lifelineVisualSettingsBranchDensity": "Densidade de Ramos",
-  "lifelineVisualSettingsBranchIntensity": "Intensidade de Ramos",
-  "lifelineVisualSettingsAnimate": "Animar",
-  "lifelineVisualSettingsDoneButton": "Concluído",
-  "onboardingWelcomeTitle": "Bem-vindo ao Lifeline",
-  "onboardingWelcomeSubtitle": "Sua jornada pessoal, visualizada. Vamos fazer um tour rápido para ver como você pode começar a capturar seus momentos.",
-  "onboardingSkipButton": "Pular por enquanto",
-  "onboardingBeginTourButton": "Começar Tour",
-  "onboardingGesturesTitle": "Navegue em Sua Linha do Tempo",
-  "onboardingGestureSwipe": "Deslizar",
-  "onboardingGesturePinch": "Pinçar para Zoom",
-  "onboardingGesturesSubtitle": "Sua Lifeline crescerá com você. Pince para diminuir o zoom e ver o quadro geral. Deslize para a esquerda e para a direita para navegar no tempo.",
-  "onboardingContinueButton": "Continuar",
-  "onboardingFinalTitle": "Tudo Pronto!",
-  "onboardingFinalSubtitle": "Sua jornada começa agora. Comece a capturar os momentos que importam.",
-  "onboardingStartJourneyButton": "Começar Minha Jornada",
-  "onboardingSkipTourButton": "Pular Tour",
-  "onboardingLifelineIntroText": "Esta é a sua Lifeline. Cada memória que você adicionar criará um nó único neste caminho, formando um belo mapa da jornada da sua vida.",
-  "onboardingLifelineIntroButton": "Próximo",
-  "onboardingAddMemoryText": "Toque aqui para adicionar uma nova memória. Um nó aparecerá em sua Lifeline para cada momento que você capturar.",
-  "onboardingNavGesturesText": "Ótimo! Agora, vamos aprender a navegar em sua linha do tempo.",
-  "onboardingControlsPanelText": "Use estes controles para gerenciar sua visualização. Você pode recentralizar a linha do tempo, ajustar efeitos visuais e acessar seu perfil.",
-  "onboardingControlsPanelButton": "Entendi",
-  "onboardingStatsCardText": "Este cartão mostra um resumo de suas memórias. Toque nele para abrir uma lista completa e pesquisável de toda a sua jornada.",
-  "onboardingStatsCardButton": "Quase lá!",
-  "audioPlayerPreviousTooltip": "Faixa Anterior",
-  "audioPlayerPlayTooltip": "Tocar",
-  "audioPlayerPauseTooltip": "Pausar",
-  "audioPlayerNextTooltip": "Próxima Faixa",
-  "memoryEditCbtStepLabel": "Passo {step}: ",
-  "@memoryEditCbtStepLabel": {
-    "description": "Label for a step in the CBT reflection helper",
-    "placeholders": {
-      "step": {
-        "type": "int",
-        "example": "1"
-      }
-    }
-  },
-  "premiumBannerTitle": "Desbloqueie o Lifeline Premium",
-  "premiumBannerSubtitle": "Mídia ilimitada, reflexão avançada, contexto histórico e muito mais!",
-  "premiumDialogTitle": "Atualize para o Premium",
-  "premiumDialogContent": "Desbloqueie a capacidade de {feature} e tenha acesso a todos os recursos premium.",
-  "@premiumDialogContent": {
-    "placeholders": {
-      "feature": {
-        "type": "String"
-      }
-    }
-  },
-  "premiumDialogGoPremium": "Vá para o Premium",
-  "premiumFeaturePhotos": "adicionar mais fotos",
-  "premiumFeatureVideos": "adicionar um vídeo",
-  "premiumFeatureAudio": "adicionar uma nota de áudio",
-  "premiumFeatureSpotify": "adicionar uma faixa do Spotify",
-  "premiumScreenTitle": "Lifeline Premium",
-  "premiumScreenHeaderTitle": "Desbloqueie seu potencial máximo",
-  "premiumScreenHeaderSubtitle": "Vá além dos limites com o Lifeline Premium e aproveite ao máximo sua jornada de autodescoberta.",
-  "premiumFeatureUnlimitedPhotos": "Fotos e vídeos ilimitados",
-  "premiumFeatureUnlimitedAudio": "Notas de áudio ilimitadas",
-  "premiumFeatureUnlimitedSpotify": "Faixas do Spotify ilimitadas",
-  "premiumFeatureAdvancedCbt": "Assistente de reflexão avançado",
-  "premiumFeatureActionReminders": "Lembretes do plano de ação",
-  "premiumFeatureHistoricalContext": "Contexto histórico 'No Mundo'",
-  "premiumFeatureSoundLibrary": "Biblioteca completa de sons ambientes",
-  "premiumScreenYearlyPopular": "Mais popular e melhor custo-benefício",
-  "premiumScreenRestore": "Restaurar compras",
-  "premiumScreenTerms": "Termos de Serviço",
-  "premiumScreenPrivacy": "Política de Privacidade",
-  "premiumStatusTitle": "Membro Premium",
-  "premiumStatusExpiresOn": "Expira em {date}",
-  "@premiumStatusExpiresOn": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
-  "onboardingEncryptionTitle": "Suas memórias, seguras",
-  "onboardingEncryptionSubtitle": "O Lifeline oferece criptografia de ponta a ponta. Isso significa que apenas você pode ler suas memórias privadas. Vamos configurar sua Senha Mestra para protegê-las.",
-  "onboardingEncryptionSetupButton": "Configurar agora",
-  "onboardingEncryptionLaterButton": "Talvez mais tarde",
-  "onboardingEncryptionActiveTitle": "A Criptografia está Ativa",
-  "onboardingEncryptionActiveSubtitle": "As suas memórias já estão protegidas. Pode gerir a sua palavra-passe mestra nas definições do perfil.",
-  "onboardingEncryptionContinueButton": "Continuar",
-  "memoryEditEncryptMemory": "Criptografar esta memória",
-  "memoryEditSetupEncryptionTitle": "Ativar criptografia?",
-  "memoryEditSetupEncryptionContent": "Para proteger esta memória, você primeiro precisa criar uma Senha Mestra. Esta será sua única chave para todas as entradas criptografadas.",
-  "memoryEditCreatePasswordButton": "Criar Senha Mestra",
-  "memoryViewExportPdf": "Compartilhar como PDF"
+"@@locale": "pt",
+"email": "E-mail",
+"password": "Senha",
+"signIn": "Entrar",
+"register": "Registrar",
+"createAccount": "Criar uma nova conta",
+"alreadyHaveAccount": "Já tenho uma conta",
+"orSignInWith": "Ou entre com",
+"passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+"invalidEmail": "Por favor, insira um e-mail válido",
+"consentWelcomeTitle": "Bem-vindo ao Lifeline",
+"consentWelcomeSubtitle": "Antes de começar, por favor, revise e concorde com nossos termos.",
+"consentIAgreeTo": "Eu li e concordo com os ",
+"consentTermsOfService": "Termos de Serviço",
+"consentAnd": " e a ",
+"consentPrivacyPolicy": "Política de Privacidade",
+"consentContinue": "Continuar",
+"consentErrorSaving": "Erro ao salvar as configurações: {error}",
+"@consentErrorSaving": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+"splashMessageInitializing": "Inicializando...",
+"splashMessageCheckingSettings": "Verificando configurações...",
+"splashMessageAuthenticating": "Autenticando...",
+"splashMessageSyncing": "Sincronizando sua linha do tempo...",
+"authGateLoadingMemories": "Carregando memórias...",
+"authGateAuthenticating": "Autenticando...",
+"authGateSomethingWentWrong": "Algo deu errado",
+"authGateCouldNotLoad": "Não foi possível carregar seus dados. Verifique sua conexão e tente novamente.",
+"authGateTryAgain": "Tentar Novamente",
+"authGateEmptyState": "Sua Lifeline está pronta.\nToque no botão + para adicionar sua primeira memória.",
+"authGateUnsavedDraftTitle": "Memória não salva",
+"authGateUnsavedDraftContent": "Você tem um rascunho de memória não salvo. Deseja continuar editando?",
+"authGateDiscard": "Descartar",
+"authGateContinueEditing": "Continuar Editando",
+"verifyEmailTitle": "Verificação de E-mail",
+"verifyEmailSentTo": "Um e-mail de verificação foi enviado para:",
+"verifyEmailInstructions": "Por favor, clique no link do e-mail para completar o seu registo.",
+"verifyEmailResendButton": "Reenviar E-mail",
+"verifyEmailCancelButton": "Cancelar",
+"profileTitle": "Perfil e Configurações",
+"profileSectionProfile": "PERFIL",
+"profileChangeNameTitle": "Alterar Nome",
+"profileEnterYourName": "Digite seu nome",
+"profileSave": "Salvar",
+"profileCancel": "Cancelar",
+"profileName": "Nome",
+"profileEmail": "E-mail",
+"profileCountry": "País",
+"profileCountryNotSelected": "Não selecionado",
+"profileLanguage": "Idioma do Conteúdo",
+"profileLanguageDefault": "Inglês (Padrão)",
+"profileSelectLanguage": "Selecionar Idioma",
+"profileSectionSettings": "CONFIGURAÇÕES",
+"profileTheme": "Tema",
+"profileThemeSystem": "Sistema",
+"profileThemeLight": "Claro",
+"profileThemeDark": "Escuro",
+"profileReauthTitle": "Reautenticação Necessária",
+"profileReauthContent": "Esta é uma operação sensível. Por favor, faça login novamente antes de prosseguir.",
+"profileReauthButton": "Entrar e Excluir",
+"profileReauthPasswordDialogTitle": "Confirmar Ação",
+"profileReauthPasswordDialogContent": "Para excluir sua conta, digite sua senha atual.",
+"profilePasswordCannotBeEmpty": "A senha não pode estar vazia",
+"profileChangePasswordSuccess": "Senha mestre alterada com sucesso!",
+"profileChangePasswordErrorIncorrect": "A senha mestra atual que você inseriu está incorreta.",
+"profileOldPasswordHint": "Senha Antiga",
+"profileNewPasswordHint": "Nova Senha",
+"profileDeleteAccountConfirmContent": "Esta ação é irreversível. Toda a sua conta, incluindo todas as memórias e configurações, será excluída permanentemente. Para prosseguir, pressione e segure o botão de exclusão por 5 segundos.",
+"profileChangePasswordCurrentPasswordHint": "Senha Mestra Atual",
+"profileChangePasswordNewPasswordHint": "Nova Senha Mestra",
+"profileChangePasswordInfo": "Por favor, insira sua senha mestra atual para definir uma nova. Isso irá criptografar novamente sua chave secreta.",
+"profileGraphics": "Qualidade Gráfica",
+"profileGraphicsAuto": "Automático",
+"profileGraphicsLow": "Baixa",
+"profileGraphicsMedium": "Média",
+"profileGraphicsHigh": "Alta",
+"profileReminders": "Lembretes de Reflexão",
+"profileRemindersSubtitle": "Receba notificações para seus planos de ação",
+"profileSectionSecurity": "SEGURANÇA",
+"profileChangePassword": "Alterar Senha Mestra",
+"profileEncryptionActive": "A criptografia de ponta a ponta está ativa",
+"profileEnableEncryption": "Ativar Criptografia de Ponta a Ponta",
+"profileEnableEncryptionSubtitle": "Proteja suas memórias sensíveis com uma senha mestra.",
+"profileCreateMasterPassword": "Criar Senha Mestra",
+"profileMasterPasswordInfo": "Esta senha protegerá suas memórias. Ela não pode ser recuperada se você a esquecer. Por favor, guarde-a em um local seguro.",
+"profileMasterPasswordHint": "Senha Mestra",
+"profileConfirmPasswordHint": "Confirmar Senha",
+"profilePasswordMinLength": "A senha deve ter pelo menos 8 caracteres",
+"profilePasswordsDoNotMatch": "As senhas não coincidem",
+"profileEnable": "Ativar",
+"profileSectionHelp": "AJUDA",
+"profileReplayTutorial": "Repetir Tutorial",
+"profileReplayTutorialConfirmTitle": "Repetir Tutorial?",
+"profileReplayTutorialConfirmContent": "Tem certeza de que deseja reiniciar o tutorial?",
+"profileRestart": "Reiniciar",
+"profileSectionAccount": "GERENCIAMENTO DA CONTA",
+"profileSignOut": "Sair",
+"profileDeleteAccount": "Excluir Conta",
+"profileDeleteAccountConfirmTitle": "Excluir Conta?",
+"profileDelete": "Excluir",
+"profileDeletingAccount": "Excluindo sua conta...",
+"profileErrorCouldNotFindProfile": "Não foi possível encontrar o perfil do usuário.",
+"memoryEditNewTitle": "Nova Memória",
+"memoryEditEditTitle": "Editar Memória",
+"memoryEditSave": "Salvar",
+"memoryEditTitleHint": "Título",
+"memoryEditTitleValidator": "Por favor, insira um título",
+"memoryEditDescriptionHint": "Descrição",
+"memoryEditDateLabel": "Data:",
+"memoryEditSelectDateButton": "Selecionar Data",
+"memoryEditAmbientSoundLabel": "Som Ambiente:",
+"memoryEditAmbientSoundDropdownHint": "Selecione um som ambiente",
+"memoryEditMusicAnchorLabel": "Âncora Musical:",
+"memoryEditAttachTrackButton": "Anexar faixa do Spotify",
+"memoryEditPhotosLabel": "Fotos:",
+"memoryEditNoPhotosSelected": "Nenhuma foto selecionada",
+"memoryEditAddPhotosButton": "Adicionar Fotos",
+"memoryEditVideosLabel": "Vídeos:",
+"memoryEditNoVideosSelected": "Nenhum vídeo selecionado",
+"memoryEditAddVideoButton": "Adicionar Vídeo",
+"memoryEditAudioNoteLabel": "Nota de Áudio:",
+"memoryEditAudioNoteSaved": "Nota de áudio salva",
+"memoryEditRecordButton": "Gravar",
+"memoryEditStopRecordingButton": "Parar Gravação",
+"memoryEditRecordingIndicator": "Gravando...",
+"memoryEditReflectionSectionTitle": "Reflexão",
+"memoryEditEncryptLabel": "Criptografar",
+"memoryEditEncryptionInfoTooltip": "O que é criptografia?",
+"memoryEditImpactPrompt": "Como este evento me impactou?",
+"memoryEditLessonPrompt": "Que lição eu aprendi?",
+"memoryEditEmotionsLabel": "Emoções:",
+"emotionJoy": "Alegria",
+"emotionNostalgia": "Nostalgia",
+"emotionPride": "Orgulho",
+"emotionSadness": "Tristeza",
+"emotionGratitude": "Gratidão",
+"emotionLove": "Amor",
+"emotionFear": "Medo",
+"emotionAnger": "Raiva",
+"memoryEditCbtHelperTitle": "Assistente de Reflexão",
+"memoryEditCbtStep1Title": "Qual foi o primeiro pensamento ou crença?",
+"memoryEditCbtStep1Subtitle": "ex: 'Vou falhar' ou 'Fiz tudo certo'.",
+"memoryEditCbtStep2Title": "O que apoia esse pensamento?",
+"memoryEditCbtStep2Subtitle": "Quais fatos ou eventos provam que esse pensamento é verdadeiro?",
+"memoryEditCbtStep3Title": "Qual é a visão do outro lado?",
+"memoryEditCbtStep3Subtitle": "Quais fatos ou eventos podem refutar ou desafiar o primeiro pensamento?",
+"memoryEditCbtStep4Title": "Como posso ver isso de forma diferente?",
+"memoryEditCbtStep4Subtitle": "Com base no exposto, formule uma perspectiva nova e mais equilibrada.",
+"memoryEditActionPlanTitle": "Plano de Ação",
+"memoryEditActionPrompt": "Qual é um pequeno passo que posso dar?",
+"memoryEditReminderLabel": "Lembrete:",
+"memoryEditReminderNotSet": "Não definido",
+"memoryEditSetReminderButton": "Definir Data",
+"memoryEditYourThoughtsHint": "Seus pensamentos aqui...",
+"memoryEditDraftSavedMessage": "Rascunho salvo",
+"memoryEditErrorRepoUnavailable": "Erro: Repositório não disponível.",
+"memoryEditErrorSaving": "Erro ao salvar memória: {error}",
+"@memoryEditErrorSaving": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+"memoryEditUnlockDialogTitle": "Desbloquear para Salvar",
+"memoryEditUnlockDialogContent": "Por favor, insira sua Senha Mestra para salvar esta memória criptografada.",
+"memoryEditMasterPasswordHint": "Senha Mestra",
+"memoryEditUnlockButton": "Desbloquear",
+"memoryEditEncryptionInfoDialogTitle": "Criptografia de Ponta a Ponta",
+"memoryEditEncryptionInfoDialogContent": "Quando você criptografa uma memória, seus campos de descrição e reflexão são embaralhados usando uma chave derivada de sua Senha Mestra.\n\nOs dados são armazenados em um formato ilegível na nuvem e só podem ser descriptografados em seus dispositivos com sua senha.\n\nIMPORTANTE: Não podemos recuperar sua Senha Mestra. Se você a esquecer, seus dados criptografados serão perdidos para sempre.",
+"memoryEditOkButton": "OK",
+"memoryEditPermissionDeniedSnackbar": "A permissão para {permissionName} foi negada. Por favor, ative-a nas configurações.",
+"@memoryEditPermissionDeniedSnackbar": {
+"placeholders": {
+"permissionName": {
+"type": "String"
+}
+}
+},
+"memoryEditSettingsButton": "Configurações",
+"memoryEditNoInternetSnackbar": "É necessária conexão com a internet para pesquisar músicas.",
+"memoryEditEmotionIntensityDialogTitle": "Intensidade para '{emotion}'",
+"@memoryEditEmotionIntensityDialogTitle": {
+"placeholders": {
+"emotion": {
+"type": "String"
+}
+}
+},
+"memoryViewBackTooltip": "Voltar",
+"memoryViewShareTooltip": "Compartilhar",
+"memoryViewEditTooltip": "Editar",
+"memoryViewDeleteTooltip": "Excluir",
+"memoryViewTabMemory": "Memória",
+"memoryViewTabInTheWorld": "No Mundo",
+"memoryViewEncryptedTitle": "Memória Criptografada",
+"memoryViewReflectionTitle": "Reflexão",
+"memoryViewReflectionImpact": "Impacto",
+"memoryViewReflectionLesson": "Lição Aprendida",
+"memoryViewCbtStep1Title": "Primeiro Pensamento ou Crença",
+"memoryViewCbtStep2Title": "Evidências para Este Pensamento",
+"memoryViewCbtStep3Title": "Evidências Contra Este Pensamento",
+"memoryViewCbtStep4Title": "Perspectiva Nova e Equilibrada (Reenquadramento)",
+"memoryViewActionReminder": "Lembrete: {date}",
+"@memoryViewActionReminder": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"memoryViewMarkIncompleteTooltip": "Marcar como incompleto",
+"memoryViewMarkCompleteTooltip": "Marcar como completo",
+"memoryViewUnlockDialogTitle": "Desbloquear Memória",
+"memoryViewUnlockDialogContent": "Digite sua Senha Mestra para ver este conteúdo.",
+"memoryViewIncorrectPassword": "Senha incorreta.",
+"memoryViewUnlockButton": "Desbloquear",
+"memoryViewErrorCouldNotLoadProfile": "Não foi possível carregar seu perfil para buscar dados históricos.",
+"memoryViewErrorCouldNotLoadHistoricalData": "Não foi possível carregar dados históricos para este dia.",
+"memoryViewNoHistoricalData": "Não há dados históricos disponíveis para este dia.",
+"memoryViewErrorCouldNotLoadTrack": "Não foi possível carregar a faixa",
+"memoryViewTabNews": "Notícias",
+"memoryViewTabMusic": "Música",
+"memoryViewNoDataForDay": "Sem dados para este dia.",
+"memoryViewNoNewsForDay": "Sem notícias históricas para este dia.",
+"memoryViewNewsSource": "Fonte: {source}",
+"@memoryViewNewsSource": {
+"placeholders": {
+"source": {
+"type": "String"
+}
+}
+},
+"memoryViewConfirmDeleteTitle": "Confirmar Exclusão",
+"memoryViewConfirmDeleteContent": "Esta ação é irreversível. Para prosseguir, pressione e segure o botão de exclusão por 5 segundos.",
+"memoryViewDeleteButton": "EXCLUIR",
+"memoryViewErrorLoadingProfile": "Não foi possível carregar seu perfil. Verifique sua conexão e tente novamente.",
+"memoryViewErrorLocalDb": "Erro: Não foi possível acessar o banco de dados local.",
+"memoryViewMemoryDeleted": "Memória excluída",
+"memoryViewSharingNotImplemented": "A funcionalidade de compartilhamento ainda não foi implementada.",
+"memoryViewActionCompleted": "Ação marcada como concluída!",
+"memoryViewActionIncomplete": "Ação marcada como incompleta.",
+"memoryViewErrorUpdatingAction": "Erro ao atualizar ação: {error}",
+"@memoryViewErrorUpdatingAction": {
+"placeholders": {
+"error": {
+"type": "String"
+}
+}
+},
+"memoryViewContentEncrypted": "Conteúdo Criptografado",
+"memoryViewReflectionEncrypted": "Reflexão Criptografada",
+"memoryViewMediaEncrypted": "Mídia Criptografada",
+"memoryViewAmbientSound": "Som Ambiente: {sound}",
+"@memoryViewAmbientSound": {
+"placeholders": {
+"sound": {
+"type": "String"
+}
+}
+},
+"memoryViewAudioNote": "Nota de Áudio",
+"spotifySearchTitle": "Pesquisar Faixa no Spotify",
+"spotifySearchHint": "Título da música ou artista",
+"documentErrorLoading": "Não foi possível carregar o documento.",
+"lifelineMemoriesCount": "Memórias: {count}",
+"@lifelineMemoriesCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelinePeriodRange": "Período: {startYear} - {endYear}",
+"@lifelinePeriodRange": {
+"placeholders": {
+"startYear": {
+"type": "int"
+},
+"endYear": {
+"type": "int"
+}
+}
+},
+"lifelineSyncStatus": "{status} (faltam {jobs})",
+"@lifelineSyncStatus": {
+"placeholders": {
+"status": {
+"type": "String"
+},
+"jobs": {
+"type": "int"
+}
+}
+},
+"lifelineCalculating": "Calculando...",
+"lifelineScaleValue": "Escala: {scale}%",
+"@lifelineScaleValue": {
+"placeholders": {
+"scale": {
+"type": "int"
+}
+}
+},
+"lifelineFpsValue": "FPS: {fps}",
+"@lifelineFpsValue": {
+"placeholders": {
+"fps": {
+"type": "String"
+}
+}
+},
+"lifelineFramePaintValue": "Pintura do Quadro: {ms} ms",
+"@lifelineFramePaintValue": {
+"placeholders": {
+"ms": {
+"type": "int"
+}
+}
+},
+"lifelineShowFullTimelineTooltip": "Mostrar linha do tempo completa",
+"lifelineVisualSettingsTooltip": "Configurações visuais",
+"lifelineMenuProfile": "Perfil",
+"lifelineMenuDebugOn": "Depuração Ativada",
+"lifelineMenuDebugOff": "Depuração Desativada",
+"lifelineMenuSignOut": "Sair",
+"lifelineSearchHint": "Pesquisar...",
+"lifelineMemoriesListTitle": "Memórias",
+"lifelineVisualSettingsDialogTitle": "Configurações Visuais",
+"lifelineVisualSettingsSpeed": "Velocidade",
+"lifelineVisualSettingsAmplitude": "Amplitude",
+"lifelineVisualSettingsYearLine": "Posição da Linha do Ano",
+"lifelineVisualSettingsBranchDensity": "Densidade de Ramos",
+"lifelineVisualSettingsBranchIntensity": "Intensidade de Ramos",
+"lifelineVisualSettingsAnimate": "Animar",
+"lifelineVisualSettingsDoneButton": "Concluído",
+"onboardingWelcomeTitle": "Bem-vindo ao Lifeline",
+"onboardingWelcomeSubtitle": "Sua jornada pessoal, visualizada. Vamos fazer um tour rápido para ver como você pode começar a capturar seus momentos.",
+"onboardingSkipButton": "Pular por enquanto",
+"onboardingBeginTourButton": "Começar Tour",
+"onboardingGesturesTitle": "Navegue em Sua Linha do Tempo",
+"onboardingGestureSwipe": "Deslizar",
+"onboardingGesturePinch": "Pinçar para Zoom",
+"onboardingGesturesSubtitle": "Sua Lifeline crescerá com você. Pince para diminuir o zoom e ver o quadro geral. Deslize para a esquerda e para a direita para navegar no tempo.",
+"onboardingContinueButton": "Continuar",
+"onboardingFinalTitle": "Tudo Pronto!",
+"onboardingFinalSubtitle": "Sua jornada começa agora. Comece a capturar os momentos que importam.",
+"onboardingStartJourneyButton": "Começar Minha Jornada",
+"onboardingSkipTourButton": "Pular Tour",
+"onboardingLifelineIntroText": "Esta é a sua Lifeline. Cada memória que você adicionar criará um nó único neste caminho, formando um belo mapa da jornada da sua vida.",
+"onboardingLifelineIntroButton": "Próximo",
+"onboardingAddMemoryText": "Toque aqui para adicionar uma nova memória. Um nó aparecerá em sua Lifeline para cada momento que você capturar.",
+"onboardingNavGesturesText": "Ótimo! Agora, vamos aprender a navegar em sua linha do tempo.",
+"onboardingControlsPanelText": "Use estes controles para gerenciar sua visualização. Você pode recentralizar a linha do tempo, ajustar efeitos visuais e acessar seu perfil.",
+"onboardingControlsPanelButton": "Entendi",
+"onboardingStatsCardText": "Este cartão mostra um resumo de suas memórias. Toque nele para abrir uma lista completa e pesquisável de toda a sua jornada.",
+"onboardingStatsCardButton": "Quase lá!",
+"audioPlayerPreviousTooltip": "Faixa Anterior",
+"audioPlayerPlayTooltip": "Tocar",
+"audioPlayerPauseTooltip": "Pausar",
+"audioPlayerNextTooltip": "Próxima Faixa",
+"memoryEditCbtStepLabel": "Passo {step}: ",
+"@memoryEditCbtStepLabel": {
+"description": "Label for a step in the CBT reflection helper",
+"placeholders": {
+"step": {
+"type": "int",
+"example": "1"
+}
+}
+},
+"premiumBannerTitle": "Desbloqueie o Lifeline Premium",
+"premiumBannerSubtitle": "Mídia ilimitada, reflexão avançada, contexto histórico e muito mais!",
+"premiumDialogTitle": "Atualize para o Premium",
+"premiumDialogContent": "Desbloqueie a capacidade de {feature} e tenha acesso a todos os recursos premium.",
+"@premiumDialogContent": {
+"placeholders": {
+"feature": {
+"type": "String"
+}
+}
+},
+"premiumDialogGoPremium": "Vá para o Premium",
+"premiumFeaturePhotos": "adicionar mais fotos",
+"premiumFeatureVideos": "adicionar um vídeo",
+"premiumFeatureAudio": "adicionar uma nota de áudio",
+"premiumFeatureSpotify": "adicionar uma faixa do Spotify",
+"premiumScreenTitle": "Lifeline Premium",
+"premiumScreenHeaderTitle": "Desbloqueie seu potencial máximo",
+"premiumScreenHeaderSubtitle": "Vá além dos limites com o Lifeline Premium e aproveite ao máximo sua jornada de autodescoberta.",
+"premiumFeatureUnlimitedPhotos": "Fotos e vídeos ilimitados",
+"premiumFeatureUnlimitedAudio": "Notas de áudio ilimitadas",
+"premiumFeatureUnlimitedSpotify": "Faixas do Spotify ilimitadas",
+"premiumFeatureAdvancedCbt": "Assistente de reflexão avançado",
+"premiumFeatureActionReminders": "Lembretes do plano de ação",
+"premiumFeatureHistoricalContext": "Contexto histórico 'No Mundo'",
+"premiumFeatureSoundLibrary": "Biblioteca completa de sons ambientes",
+"premiumScreenYearlyPopular": "Mais popular e melhor custo-benefício",
+"premiumScreenRestore": "Restaurar compras",
+"premiumScreenTerms": "Termos de Serviço",
+"premiumScreenPrivacy": "Política de Privacidade",
+"premiumStatusTitle": "Membro Premium",
+"premiumStatusExpiresOn": "Expira em {date}",
+"@premiumStatusExpiresOn": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"onboardingEncryptionTitle": "Suas memórias, seguras",
+"onboardingEncryptionSubtitle": "O Lifeline oferece criptografia de ponta a ponta. Isso significa que apenas você pode ler suas memórias privadas. Vamos configurar sua Senha Mestra para protegê-las.",
+"onboardingEncryptionSetupButton": "Configurar agora",
+"onboardingEncryptionLaterButton": "Talvez mais tarde",
+"onboardingEncryptionActiveTitle": "A Criptografia está Ativa",
+"onboardingEncryptionActiveSubtitle": "As suas memórias já estão protegidas. Pode gerir a sua palavra-passe mestra nas definições do perfil.",
+"onboardingEncryptionContinueButton": "Continuar",
+"memoryEditEncryptMemory": "Criptografar esta memória",
+"memoryEditSetupEncryptionTitle": "Ativar criptografia?",
+"memoryEditSetupEncryptionContent": "Para proteger esta memória, você primeiro precisa criar uma Senha Mestra. Esta será sua única chave para todas as entradas criptografadas.",
+"memoryEditCreatePasswordButton": "Criar Senha Mestra",
+"memoryViewExportPdf": "Compartilhar como PDF",
+"shareActionTitle": "Adicionar ao Lifeline",
+"shareActionSubtitle": "O que você gostaria de fazer com estes arquivos?",
+"shareCreateNewMemory": "Criar uma Nova Memória",
+"shareAddToExisting": "Adicionar a uma Memória Existente",
+"selectMemoryTitle": "Selecionar uma Memória",
+"selectMemorySearchHint": "Pesquisar por título ou conteúdo...",
+"selectMemoryEmpty": "Nenhuma memória encontrada",
+"memoryUpdatedSuccess": "Memória atualizada com sucesso!"
 }

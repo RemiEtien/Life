@@ -1001,4 +1001,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get memoryViewExportPdf => 'Als PDF teilen';
+
+  @override
+  String get shareActionTitle => 'Zu Lifeline hinzufügen';
+
+  @override
+  String get shareActionSubtitle => 'Was möchten Sie mit diesen Dateien tun?';
+
+  @override
+  String get shareCreateNewMemory => 'Neue Erinnerung erstellen';
+
+  @override
+  String get shareAddToExisting => 'Zu bestehender Erinnerung hinzufügen';
+
+  @override
+  String get selectMemoryTitle => 'Erinnerung auswählen';
+
+  @override
+  String get selectMemorySearchHint => 'Suche nach Titel oder Inhalt...';
+
+  @override
+  String get selectMemoryEmpty => 'Keine Erinnerungen gefunden';
+
+  @override
+  String get memoryUpdatedSuccess => 'Erinnerung erfolgreich aktualisiert!';
 }

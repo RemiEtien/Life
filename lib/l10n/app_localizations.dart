@@ -1905,6 +1905,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share as PDF'**
   String get memoryViewExportPdf;
+
+  /// No description provided for @shareActionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Lifeline'**
+  String get shareActionTitle;
+
+  /// No description provided for @shareActionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to do with these files?'**
+  String get shareActionSubtitle;
+
+  /// No description provided for @shareCreateNewMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a New Memory'**
+  String get shareCreateNewMemory;
+
+  /// No description provided for @shareAddToExisting.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Existing Memory'**
+  String get shareAddToExisting;
+
+  /// No description provided for @selectMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Memory'**
+  String get selectMemoryTitle;
+
+  /// No description provided for @selectMemorySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by title or content...'**
+  String get selectMemorySearchHint;
+
+  /// No description provided for @selectMemoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No memories found'**
+  String get selectMemoryEmpty;
+
+  /// No description provided for @memoryUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory successfully updated!'**
+  String get memoryUpdatedSuccess;
 }
 
 class _AppLocalizationsDelegate
