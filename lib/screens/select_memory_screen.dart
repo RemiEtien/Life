@@ -10,9 +10,11 @@ import 'package:lifeline/services/message_service.dart';
 
 /// A screen to select an existing memory to add media to.
 class SelectMemoryScreen extends ConsumerStatefulWidget {
-  final List<MediaItem> mediaToAdd;
+  // ИЗМЕНЕНО: Списки теперь могут быть null
+  final List<MediaItem>? mediaToAdd;
+  final List<VideoMediaItem>? videosToAdd;
 
-  const SelectMemoryScreen({super.key, required this.mediaToAdd});
+  const SelectMemoryScreen({super.key, this.mediaToAdd, this.videosToAdd});
 
   @override
   ConsumerState<SelectMemoryScreen> createState() => _SelectMemoryScreenState();
@@ -53,42 +55,55 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
         throw Exception("Memory repository is not available.");
       }
 
-      // Создаем изменяемые копии списков перед добавлением элементов
-      memory.mediaPaths = List.from(memory.mediaPaths)
-        ..addAll(widget.mediaToAdd.where((i) => i.isLocal).map((i) => i.path));
-      memory.mediaUrls = List.from(memory.mediaUrls)
-        ..addAll(widget.mediaToAdd.where((i) => !i.isLocal).map((i) => i.path));
-      memory.mediaThumbPaths = List.from(memory.mediaThumbPaths)
-        ..addAll(
-            widget.mediaToAdd.where((i) => i.isLocal).map((i) => i.thumbPath));
-      memory.mediaThumbUrls = List.from(memory.mediaThumbUrls)
-        ..addAll(
-            widget.mediaToAdd.where((i) => !i.isLocal).map((i) => i.thumbPath));
-      
-      memory.mediaKeysOrder = List.from(memory.mediaKeysOrder)
-        ..addAll(widget.mediaToAdd.map((item) => _getFileKey(item.path)));
+      // ИЗМЕНЕНО: Обработка и фото, и видео
+      if (widget.mediaToAdd != null && widget.mediaToAdd!.isNotEmpty) {
+        memory.mediaPaths = List.from(memory.mediaPaths)
+          ..addAll(widget.mediaToAdd!.where((i) => i.isLocal).map((i) => i.path));
+        memory.mediaUrls = List.from(memory.mediaUrls)
+          ..addAll(widget.mediaToAdd!.where((i) => !i.isLocal).map((i) => i.path));
+        memory.mediaThumbPaths = List.from(memory.mediaThumbPaths)
+          ..addAll(widget.mediaToAdd!
+              .where((i) => i.isLocal)
+              .map((i) => i.thumbPath));
+        memory.mediaThumbUrls = List.from(memory.mediaThumbUrls)
+          ..addAll(widget.mediaToAdd!
+              .where((i) => !i.isLocal)
+              .map((i) => i.thumbPath));
+        memory.mediaKeysOrder = List.from(memory.mediaKeysOrder)
+          ..addAll(widget.mediaToAdd!.map((item) => _getFileKey(item.path)));
+      }
 
+      if (widget.videosToAdd != null && widget.videosToAdd!.isNotEmpty) {
+        memory.videoPaths = List.from(memory.videoPaths)
+          ..addAll(
+              widget.videosToAdd!.where((i) => i.isLocal).map((i) => i.path));
+        memory.videoUrls = List.from(memory.videoUrls)
+          ..addAll(
+              widget.videosToAdd!.where((i) => !i.isLocal).map((i) => i.path));
+        memory.videoKeysOrder = List.from(memory.videoKeysOrder)
+          ..addAll(widget.videosToAdd!.map((item) => _getFileKey(item.path)));
+      }
 
       await repo.update(memory);
       ref.read(syncServiceProvider).queueSync(memory.id);
 
       if (mounted) {
         Navigator.of(context).pop(); // Pop loading dialog
-        Navigator.of(context).popUntil((route) => route.isFirst); // Go back to timeline
+        Navigator.of(context)
+            .popUntil((route) => route.isFirst); // Go back to timeline
         ref
             .read(messageProvider.notifier)
             .addMessage(l10n.memoryUpdatedSuccess, type: MessageType.success);
       }
     } catch (e, stack) {
-        if (kDebugMode) {
-          print("Error adding media to memory: $e\n$stack");
-        }
-        if (mounted) {
-          Navigator.of(context).pop(); // Pop loading dialog on error
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to add media: $e"))
-          );
-        }
+      if (kDebugMode) {
+        print("Error adding media to memory: $e\n$stack");
+      }
+      if (mounted) {
+        Navigator.of(context).pop(); // Pop loading dialog on error
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Failed to add media: $e")));
+      }
     }
   }
 
@@ -157,4 +172,3 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
     );
   }
 }
-

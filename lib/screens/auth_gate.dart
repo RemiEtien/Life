@@ -73,23 +73,24 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   Future<void> _handleSharedFiles(List<SharedMediaFile> files) async {
     if (files.isEmpty || !mounted) return;
-  
+
     // Читаем все необходимые значения ДО асинхронных операций
     final authValue = ref.read(authStateChangesProvider);
     final user = authValue.asData?.value;
     if (user == null) {
       return;
     }
-  
+
     final imageProcessor = ref.read(imageProcessingServiceProvider);
-    final List<MediaItem> processedMedia = [];
-  
+    // ИЗМЕНЕНО: Создаем список, который может содержать и MediaItem, и VideoMediaItem
+    final List<dynamic> processedMedia = [];
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-  
+
     for (var file in files) {
       if (file.type == SharedMediaType.image) {
         final result = await imageProcessor.processPickedImage(XFile(file.path));
@@ -100,19 +101,22 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             isLocal: true,
           ));
         }
+      } else if (file.type == SharedMediaType.video) { // ДОБАВЛЕНО: Обработка видео
+        // Для видео мы не обрабатываем их здесь, просто создаем элемент.
+        processedMedia.add(VideoMediaItem(path: file.path, isLocal: true));
       }
-       // TODO: Добавить обработку видео, если необходимо.
     }
-  
+
     if (mounted) Navigator.of(context).pop();
-  
+
     if (processedMedia.isNotEmpty && mounted) {
       ReceiveSharingIntent.instance.reset();
       _showShareActionSheet(processedMedia, user.uid);
     }
   }
 
-  void _showShareActionSheet(List<MediaItem> media, String userId) {
+  // ИЗМЕНЕНО: Теперь принимает List<dynamic>
+  void _showShareActionSheet(List<dynamic> media, String userId) {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
@@ -149,7 +153,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                         child: SizedBox(
                           width: 100,
                           height: 100,
-                          child: Image.file(File(item.thumbPath), fit: BoxFit.cover),
+                          // ИЗМЕНЕНО: Различаем фото и видео для превью
+                          child: item is MediaItem
+                              ? Image.file(File(item.thumbPath),
+                                  fit: BoxFit.cover)
+                              : Container(
+                                  color: Colors.black54,
+                                  child: const Icon(Icons.videocam,
+                                      color: Colors.white, size: 50),
+                                ),
                         ),
                       ),
                     );
@@ -171,7 +183,10 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                     MaterialPageRoute(
                       builder: (_) => MemoryEditScreen(
                         userId: userId,
-                        initialMedia: media,
+                        // ИЗМЕНЕНО: Передаем оба списка в MemoryEditScreen
+                        initialMedia: media.whereType<MediaItem>().toList(),
+                        initialVideos:
+                            media.whereType<VideoMediaItem>().toList(),
                       ),
                     ),
                   );
@@ -184,14 +199,17 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   foregroundColor: Colors.white,
-                  side: BorderSide(color: Colors.white.withAlpha((255 * 0.5).round())),
+                  side: BorderSide(
+                      color: Colors.white.withAlpha((255 * 0.5).round())),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop(); // Close bottom sheet
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => SelectMemoryScreen(
-                        mediaToAdd: media,
+                        // ИЗМЕНЕНО: Передаем оба списка в SelectMemoryScreen
+                        mediaToAdd: media.whereType<MediaItem>().toList(),
+                        videosToAdd: media.whereType<VideoMediaItem>().toList(),
                       ),
                     ),
                   );
@@ -207,7 +225,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   void _checkForDrafts(AppLocalizations l10n) async {
     if (!mounted) return;
     FirebaseCrashlytics.instance.log('AuthGate: Checking for drafts.');
-  
+
     // Читаем repo один раз
     final repo = ref.read(memoryRepositoryProvider);
     if (repo == null) {
@@ -215,15 +233,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
           .log('AuthGate: Draft check aborted, repo is null.');
       return;
     }
-  
+
     final draft = await repo.findDraft();
-  
+
     if (!mounted) {
       FirebaseCrashlytics.instance
           .log('AuthGate: Unmounted after finding draft.');
       return;
     }
-  
+
     // Проверяем auth state заново после асинхронной операции
     final currentAuthValue = ref.read(authStateChangesProvider);
     if (currentAuthValue.asData?.value == null) {
@@ -231,7 +249,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
           .log('AuthGate: Draft check aborted, user logged out.');
       return;
     }
-  
+
     if (draft != null) {
       FirebaseCrashlytics.instance
           .log('AuthGate: Found draft ${draft.id}. Showing dialog.');
@@ -243,10 +261,10 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   void _showDraftDialog(Memory draft, AppLocalizations l10n) {
     if (!mounted) return;
-    
+
     // Читаем repo заранее
     final repo = ref.read(memoryRepositoryProvider);
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
