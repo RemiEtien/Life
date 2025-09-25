@@ -7,6 +7,12 @@ import 'package:lifeline/providers/application_providers.dart';
 import 'package:lifeline/services/firestore_service.dart';
 import 'package:lifeline/services/memory_repository.dart';
 
+// Вспомогательный метод для получения ключа файла (имя файла без временной метки)
+String _getFileKey(String path) {
+  String filename = path.split('/').last.split('?').first;
+  return filename.replaceAll(RegExp(r'^\d{13}_'), '');
+}
+
 @immutable
 class SyncState {
   final int pendingJobs;
@@ -45,6 +51,7 @@ class SyncService {
     _checkForUnsyncedMemories();
   }
 
+  /// РЕАЛИЗАЦИЯ ПРИНЦИПА 4: "Умная" синхронизация (слияние)
   Future<void> syncFromCloudToLocal({bool isInitialSync = false}) async {
     final notifier = _ref.read(syncNotifierProvider.notifier);
     if (!isInitialSync && notifier.state.isSyncing) return;
@@ -56,16 +63,39 @@ class SyncService {
     if (userId == null) return;
 
     if (!isInitialSync) {
-        notifier.updateState(isSyncing: true, currentStatus: "Fetching from cloud...");
+      notifier.updateState(isSyncing: true, currentStatus: "Fetching from cloud...");
     }
 
     try {
       final cloudMemories = await firestore.fetchAllMemoriesOnce(userId);
       if (cloudMemories != null) {
         if (!isInitialSync) {
-            notifier.updateState(currentStatus: "Updating local database...");
+          notifier.updateState(currentStatus: "Merging with local data...");
         }
-        await repo!.replaceAll(cloudMemories);
+
+        // --- ЛОГИКА СЛИЯНИЯ ---
+        final localMemoriesMap = await repo!.getMemoriesMap();
+        final List<Memory> memoriesToUpsert = [];
+
+        for (final cloudMemory in cloudMemories) {
+          final localMemory = localMemoriesMap[cloudMemory.firestoreId];
+          if (localMemory == null) {
+            // Новое воспоминание из облака, просто добавляем.
+            memoriesToUpsert.add(cloudMemory);
+          } else {
+            // Воспоминание существует локально, сравниваем метки времени.
+            if (cloudMemory.lastModified.isAfter(localMemory.lastModified) &&
+                localMemory.syncStatus != 'pending') {
+              // Облачная версия новее и локальная не ожидает синхронизации.
+              memoriesToUpsert.add(cloudMemory);
+            }
+          }
+        }
+
+        if (memoriesToUpsert.isNotEmpty) {
+          await repo.upsertMemories(memoriesToUpsert);
+        }
+        // --- КОНЕЦ ЛОГИКИ СЛИЯНИЯ ---
       }
       if (!isInitialSync) {
         notifier.updateState(isSyncing: false, currentStatus: "Sync complete!");
@@ -78,9 +108,9 @@ class SyncService {
         rethrow;
       }
     } finally {
-        if (!isInitialSync) {
-            _checkForUnsyncedMemories();
-        }
+      if (!isInitialSync) {
+        _checkForUnsyncedMemories();
+      }
     }
   }
 
@@ -156,8 +186,8 @@ class SyncService {
       final repo = _ref.read(memoryRepositoryProvider);
       final memory = await repo?.getById(memoryId);
       if (memory != null) {
-          memory.syncStatus = status;
-          await repo!.updateAfterSync(memory);
+          final updatedMemory = memory.copyWith(syncStatus: status);
+          await repo!.updateAfterSync(updatedMemory);
       }
   }
 
@@ -170,7 +200,7 @@ class SyncService {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       Memory? memory = await repo.getDecryptedById(memoryId);
-      if (memory == null) return true;
+      if (memory == null) return true; // Already deleted, sync is "successful"
 
       try {
         final notifier = _ref.read(syncNotifierProvider.notifier);
@@ -187,24 +217,27 @@ class SyncService {
         notifier.updateState(currentStatus: "Uploading audio...", progress: 0.8);
         final newAudioUrls = await firestore.uploadFiles(userId, memory.universalId, memory.audioNotePaths, 'audio');
         
-        Memory memoryToSaveInCloud = (await repo.getById(memoryId))!;
+        /// РЕАЛИЗАЦИЯ ПРИНЦИПА 3: Атомарное обновление с copyWith
+        final memoryForCloud = memory.copyWith(
+          mediaUrls: [...memory.mediaUrls, ...newPhotoUrls].toSet().toList(),
+          mediaPaths: [],
+          mediaThumbUrls: [...memory.mediaThumbUrls, ...newThumbUrls].toSet().toList(),
+          mediaThumbPaths: [],
+          videoUrls: [...memory.videoUrls, ...newVideoUrls].toSet().toList(),
+          videoPaths: [],
+          audioUrls: [...memory.audioUrls, ...newAudioUrls].toSet().toList(),
+          audioNotePaths: [],
+          syncStatus: 'synced',
+          // Обновляем mediaKeysOrder, сохраняя порядок и используя ключи из новых URL
+          mediaKeysOrder: [...memory.mediaUrls, ...newPhotoUrls].toSet().map((url) => _getFileKey(url)).toList(),
+          videoKeysOrder: [...memory.videoUrls, ...newVideoUrls].toSet().map((url) => _getFileKey(url)).toList(),
+          audioKeysOrder: [...memory.audioUrls, ...newAudioUrls].toSet().map((url) => _getFileKey(url)).toList(),
+        );
 
-        memoryToSaveInCloud
-          ..mediaUrls = [...memory.mediaUrls, ...newPhotoUrls].toSet().toList()
-          ..mediaPaths = []
-          ..mediaThumbUrls = [...memory.mediaThumbUrls, ...newThumbUrls].toSet().toList() // НОВОЕ ПОЛЕ
-          ..mediaThumbPaths = [] // НОВОЕ ПОЛЕ
-          ..videoUrls = [...memory.videoUrls, ...newVideoUrls].toSet().toList()
-          ..videoPaths = []
-          ..audioUrls = [...memory.audioUrls, ...newAudioUrls].toSet().toList()
-          ..audioNotePaths = []
-          ..syncStatus = 'synced'
-          ..touch();
-        
         notifier.updateState(currentStatus: "Saving to cloud...", progress: 0.9);
-        await firestore.setMemory(userId, memoryToSaveInCloud);
+        await firestore.setMemory(userId, memoryForCloud);
         
-        await repo.updateAfterSync(memoryToSaveInCloud);
+        await repo.updateAfterSync(memoryForCloud);
 
         return true;
 

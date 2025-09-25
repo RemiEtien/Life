@@ -125,8 +125,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       return false;
     }
   }
-  
-  // --- НОВЫЙ МЕТОД ---
+
   /// Changes the user's master password.
   Future<bool> changeMasterPassword(String oldPassword, String newPassword) async {
     final userProfile = _ref.read(userProfileProvider).value;
@@ -138,11 +137,11 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final unlocked = await unlockSession(oldPassword);
     if (!unlocked || _unlockedDEK == null) {
       // If unlock fails, the old password was incorrect.
-      return false; 
+      return false;
     }
 
     // At this point, _unlockedDEK contains the decrypted Data Encryption Key.
-    
+
     // 2. Generate a NEW salt for the NEW password.
     final newSalt = _generateRandomBytes(16);
 
@@ -161,7 +160,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       wrappedDEK: newWrappedDEK,
     );
     await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
-    
+
     // The session remains unlocked with the same DEK.
     return true;
   }
@@ -213,20 +212,19 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     }
   }
 
+  /// РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Возвращает новую, расшифрованную копию, не изменяя оригинал
   Memory decryptMemory(Memory m) {
     if (!m.isEncrypted) return m;
 
-    final decryptedMemory = m;
-    decryptedMemory.content = decrypt(m.content);
-    decryptedMemory.reflectionImpact = decrypt(m.reflectionImpact);
-    decryptedMemory.reflectionLesson = decrypt(m.reflectionLesson);
-    decryptedMemory.reflectionAutoThought = decrypt(m.reflectionAutoThought);
-    decryptedMemory.reflectionEvidenceFor = decrypt(m.reflectionEvidenceFor);
-    decryptedMemory.reflectionEvidenceAgainst = decrypt(m.reflectionEvidenceAgainst);
-    decryptedMemory.reflectionReframe = decrypt(m.reflectionReframe);
-    decryptedMemory.reflectionAction = decrypt(m.reflectionAction);
-    
-    return decryptedMemory;
+    return m.copyWith(
+        content: decrypt(m.content),
+        reflectionImpact: decrypt(m.reflectionImpact),
+        reflectionLesson: decrypt(m.reflectionLesson),
+        reflectionAutoThought: decrypt(m.reflectionAutoThought),
+        reflectionEvidenceFor: decrypt(m.reflectionEvidenceFor),
+        reflectionEvidenceAgainst: decrypt(m.reflectionEvidenceAgainst),
+        reflectionReframe: decrypt(m.reflectionReframe),
+        reflectionAction: decrypt(m.reflectionAction));
   }
 
   bool isValueEncrypted(String? value) {
@@ -245,7 +243,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   Key _deriveKey(String password, Uint8List salt) {
     final derivator = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
       ..init(Pbkdf2Parameters(salt, 100000,
-          32)); 
+          32)); // 32 bytes for AES-256
     return Key(derivator.process(Uint8List.fromList(utf8.encode(password))));
   }
 
@@ -253,4 +251,3 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     return IV.fromSecureRandom(length).bytes;
   }
 }
-

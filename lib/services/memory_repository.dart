@@ -11,56 +11,44 @@ class MemoryRepository {
   MemoryRepository({required this.userId, required this.encryptionService});
 
   Future<Isar> get _db async => IsarService.instance(userId);
-  
-  // Encrypts fields of a memory object if it's marked as encrypted
-  // and the fields are not already in encrypted format.
+
+  /// РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Метод теперь возвращает новую, зашифрованную копию, не изменяя оригинал.
   Memory _encryptMemoryIfNeeded(Memory m) {
     if (!m.isEncrypted) return m;
 
-    // A simple helper to avoid encrypting already encrypted data
     bool isEncrypted(String? val) => encryptionService.isValueEncrypted(val);
-
-    m.content = isEncrypted(m.content) ? m.content : encryptionService.encrypt(m.content);
-    m.reflectionImpact = isEncrypted(m.reflectionImpact) ? m.reflectionImpact : encryptionService.encrypt(m.reflectionImpact);
-    m.reflectionLesson = isEncrypted(m.reflectionLesson) ? m.reflectionLesson : encryptionService.encrypt(m.reflectionLesson);
-    m.reflectionAutoThought = isEncrypted(m.reflectionAutoThought) ? m.reflectionAutoThought : encryptionService.encrypt(m.reflectionAutoThought);
-    m.reflectionEvidenceFor = isEncrypted(m.reflectionEvidenceFor) ? m.reflectionEvidenceFor : encryptionService.encrypt(m.reflectionEvidenceFor);
-    m.reflectionEvidenceAgainst = isEncrypted(m.reflectionEvidenceAgainst) ? m.reflectionEvidenceAgainst : encryptionService.encrypt(m.reflectionEvidenceAgainst);
-    m.reflectionReframe = isEncrypted(m.reflectionReframe) ? m.reflectionReframe : encryptionService.encrypt(m.reflectionReframe);
-    m.reflectionAction = isEncrypted(m.reflectionAction) ? m.reflectionAction : encryptionService.encrypt(m.reflectionAction);
-
-    return m;
+    // Используем copyWith для создания нового объекта с зашифрованными полями
+    return m.copyWith(
+      content: isEncrypted(m.content) ? m.content : encryptionService.encrypt(m.content),
+      reflectionImpact: isEncrypted(m.reflectionImpact) ? m.reflectionImpact : encryptionService.encrypt(m.reflectionImpact),
+      reflectionLesson: isEncrypted(m.reflectionLesson) ? m.reflectionLesson : encryptionService.encrypt(m.reflectionLesson),
+      reflectionAutoThought: isEncrypted(m.reflectionAutoThought) ? m.reflectionAutoThought : encryptionService.encrypt(m.reflectionAutoThought),
+      reflectionEvidenceFor: isEncrypted(m.reflectionEvidenceFor) ? m.reflectionEvidenceFor : encryptionService.encrypt(m.reflectionEvidenceFor),
+      reflectionEvidenceAgainst: isEncrypted(m.reflectionEvidenceAgainst) ? m.reflectionEvidenceAgainst : encryptionService.encrypt(m.reflectionEvidenceAgainst),
+      reflectionReframe: isEncrypted(m.reflectionReframe) ? m.reflectionReframe : encryptionService.encrypt(m.reflectionReframe),
+      reflectionAction: isEncrypted(m.reflectionAction) ? m.reflectionAction : encryptionService.encrypt(m.reflectionAction),
+    );
   }
 
-  // Decrypts fields of a memory object if it's marked as encrypted.
+  // РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Метод возвращает новую, расшифрованную копию.
   Memory _decryptMemory(Memory m) {
-    if (!m.isEncrypted) return m;
-
-    m.content = encryptionService.decrypt(m.content);
-    m.reflectionImpact = encryptionService.decrypt(m.reflectionImpact);
-    m.reflectionLesson = encryptionService.decrypt(m.reflectionLesson);
-    m.reflectionAutoThought = encryptionService.decrypt(m.reflectionAutoThought);
-    m.reflectionEvidenceFor = encryptionService.decrypt(m.reflectionEvidenceFor);
-    m.reflectionEvidenceAgainst = encryptionService.decrypt(m.reflectionEvidenceAgainst);
-    m.reflectionReframe = encryptionService.decrypt(m.reflectionReframe);
-    m.reflectionAction = encryptionService.decrypt(m.reflectionAction);
-    
-    return m;
+    return encryptionService.decryptMemory(m);
   }
 
   /// Creates a new memory, ready for cloud sync.
   Future<int> create(Memory m) async {
     final isar = await _db;
-    m.userId = userId;
-    m.syncStatus = 'pending';
-    m.touch();
-
-    // Generate Firestore ID if it doesn't exist
-    m.firestoreId ??= FirebaseFirestore.instance.collection('users').doc(userId).collection('memories').doc().id;
+    final memoryToSave = m.copyWith(
+      userId: userId,
+      syncStatus: 'pending',
+      lastModified: DateTime.now().toUtc(),
+      // Generate Firestore ID if it doesn't exist
+      firestoreId: m.firestoreId ?? FirebaseFirestore.instance.collection('users').doc(userId).collection('memories').doc().id,
+    );
     
-    final memoryToSave = _encryptMemoryIfNeeded(m);
+    final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
     
-    return isar.writeTxn(() => isar.memorys.put(memoryToSave));
+    return isar.writeTxn(() => isar.memorys.put(encryptedMemory));
   }
 
   /// [NEW] Creates a local draft of a memory that is not yet ready for syncing.
@@ -90,7 +78,23 @@ class MemoryRepository {
       .sortByLastModifiedDesc()
       .findFirst();
   }
+  
+  /// [NEW for Principle 4] Fetches all memories for a user as a map for efficient merging.
+  Future<Map<String, Memory>> getMemoriesMap() async {
+    final isar = await _db;
+    final allMemories = await isar.memorys.where().filter().userIdEqualTo(userId).findAll();
+    return { for (var m in allMemories) if (m.firestoreId != null) m.firestoreId! : m };
+  }
 
+  /// [NEW for Principle 4] Batch inserts or updates memories.
+  Future<void> upsertMemories(List<Memory> memories) async {
+    final isar = await _db;
+    await isar.writeTxn(() async {
+      await isar.memorys.putAll(memories);
+    });
+  }
+
+  /// [DEPRECATED in favor of merge logic]
   Future<void> replaceAll(List<Memory> memories) async {
     final isar = await _db;
     await isar.writeTxn(() async {
@@ -136,23 +140,21 @@ class MemoryRepository {
     return _decryptMemory(memory);
   }
 
-  /// [MODIFIED] Updates a memory. If it's a synced memory, marks it for re-sync.
-  /// If it's a draft, it remains a draft. This is for USER EDITS.
+  /// [REFACTORED with Principle 1] Updates a memory. If it's a synced memory, marks it for re-sync.
   Future<bool> update(Memory m) async {
     final isar = await _db;
-    m.userId = userId;
-    
-    // Only mark a fully synced memory as 'pending' on user change.
-    // Drafts remain drafts until explicitly saved.
-    if (m.syncStatus == 'synced') {
-        m.syncStatus = 'pending';
-    }
-    m.touch();
-    
-    final memoryToSave = _encryptMemoryIfNeeded(m);
+    final status = (m.syncStatus == 'synced') ? 'pending' : m.syncStatus;
+
+    final memoryToSave = m.copyWith(
+      userId: userId,
+      syncStatus: status,
+      lastModified: DateTime.now().toUtc(),
+    );
+
+    final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
 
     return isar.writeTxn(() async {
-      await isar.memorys.put(memoryToSave);
+      await isar.memorys.put(encryptedMemory);
       return true;
     });
   }
@@ -160,9 +162,8 @@ class MemoryRepository {
   /// [NEW] Specifically for the SyncService to update status without triggering re-sync logic.
   Future<void> updateAfterSync(Memory m) async {
     final isar = await _db;
-    m.touch(); // Update last modified time
-    // NO other logic, just save the object as is.
-    await isar.writeTxn(() => isar.memorys.put(m));
+    final finalMemory = m.copyWith(lastModified: DateTime.now().toUtc());
+    await isar.writeTxn(() => isar.memorys.put(finalMemory));
   }
   
   Future<bool> delete(int id) async {
@@ -170,4 +171,3 @@ class MemoryRepository {
     return isar.writeTxn(() => isar.memorys.delete(id));
   }
 }
-

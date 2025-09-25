@@ -22,123 +22,153 @@ const MemorySchema = CollectionSchema(
       name: r'ambientSound',
       type: IsarType.string,
     ),
-    r'audioNotePaths': PropertySchema(
+    r'audioKeysOrder': PropertySchema(
       id: 1,
+      name: r'audioKeysOrder',
+      type: IsarType.stringList,
+    ),
+    r'audioNotePaths': PropertySchema(
+      id: 2,
       name: r'audioNotePaths',
       type: IsarType.stringList,
     ),
     r'audioUrls': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'audioUrls',
       type: IsarType.stringList,
     ),
     r'content': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'content',
       type: IsarType.string,
     ),
     r'date': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'date',
       type: IsarType.dateTime,
     ),
+    r'emotionsData': PropertySchema(
+      id: 6,
+      name: r'emotionsData',
+      type: IsarType.stringList,
+    ),
     r'firestoreId': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'firestoreId',
       type: IsarType.string,
     ),
     r'isEncrypted': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'isEncrypted',
       type: IsarType.bool,
     ),
     r'lastModified': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'lastModified',
       type: IsarType.dateTime,
     ),
+    r'mediaKeysOrder': PropertySchema(
+      id: 10,
+      name: r'mediaKeysOrder',
+      type: IsarType.stringList,
+    ),
     r'mediaPaths': PropertySchema(
-      id: 8,
+      id: 11,
       name: r'mediaPaths',
       type: IsarType.stringList,
     ),
+    r'mediaThumbPaths': PropertySchema(
+      id: 12,
+      name: r'mediaThumbPaths',
+      type: IsarType.stringList,
+    ),
+    r'mediaThumbUrls': PropertySchema(
+      id: 13,
+      name: r'mediaThumbUrls',
+      type: IsarType.stringList,
+    ),
     r'mediaUrls': PropertySchema(
-      id: 9,
+      id: 14,
       name: r'mediaUrls',
       type: IsarType.stringList,
     ),
     r'reflectionAction': PropertySchema(
-      id: 10,
+      id: 15,
       name: r'reflectionAction',
       type: IsarType.string,
     ),
     r'reflectionActionCompleted': PropertySchema(
-      id: 11,
+      id: 16,
       name: r'reflectionActionCompleted',
       type: IsarType.bool,
     ),
     r'reflectionAutoThought': PropertySchema(
-      id: 12,
+      id: 17,
       name: r'reflectionAutoThought',
       type: IsarType.string,
     ),
     r'reflectionEvidenceAgainst': PropertySchema(
-      id: 13,
+      id: 18,
       name: r'reflectionEvidenceAgainst',
       type: IsarType.string,
     ),
     r'reflectionEvidenceFor': PropertySchema(
-      id: 14,
+      id: 19,
       name: r'reflectionEvidenceFor',
       type: IsarType.string,
     ),
     r'reflectionFollowUpAt': PropertySchema(
-      id: 15,
+      id: 20,
       name: r'reflectionFollowUpAt',
       type: IsarType.dateTime,
     ),
     r'reflectionImpact': PropertySchema(
-      id: 16,
+      id: 21,
       name: r'reflectionImpact',
       type: IsarType.string,
     ),
     r'reflectionLesson': PropertySchema(
-      id: 17,
+      id: 22,
       name: r'reflectionLesson',
       type: IsarType.string,
     ),
     r'reflectionReframe': PropertySchema(
-      id: 18,
+      id: 23,
       name: r'reflectionReframe',
       type: IsarType.string,
     ),
     r'spotifyTrackIds': PropertySchema(
-      id: 19,
+      id: 24,
       name: r'spotifyTrackIds',
       type: IsarType.stringList,
     ),
     r'syncStatus': PropertySchema(
-      id: 20,
+      id: 25,
       name: r'syncStatus',
       type: IsarType.string,
     ),
     r'title': PropertySchema(
-      id: 21,
+      id: 26,
       name: r'title',
       type: IsarType.string,
     ),
     r'userId': PropertySchema(
-      id: 22,
+      id: 27,
       name: r'userId',
       type: IsarType.string,
     ),
+    r'videoKeysOrder': PropertySchema(
+      id: 28,
+      name: r'videoKeysOrder',
+      type: IsarType.stringList,
+    ),
     r'videoPaths': PropertySchema(
-      id: 23,
+      id: 29,
       name: r'videoPaths',
       type: IsarType.stringList,
     ),
     r'videoUrls': PropertySchema(
-      id: 24,
+      id: 30,
       name: r'videoUrls',
       type: IsarType.stringList,
     )
@@ -209,6 +239,13 @@ int _memoryEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.audioKeysOrder.length * 3;
+  {
+    for (var i = 0; i < object.audioKeysOrder.length; i++) {
+      final value = object.audioKeysOrder[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.audioNotePaths.length * 3;
   {
     for (var i = 0; i < object.audioNotePaths.length; i++) {
@@ -229,16 +266,44 @@ int _memoryEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.emotionsData.length * 3;
+  {
+    for (var i = 0; i < object.emotionsData.length; i++) {
+      final value = object.emotionsData[i];
+      bytesCount += value.length * 3;
+    }
+  }
   {
     final value = object.firestoreId;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.mediaKeysOrder.length * 3;
+  {
+    for (var i = 0; i < object.mediaKeysOrder.length; i++) {
+      final value = object.mediaKeysOrder[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.mediaPaths.length * 3;
   {
     for (var i = 0; i < object.mediaPaths.length; i++) {
       final value = object.mediaPaths[i];
+      bytesCount += value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.mediaThumbPaths.length * 3;
+  {
+    for (var i = 0; i < object.mediaThumbPaths.length; i++) {
+      final value = object.mediaThumbPaths[i];
+      bytesCount += value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.mediaThumbUrls.length * 3;
+  {
+    for (var i = 0; i < object.mediaThumbUrls.length; i++) {
+      final value = object.mediaThumbUrls[i];
       bytesCount += value.length * 3;
     }
   }
@@ -306,6 +371,13 @@ int _memoryEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.videoKeysOrder.length * 3;
+  {
+    for (var i = 0; i < object.videoKeysOrder.length; i++) {
+      final value = object.videoKeysOrder[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.videoPaths.length * 3;
   {
     for (var i = 0; i < object.videoPaths.length; i++) {
@@ -330,30 +402,36 @@ void _memorySerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.ambientSound);
-  writer.writeStringList(offsets[1], object.audioNotePaths);
-  writer.writeStringList(offsets[2], object.audioUrls);
-  writer.writeString(offsets[3], object.content);
-  writer.writeDateTime(offsets[4], object.date);
-  writer.writeString(offsets[5], object.firestoreId);
-  writer.writeBool(offsets[6], object.isEncrypted);
-  writer.writeDateTime(offsets[7], object.lastModified);
-  writer.writeStringList(offsets[8], object.mediaPaths);
-  writer.writeStringList(offsets[9], object.mediaUrls);
-  writer.writeString(offsets[10], object.reflectionAction);
-  writer.writeBool(offsets[11], object.reflectionActionCompleted);
-  writer.writeString(offsets[12], object.reflectionAutoThought);
-  writer.writeString(offsets[13], object.reflectionEvidenceAgainst);
-  writer.writeString(offsets[14], object.reflectionEvidenceFor);
-  writer.writeDateTime(offsets[15], object.reflectionFollowUpAt);
-  writer.writeString(offsets[16], object.reflectionImpact);
-  writer.writeString(offsets[17], object.reflectionLesson);
-  writer.writeString(offsets[18], object.reflectionReframe);
-  writer.writeStringList(offsets[19], object.spotifyTrackIds);
-  writer.writeString(offsets[20], object.syncStatus);
-  writer.writeString(offsets[21], object.title);
-  writer.writeString(offsets[22], object.userId);
-  writer.writeStringList(offsets[23], object.videoPaths);
-  writer.writeStringList(offsets[24], object.videoUrls);
+  writer.writeStringList(offsets[1], object.audioKeysOrder);
+  writer.writeStringList(offsets[2], object.audioNotePaths);
+  writer.writeStringList(offsets[3], object.audioUrls);
+  writer.writeString(offsets[4], object.content);
+  writer.writeDateTime(offsets[5], object.date);
+  writer.writeStringList(offsets[6], object.emotionsData);
+  writer.writeString(offsets[7], object.firestoreId);
+  writer.writeBool(offsets[8], object.isEncrypted);
+  writer.writeDateTime(offsets[9], object.lastModified);
+  writer.writeStringList(offsets[10], object.mediaKeysOrder);
+  writer.writeStringList(offsets[11], object.mediaPaths);
+  writer.writeStringList(offsets[12], object.mediaThumbPaths);
+  writer.writeStringList(offsets[13], object.mediaThumbUrls);
+  writer.writeStringList(offsets[14], object.mediaUrls);
+  writer.writeString(offsets[15], object.reflectionAction);
+  writer.writeBool(offsets[16], object.reflectionActionCompleted);
+  writer.writeString(offsets[17], object.reflectionAutoThought);
+  writer.writeString(offsets[18], object.reflectionEvidenceAgainst);
+  writer.writeString(offsets[19], object.reflectionEvidenceFor);
+  writer.writeDateTime(offsets[20], object.reflectionFollowUpAt);
+  writer.writeString(offsets[21], object.reflectionImpact);
+  writer.writeString(offsets[22], object.reflectionLesson);
+  writer.writeString(offsets[23], object.reflectionReframe);
+  writer.writeStringList(offsets[24], object.spotifyTrackIds);
+  writer.writeString(offsets[25], object.syncStatus);
+  writer.writeString(offsets[26], object.title);
+  writer.writeString(offsets[27], object.userId);
+  writer.writeStringList(offsets[28], object.videoKeysOrder);
+  writer.writeStringList(offsets[29], object.videoPaths);
+  writer.writeStringList(offsets[30], object.videoUrls);
 }
 
 Memory _memoryDeserialize(
@@ -364,31 +442,37 @@ Memory _memoryDeserialize(
 ) {
   final object = Memory();
   object.ambientSound = reader.readStringOrNull(offsets[0]);
-  object.audioNotePaths = reader.readStringList(offsets[1]) ?? [];
-  object.audioUrls = reader.readStringList(offsets[2]) ?? [];
-  object.content = reader.readStringOrNull(offsets[3]);
-  object.date = reader.readDateTime(offsets[4]);
-  object.firestoreId = reader.readStringOrNull(offsets[5]);
+  object.audioKeysOrder = reader.readStringList(offsets[1]) ?? [];
+  object.audioNotePaths = reader.readStringList(offsets[2]) ?? [];
+  object.audioUrls = reader.readStringList(offsets[3]) ?? [];
+  object.content = reader.readStringOrNull(offsets[4]);
+  object.date = reader.readDateTime(offsets[5]);
+  object.emotionsData = reader.readStringList(offsets[6]) ?? [];
+  object.firestoreId = reader.readStringOrNull(offsets[7]);
   object.id = id;
-  object.isEncrypted = reader.readBool(offsets[6]);
-  object.lastModified = reader.readDateTime(offsets[7]);
-  object.mediaPaths = reader.readStringList(offsets[8]) ?? [];
-  object.mediaUrls = reader.readStringList(offsets[9]) ?? [];
-  object.reflectionAction = reader.readStringOrNull(offsets[10]);
-  object.reflectionActionCompleted = reader.readBool(offsets[11]);
-  object.reflectionAutoThought = reader.readStringOrNull(offsets[12]);
-  object.reflectionEvidenceAgainst = reader.readStringOrNull(offsets[13]);
-  object.reflectionEvidenceFor = reader.readStringOrNull(offsets[14]);
-  object.reflectionFollowUpAt = reader.readDateTimeOrNull(offsets[15]);
-  object.reflectionImpact = reader.readStringOrNull(offsets[16]);
-  object.reflectionLesson = reader.readStringOrNull(offsets[17]);
-  object.reflectionReframe = reader.readStringOrNull(offsets[18]);
-  object.spotifyTrackIds = reader.readStringList(offsets[19]) ?? [];
-  object.syncStatus = reader.readString(offsets[20]);
-  object.title = reader.readString(offsets[21]);
-  object.userId = reader.readStringOrNull(offsets[22]);
-  object.videoPaths = reader.readStringList(offsets[23]) ?? [];
-  object.videoUrls = reader.readStringList(offsets[24]) ?? [];
+  object.isEncrypted = reader.readBool(offsets[8]);
+  object.lastModified = reader.readDateTime(offsets[9]);
+  object.mediaKeysOrder = reader.readStringList(offsets[10]) ?? [];
+  object.mediaPaths = reader.readStringList(offsets[11]) ?? [];
+  object.mediaThumbPaths = reader.readStringList(offsets[12]) ?? [];
+  object.mediaThumbUrls = reader.readStringList(offsets[13]) ?? [];
+  object.mediaUrls = reader.readStringList(offsets[14]) ?? [];
+  object.reflectionAction = reader.readStringOrNull(offsets[15]);
+  object.reflectionActionCompleted = reader.readBool(offsets[16]);
+  object.reflectionAutoThought = reader.readStringOrNull(offsets[17]);
+  object.reflectionEvidenceAgainst = reader.readStringOrNull(offsets[18]);
+  object.reflectionEvidenceFor = reader.readStringOrNull(offsets[19]);
+  object.reflectionFollowUpAt = reader.readDateTimeOrNull(offsets[20]);
+  object.reflectionImpact = reader.readStringOrNull(offsets[21]);
+  object.reflectionLesson = reader.readStringOrNull(offsets[22]);
+  object.reflectionReframe = reader.readStringOrNull(offsets[23]);
+  object.spotifyTrackIds = reader.readStringList(offsets[24]) ?? [];
+  object.syncStatus = reader.readString(offsets[25]);
+  object.title = reader.readString(offsets[26]);
+  object.userId = reader.readStringOrNull(offsets[27]);
+  object.videoKeysOrder = reader.readStringList(offsets[28]) ?? [];
+  object.videoPaths = reader.readStringList(offsets[29]) ?? [];
+  object.videoUrls = reader.readStringList(offsets[30]) ?? [];
   return object;
 }
 
@@ -406,48 +490,60 @@ P _memoryDeserializeProp<P>(
     case 2:
       return (reader.readStringList(offset) ?? []) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 4:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
-    case 6:
-      return (reader.readBool(offset)) as P;
-    case 7:
       return (reader.readDateTime(offset)) as P;
+    case 6:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 7:
+      return (reader.readStringOrNull(offset)) as P;
     case 8:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 9:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 10:
-      return (reader.readStringOrNull(offset)) as P;
-    case 11:
       return (reader.readBool(offset)) as P;
+    case 9:
+      return (reader.readDateTime(offset)) as P;
+    case 10:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 11:
+      return (reader.readStringList(offset) ?? []) as P;
     case 12:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 13:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 14:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 15:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 16:
       return (reader.readStringOrNull(offset)) as P;
+    case 16:
+      return (reader.readBool(offset)) as P;
     case 17:
       return (reader.readStringOrNull(offset)) as P;
     case 18:
       return (reader.readStringOrNull(offset)) as P;
     case 19:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 20:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 21:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 22:
       return (reader.readStringOrNull(offset)) as P;
     case 23:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 24:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 25:
+      return (reader.readString(offset)) as P;
+    case 26:
+      return (reader.readString(offset)) as P;
+    case 27:
+      return (reader.readStringOrNull(offset)) as P;
+    case 28:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 29:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 30:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -896,6 +992,231 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
   }
 
   QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'audioKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'audioKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'audioKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'audioKeysOrder',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'audioKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'audioKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'audioKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'audioKeysOrder',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'audioKeysOrder',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'audioKeysOrder',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'audioKeysOrder',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> audioKeysOrderIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'audioKeysOrder',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'audioKeysOrder',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'audioKeysOrder',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'audioKeysOrder',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      audioKeysOrderLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'audioKeysOrder',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
       audioNotePathsElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1001,7 +1322,8 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
   }
 
   QueryBuilder<Memory, Memory, QAfterFilterCondition>
-      audioNotePathsElementMatches(String pattern, {bool caseSensitive = true}) {
+      audioNotePathsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'audioNotePaths',
@@ -1119,8 +1441,7 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Memory, Memory, QAfterFilterCondition>
-      audioUrlsElementEqualTo(
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> audioUrlsElementEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1538,6 +1859,228 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'emotionsData',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'emotionsData',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'emotionsData',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'emotionsData',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'emotionsData',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'emotionsData',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'emotionsData',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'emotionsData',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'emotionsData',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'emotionsData',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionsDataLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'emotionsData',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionsDataIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'emotionsData',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionsDataIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'emotionsData',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'emotionsData',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionsDataLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'emotionsData',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionsDataLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'emotionsData',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterFilterCondition> firestoreIdIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1799,6 +2342,231 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'mediaKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'mediaKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'mediaKeysOrder',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'mediaKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'mediaKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'mediaKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'mediaKeysOrder',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaKeysOrder',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'mediaKeysOrder',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaKeysOrder',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> mediaKeysOrderIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaKeysOrder',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaKeysOrder',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaKeysOrder',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaKeysOrder',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaKeysOrderLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaKeysOrder',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterFilterCondition> mediaPathsElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2010,6 +2778,457 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
         r'mediaPaths',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaThumbPaths',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'mediaThumbPaths',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'mediaThumbPaths',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'mediaThumbPaths',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'mediaThumbPaths',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'mediaThumbPaths',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'mediaThumbPaths',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'mediaThumbPaths',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaThumbPaths',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'mediaThumbPaths',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbPaths',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> mediaThumbPathsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbPaths',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbPaths',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbPaths',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbPaths',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbPathsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbPaths',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaThumbUrls',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'mediaThumbUrls',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'mediaThumbUrls',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'mediaThumbUrls',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'mediaThumbUrls',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'mediaThumbUrls',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'mediaThumbUrls',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'mediaThumbUrls',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mediaThumbUrls',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'mediaThumbUrls',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbUrls',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> mediaThumbUrlsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbUrls',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbUrls',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbUrls',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbUrls',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      mediaThumbUrlsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'mediaThumbUrls',
         lower,
         includeLower,
         upper,
@@ -4024,6 +5243,231 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'videoKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'videoKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'videoKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'videoKeysOrder',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'videoKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'videoKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'videoKeysOrder',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'videoKeysOrder',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'videoKeysOrder',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'videoKeysOrder',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'videoKeysOrder',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> videoKeysOrderIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'videoKeysOrder',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'videoKeysOrder',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'videoKeysOrder',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'videoKeysOrder',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      videoKeysOrderLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'videoKeysOrder',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterFilterCondition> videoPathsElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -4927,6 +6371,12 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QDistinct> distinctByAudioKeysOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'audioKeysOrder');
+    });
+  }
+
   QueryBuilder<Memory, Memory, QDistinct> distinctByAudioNotePaths() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'audioNotePaths');
@@ -4952,6 +6402,12 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QDistinct> distinctByEmotionsData() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'emotionsData');
+    });
+  }
+
   QueryBuilder<Memory, Memory, QDistinct> distinctByFirestoreId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -4971,9 +6427,27 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QDistinct> distinctByMediaKeysOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'mediaKeysOrder');
+    });
+  }
+
   QueryBuilder<Memory, Memory, QDistinct> distinctByMediaPaths() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'mediaPaths');
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QDistinct> distinctByMediaThumbPaths() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'mediaThumbPaths');
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QDistinct> distinctByMediaThumbUrls() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'mediaThumbUrls');
     });
   }
 
@@ -5079,6 +6553,12 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QDistinct> distinctByVideoKeysOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'videoKeysOrder');
+    });
+  }
+
   QueryBuilder<Memory, Memory, QDistinct> distinctByVideoPaths() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'videoPaths');
@@ -5102,6 +6582,13 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
   QueryBuilder<Memory, String?, QQueryOperations> ambientSoundProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'ambientSound');
+    });
+  }
+
+  QueryBuilder<Memory, List<String>, QQueryOperations>
+      audioKeysOrderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'audioKeysOrder');
     });
   }
 
@@ -5130,6 +6617,12 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Memory, List<String>, QQueryOperations> emotionsDataProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'emotionsData');
+    });
+  }
+
   QueryBuilder<Memory, String?, QQueryOperations> firestoreIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'firestoreId');
@@ -5148,9 +6641,30 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Memory, List<String>, QQueryOperations>
+      mediaKeysOrderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'mediaKeysOrder');
+    });
+  }
+
   QueryBuilder<Memory, List<String>, QQueryOperations> mediaPathsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'mediaPaths');
+    });
+  }
+
+  QueryBuilder<Memory, List<String>, QQueryOperations>
+      mediaThumbPathsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'mediaThumbPaths');
+    });
+  }
+
+  QueryBuilder<Memory, List<String>, QQueryOperations>
+      mediaThumbUrlsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'mediaThumbUrls');
     });
   }
 
@@ -5241,6 +6755,13 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
   QueryBuilder<Memory, String?, QQueryOperations> userIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'userId');
+    });
+  }
+
+  QueryBuilder<Memory, List<String>, QQueryOperations>
+      videoKeysOrderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'videoKeysOrder');
     });
   }
 
