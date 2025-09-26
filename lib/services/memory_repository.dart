@@ -12,13 +12,14 @@ class MemoryRepository {
 
   Future<Isar> get _db async => IsarService.instance(userId);
 
-  /// РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Метод теперь возвращает новую, зашифрованную копию, не изменяя оригинал.
   Memory _encryptMemoryIfNeeded(Memory m) {
     if (!m.isEncrypted) return m;
 
+    final memoryCopy = m.copyWith();
+
     bool isEncrypted(String? val) => encryptionService.isValueEncrypted(val);
-    // Используем copyWith для создания нового объекта с зашифрованными полями
-    return m.copyWith(
+
+    return memoryCopy.copyWith(
       content: isEncrypted(m.content) ? m.content : encryptionService.encrypt(m.content),
       reflectionImpact: isEncrypted(m.reflectionImpact) ? m.reflectionImpact : encryptionService.encrypt(m.reflectionImpact),
       reflectionLesson: isEncrypted(m.reflectionLesson) ? m.reflectionLesson : encryptionService.encrypt(m.reflectionLesson),
@@ -30,20 +31,30 @@ class MemoryRepository {
     );
   }
 
-  // РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Метод возвращает новую, расшифрованную копию.
   Memory _decryptMemory(Memory m) {
-    return encryptionService.decryptMemory(m);
+    if (!m.isEncrypted) return m;
+    
+    final memoryCopy = m.copyWith();
+
+    return memoryCopy.copyWith(
+      content: encryptionService.decrypt(m.content),
+      reflectionImpact: encryptionService.decrypt(m.reflectionImpact),
+      reflectionLesson: encryptionService.decrypt(m.reflectionLesson),
+      reflectionAutoThought: encryptionService.decrypt(m.reflectionAutoThought),
+      reflectionEvidenceFor: encryptionService.decrypt(m.reflectionEvidenceFor),
+      reflectionEvidenceAgainst: encryptionService.decrypt(m.reflectionEvidenceAgainst),
+      reflectionReframe: encryptionService.decrypt(m.reflectionReframe),
+      reflectionAction: encryptionService.decrypt(m.reflectionAction),
+    );
   }
 
-  /// Creates a new memory, ready for cloud sync.
   Future<int> create(Memory m) async {
     final isar = await _db;
     final memoryToSave = m.copyWith(
       userId: userId,
       syncStatus: 'pending',
       lastModified: DateTime.now().toUtc(),
-      // Generate Firestore ID if it doesn't exist
-      firestoreId: m.firestoreId ?? FirebaseFirestore.instance.collection('users').doc(userId).collection('memories').doc().id,
+      firestoreId: m.firestoreId ?? FirebaseFirestore.instance.collection('users').doc(userId).collection('memories').doc().id
     );
     
     final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
@@ -51,24 +62,21 @@ class MemoryRepository {
     return isar.writeTxn(() => isar.memorys.put(encryptedMemory));
   }
 
-  /// [NEW] Creates a local draft of a memory that is not yet ready for syncing.
   Future<Memory> createDraft() async {
     final isar = await _db;
     final draft = Memory()
       ..userId = userId
-      ..syncStatus = 'draft' // New status for drafts
+      ..syncStatus = 'draft' 
       ..title = ''
       ..date = DateTime.now();
     draft.touch();
     
-    // Generate Firestore ID upfront so it's consistent during saves
     draft.firestoreId = FirebaseFirestore.instance.collection('users').doc(userId).collection('memories').doc().id;
 
     await isar.writeTxn(() => isar.memorys.put(draft));
     return draft;
   }
 
-  /// [NEW] Finds the most recent unsaved draft for the current user.
   Future<Memory?> findDraft() async {
     final isar = await _db;
     return isar.memorys.where()
@@ -78,15 +86,22 @@ class MemoryRepository {
       .sortByLastModifiedDesc()
       .findFirst();
   }
-  
-  /// [NEW for Principle 4] Fetches all memories for a user as a map for efficient merging.
-  Future<Map<String, Memory>> getMemoriesMap() async {
-    final isar = await _db;
-    final allMemories = await isar.memorys.where().filter().userIdEqualTo(userId).findAll();
-    return { for (var m in allMemories) if (m.firestoreId != null) m.firestoreId! : m };
-  }
 
-  /// [NEW for Principle 4] Batch inserts or updates memories.
+  /// **УСТАРЕВШИЙ МЕТОД:** Больше не используется, заменен на 'upsertMemories'
+  // Future<void> replaceAll(List<Memory> memories) async {
+  //   final isar = await _db;
+  //   await isar.writeTxn(() async {
+  //     await isar.memorys.where().filter().userIdEqualTo(userId).deleteAll();
+  //     for (var m in memories) {
+  //       m.userId = userId;
+  //     }
+  //     await isar.memorys.putAll(memories);
+  //   });
+  // }
+  
+  /// **НОВЫЙ МЕТОД:** Вставляет или обновляет список воспоминаний.
+  /// Благодаря уникальному индексу `firestoreId` в модели `Memory`,
+  /// `putAll` будет автоматически обновлять записи, если они уже существуют.
   Future<void> upsertMemories(List<Memory> memories) async {
     final isar = await _db;
     await isar.writeTxn(() async {
@@ -94,17 +109,13 @@ class MemoryRepository {
     });
   }
 
-  /// [DEPRECATED in favor of merge logic]
-  Future<void> replaceAll(List<Memory> memories) async {
+  /// **НОВЫЙ МЕТОД:** Получает локальные воспоминания в виде карты для быстрого поиска по firestoreId.
+  Future<Map<String, Memory>> getMemoriesMapByFirestoreId() async {
     final isar = await _db;
-    await isar.writeTxn(() async {
-      await isar.memorys.where().filter().userIdEqualTo(userId).deleteAll();
-      for (var m in memories) {
-        m.userId = userId;
-      }
-      await isar.memorys.putAll(memories);
-    });
+    final memories = await isar.memorys.where().filter().userIdEqualTo(userId).findAll();
+    return { for (var m in memories) if (m.firestoreId != null) m.firestoreId! : m };
   }
+
 
   Stream<List<Memory>> watchAllSortedByDate() async* {
     final isar = await _db;
@@ -112,12 +123,11 @@ class MemoryRepository {
       .filter()
       .userIdEqualTo(userId)
       .not()
-      .syncStatusEqualTo('draft') // Don't show drafts on timeline
+      .syncStatusEqualTo('draft') 
       .sortByDateDesc()
       .watch(fireImmediately: true);
   }
 
-  // Returns raw (potentially encrypted) memories for sync.
   Future<List<Memory>> getMemoriesToSync() async {
     final isar = await _db;
     return isar.memorys.where()
@@ -127,7 +137,6 @@ class MemoryRepository {
       .findAll();
   }
   
-  // Gets a single memory by ID and returns it raw (potentially encrypted).
   Future<Memory?> getById(int id) async {
     final isar = await _db;
     return await isar.memorys.get(id);
@@ -140,30 +149,29 @@ class MemoryRepository {
     return _decryptMemory(memory);
   }
 
-  /// [REFACTORED with Principle 1] Updates a memory. If it's a synced memory, marks it for re-sync.
-  Future<bool> update(Memory m) async {
+  /// **ИСПРАВЛЕНО:** Метод теперь возвращает обновленный объект Memory.
+  Future<Memory?> update(Memory m) async {
     final isar = await _db;
-    final status = (m.syncStatus == 'synced') ? 'pending' : m.syncStatus;
-
+    
     final memoryToSave = m.copyWith(
       userId: userId,
-      syncStatus: status,
-      lastModified: DateTime.now().toUtc(),
+      syncStatus: m.syncStatus == 'synced' ? 'pending' : m.syncStatus,
+      lastModified: DateTime.now().toUtc()
     );
-
+    
     final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
 
-    return isar.writeTxn(() async {
+    await isar.writeTxn(() async {
       await isar.memorys.put(encryptedMemory);
-      return true;
     });
+    
+    return encryptedMemory;
   }
 
-  /// [NEW] Specifically for the SyncService to update status without triggering re-sync logic.
   Future<void> updateAfterSync(Memory m) async {
     final isar = await _db;
-    final finalMemory = m.copyWith(lastModified: DateTime.now().toUtc());
-    await isar.writeTxn(() => isar.memorys.put(finalMemory));
+    final memoryToSave = m.copyWith(lastModified: DateTime.now().toUtc());
+    await isar.writeTxn(() => isar.memorys.put(memoryToSave));
   }
   
   Future<bool> delete(int id) async {

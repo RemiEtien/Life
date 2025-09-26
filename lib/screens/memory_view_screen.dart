@@ -15,6 +15,7 @@ import 'package:lifeline/memory.dart';
 import 'package:lifeline/models/anchors/anchor_models.dart';
 import 'package:lifeline/providers/application_providers.dart';
 import 'package:lifeline/screens/memory_edit_screen.dart';
+import 'package:lifeline/services/audio_service.dart';
 import 'package:lifeline/services/encryption_service.dart';
 import 'package:lifeline/services/export_service.dart';
 import 'package:lifeline/services/message_service.dart';
@@ -65,9 +66,13 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   List<String> _displayVideoPaths = [];
   List<String> _displayThumbPaths = [];
 
+  late final AudioNotifier _audioNotifier;
+
   @override
   void initState() {
     super.initState();
+    _audioNotifier = ref.read(audioPlayerProvider.notifier);
+
     _currentMemory = widget.memory;
     _startAmbientSound();
     _initializeMedia();
@@ -81,7 +86,6 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
     int initialPage = _infiniteScrollInitialPage;
     if(allMedia.isNotEmpty) {
-      // Рассчитываем начальную страницу так, чтобы реальный индекс был 0
       initialPage = _infiniteScrollInitialPage - (_infiniteScrollInitialPage % allMedia.length);
     }
     
@@ -184,17 +188,16 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   void _startAmbientSound() {
     if (_currentMemory.ambientSound != null &&
         _currentMemory.ambientSound!.isNotEmpty) {
-      ref
-          .read(audioPlayerProvider.notifier)
-          .playAmbientSound(_currentMemory.ambientSound!);
+      _audioNotifier.playAmbientSound(_currentMemory.ambientSound!);
       _isSoundPlaying = true;
     }
   }
 
   @override
   void dispose() {
-    ref.read(audioPlayerProvider.notifier).stopAmbientSound();
-    ref.read(audioPlayerProvider.notifier).resumeGlobalPlayerIfNeeded();
+    _audioNotifier.stopAmbientSound();
+    _audioNotifier.resumeGlobalPlayerIfNeeded();
+    
     _pageController.dispose();
     _audioNotePlayer.dispose();
     for (var controller in _videoControllers.values) {
@@ -205,14 +208,13 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   void _toggleSoundPlayback() {
-    final audioNotifier = ref.read(audioPlayerProvider.notifier);
     setState(() {
       if (_isSoundPlaying) {
-        audioNotifier.stopAmbientSound();
+        _audioNotifier.stopAmbientSound();
         _isSoundPlaying = false;
       } else {
         if (_currentMemory.ambientSound != null) {
-          audioNotifier.playAmbientSound(_currentMemory.ambientSound!);
+          _audioNotifier.playAmbientSound(_currentMemory.ambientSound!);
           _isSoundPlaying = true;
         }
       }
@@ -222,12 +224,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   void _changeVolume(double volume) {
     setState(() {
       _currentVolume = volume;
-      ref.read(audioPlayerProvider.notifier).setVolume(volume);
+      _audioNotifier.setVolume(volume);
     });
   }
 
   Future<void> _playAudioNote() async {
-    await ref.read(audioPlayerProvider.notifier).pauseGlobalPlayer();
+    await _audioNotifier.pauseGlobalPlayer();
     final audioPaths = _currentMemory.displayableAudioPaths;
     if (audioPaths.isEmpty) return;
 
@@ -261,35 +263,16 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   Future<void> _editMemory() async {
-    final memoryForEdit = Memory()
-      ..id = _currentMemory.id
-      ..firestoreId = _currentMemory.firestoreId
-      ..userId = _currentMemory.userId
-      ..title = _currentMemory.title
-      ..content = _decryptedContent['content']
-      ..date = _currentMemory.date
-      ..lastModified = _currentMemory.lastModified
-      ..mediaPaths = List<String>.from(_currentMemory.mediaPaths)
-      ..videoPaths = List<String>.from(_currentMemory.videoPaths)
-      ..audioNotePaths = List<String>.from(_currentMemory.audioNotePaths)
-      ..mediaUrls = List<String>.from(_currentMemory.mediaUrls)
-      ..videoUrls = List<String>.from(_currentMemory.videoUrls)
-      ..audioUrls = List<String>.from(_currentMemory.audioUrls)
-      ..syncStatus = _currentMemory.syncStatus
-      ..spotifyTrackIds = List<String>.from(_currentMemory.spotifyTrackIds)
-      ..ambientSound = _currentMemory.ambientSound
-      ..reflectionImpact = _decryptedContent['reflectionImpact']
-      ..reflectionLesson = _decryptedContent['reflectionLesson']
-      ..reflectionAutoThought = _decryptedContent['reflectionAutoThought']
-      ..reflectionEvidenceFor = _decryptedContent['reflectionEvidenceFor']
-      ..reflectionEvidenceAgainst =
-          _decryptedContent['reflectionEvidenceAgainst']
-      ..reflectionReframe = _decryptedContent['reflectionReframe']
-      ..reflectionAction = _decryptedContent['reflectionAction']
-      ..reflectionFollowUpAt = _currentMemory.reflectionFollowUpAt
-      ..reflectionActionCompleted = _currentMemory.reflectionActionCompleted
-      ..isEncrypted = _currentMemory.isEncrypted
-      ..emotions = Map<String, int>.from(_currentMemory.emotions);
+    final memoryForEdit = _currentMemory.copyWith(
+      content: _decryptedContent['content'],
+      reflectionImpact: _decryptedContent['reflectionImpact'],
+      reflectionLesson: _decryptedContent['reflectionLesson'],
+      reflectionAutoThought: _decryptedContent['reflectionAutoThought'],
+      reflectionEvidenceFor: _decryptedContent['reflectionEvidenceFor'],
+      reflectionEvidenceAgainst: _decryptedContent['reflectionEvidenceAgainst'],
+      reflectionReframe: _decryptedContent['reflectionReframe'],
+      reflectionAction: _decryptedContent['reflectionAction'],
+    );
 
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
@@ -455,9 +438,13 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   Future<void> _toggleActionCompleted() async {
     final l10n = AppLocalizations.of(context)!;
+    
+    final updatedMemory = _currentMemory.copyWith(
+      reflectionActionCompleted: !_currentMemory.reflectionActionCompleted,
+    );
+
     setState(() {
-      _currentMemory.reflectionActionCompleted =
-          !_currentMemory.reflectionActionCompleted;
+      _currentMemory = updatedMemory;
       _wasChanged = true;
     });
 
@@ -465,12 +452,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       final repo = ref.read(memoryRepositoryProvider);
       final firestore = ref.read(firestoreServiceProvider);
       if (repo != null) {
-        await repo.update(_currentMemory);
+        await repo.update(updatedMemory);
         if(!mounted) return;
-        await firestore.updateMemory(widget.userId, _currentMemory);
+        await firestore.updateMemory(widget.userId, updatedMemory);
       }
       if (mounted) {
-        final message = _currentMemory.reflectionActionCompleted
+        final message = updatedMemory.reflectionActionCompleted
             ? l10n.memoryViewActionCompleted
             : l10n.memoryViewActionIncomplete;
         ref
@@ -485,8 +472,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         );
       }
       setState(() {
-        _currentMemory.reflectionActionCompleted =
-            !_currentMemory.reflectionActionCompleted;
+        _currentMemory = _currentMemory.copyWith(
+          reflectionActionCompleted: !_currentMemory.reflectionActionCompleted,
+        );
       });
     }
   }
@@ -639,10 +627,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
-
-        final audioNotifier = ref.read(audioPlayerProvider.notifier);
-        await audioNotifier.stopAmbientSound();
-        await audioNotifier.resumeGlobalPlayerIfNeeded();
+        
+        await _audioNotifier.stopAmbientSound();
+        await _audioNotifier.resumeGlobalPlayerIfNeeded();
 
         if (mounted) {
           Navigator.of(context).pop(_wasChanged);
@@ -680,7 +667,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         icon: const Icon(Icons.arrow_back,
                             color: Colors.white, size: 30),
                         onPressed: () {
-                          Navigator.of(context).maybePop(_wasChanged);
+                          Navigator.of(context).maybePop();
                         },
                         tooltip: l10n.memoryViewBackTooltip,
                       ),
@@ -868,8 +855,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final reframe = _decryptedContent['reflectionReframe'];
     final action = _decryptedContent['reflectionAction'];
 
-    final hasSimpleReflection =
-        (impact?.isNotEmpty ?? false) || (lesson?.isNotEmpty ?? false);
+    final hasSimpleReflection = (impact?.isNotEmpty ?? false) || (lesson?.isNotEmpty ?? false);
     final hasEmotions = _currentMemory.emotions.isNotEmpty;
     final hasAdvancedReflection = (autoThought?.isNotEmpty ?? false) ||
         (reframe?.isNotEmpty ?? false) ||
@@ -877,16 +863,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         (evidenceAgainst?.isNotEmpty ?? false);
     final hasAction = action?.isNotEmpty ?? false;
 
-    if (!hasSimpleReflection &&
-        !hasEmotions &&
-        !hasAdvancedReflection &&
-        !hasAction) {
+    if (!hasSimpleReflection && !hasEmotions && !hasAdvancedReflection && !hasAction) {
       return const SizedBox.shrink();
     }
 
     if (_needsUnlock) {
-      return _buildLockedContentPlaceholder(
-          isReflection: true, showUnlockButton: false);
+      return _buildLockedContentPlaceholder(isReflection: true, showUnlockButton: false);
     }
 
     return Padding(
@@ -950,22 +932,23 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                           fontWeight: FontWeight.bold,
                           fontSize: 16)),
                   const SizedBox(height: 16),
+                  // *** ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ №1: Проверяем каждое поле на null перед отрисовкой ***
                   _buildCbtStepItem(
                       step: 1,
                       title: l10n.memoryViewCbtStep1Title,
-                      content: autoThought!),
+                      content: autoThought),
                   _buildCbtStepItem(
                       step: 2,
                       title: l10n.memoryViewCbtStep2Title,
-                      content: evidenceFor!),
+                      content: evidenceFor),
                   _buildCbtStepItem(
                       step: 3,
                       title: l10n.memoryViewCbtStep3Title,
-                      content: evidenceAgainst!),
+                      content: evidenceAgainst),
                   _buildCbtStepItem(
                       step: 4,
                       title: l10n.memoryViewCbtStep4Title,
-                      content: reframe!),
+                      content: reframe),
                 ],
                 if (hasAction) ...[
                   const Divider(height: 32),
@@ -993,7 +976,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              action!,
+                              action!, // Мы уже знаем, что action не null
                               style: TextStyle(
                                 color: Colors.white.withAlpha((255 * 0.9).round()),
                                 height: 1.5,
@@ -1057,8 +1040,11 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   Widget _buildCbtStepItem(
-      {required int step, required String title, required String content}) {
+      {required int step, required String title, required String? content}) {
     final l10n = AppLocalizations.of(context)!;
+    if (content == null || content.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(

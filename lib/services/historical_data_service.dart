@@ -12,14 +12,15 @@ class HistoricalDataService {
   final SpotifyService _spotifyService;
 
   HistoricalDataService(this._spotifyService);
-
+  
+  /// **ИСПРАВЛЕНО: Улучшена обработка ошибок.**
+  /// Теперь метод не пробрасывает исключение наверх, а возвращает null,
+  /// чтобы UI мог gracefully показать "Нет данных" вместо экрана ошибки.
   Future<EmotionalAnchorBundle?> getEmotionalAnchor(
       DateTime date, String? countryCode, String? languageCode) async {
     const lang = 'en';
 
     try {
-      // Запускаем запросы параллельно, но теперь при ошибке любого из них
-      // будет выброшено исключение, которое поймает Provider.
       final results = await Future.wait([
         _fetchNewsEvents(date, lang),
         _fetchBillboardWeekWithRetries(date),
@@ -28,8 +29,6 @@ class HistoricalDataService {
       final worldNews = results[0] as List<NewsAnchor>;
       final musicChart = results[1] as List<MusicAnchor>;
 
-      // Если оба списка пусты, даже после успешных запросов, возвращаем null,
-      // чтобы показать сообщение "Нет данных".
       if (worldNews.isEmpty && musicChart.isEmpty) {
         return null;
       }
@@ -39,21 +38,17 @@ class HistoricalDataService {
         musicChart: musicChart,
       );
     } catch (e, stackTrace) {
-      // Логируем ошибку и пробрасываем ее дальше, чтобы UI мог показать
-      // состояние ошибки с кнопкой "Повторить".
       FirebaseCrashlytics.instance.recordError(e, stackTrace,
           reason: 'HistoricalDataService: getEmotionalAnchor failed');
-      rethrow;
+      // Возвращаем null вместо rethrow, чтобы UI не падал
+      return null;
     }
   }
 
-  // Убран try-catch, чтобы ошибки "всплывали" до Provider'а.
   Future<List<NewsAnchor>> _fetchNewsEvents(DateTime date, String lang) async {
-    // Сначала пытаемся получить статью, т.к. она более релевантна.
     final articleNews = await _fetchArticleForSpecificDate(date, lang);
     if (articleNews.isNotEmpty) return articleNews;
 
-    // Если статьи нет, получаем события "в этот день".
     return await _fetchOnThisDayEvents(date, lang);
   }
 
@@ -117,7 +112,10 @@ class HistoricalDataService {
     }
     return anyDate.subtract(Duration(days: daysToSubtract));
   }
-
+  
+  /// **ИСПРАВЛЕНО: Убрано исключение при отсутствии чартов**
+  /// Теперь метод просто возвращает пустой список, если ничего не найдено,
+  /// что делает его более отказоустойчивым.
   Future<List<MusicAnchor>> _fetchBillboardWeekWithRetries(DateTime date,
       {int maxWeeksBack = 8}) async {
     DateTime chartDate = _normalizeToBillboardWeek(date);
@@ -159,11 +157,14 @@ class HistoricalDataService {
         if (kDebugMode) {
           print("Error fetching week $formattedDate, trying previous week. Error: $e");
         }
+        // Не пробрасываем ошибку, а просто переходим к следующей неделе
       }
     }
     
-    throw Exception(
-        "Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.");
+    if (kDebugMode) {
+      print("Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.");
+    }
+    return []; // Возвращаем пустой список вместо исключения
   }
 
   Future<List<Map<String, String>>> _fetchAndParseBillboardPage(DateTime chartDate) async {
@@ -265,4 +266,3 @@ class HistoricalDataService {
     return DateFormat('MMMM d, yyyy', 'en_US').format(date);
   }
 }
-

@@ -37,17 +37,17 @@ kotlin {
 
 android {
     namespace "com.momentic.lifeline"
-    compileSdk 36 
+    compileSdk 36
     ndkVersion "26.1.10909125" // ИСПРАВЛЕНИЕ: Указываем конкретную версию NDK
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_17  // ОБНОВЛЕНО: было VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_17  // ОБНОВЛЕНО: было VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '17'  // ОБНОВЛЕНО: было '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -57,14 +57,13 @@ android {
     defaultConfig {
         applicationId "com.momentic.lifeline"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 36 
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
         
-        // ИСПРАВЛЕНИЕ: Поддержка 16KB страниц памяти
+        // ИСПРАВЛЕНИЕ: Добавлена поддержка архитектуры x86_64 для эмуляторов
         ndk {
-            // Убираем old ABI, добавляем поддержку новых архитектур
             abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
         }
     }

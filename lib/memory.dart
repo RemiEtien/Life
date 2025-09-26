@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Index;
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 part 'memory.g.dart';
 
@@ -9,51 +10,66 @@ part 'memory.g.dart';
 // flutter pub run build_runner build --delete-conflicting-outputs
 // ---------------------------------------------------------------------------
 
-// Вспомогательный метод для получения ключа файла (имя файла без временной метки)
-String _getFileKey(String path) {
-  String filename = path.split('/').last.split('?').first;
-  // Removes timestamp like '1725798993883_' from synced files
-  return filename.replaceAll(RegExp(r'^\d{13}_'), '');
+
+/// **ИСПРАВЛЕНО:** Надежно извлекает базовый ключ файла из любого типа пути.
+String getFileKey(String path) {
+  try {
+    // Эта функция обрабатывает полные URL-адреса, URL-кодированные пути и локальные пути.
+    final decodedPath = Uri.decodeComponent(path);
+    // Получает последнюю часть после последнего '/'
+    final lastSegment = decodedPath.split('/').last;
+    // Имя файла - это часть до любых параметров запроса.
+    final fileName = lastSegment.split('?').first;
+    // Удаляет возможные временные метки, используемые при локальной обработке.
+    final withoutTimestamp = fileName.replaceAll(RegExp(r'^\d{13}_'), '');
+    // Нормализует имена миниатюр до их базового имени для консистентности ключей.
+    return withoutTimestamp
+        .replaceAll('_thumb.webp', '.webp')
+        .replaceAll('thumb_', '');
+  } catch (e) {
+    // Запасной вариант для любых неожиданных форматов.
+    return path.split('/').last.split('?').first;
+  }
 }
 
-// Вспомогательный метод для получения ключа миниатюры
-String _getThumbKey(String path) {
-  String filename = _getFileKey(path);
-  if (filename.startsWith('thumb_')) {
-    return filename;
-  }
-  return 'thumb_$filename';
-}
 
 @collection
 class Memory {
   Id id = Isar.autoIncrement;
+
+  /// **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №1: Уникальный индекс для firestoreId**
+  /// Это гарантирует, что в локальной базе Isar не может быть двух записей
+  /// с одинаковым ID из Firestore.
+  /// `replace: true` означает, что при попытке вставить дубликат, Isar
+  /// автоматически заменит (обновит) существующую запись. Это и есть "Upsert".
+  @Index(unique: true, replace: true)
   String? firestoreId;
 
   @Index()
   String? userId;
 
   late String title;
-
+  
   String? content;
-
+  
   @Index()
   late DateTime date;
-
+  
   late DateTime lastModified;
 
   List<String> mediaPaths = [];
   List<String> videoPaths = [];
-
+  
   List<String> mediaUrls = [];
   List<String> videoUrls = [];
-
+  
   List<String> mediaThumbPaths = [];
   List<String> mediaThumbUrls = [];
 
+
   @ignore
   bool get isSynced => syncStatus == 'synced';
-
+  
   @Index()
   String syncStatus = 'pending';
 
@@ -79,11 +95,12 @@ class Memory {
   List<String> videoKeysOrder = [];
   List<String> audioKeysOrder = [];
 
-  // Isar не поддерживает Map, поэтому используем обходной путь:
-  // храним данные как List<String> в формате "key:value"
   List<String> emotionsData = [];
+  
+  /// **НОВОЕ ПОЛЕ:** Временное поле для отслеживания миграции данных на лету.
+  @ignore
+  bool wasMigrated = false;
 
-  // Геттер и сеттер для удобной работы с эмоциями как с Map
   @ignore
   Map<String, int> get emotions {
     final map = <String, int>{};
@@ -102,8 +119,7 @@ class Memory {
 
   @ignore
   set emotions(Map<String, int> newEmotions) {
-    emotionsData =
-        newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
+    emotionsData = newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
   }
 
   Memory() {
@@ -119,110 +135,82 @@ class Memory {
 
   @ignore
   List<String> get displayableMediaPaths {
-    if (mediaKeysOrder.isEmpty) {
-      final combinedPaths =
-          mediaPaths.where((path) => File(path).existsSync()).toList();
-      final localKeys = combinedPaths.map((path) => _getFileKey(path)).toSet();
-      for (var url in mediaUrls) {
-        final key = _getFileKey(url);
-        if (!localKeys.contains(key)) {
-          combinedPaths.add(url);
-        }
-      }
-      return combinedPaths;
-    }
-
     final allPaths = [...mediaPaths, ...mediaUrls];
-    final pathMap = {for (var p in allPaths) _getFileKey(p): p};
-
+    final pathMap = { for (var p in allPaths) getFileKey(p) : p };
+    
     final orderedPaths = <String>[];
     for (var key in mediaKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
         if (path.startsWith('http') || File(path).existsSync()) {
-          orderedPaths.add(path);
+            orderedPaths.add(path);
         }
       }
     }
     return orderedPaths;
   }
-
+  
   @ignore
   List<String> get displayableThumbPaths {
-    if (mediaKeysOrder.isEmpty) {
-      return displayableMediaPaths; // Fallback для старых данных
-    }
-
     final allThumbs = [...mediaThumbPaths, ...mediaThumbUrls];
-    final thumbMap = {for (var p in allThumbs) _getThumbKey(p): p};
-
-    final orderedThumbs = <String>[];
-    for (var key in mediaKeysOrder) {
-      final thumbKey = 'thumb_$key';
-      if (thumbMap.containsKey(thumbKey)) {
-        final path = thumbMap[thumbKey]!;
-        if (path.startsWith('http') || File(path).existsSync()) {
-          orderedThumbs.add(path);
+    
+    // Primary logic: Try to find ordered thumbnails
+    if (allThumbs.isNotEmpty && mediaKeysOrder.isNotEmpty) {
+        final thumbMap = { for (var p in allThumbs) getFileKey(p) : p };
+        final orderedThumbs = <String>[];
+        for (var key in mediaKeysOrder) {
+            if (thumbMap.containsKey(key)) {
+                final path = thumbMap[key]!;
+                if (path.startsWith('http') || File(path).existsSync()) {
+                    orderedThumbs.add(path);
+                }
+            }
         }
-      }
+        
+        if (orderedThumbs.isNotEmpty) {
+            return orderedThumbs;
+        }
     }
-    return orderedThumbs;
+    
+    // Fallback logic: If no thumbnails were found, use the main media paths.
+    // This is crucial for old memories.
+    final mainPaths = displayableMediaPaths;
+    if (mainPaths.isNotEmpty) {
+        return mainPaths;
+    }
+    
+    return []; // Return empty list if nothing is found
   }
+
 
   @ignore
   List<String> get displayableVideoPaths {
-    if (videoKeysOrder.isEmpty) {
-      final combinedPaths =
-          videoPaths.where((path) => File(path).existsSync()).toList();
-      final localKeys = combinedPaths.map((path) => _getFileKey(path)).toSet();
-      for (var url in videoUrls) {
-        final key = _getFileKey(url);
-        if (!localKeys.contains(key)) {
-          combinedPaths.add(url);
-        }
-      }
-      return combinedPaths;
-    }
-
     final allPaths = [...videoPaths, ...videoUrls];
-    final pathMap = {for (var p in allPaths) _getFileKey(p): p};
+    final pathMap = { for (var p in allPaths) getFileKey(p) : p };
 
     final orderedPaths = <String>[];
     for (var key in videoKeysOrder) {
       if (pathMap.containsKey(key)) {
-        final path = pathMap[key]!;
+         final path = pathMap[key]!;
         if (path.startsWith('http') || File(path).existsSync()) {
-          orderedPaths.add(path);
+            orderedPaths.add(path);
         }
       }
     }
     return orderedPaths;
   }
-
+  
   @ignore
   List<String> get displayableAudioPaths {
-    if (audioKeysOrder.isEmpty) {
-      final combinedPaths =
-          audioNotePaths.where((path) => File(path).existsSync()).toList();
-      final localKeys = combinedPaths.map((path) => _getFileKey(path)).toSet();
-      for (var url in audioUrls) {
-        final key = _getFileKey(url);
-        if (!localKeys.contains(key)) {
-          combinedPaths.add(url);
-        }
-      }
-      return combinedPaths;
-    }
-
     final allPaths = [...audioNotePaths, ...audioUrls];
-    final pathMap = {for (var p in allPaths) _getFileKey(p): p};
+    final pathMap = { for (var p in allPaths) getFileKey(p) : p };
 
     final orderedPaths = <String>[];
     for (var key in audioKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
         if (path.startsWith('http') || File(path).existsSync()) {
-          orderedPaths.add(path);
+            orderedPaths.add(path);
         }
       }
     }
@@ -234,14 +222,13 @@ class Memory {
     final paths = displayableMediaPaths;
     return paths.isNotEmpty ? paths.first : null;
   }
-
+  
   @ignore
   String? get coverThumbPath {
-    final paths = displayableThumbPaths;
-    return paths.isNotEmpty ? paths.first : null;
+      final paths = displayableThumbPaths;
+      return paths.isNotEmpty ? paths.first : null;
   }
 
-  /// РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Иммутабельность
   Memory copyWith({
     Id? id,
     String? firestoreId,
@@ -322,6 +309,7 @@ class Memory {
     return newMemory;
   }
 
+
   Map<String, dynamic> toFirestore() {
     return {
       'userId': userId,
@@ -332,7 +320,7 @@ class Memory {
       'mediaUrls': mediaUrls,
       'videoUrls': videoUrls,
       'audioUrls': audioUrls,
-      'mediaThumbUrls': mediaThumbUrls,
+      'mediaThumbUrls': mediaThumbUrls, 
       'syncStatus': syncStatus,
       'spotifyTrackIds': spotifyTrackIds,
       'ambientSound': ambientSound,
@@ -343,14 +331,15 @@ class Memory {
       'reflectionEvidenceAgainst': reflectionEvidenceAgainst,
       'reflectionReframe': reflectionReframe,
       'reflectionAction': reflectionAction,
-      'reflectionFollowUpAt':
-          reflectionFollowUpAt != null ? Timestamp.fromDate(reflectionFollowUpAt!) : null,
-      'isEncrypted': isEncrypted,
+      'reflectionFollowUpAt': reflectionFollowUpAt != null
+          ? Timestamp.fromDate(reflectionFollowUpAt!)
+          : null,
+      'isEncrypted': isEncrypted, 
       'reflectionActionCompleted': reflectionActionCompleted,
-      'emotions': emotions, // Firestore/JSON can handle maps directly
-      'mediaKeysOrder': mediaKeysOrder,
-      'videoKeysOrder': videoKeysOrder,
-      'audioKeysOrder': audioKeysOrder,
+      'emotions': emotions,
+      'mediaKeysOrder': mediaKeysOrder.map((key) => getFileKey(key)).toList(),
+      'videoKeysOrder': videoKeysOrder.map((key) => getFileKey(key)).toList(),
+      'audioKeysOrder': audioKeysOrder.map((key) => getFileKey(key)).toList(),
     };
   }
 
@@ -377,20 +366,18 @@ class Memory {
       ..reflectionEvidenceAgainst = data['reflectionEvidenceAgainst']
       ..reflectionReframe = data['reflectionReframe']
       ..reflectionAction = data['reflectionAction']
-      ..reflectionFollowUpAt = data['reflectionFollowUpAt'] != null ? (data['reflectionFollowUpAt'] as Timestamp).toDate() : null
+      ..reflectionFollowUpAt = data['reflectionFollowUpAt'] != null
+          ? (data['reflectionFollowUpAt'] as Timestamp).toDate()
+          : null
       ..isEncrypted = data['isEncrypted'] ?? data['reflectionPrivate'] ?? false
-      ..reflectionActionCompleted = data['reflectionActionCompleted'] ?? false
-      ..mediaKeysOrder = List<String>.from(data['mediaKeysOrder'] ?? [])
-      ..videoKeysOrder = List<String>.from(data['videoKeysOrder'] ?? [])
-      ..audioKeysOrder = List<String>.from(data['audioKeysOrder'] ?? []);
+      ..reflectionActionCompleted = data['reflectionActionCompleted'] ?? false;
+      
+    memory.wasMigrated = false; // По умолчанию считаем, что миграция не требовалась
 
-    // РЕАЛИЗАЦИЯ ПРИНЦИПА 2: Обратная совместимость
     final emotionsData = data['emotions'];
     if (emotionsData is List) {
-      // Старый формат: List<String> -> преобразуем в Map<String, int>
-      memory.emotions = {for (var e in emotionsData.cast<String>()) e: 50}; // Интенсивность по умолчанию 50
+      memory.emotions = {for (var e in emotionsData.cast<String>()) e: 50};
     } else if (emotionsData is Map) {
-      // Новый формат: Map<String, dynamic>
       memory.emotions = Map<String, int>.from(
           emotionsData.map((key, value) => MapEntry(key, (value as num).toInt())));
     } else {
@@ -398,7 +385,47 @@ class Memory {
     }
 
     if (data.containsKey('audioNotePath') && data['audioNotePath'] != null) {
-      memory.audioNotePaths.add(data['audioNotePath']);
+        memory.audioNotePaths.add(data['audioNotePath']);
+    }
+
+    // --- ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ: Миграция и нормализация ключей и миниатюр при загрузке ---
+    
+    // 1. Обработка КЛЮЧЕЙ МЕДИА
+    final rawMediaKeysOrder = List<String>.from(data['mediaKeysOrder'] ?? []);
+    if (rawMediaKeysOrder.isEmpty && memory.mediaUrls.isNotEmpty) {
+      if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.mediaUrls.length} media keys from mediaUrls.");
+      memory.mediaKeysOrder = memory.mediaUrls.map((url) => getFileKey(url)).toList();
+      memory.wasMigrated = true;
+    } else {
+      memory.mediaKeysOrder = rawMediaKeysOrder.map((key) => getFileKey(key)).toList();
+    }
+
+    // 2. Обработка МИНИАТЮР
+    // Если миниатюр нет, но есть основные фото, используем основные фото в качестве миниатюр.
+    if (memory.mediaThumbUrls.isEmpty && memory.mediaUrls.isNotEmpty) {
+       if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: Using full images as thumbnails fallback.");
+       memory.mediaThumbUrls = List.from(memory.mediaUrls);
+       memory.wasMigrated = true;
+    }
+    
+    // 3. Обработка КЛЮЧЕЙ ВИДЕО
+    final rawVideoKeysOrder = List<String>.from(data['videoKeysOrder'] ?? []);
+    if (rawVideoKeysOrder.isEmpty && memory.videoUrls.isNotEmpty) {
+        if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.videoUrls.length} video keys from videoUrls.");
+        memory.videoKeysOrder = memory.videoUrls.map((url) => getFileKey(url)).toList();
+        memory.wasMigrated = true;
+    } else {
+        memory.videoKeysOrder = rawVideoKeysOrder.map((key) => getFileKey(key)).toList();
+    }
+
+    // 4. Обработка КЛЮЧЕЙ АУДИО
+    final rawAudioKeysOrder = List<String>.from(data['audioKeysOrder'] ?? []);
+    if (rawAudioKeysOrder.isEmpty && memory.audioUrls.isNotEmpty) {
+        if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.audioUrls.length} audio keys from audioUrls.");
+        memory.audioKeysOrder = memory.audioUrls.map((url) => getFileKey(url)).toList();
+        memory.wasMigrated = true;
+    } else {
+        memory.audioKeysOrder = rawAudioKeysOrder.map((key) => getFileKey(key)).toList();
     }
 
     return memory;

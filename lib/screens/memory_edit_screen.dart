@@ -14,7 +14,6 @@ import 'package:lifeline/screens/profile_screen.dart';
 import 'package:lifeline/screens/spotify_search_screen.dart';
 import 'package:lifeline/services/audio_service.dart';
 import 'package:lifeline/services/encryption_service.dart';
-// НОВЫЙ ИМПОРТ
 import 'package:lifeline/services/image_processing_service.dart';
 import 'package:lifeline/services/message_service.dart';
 import 'package:lifeline/widgets/premium_upsell_widgets.dart';
@@ -52,17 +51,10 @@ class VideoMediaItem {
   VideoMediaItem({required this.path, required this.isLocal});
 }
 
-// Вспомогательный метод для получения ключа файла (имя файла без временной метки)
-String _getFileKey(String path) {
-  String filename = path.split('/').last.split('?').first;
-  return filename.replaceAll(RegExp(r'^\d{13}_'), '');
-}
-
 class MemoryEditScreen extends ConsumerStatefulWidget {
   final Memory? initial;
   final String userId;
   final List<MediaItem>? initialMedia;
-  // ДОБАВЛЕНО: Параметр для приема видео извне
   final List<VideoMediaItem>? initialVideos;
 
   const MemoryEditScreen({
@@ -70,7 +62,7 @@ class MemoryEditScreen extends ConsumerStatefulWidget {
     this.initial,
     required this.userId,
     this.initialMedia,
-    this.initialVideos, // ДОБАВЛЕНО
+    this.initialVideos,
   });
 
   @override
@@ -120,6 +112,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   final _audioRecorder = AudioRecorder();
   bool _isRecording = false;
   bool _isSaving = false;
+  bool _isProcessingImages = false;
 
   Timer? _autosaveTimer;
   Memory? _draftMemory;
@@ -165,7 +158,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       final thumbnails = _draftMemory!.displayableThumbPaths;
       for (int i = 0; i < fullImages.length; i++) {
         final fullPath = fullImages[i];
-        // Если для полного изображения есть миниатюра, используем ее. Иначе - само полное изображение.
         final thumbPath = i < thumbnails.length ? thumbnails[i] : fullPath;
         _mediaItems.add(MediaItem(
             path: fullPath, thumbPath: thumbPath, isLocal: !fullPath.startsWith('http')));
@@ -177,7 +169,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
           .map((p) => AudioMediaItem(path: p, isLocal: !p.startsWith('http'))));
     }
 
-    // ИЗМЕНЕНО: Добавляем медиа и видео, переданные извне
     if (widget.initialMedia != null) {
       _mediaItems.insertAll(0, widget.initialMedia!);
     }
@@ -231,71 +222,57 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     _autosaveTimer =
         Timer.periodic(const Duration(seconds: 20), (_) => _autoSaveDraft(isTimerBased: true));
   }
+  
+  Memory _buildMemoryFromState() {
+    final baseMemory = _draftMemory ?? Memory();
+
+    return baseMemory.copyWith(
+      userId: widget.userId,
+      title: _titleCtrl.text.trim(),
+      content: _contentCtrl.text.trim().isEmpty ? null : _contentCtrl.text.trim(),
+      date: _date,
+      mediaPaths: _mediaItems.where((i) => i.isLocal).map((i) => i.path).toList(),
+      mediaUrls: _mediaItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
+      mediaThumbPaths: _mediaItems.where((i) => i.isLocal).map((i) => i.thumbPath).toList(),
+      mediaThumbUrls: _mediaItems.where((i) => !i.isLocal).map((i) => i.thumbPath).toList(),
+      videoPaths: _videoItems.where((i) => i.isLocal).map((i) => i.path).toList(),
+      videoUrls: _videoItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
+      audioNotePaths: _audioNoteItems.where((i) => i.isLocal).map((i) => i.path).toList(),
+      audioUrls: _audioNoteItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
+      spotifyTrackIds: _spotifyTrackIds,
+      ambientSound: _ambientSound == 'None' ? null : _ambientSound,
+      reflectionImpact: _impactCtrl.text.trim().isEmpty ? null : _impactCtrl.text.trim(),
+      reflectionLesson: _lessonCtrl.text.trim().isEmpty ? null : _lessonCtrl.text.trim(),
+      reflectionAutoThought: _autoThoughtCtrl.text.trim().isEmpty ? null : _autoThoughtCtrl.text.trim(),
+      reflectionEvidenceFor: _evidenceForCtrl.text.trim().isEmpty ? null : _evidenceForCtrl.text.trim(),
+      reflectionEvidenceAgainst: _evidenceAgainstCtrl.text.trim().isEmpty ? null : _evidenceAgainstCtrl.text.trim(),
+      reflectionReframe: _reframeCtrl.text.trim().isEmpty ? null : _reframeCtrl.text.trim(),
+      reflectionAction: _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text.trim(),
+      reflectionFollowUpAt: _followUpDate,
+      isEncrypted: _isEncrypted,
+      emotions: _selectedEmotionsWithIntensity,
+      mediaKeysOrder: _mediaItems.map((item) => getFileKey(item.path)).toList(),
+      videoKeysOrder: _videoItems.map((item) => getFileKey(item.path)).toList(),
+      audioKeysOrder: _audioNoteItems.map((item) => getFileKey(item.path)).toList(),
+    );
+  }
+
 
   Future<void> _autoSaveDraft({bool isTimerBased = false}) async {
-    if (!mounted) return;
+    if (!mounted || _draftMemory == null || !(_formKey.currentState?.validate() ?? true)) return;
+    
     final l10n = AppLocalizations.of(context)!;
-    if (_draftMemory == null || !(_formKey.currentState?.validate() ?? true)) return;
-
-    if (!mounted) return;
     final repo = ref.read(memoryRepositoryProvider);
     if (repo == null) return;
+    
+    final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'draft');
 
-    final memoryToSave = _draftMemory!;
-    memoryToSave.mediaPaths =
-        _mediaItems.where((i) => i.isLocal).map((i) => i.path).toList();
-    memoryToSave.mediaUrls =
-        _mediaItems.where((i) => !i.isLocal).map((i) => i.path).toList();
-    memoryToSave.mediaThumbPaths =
-        _mediaItems.where((i) => i.isLocal).map((i) => i.thumbPath).toList();
-    memoryToSave.mediaThumbUrls =
-        _mediaItems.where((i) => !i.isLocal).map((i) => i.thumbPath).toList();
-
-    memoryToSave.videoPaths =
-        _videoItems.where((i) => i.isLocal).map((i) => i.path).toList();
-    memoryToSave.videoUrls =
-        _videoItems.where((i) => !i.isLocal).map((i) => i.path).toList();
-    memoryToSave.audioNotePaths =
-        _audioNoteItems.where((i) => i.isLocal).map((i) => i.path).toList();
-    memoryToSave.audioUrls =
-        _audioNoteItems.where((i) => !i.isLocal).map((i) => i.path).toList();
-    memoryToSave.title = _titleCtrl.text.trim();
-    memoryToSave.content =
-        _contentCtrl.text.trim().isEmpty ? null : _contentCtrl.text.trim();
-    memoryToSave.date = _date;
-    memoryToSave.spotifyTrackIds = _spotifyTrackIds;
-    memoryToSave.ambientSound = _ambientSound == 'None' ? null : _ambientSound;
-    memoryToSave.reflectionImpact =
-        _impactCtrl.text.trim().isEmpty ? null : _impactCtrl.text.trim();
-    memoryToSave.reflectionLesson =
-        _lessonCtrl.text.trim().isEmpty ? null : _lessonCtrl.text.trim();
-    memoryToSave.reflectionAutoThought = _autoThoughtCtrl.text.trim().isEmpty
-        ? null
-        : _autoThoughtCtrl.text.trim();
-    memoryToSave.reflectionEvidenceFor = _evidenceForCtrl.text.trim().isEmpty
-        ? null
-        : _evidenceForCtrl.text.trim();
-    memoryToSave.reflectionEvidenceAgainst =
-        _evidenceAgainstCtrl.text.trim().isEmpty
-            ? null
-            : _evidenceAgainstCtrl.text.trim();
-    memoryToSave.reflectionReframe =
-        _reframeCtrl.text.trim().isEmpty ? null : _reframeCtrl.text.trim();
-    memoryToSave.reflectionAction =
-        _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text.trim();
-    memoryToSave.reflectionFollowUpAt = _followUpDate;
-    memoryToSave.isEncrypted = _isEncrypted;
-    memoryToSave.emotions = _selectedEmotionsWithIntensity;
-
-    // --- ИСПРАВЛЕНИЕ: Сохраняем порядок ---
-    memoryToSave.mediaKeysOrder =
-        _mediaItems.map((item) => _getFileKey(item.path)).toList();
-    memoryToSave.videoKeysOrder =
-        _videoItems.map((item) => _getFileKey(item.path)).toList();
-    memoryToSave.audioKeysOrder =
-        _audioNoteItems.map((item) => _getFileKey(item.path)).toList();
-
-    await repo.update(memoryToSave);
+    final updatedDraft = await repo.update(memoryToSave);
+    if(mounted) {
+       setState(() {
+         _draftMemory = updatedDraft;
+       });
+    }
 
     if (mounted && isTimerBased) {
       ref
@@ -330,37 +307,48 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       }
     }
   }
-
+  
   Future<void> _pickImage() async {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
 
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
+    if (!mounted || pickedFiles.isEmpty) return;
+    
+    if (!isPremium && (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
+      await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+      return;
+    }
+    
+    setState(() => _isProcessingImages = true);
 
-    if (pickedFiles.isNotEmpty) {
-      if (!isPremium &&
-          (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
-        if (context.mounted) {
-          await showPremiumDialog(context, l10n.premiumFeaturePhotos);
-        }
-        return;
-      }
-
+    try {
       final imageProcessor = ref.read(imageProcessingServiceProvider);
-      for (final file in pickedFiles) {
-        final result = await imageProcessor.processPickedImage(file);
-        if (result != null) {
-          setState(() {
-            _mediaItems.add(MediaItem(
-              path: result.compressedImagePath,
-              thumbPath: result.thumbnailPath,
-              isLocal: true,
-            ));
-          });
-        }
+      
+      final processingFutures = pickedFiles.map((file) => imageProcessor.processPickedImage(file)).toList();
+      final results = await Future.wait(processingFutures);
+
+      if (!mounted) return;
+
+      final newMediaItems = results.whereType<ProcessedImageResult>().map((result) => MediaItem(
+        path: result.compressedImagePath,
+        thumbPath: result.thumbnailPath,
+        isLocal: true,
+      )).toList();
+      
+      setState(() {
+        _mediaItems.addAll(newMediaItems);
+      });
+      
+      await _autoSaveDraft();
+
+    } catch (e) {
+      // Handle errors if necessary
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessingImages = false);
       }
-      _autoSaveDraft();
     }
   }
 
@@ -541,7 +529,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     setState(() => _isSaving = true);
 
-    await _autoSaveDraft();
     if (_draftMemory == null) {
       setState(() => _isSaving = false);
       return;
@@ -556,9 +543,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       }
       return;
     }
-
-    final memoryToSave = _draftMemory!;
-    memoryToSave.syncStatus = 'pending';
+    
+    final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'pending');
 
     try {
       await memoryRepository.update(memoryToSave);
@@ -689,7 +675,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) async {
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
         if (didPop) return;
         _autosaveTimer?.cancel();
         Navigator.of(context).pop(false);
@@ -711,7 +697,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                   )
                 : IconButton(
                     icon: const Icon(Icons.save),
-                    onPressed: _save,
+                    onPressed: _isSaving || _isProcessingImages ? null : _save,
                     tooltip: l10n.memoryEditSave)
           ],
         ),
@@ -774,7 +760,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                 limit: _freePhotoLimit,
                 builder: _buildMediaGrid,
                 button: ElevatedButton.icon(
-                  onPressed: _pickImage,
+                  onPressed: _isProcessingImages ? null : _pickImage,
                   icon: const Icon(Icons.add_a_photo),
                   label: Text(l10n.memoryEditAddPhotosButton),
                 ),
@@ -909,7 +895,13 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         builder(l10n),
         if (button != null) ...[
           const SizedBox(height: 8),
-          button,
+          if (_isProcessingImages)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            button,
         ],
       ],
     );
@@ -1073,7 +1065,6 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         itemCount: _mediaItems.length,
         itemBuilder: (context, index) {
           final item = _mediaItems[index];
-          // ИСПОЛЬЗУЕМ THUMBPATH ДЛЯ ОТОБРАЖЕНИЯ
           final displayPath = item.thumbPath;
           return Card(
             key: ValueKey(item.path),
@@ -1454,3 +1445,4 @@ class _AutosavingTextFieldState extends State<_AutosavingTextField> {
     );
   }
 }
+

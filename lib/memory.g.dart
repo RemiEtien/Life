@@ -179,6 +179,19 @@ const MemorySchema = CollectionSchema(
   deserializeProp: _memoryDeserializeProp,
   idName: r'id',
   indexes: {
+    r'firestoreId': IndexSchema(
+      id: 1863077355534729001,
+      name: r'firestoreId',
+      unique: true,
+      replace: true,
+      properties: [
+        IndexPropertySchema(
+          name: r'firestoreId',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
     r'userId': IndexSchema(
       id: -2005826577402374815,
       name: r'userId',
@@ -562,6 +575,61 @@ void _memoryAttach(IsarCollection<dynamic> col, Id id, Memory object) {
   object.id = id;
 }
 
+extension MemoryByIndex on IsarCollection<Memory> {
+  Future<Memory?> getByFirestoreId(String? firestoreId) {
+    return getByIndex(r'firestoreId', [firestoreId]);
+  }
+
+  Memory? getByFirestoreIdSync(String? firestoreId) {
+    return getByIndexSync(r'firestoreId', [firestoreId]);
+  }
+
+  Future<bool> deleteByFirestoreId(String? firestoreId) {
+    return deleteByIndex(r'firestoreId', [firestoreId]);
+  }
+
+  bool deleteByFirestoreIdSync(String? firestoreId) {
+    return deleteByIndexSync(r'firestoreId', [firestoreId]);
+  }
+
+  Future<List<Memory?>> getAllByFirestoreId(List<String?> firestoreIdValues) {
+    final values = firestoreIdValues.map((e) => [e]).toList();
+    return getAllByIndex(r'firestoreId', values);
+  }
+
+  List<Memory?> getAllByFirestoreIdSync(List<String?> firestoreIdValues) {
+    final values = firestoreIdValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'firestoreId', values);
+  }
+
+  Future<int> deleteAllByFirestoreId(List<String?> firestoreIdValues) {
+    final values = firestoreIdValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'firestoreId', values);
+  }
+
+  int deleteAllByFirestoreIdSync(List<String?> firestoreIdValues) {
+    final values = firestoreIdValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'firestoreId', values);
+  }
+
+  Future<Id> putByFirestoreId(Memory object) {
+    return putByIndex(r'firestoreId', object);
+  }
+
+  Id putByFirestoreIdSync(Memory object, {bool saveLinks = true}) {
+    return putByIndexSync(r'firestoreId', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByFirestoreId(List<Memory> objects) {
+    return putAllByIndex(r'firestoreId', objects);
+  }
+
+  List<Id> putAllByFirestoreIdSync(List<Memory> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'firestoreId', objects, saveLinks: saveLinks);
+  }
+}
+
 extension MemoryQueryWhereSort on QueryBuilder<Memory, Memory, QWhere> {
   QueryBuilder<Memory, Memory, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
@@ -641,6 +709,71 @@ extension MemoryQueryWhere on QueryBuilder<Memory, Memory, QWhereClause> {
         upper: upperId,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterWhereClause> firestoreIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'firestoreId',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterWhereClause> firestoreIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'firestoreId',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterWhereClause> firestoreIdEqualTo(
+      String? firestoreId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'firestoreId',
+        value: [firestoreId],
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterWhereClause> firestoreIdNotEqualTo(
+      String? firestoreId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'firestoreId',
+              lower: [],
+              upper: [firestoreId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'firestoreId',
+              lower: [firestoreId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'firestoreId',
+              lower: [firestoreId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'firestoreId',
+              lower: [],
+              upper: [firestoreId],
+              includeUpper: false,
+            ));
+      }
     });
   }
 

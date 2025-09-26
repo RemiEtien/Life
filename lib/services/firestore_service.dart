@@ -1,12 +1,18 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lifeline/memory.dart';
+import 'package:lifeline/providers/application_providers.dart';
 import 'package:path/path.dart' as p;
 
 class FirestoreService {
+  final Ref _ref;
+  FirestoreService(this._ref);
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -21,10 +27,29 @@ class FirestoreService {
           .orderBy('date', descending: true)
           .get();
 
-      return snapshot.docs
+      final memoriesFromCloud = snapshot.docs
           .map((doc) =>
               Memory.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
           .toList();
+
+      // **ИСПРАВЛЕННАЯ ЛОГИКА**: Теперь мы проверяем флаг `wasMigrated`, 
+      // который устанавливается внутри конструктора Memory.fromFirestore.
+      final memoriesToUpdateLocally =
+          memoriesFromCloud.where((m) => m.wasMigrated).toList();
+
+      if (memoriesToUpdateLocally.isNotEmpty) {
+        // Получаем доступ к репозиторию через ref
+        final repo = _ref.read(memoryRepositoryProvider);
+        if (repo != null) {
+          await repo.upsertMemories(memoriesToUpdateLocally);
+          if (kDebugMode) {
+            print(
+                "[FirestoreService] Persisted ${memoriesToUpdateLocally.length} migrated memories back to local Isar DB.");
+          }
+        }
+      }
+
+      return memoriesFromCloud;
     } catch (e, stackTrace) {
       if (kDebugMode) {
         print("Error fetching from Firestore: $e");
@@ -213,3 +238,4 @@ class FirestoreService {
     return uploadedUrls;
   }
 }
+

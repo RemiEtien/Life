@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,7 +34,7 @@ final connectivityStreamProvider =
 });
 
 // 1. Service providers (simple)
-final firestoreServiceProvider = Provider((ref) => FirestoreService());
+final firestoreServiceProvider = Provider((ref) => FirestoreService(ref));
 final notificationServiceProvider = Provider((ref) => NotificationService());
 final exportServiceProvider = Provider((ref) => ExportService());
 
@@ -91,10 +92,28 @@ final authStateChangesProvider = StreamProvider.autoDispose<User?>((ref) {
 
 // 3. User-dependent providers
 final memoryRepositoryProvider = Provider.autoDispose<MemoryRepository?>((ref) {
+  // ИЗМЕНЕНО: Мы слушаем `authStateChangesProvider`, чтобы получить пользователя,
+  // но теперь мы НЕ будем пересоздавать репозиторий при каждом изменении, а будем делать это более "умно".
   final user = ref.watch(authStateChangesProvider).asData?.value;
   if (user != null) {
     final encryptionService = ref.watch(encryptionServiceProvider.notifier);
-    ref.keepAlive();
+    
+    // Этот хак предотвращает "умирание" провайдера при выходе из аккаунта,
+    // позволяя плавно пересоздать его при следующем входе.
+    final link = ref.keepAlive();
+    Timer? timer;
+    ref.onDispose(() {
+        timer?.cancel();
+    });
+    ref.onCancel(() {
+       // Если провайдер больше не используется, мы даем ему 10 секунд,
+       // прежде чем он будет уничтожен. Это предотвращает ненужные пересоздания
+       // при быстрой навигации.
+       timer = Timer(const Duration(seconds: 10), () {
+          link.close();
+       });
+    });
+
     return MemoryRepository(
         userId: user.uid, encryptionService: encryptionService);
   }
@@ -131,7 +150,18 @@ final isPremiumProvider = Provider<bool>((ref) {
 final memoriesStreamProvider = StreamProvider.autoDispose<List<Memory>>((ref) {
   final memoryRepo = ref.watch(memoryRepositoryProvider);
   if (memoryRepo != null) {
-    ref.keepAlive();
+    // ИЗМЕНЕНО: Мы также используем `keepAlive` здесь для стабильности
+    // во время навигации.
+    final link = ref.keepAlive();
+    Timer? timer;
+     ref.onDispose(() {
+        timer?.cancel();
+    });
+    ref.onCancel(() {
+       timer = Timer(const Duration(seconds: 10), () {
+          link.close();
+       });
+    });
     return memoryRepo.watchAllSortedByDate();
   }
   return Stream.value([]);

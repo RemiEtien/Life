@@ -107,6 +107,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   late final AnimationController _geometryController;
   late final AnimationController _backgroundController;
   late final AnimationController _branchController;
+  // НОВЫЕ ПЕРЕМЕННЫЕ: Контроллер и анимация для плавного зума
+  AnimationController? _zoomAnimationController;
+  Animation<Matrix4>? _zoomAnimation;
 
   final TransformationController _transformationController =
       TransformationController();
@@ -140,7 +143,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   final _performanceMonitor = PerformanceMonitor();
   bool _centerOnNextLayout = false;
   bool _isDisposed = false;
-  
+
+  // НОВАЯ ПЕРЕМЕННАЯ: Для хранения позиции двойного тапа
+  Offset _doubleTapLocalPosition = Offset.zero;
+
   // НОВОЕ: Флаг для управления готовностью онбординга
   bool _isOnboardingPending = false;
 
@@ -441,6 +447,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     _geometryController.stop();
     _backgroundController.stop();
     _branchController.stop();
+
+    // НОВОЕ: Уничтожаем контроллер анимации зума
+    _zoomAnimationController?.dispose();
 
     final geometryAndBranchListener =
         Listenable.merge([_geometryController, _branchController]);
@@ -797,6 +806,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     return minScale;
   }
 
+  // ИЗМЕНЕНИЕ: Отдельная функция для расчета максимального зума
+  double _calculateMaxScale(double minScale, double screenWidth) {
+    const double kBaseContentWidth = 1200.0;
+    final baseScale = _calculateMinScale(kBaseContentWidth, screenWidth);
+    const zoomFactor = 6.0;
+    final desiredMaxScale = baseScale * zoomFactor;
+    return max(minScale, desiredMaxScale);
+  }
+
   void _updateStructureCache(
       RenderData data, Size size, List<Memory> memories) {
     if (!mounted || size.isEmpty || _isDisposed) return;
@@ -881,6 +899,82 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       }
     }
   }
+
+  // НОВЫЙ МЕТОД: Обрабатывает двойной тап для зума
+  void _handleDoubleTap() {
+    if (_zoomAnimationController?.isAnimating ?? false) return;
+    if (_cachedLayoutResult == null) return;
+
+    final matrix = _transformationController.value;
+    final currentScale = matrix.getMaxScaleOnAxis();
+
+    final totalWidth = _cachedLayoutResult!.totalWidth;
+    final screenWidth = _lastKnownSize.width;
+
+    final minScale = _calculateMinScale(totalWidth, screenWidth);
+    final maxScale = _calculateMaxScale(minScale, screenWidth);
+    
+    // Определяем целевой масштаб: если мы уже приближены, то отдаляем, иначе приближаем к максимальному уровню
+    final targetScale = (currentScale - minScale).abs() > 0.1 ? minScale : maxScale;
+    
+    // Анимируем к новому масштабу, центрируясь на точке касания
+    _animateZoomToPoint(targetScale, _doubleTapLocalPosition);
+  }
+
+  // ИСПРАВЛЕНИЕ: Полностью переписанная логика для корректного зума к точке.
+  void _animateZoomToPoint(double targetScale, Offset focalPoint) {
+    _zoomAnimationController?.stop(); // Останавливаем любую текущую анимацию зума
+
+    final currentMatrix = _transformationController.value;
+    final currentScale = currentMatrix.getMaxScaleOnAxis();
+
+    // Избегаем ненужной анимации, если масштаб уже почти целевой
+    if ((targetScale - currentScale).abs() < 0.01) return;
+
+    // Точка в координатах сцены (контента), которая должна остаться под пальцем
+    final sceneFocalPoint = _transformationController.toScene(focalPoint);
+
+    // Вычисляем новое смещение (translation) для матрицы, чтобы
+    // точка sceneFocalPoint после масштабирования оказалась под точкой focalPoint на экране.
+    final double tx = focalPoint.dx - sceneFocalPoint.dx * targetScale;
+    final double ty = focalPoint.dy - sceneFocalPoint.dy * targetScale;
+
+    // Создаем новую целевую матрицу "с нуля"
+    final targetMatrix = Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(targetScale);
+
+    // Запускаем анимацию к новой матрице
+    _animateToMatrix(targetMatrix);
+  }
+
+  // НОВЫЙ МЕТОД: Общая функция для плавной анимации матрицы
+  void _animateToMatrix(Matrix4 target) {
+    _zoomAnimationController?.dispose();
+    _zoomAnimationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
+
+    _zoomAnimation = Matrix4Tween(
+      begin: _transformationController.value,
+      end: target,
+    ).animate(CurvedAnimation(
+        parent: _zoomAnimationController!, curve: Curves.easeInOutCubic));
+
+    _zoomAnimation!.addListener(() {
+      _transformationController.value = _zoomAnimation!.value;
+    });
+    
+    _zoomAnimationController!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _zoomAnimationController?.dispose();
+        _zoomAnimationController = null;
+        _zoomAnimation = null;
+      }
+    });
+
+    _zoomAnimationController!.forward();
+  }
+
 
   void _handleTappableItemAction(
       TappableItem item, Offset globalPosition, String userId) {
@@ -1035,31 +1129,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     targetMatrix.scale(minScale, minScale);
     targetMatrix.translate(-contentCenter.dx, -contentCenter.dy);
 
-    final controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800));
-    final animation =
-        Matrix4Tween(begin: _transformationController.value, end: targetMatrix)
-            .animate(CurvedAnimation(
-                parent: controller, curve: Curves.easeInOutCubic));
-    animation
-        .addListener(() => _transformationController.value = animation.value);
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.dispose();
-        
-        // ИСПРАВЛЕНИЕ: После завершения анимации центрирования, запускаем онбординг, если он ожидает
-        if (_isOnboardingPending) {
-          _isOnboardingPending = false;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && !_isDisposed) {
-              // Используем новый метод startTour, который не проверяет, был ли онбординг завершен.
-              ref.read(onboardingServiceProvider.notifier).startTour();
-            }
-          });
-        }
-      }
-    });
-    controller.forward();
+    _animateToMatrix(targetMatrix);
   }
 
   void _toggleDebugMode() => setState(() => _debugMode = !_debugMode);
@@ -1233,11 +1303,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       final screenWidth = constraints.maxWidth;
 
       final minScale = _calculateMinScale(totalWidth, screenWidth);
-      const double kBaseContentWidth = 1200.0;
-      final baseScale = _calculateMinScale(kBaseContentWidth, screenWidth);
-      const zoomFactor = 6.0;
-      final desiredMaxScale = baseScale * zoomFactor;
-      final maxScale = max(minScale, desiredMaxScale);
+      final maxScale = _calculateMaxScale(minScale, screenWidth);
       final contentHeight = constraints.maxHeight;
 
       return Container(
@@ -1287,6 +1353,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTapDown: isTimelineInteractionDisabled ? null : _onTapDown,
+                  // НОВОЕ: Добавляем обработчики для двойного тапа
+                  onDoubleTapDown: (details) => _doubleTapLocalPosition = details.localPosition,
+                  onDoubleTap: isTimelineInteractionDisabled ? null : _handleDoubleTap,
                   child: InteractiveViewer(
                     transformationController: _transformationController,
                     boundaryMargin: const EdgeInsets.all(double.infinity),
@@ -1940,4 +2009,5 @@ class PerformanceMonitor {
     fpsNotifier.dispose();
   }
 }
+
 

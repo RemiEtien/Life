@@ -118,6 +118,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       setState(() => _statusMessage = l10n.splashMessageSyncing);
     }
     
+    // ИЗМЕНЕНО: Мы дожидаемся завершения первой синхронизации ЗДЕСЬ,
+    // чтобы гарантировать, что локальная база данных актуальна перед показом UI.
     FirebaseCrashlytics.instance.log('SplashScreen: Starting initial sync from cloud.');
     try {
       await ref.read(syncServiceProvider).syncFromCloudToLocal(isInitialSync: true);
@@ -179,5 +181,3 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 }
-
-
