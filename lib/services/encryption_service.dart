@@ -1,18 +1,23 @@
 import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' hide Key;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lifeline/memory.dart';
 import 'package:lifeline/models/user_profile.dart';
 import 'package:lifeline/providers/application_providers.dart';
-import 'package:pointycastle/api.dart';
 import 'package:pointycastle/key_derivators/api.dart';
 import 'package:pointycastle/key_derivators/pbkdf2.dart';
 import 'package:pointycastle/macs/hmac.dart';
 import 'package:pointycastle/digests/sha256.dart';
+
+/// **НОВОЕ:** Исключение, выбрасываемое при попытке шифрования/дешифрования
+/// в заблокированном состоянии.
+class EncryptionLockedException implements Exception {
+  final String message =
+      "Encryption service is locked. Unlock with master password before proceeding.";
+  @override
+  String toString() => message;
+}
 
 // Represents the state of encryption for the current user session.
 enum EncryptionState {
@@ -29,8 +34,7 @@ enum EncryptionState {
 /// securely, encrypted, in their profile.
 class EncryptionService extends StateNotifier<EncryptionState> {
   final Ref _ref;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  static const _dekStorageKey = 'lifeline_unlocked_dek';
+  // **УДАЛЕНО:** Ключ больше не кэшируется в FlutterSecureStorage.
 
   Key? _unlockedDEK; // Data Encryption Key, cached in memory for the session.
 
@@ -43,21 +47,15 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   Future<void> _initializeState(UserProfile? userProfile) async {
     if (userProfile == null || !userProfile.isEncryptionEnabled) {
-      await _secureStorage.delete(key: _dekStorageKey);
       _unlockedDEK = null;
       state = EncryptionState.notConfigured;
       return;
     }
 
-    // Check if the DEK was cached from a previous session unlock.
-    final cachedDEK = await _secureStorage.read(key: _dekStorageKey);
-    if (cachedDEK != null) {
-      _unlockedDEK = Key.fromBase64(cachedDEK);
-      state = EncryptionState.unlocked;
-    } else {
-      _unlockedDEK = null;
-      state = EncryptionState.locked;
-    }
+    // **ИЗМЕНЕНО:** Логика инициализации теперь проще. Если шифрование включено,
+    // сервис всегда стартует в заблокированном состоянии.
+    _unlockedDEK = null;
+    state = EncryptionState.locked;
   }
 
   /// Sets up encryption for the first time for a user.
@@ -75,10 +73,12 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     // 3. Derive the Key Encryption Key (KEK) from the master password and salt.
     final kek = _deriveKey(masterPassword, salt);
 
-    // 4. "Wrap" (encrypt) the DEK with the KEK.
-    final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(kek));
+    // 4. "Wrap" (encrypt) the DEK with the KEK using AES-GCM.
+    final iv = IV.fromSecureRandom(12); // GCM standard is 12 bytes
+    // **ИЗМЕНЕНО:** Используем AESMode.gcm
+    final encrypter = Encrypter(AES(kek, mode: AESMode.gcm));
     final encryptedDEK = encrypter.encrypt(newDEK.base64, iv: iv);
+    // Структура хранит IV и зашифрованные данные (которые включают auth tag)
     final wrappedDEK = '${iv.base64}:${encryptedDEK.base64}';
 
     // 5. Save the salt and wrapped DEK to Firestore.
@@ -91,7 +91,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
     // 6. Unlock the current session.
     _unlockedDEK = newDEK;
-    await _secureStorage.write(key: _dekStorageKey, value: _unlockedDEK!.base64);
+    // **УДАЛЕНО:** Больше не сохраняем ключ в хранилище.
     state = EncryptionState.unlocked;
   }
 
@@ -109,13 +109,13 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       final encryptedDEK = Encrypted.fromBase64(wrappedDEKParts[1]);
 
       final kek = _deriveKey(masterPassword, salt);
-      final encrypter = Encrypter(AES(kek));
+      // **ИЗМЕНЕНО:** Используем AESMode.gcm для дешифровки
+      final encrypter = Encrypter(AES(kek, mode: AESMode.gcm));
 
       final decryptedDEKString = encrypter.decrypt(encryptedDEK, iv: iv);
       _unlockedDEK = Key.fromBase64(decryptedDEKString);
 
-      await _secureStorage.write(
-          key: _dekStorageKey, value: _unlockedDEK!.base64);
+      // **УДАЛЕНО:** Больше не сохраняем ключ в хранилище.
       state = EncryptionState.unlocked;
       return true;
     } catch (e) {
@@ -127,7 +127,8 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   /// Changes the user's master password.
-  Future<bool> changeMasterPassword(String oldPassword, String newPassword) async {
+  Future<bool> changeMasterPassword(
+      String oldPassword, String newPassword) async {
     final userProfile = _ref.read(userProfileProvider).value;
     if (userProfile == null || !userProfile.isEncryptionEnabled) {
       return false; // Encryption not enabled
@@ -148,9 +149,10 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     // 3. Derive the new Key Encryption Key (KEK) from the new password and new salt.
     final newKek = _deriveKey(newPassword, newSalt);
 
-    // 4. Re-wrap (encrypt) the existing DEK with the NEW KEK.
-    final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(newKek));
+    // 4. Re-wrap (encrypt) the existing DEK with the NEW KEK using AES-GCM.
+    final iv = IV.fromSecureRandom(12);
+    // **ИЗМЕНЕНО:** Используем AESMode.gcm
+    final encrypter = Encrypter(AES(newKek, mode: AESMode.gcm));
     final encryptedDEK = encrypter.encrypt(_unlockedDEK!.base64, iv: iv);
     final newWrappedDEK = '${iv.base64}:${encryptedDEK.base64}';
 
@@ -168,7 +170,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   /// Locks the session by clearing the cached DEK.
   Future<void> lockSession() async {
     _unlockedDEK = null;
-    await _secureStorage.delete(key: _dekStorageKey);
+    // **УДАЛЕНО:** Больше не нужно удалять ключ из хранилища.
 
     final userProfile = _ref.read(userProfileProvider).value;
     if (userProfile?.isEncryptionEnabled == true) {
@@ -179,16 +181,20 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   String? encrypt(String? plainText) {
-    if (plainText == null ||
-        plainText.isEmpty ||
-        state != EncryptionState.unlocked ||
-        _unlockedDEK == null) {
+    if (plainText == null || plainText.isEmpty) {
       return plainText;
     }
-    final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(_unlockedDEK!));
+    // **ИЗМЕНЕНО:** Выбрасываем исключение, если сервис заблокирован.
+    if (state != EncryptionState.unlocked || _unlockedDEK == null) {
+      throw EncryptionLockedException();
+    }
+    final iv = IV.fromSecureRandom(12); // GCM standard
+    // **ИЗМЕНЕНО:** Используем AESMode.gcm
+    final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
     final encrypted = encrypter.encrypt(plainText, iv: iv);
-    return '${iv.base64}:${encrypted.base64}';
+
+    // **ИЗМЕНЕНО:** Добавляем префикс для версионирования.
+    return 'gcm_v1:${iv.base64}:${encrypted.base64}';
   }
 
   String? decrypt(String? encryptedText) {
@@ -197,14 +203,18 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         !isValueEncrypted(encryptedText)) {
       return encryptedText;
     }
+    // **ИЗМЕНЕНО:** Выбрасываем исключение, если сервис заблокирован.
     if (state != EncryptionState.unlocked || _unlockedDEK == null) {
-      return null;
+      throw EncryptionLockedException();
     }
     try {
+      // **ИЗМЕНЕНО:** Обрабатываем новый формат с префиксом.
       final parts = encryptedText.split(':');
-      final iv = IV.fromBase64(parts[0]);
-      final encrypted = Encrypted.fromBase64(parts[1]);
-      final encrypter = Encrypter(AES(_unlockedDEK!));
+      // parts[0] is 'gcm_v1'
+      final iv = IV.fromBase64(parts[1]);
+      final encrypted = Encrypted.fromBase64(parts[2]);
+      // **ИЗМЕНЕНО:** Используем AESMode.gcm
+      final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
       return encrypter.decrypt(encrypted, iv: iv);
     } catch (e) {
       if (kDebugMode) print("Decryption failed: $e");
@@ -229,11 +239,15 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   bool isValueEncrypted(String? value) {
     if (value == null || value.isEmpty) return false;
+    // **ИЗМЕНЕНО:** Проверяем наличие префикса и 3 частей.
+    if (!value.startsWith('gcm_v1:')) return false;
+
     final parts = value.split(':');
-    if (parts.length != 2) return false;
+    if (parts.length != 3) return false;
+
     try {
-      base64.decode(parts[0]);
-      base64.decode(parts[1]);
+      base64.decode(parts[1]); // iv
+      base64.decode(parts[2]); // encrypted data + tag
       return true;
     } catch (e) {
       return false;
@@ -242,8 +256,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   Key _deriveKey(String password, Uint8List salt) {
     final derivator = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
-      ..init(Pbkdf2Parameters(salt, 100000,
-          32)); // 32 bytes for AES-256
+      ..init(Pbkdf2Parameters(salt, 100000, 32)); // 32 bytes for AES-256
     return Key(derivator.process(Uint8List.fromList(utf8.encode(password))));
   }
 

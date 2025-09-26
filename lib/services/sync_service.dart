@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lifeline/memory.dart';
 import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/services/firestore_service.dart';
-import 'package:lifeline/services/memory_repository.dart';
+import 'package:lifeline/services/encryption_service.dart';
 
 @immutable
 class SyncState {
@@ -40,6 +39,8 @@ class SyncService {
   final Ref _ref;
   final List<int> _syncQueue = [];
   bool _isProcessing = false;
+  // НОВОЕ: Флаг для отслеживания паузы из-за шифрования
+  bool _isPausedForUnlock = false;
 
   SyncService(this._ref) {
     _checkForUnsyncedMemories();
@@ -47,7 +48,7 @@ class SyncService {
 
   Future<void> syncFromCloudToLocal({bool isInitialSync = false}) async {
     final notifier = _ref.read(syncNotifierProvider.notifier);
-    if (!isInitialSync && notifier.state.isSyncing) return;
+    if (!isInitialSync && _ref.read(syncNotifierProvider).isSyncing) return;
 
     final repo = _ref.read(memoryRepositoryProvider);
     final firestore = _ref.read(firestoreServiceProvider);
@@ -69,33 +70,34 @@ class SyncService {
         if (!isInitialSync) {
           notifier.updateState(currentStatus: "Merging with local data...");
         }
-        
+
         final memoriesToUpsert = <Memory>[];
         for (final cloudMemory in cloudMemories) {
-            final localMemory = localMemoriesMap[cloudMemory.firestoreId];
-            
-            // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №3: Логика слияния**
-            if (localMemory == null) {
-                // Если локальной записи нет - это новая запись с другого устройства, добавляем ее.
-                memoriesToUpsert.add(cloudMemory);
-            } else if (cloudMemory.lastModified.isAfter(localMemory.lastModified) && localMemory.syncStatus != 'pending') {
-                // Если облачная запись новее и локальная не ожидает синхронизации, обновляем локальную.
-                // **КРИТИЧЕСКИ ВАЖНО: Сохраняем локальный ID!**
-                // Это говорит Isar, какую именно запись нужно обновить.
-                cloudMemory.id = localMemory.id; 
-                memoriesToUpsert.add(cloudMemory);
-            }
+          final localMemory = localMemoriesMap[cloudMemory.firestoreId];
+
+          // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №3: Логика слияния**
+          if (localMemory == null) {
+            // Если локальной записи нет - это новая запись с другого устройства, добавляем ее.
+            memoriesToUpsert.add(cloudMemory);
+          } else if (cloudMemory.lastModified
+                  .isAfter(localMemory.lastModified) &&
+              localMemory.syncStatus != 'pending') {
+            // Если облачная запись новее и локальная не ожидает синхронизации, обновляем локальную.
+            // **КРИТИЧЕСКИ ВАЖНО: Сохраняем локальный ID!**
+            // Это говорит Isar, какую именно запись нужно обновить.
+            cloudMemory.id = localMemory.id;
+            memoriesToUpsert.add(cloudMemory);
+          }
         }
-        
+
         if (memoriesToUpsert.isNotEmpty) {
-           // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №4: Используем новый метод `upsert`**
-           await repo.upsertMemories(memoriesToUpsert);
+          // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №4: Используем новый метод `upsert`**
+          await repo.upsertMemories(memoriesToUpsert);
         }
       }
-       if (!isInitialSync) {
+      if (!isInitialSync) {
         notifier.updateState(isSyncing: false, currentStatus: "Sync complete!");
       }
-
     } catch (e, stackTrace) {
       FirebaseCrashlytics.instance.recordError(e, stackTrace,
           reason: "SyncService: syncFromCloudToLocal failed");
@@ -109,6 +111,17 @@ class SyncService {
       if (!isInitialSync) {
         _checkForUnsyncedMemories();
       }
+    }
+  }
+
+  // НОВЫЙ МЕТОД: Возобновляет очередь после разблокировки шифрования
+  void resumeSync() {
+    if (_isPausedForUnlock && !_isProcessing && _syncQueue.isNotEmpty) {
+      if (kDebugMode) {
+        print("[SyncService] Resuming sync queue processing after unlock.");
+      }
+      _isPausedForUnlock = false;
+      _processQueue();
     }
   }
 
@@ -142,7 +155,7 @@ class SyncService {
   }
 
   Future<void> _processQueue() async {
-    if (_isProcessing || _syncQueue.isEmpty) {
+    if (_isProcessing || _syncQueue.isEmpty || _isPausedForUnlock) {
       if (_syncQueue.isEmpty) {
         _ref.read(syncNotifierProvider.notifier).updateState(
             pendingJobs: 0,
@@ -164,25 +177,41 @@ class SyncService {
         );
 
     await _updateLocalStatus(memoryId, 'syncing');
-    final success = await _syncMemoryWithRetries(memoryId);
 
-    _syncQueue.removeAt(0);
-    _isProcessing = false;
+    // ИЗМЕНЕНО: Обработка исключения EncryptionLockedException
+    try {
+      final success = await _syncMemoryWithRetries(memoryId);
 
-    if (success) {
+      _syncQueue.removeAt(0);
+      _isProcessing = false;
+
+      if (success) {
+        _ref.read(syncNotifierProvider.notifier).updateState(
+            pendingJobs: _syncQueue.length,
+            currentStatus: "Sync complete!",
+            progress: 1.0);
+      } else {
+        _ref.read(syncNotifierProvider.notifier).updateState(
+            pendingJobs: _syncQueue.length,
+            currentStatus: "Sync failed. Will retry later.",
+            progress: null);
+      }
+
+      await Future.delayed(const Duration(seconds: 1));
+      _processQueue();
+    } on EncryptionLockedException {
+      if (kDebugMode) {
+        print("[SyncService] Queue processing paused. Waiting for unlock.");
+      }
+      // Пауза обработки очереди
+      _isProcessing = false;
+      _isPausedForUnlock = true;
       _ref.read(syncNotifierProvider.notifier).updateState(
-          pendingJobs: _syncQueue.length,
-          currentStatus: "Sync complete!",
-          progress: 1.0);
-    } else {
-      _ref.read(syncNotifierProvider.notifier).updateState(
-          pendingJobs: _syncQueue.length,
-          currentStatus: "Sync failed. Will retry later.",
+          isSyncing: true, // Keep showing sync indicator
+          currentStatus: "Sync paused - unlock needed",
           progress: null);
+      // Не вызываем _processQueue() снова, ждем resumeSync()
     }
-
-    await Future.delayed(const Duration(seconds: 1));
-    _processQueue();
   }
 
   Future<void> _updateLocalStatus(int memoryId, String status) async {
@@ -202,8 +231,12 @@ class SyncService {
     if (userId == null || repo == null) return false;
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      // ИЗМЕНЕНО: getDecryptedById теперь может выбросить исключение,
+      // которое будет поймано в _processQueue
       final initialMemoryState = await repo.getDecryptedById(memoryId);
-      if (initialMemoryState == null) return true; 
+      if (initialMemoryState == null) {
+        return true;
+      }
 
       try {
         final notifier = _ref.read(syncNotifierProvider.notifier);
@@ -211,19 +244,34 @@ class SyncService {
         notifier.updateState(
             currentStatus: "Uploading thumbnails...", progress: 0.1);
         final newThumbUrls = await firestore.uploadFiles(
-            userId, initialMemoryState.universalId, initialMemoryState.mediaThumbPaths, 'thumbs');
-        
-        notifier.updateState(currentStatus: "Uploading photos...", progress: 0.3);
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.mediaThumbPaths,
+            'thumbs');
+
+        notifier.updateState(
+            currentStatus: "Uploading photos...", progress: 0.3);
         final newPhotoUrls = await firestore.uploadFiles(
-            userId, initialMemoryState.universalId, initialMemoryState.mediaPaths, 'photos');
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.mediaPaths,
+            'photos');
 
-        notifier.updateState(currentStatus: "Uploading videos...", progress: 0.6);
+        notifier.updateState(
+            currentStatus: "Uploading videos...", progress: 0.6);
         final newVideoUrls = await firestore.uploadFiles(
-            userId, initialMemoryState.universalId, initialMemoryState.videoPaths, 'videos');
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.videoPaths,
+            'videos');
 
-        notifier.updateState(currentStatus: "Uploading audio...", progress: 0.8);
+        notifier.updateState(
+            currentStatus: "Uploading audio...", progress: 0.8);
         final newAudioUrls = await firestore.uploadFiles(
-            userId, initialMemoryState.universalId, initialMemoryState.audioNotePaths, 'audio');
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.audioNotePaths,
+            'audio');
 
         final memoryForCloud = _buildCloudReadyMemory(
           initialState: initialMemoryState,
@@ -232,16 +280,18 @@ class SyncService {
           newVideoUrls: newVideoUrls,
           newAudioUrls: newAudioUrls,
         );
-        
-        notifier.updateState(currentStatus: "Saving to cloud...", progress: 0.9);
+
+        notifier.updateState(
+            currentStatus: "Saving to cloud...", progress: 0.9);
         await firestore.setMemory(userId, memoryForCloud);
-        
+
         await repo.updateAfterSync(memoryForCloud);
 
         return true;
       } catch (e, stackTrace) {
         if (kDebugMode) {
-          print("[SyncService] Attempt $attempt failed for memory $memoryId: $e");
+          print(
+              "[SyncService] Attempt $attempt failed for memory $memoryId: $e");
         }
         FirebaseCrashlytics.instance.recordError(e, stackTrace,
             reason:
@@ -249,9 +299,9 @@ class SyncService {
 
         if (attempt < maxRetries) {
           final delay = Duration(seconds: 5 * attempt);
-          _ref
-              .read(syncNotifierProvider.notifier)
-              .updateState(currentStatus: "Sync failed. Retrying in ${delay.inSeconds}s...");
+          _ref.read(syncNotifierProvider.notifier).updateState(
+              currentStatus:
+                  "Sync failed. Retrying in ${delay.inSeconds}s...");
           await Future.delayed(delay);
         }
       }
@@ -269,32 +319,33 @@ class SyncService {
     required List<String> newVideoUrls,
     required List<String> newAudioUrls,
   }) {
-      // Используем Set для автоматического объединения и удаления дубликатов
-      final allPhotoUrls = {...initialState.mediaUrls, ...newPhotoUrls}.toList();
-      final allThumbUrls = {...initialState.mediaThumbUrls, ...newThumbUrls}.toList();
-      final allVideoUrls = {...initialState.videoUrls, ...newVideoUrls}.toList();
-      final allAudioUrls = {...initialState.audioUrls, ...newAudioUrls}.toList();
-      
-      // Генерируем ключи из ОБЪЕДИНЕННЫХ списков URL
-      final allMediaKeys = allPhotoUrls.map(getFileKey).toSet().toList();
-      final allVideoKeys = allVideoUrls.map(getFileKey).toSet().toList();
-      final allAudioKeys = allAudioUrls.map(getFileKey).toSet().toList();
+    // Используем Set для автоматического объединения и удаления дубликатов
+    final allPhotoUrls = {...initialState.mediaUrls, ...newPhotoUrls}.toList();
+    final allThumbUrls =
+        {...initialState.mediaThumbUrls, ...newThumbUrls}.toList();
+    final allVideoUrls = {...initialState.videoUrls, ...newVideoUrls}.toList();
+    final allAudioUrls = {...initialState.audioUrls, ...newAudioUrls}.toList();
 
-      return initialState.copyWith(
-        mediaUrls: allPhotoUrls,
-        mediaThumbUrls: allThumbUrls,
-        videoUrls: allVideoUrls,
-        audioUrls: allAudioUrls,
-        mediaKeysOrder: allMediaKeys,
-        videoKeysOrder: allVideoKeys,
-        audioKeysOrder: allAudioKeys,
-        // Очищаем локальные пути, так как они теперь загружены
-        mediaPaths: [],
-        mediaThumbPaths: [],
-        videoPaths: [],
-        audioNotePaths: [],
-        syncStatus: 'synced',
-      )..touch();
+    // Генерируем ключи из ОБЪЕДИНЕННЫХ списков URL
+    final allMediaKeys = allPhotoUrls.map(getFileKey).toSet().toList();
+    final allVideoKeys = allVideoUrls.map(getFileKey).toSet().toList();
+    final allAudioKeys = allAudioUrls.map(getFileKey).toSet().toList();
+
+    return initialState.copyWith(
+      mediaUrls: allPhotoUrls,
+      mediaThumbUrls: allThumbUrls,
+      videoUrls: allVideoUrls,
+      audioUrls: allAudioUrls,
+      mediaKeysOrder: allMediaKeys,
+      videoKeysOrder: allVideoKeys,
+      audioKeysOrder: allAudioKeys,
+      // Очищаем локальные пути, так как они теперь загружены
+      mediaPaths: [],
+      mediaThumbPaths: [],
+      videoPaths: [],
+      audioNotePaths: [],
+      syncStatus: 'synced',
+    )..touch();
   }
 }
 

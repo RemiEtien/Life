@@ -117,7 +117,6 @@ class Memory {
     return map;
   }
 
-  @ignore
   set emotions(Map<String, int> newEmotions) {
     emotionsData = newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
   }
@@ -303,7 +302,7 @@ class Memory {
     if (emotions != null) {
       newMemory.emotions = emotions;
     } else {
-      newMemory.emotionsData = List.from(this.emotionsData);
+      newMemory.emotionsData = List.from(emotionsData);
     }
 
     return newMemory;

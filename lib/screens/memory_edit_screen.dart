@@ -1284,7 +1284,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         decoration: InputDecoration(
             labelText: l10n.memoryEditAmbientSoundDropdownHint,
             border: const OutlineInputBorder()),
-        value: _ambientSound,
+        initialValue: _ambientSound,
         onChanged: (String? newValue) {
           if (newValue != null) {
             setState(() => _ambientSound = newValue);

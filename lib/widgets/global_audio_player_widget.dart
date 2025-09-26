@@ -27,9 +27,9 @@ class GlobalAudioPlayerWidget extends ConsumerWidget {
             width: 48,
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -72,3 +72,4 @@ class GlobalAudioPlayerWidget extends ConsumerWidget {
     );
   }
 }
+

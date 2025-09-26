@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,12 @@ class ConsentScreen extends ConsumerStatefulWidget {
 class _ConsentScreenState extends ConsumerState<ConsentScreen> {
   bool _agreedToTerms = false;
   bool _isLoading = false;
+
+  void _log(String message) {
+    if (kDebugMode) {
+      debugPrint(message);
+    }
+  }
 
   void _onContinue() async {
     final l10n = AppLocalizations.of(context)!;
@@ -45,47 +52,49 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
   }
 
   void _openDocument(String title, String path, String languageCode) async {
-    print('=== DOCUMENT DEBUG START ===');
-    print('Title: $title');
-    print('Original path: $path');
-    print('Language code: $languageCode');
+    _log('=== DOCUMENT DEBUG START ===');
+    _log('Title: $title');
+    _log('Original path: $path');
+    _log('Language code: $languageCode');
 
     String finalPath = path;
     bool fileExists = false;
 
     try {
-      print('Trying to load: $path');
+      _log('Trying to load: $path');
       await rootBundle.load(path);
       fileExists = true;
-      print('SUCCESS: File found at $path');
+      _log('SUCCESS: File found at $path');
     } catch (e) {
-      print('FAILED: File not found at $path, error: $e');
+      _log('FAILED: File not found at $path, error: $e');
     }
 
     if (!fileExists) {
       finalPath = path.replaceAll(RegExp(r'_[a-z]{2}\.md$'), '_en.md');
-      print('Trying fallback: $finalPath');
+      _log('Trying fallback: $finalPath');
       try {
         await rootBundle.load(finalPath);
         fileExists = true;
-        print('SUCCESS: Fallback file found at $finalPath');
+        _log('SUCCESS: Fallback file found at $finalPath');
       } catch (e) {
-        print('FAILED: Fallback also failed at $finalPath, error: $e');
+        _log('FAILED: Fallback also failed at $finalPath, error: $e');
       }
     }
 
-    print('Final result - fileExists: $fileExists, finalPath: $finalPath');
-    print('=== DOCUMENT DEBUG END ===');
+    _log('Final result - fileExists: $fileExists, finalPath: $finalPath');
+    _log('=== DOCUMENT DEBUG END ===');
 
     if (!fileExists) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.documentErrorLoading)),
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.documentErrorLoading)),
         );
       }
       return;
     }
-    
+
     if (mounted) {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -95,15 +104,14 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider) ?? Localizations.localeOf(context);
     final languageCode = locale.languageCode;
 
-    print('Current locale: $locale');
-    print('Language code: $languageCode');
+    _log('Current locale: $locale');
+    _log('Language code: $languageCode');
 
     return Scaffold(
       body: SafeArea(
@@ -126,7 +134,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
               Text(
                 l10n.consentWelcomeSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               ),
               const Spacer(),
               CheckboxListTile(

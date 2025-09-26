@@ -18,14 +18,14 @@ class SpotifyService {
   /// ИЗМЕНЕНО: Более безопасный маппер с проверкой типов, чтобы избежать падений.
   SpotifyTrackDetails _mapToTrackDetails(Map<String, dynamic> data) {
     // Вспомогательная функция для безопасного преобразования любого значения в String.
-    String? _s(dynamic v) => v?.toString();
+    String? s(dynamic v) => v?.toString();
 
     return SpotifyTrackDetails(
-      id: _s(data['id']) ?? '',
-      name: _s(data['name']) ?? 'Unknown Track',
-      artist: _s(data['artist']) ?? 'Unknown Artist',
-      albumArtUrl: _s(data['albumArtUrl']),
-      trackUrl: _s(data['trackUrl']),
+      id: s(data['id']) ?? '',
+      name: s(data['name']) ?? 'Unknown Track',
+      artist: s(data['artist']) ?? 'Unknown Artist',
+      albumArtUrl: s(data['albumArtUrl']),
+      trackUrl: s(data['trackUrl']),
     );
   }
 

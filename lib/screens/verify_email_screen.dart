@@ -104,7 +104,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             Text(
               l10n.verifyEmailInstructions,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.7)),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
@@ -127,4 +127,5 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     );
   }
 }
+
 
