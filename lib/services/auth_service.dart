@@ -286,11 +286,19 @@ class AuthService {
 
       // Delete the local database file to prevent conflicts on re-registration.
       final dir = await getApplicationDocumentsDirectory();
-      final dbFile = File('${dir.path}/lifeline_$uid.isar');
+      // ИСПОЛЬЗУЕМ ТОЛЬКО IsarService для работы с путями
+      final dbFile = File('${dir.path}/lifeline_$uid.isar'); 
       if (await dbFile.exists()) {
-        await dbFile.delete();
-        if (kDebugMode) {
-          print("[AuthService] Deleted local database file for user $uid.");
+        try {
+            await dbFile.delete();
+             if (kDebugMode) {
+                print("[AuthService] Deleted local database file for user $uid.");
+             }
+        } catch (e) {
+            // Ошибка удаления может произойти, если файл был переименован
+            if (kDebugMode) {
+                print("[AuthService] Could not delete DB file directly, it might have been migrated: $e");
+            }
         }
       }
 

@@ -268,38 +268,27 @@ class SyncService {
       try {
         final notifier = _ref.read(syncNotifierProvider.notifier);
 
-        notifier.updateState(
-            currentStatus: "Uploading thumbnails...", progress: 0.1);
-        final newThumbUrls = await firestore.uploadFiles(
-            userId,
-            initialMemoryState.universalId,
-            initialMemoryState.mediaThumbPaths,
-            'thumbs');
+        // ИСПРАВЛЕНИЕ: Параллельная загрузка всех медиафайлов.
+        notifier.updateState(currentStatus: "Uploading media...", progress: 0.1);
 
-        notifier.updateState(
-            currentStatus: "Uploading photos...", progress: 0.3);
-        final newPhotoUrls = await firestore.uploadFiles(
-            userId,
-            initialMemoryState.universalId,
-            initialMemoryState.mediaPaths,
-            'photos');
+        final results = await Future.wait([
+          firestore.uploadFiles(userId, initialMemoryState.universalId,
+              initialMemoryState.mediaThumbPaths, 'thumbs'),
+          firestore.uploadFiles(userId, initialMemoryState.universalId,
+              initialMemoryState.mediaPaths, 'photos'),
+          firestore.uploadFiles(userId, initialMemoryState.universalId,
+              initialMemoryState.videoPaths, 'videos'),
+          firestore.uploadFiles(userId, initialMemoryState.universalId,
+              initialMemoryState.audioNotePaths, 'audio'),
+        ]);
 
-        notifier.updateState(
-            currentStatus: "Uploading videos...", progress: 0.6);
-        final newVideoUrls = await firestore.uploadFiles(
-            userId,
-            initialMemoryState.universalId,
-            initialMemoryState.videoPaths,
-            'videos');
-
-        notifier.updateState(
-            currentStatus: "Uploading audio...", progress: 0.8);
-        final newAudioUrls = await firestore.uploadFiles(
-            userId,
-            initialMemoryState.universalId,
-            initialMemoryState.audioNotePaths,
-            'audio');
-
+        final newThumbUrls = results[0];
+        final newPhotoUrls = results[1];
+        final newVideoUrls = results[2];
+        final newAudioUrls = results[3];
+        
+        notifier.updateState(currentStatus: "Saving to cloud...", progress: 0.9);
+        
         final memoryForCloud = _buildCloudReadyMemory(
           initialState: initialMemoryState,
           newPhotoUrls: newPhotoUrls,
@@ -308,10 +297,7 @@ class SyncService {
           newAudioUrls: newAudioUrls,
         );
 
-        notifier.updateState(
-            currentStatus: "Saving to cloud...", progress: 0.9);
         await firestore.setMemory(userId, memoryForCloud);
-
         await repo.updateAfterSync(memoryForCloud);
 
         return true;
@@ -374,4 +360,3 @@ class SyncService {
       ..touch();
   }
 }
-

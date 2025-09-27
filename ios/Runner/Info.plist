@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Это приложение использует камеру для добавления фотографий и видео в ваши воспоминания.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Это приложение использует галерею для выбора фотографий и видео для ваших воспоминаний.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Это приложение использует микрофон для записи аудиозаметок к вашим воспоминаниям.</string>
 </dict>
 </plist>

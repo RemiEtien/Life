@@ -158,6 +158,7 @@ class UserService {
       await _usersCollection.doc(uid).delete();
 
       final dir = await getApplicationDocumentsDirectory();
+      // ИСПОЛЬЗУЕМ ТОЛЬКО IsarService для работы с путями, здесь просто удаляем старый файл, если он есть
       final dbFile = File('${dir.path}/lifeline_$uid.isar');
       if (await dbFile.exists()) {
         await dbFile.delete();

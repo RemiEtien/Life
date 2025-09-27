@@ -62,7 +62,6 @@ class FirestoreService {
 
   /// Sets or overwrites a memory document in Firestore using a transaction
   /// to prevent race conditions and resolve sync conflicts.
-  /// The memory object is expected to be ALREADY encrypted if needed.
   Future<void> setMemory(String userId, Memory memory) async {
     if (memory.firestoreId == null) {
       throw Exception("Firestore ID is null, but it should have been generated before saving.");
@@ -74,39 +73,24 @@ class FirestoreService {
         .doc(memory.firestoreId);
 
     try {
+      // ИСПРАВЛЕНИЕ: Возвращаем транзакционную логику
       await _db.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
+        final dataForFirestore = memory.toFirestore();
+        dataForFirestore['lastModified'] = FieldValue.serverTimestamp();
 
         if (!snapshot.exists) {
-          // Document doesn't exist, so we can safely create it.
-          transaction.set(docRef, memory.toFirestore());
-          if (kDebugMode) {
-            print("[Sync Conflict] Remote doc ${memory.firestoreId} does not exist. Creating.");
-          }
+          transaction.set(docRef, dataForFirestore);
         } else {
-          // Document exists, we must check timestamps to resolve conflict.
           final remoteData = snapshot.data();
-          if (remoteData == null) {
-            // Data is null, which is unexpected but we can treat it as non-existent.
-            transaction.set(docRef, memory.toFirestore());
-            return;
-          }
-
-          // --- ИСПРАВЛЕНИЕ: Добавлена проверка на null ---
-          final remoteLastModified = (remoteData['lastModified'] as Timestamp?)?.toDate() ?? (remoteData['date'] as Timestamp).toDate();
-
-          if (memory.lastModified.isAfter(remoteLastModified)) {
-            // Local version is newer, so we overwrite the remote document.
-            transaction.set(docRef, memory.toFirestore());
-            if (kDebugMode) {
-              print("[Sync Conflict] Local is newer for ${memory.firestoreId}. Overwriting remote.");
+          if (remoteData != null) {
+            final remoteLastModified = (remoteData['lastModified'] as Timestamp?)?.toDate();
+            // Записываем, только если локальные данные новее или на сервере нет временной метки
+            if (remoteLastModified == null || memory.lastModified.isAfter(remoteLastModified)) {
+              transaction.set(docRef, dataForFirestore);
             }
           } else {
-            // Remote version is newer or the same. Do nothing.
-            // The outdated local version will be corrected on the next sync from cloud.
-            if (kDebugMode) {
-              print("[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping upload.");
-            }
+             transaction.set(docRef, dataForFirestore);
           }
         }
       });
@@ -119,7 +103,6 @@ class FirestoreService {
 
   /// Updates a memory document in Firestore using a transaction
   /// to prevent race conditions and resolve sync conflicts.
-  /// The memory object is expected to be ALREADY encrypted if needed.
   Future<void> updateMemory(String userId, Memory memory) async {
     if (memory.firestoreId == null) return;
     final docRef = _db
@@ -129,36 +112,26 @@ class FirestoreService {
         .doc(memory.firestoreId);
 
     try {
+      // ИСПРАВЛЕНИЕ: Возвращаем транзакционную логику
       await _db.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
+        final dataForFirestore = memory.toFirestore();
+        dataForFirestore['lastModified'] = FieldValue.serverTimestamp();
 
-        if (!snapshot.exists) {
-          // If we are trying to update a doc that doesn't exist, create it.
-          transaction.set(docRef, memory.toFirestore());
-           if (kDebugMode) {
-            print("[Sync Conflict] Trying to update non-existent doc ${memory.firestoreId}. Creating instead.");
-          }
+        if (snapshot.exists) {
+            final remoteData = snapshot.data();
+            if (remoteData != null) {
+                 final remoteLastModified = (remoteData['lastModified'] as Timestamp?)?.toDate();
+                 if (remoteLastModified == null || memory.lastModified.isAfter(remoteLastModified)) {
+                    transaction.update(docRef, dataForFirestore);
+                 }
+            } else {
+                // Если документ существует, но пустой, можно его просто обновить
+                transaction.update(docRef, dataForFirestore);
+            }
         } else {
-          final remoteData = snapshot.data();
-           if (remoteData == null) {
-            transaction.set(docRef, memory.toFirestore());
-            return;
-          }
-          // --- ИСПРАВЛЕНИЕ: Добавлена проверка на null ---
-          final remoteLastModified = (remoteData['lastModified'] as Timestamp?)?.toDate() ?? (remoteData['date'] as Timestamp).toDate();
-
-          if (memory.lastModified.isAfter(remoteLastModified)) {
-            // Local changes are newer, so apply the update.
-            transaction.update(docRef, memory.toFirestore());
-             if (kDebugMode) {
-              print("[Sync Conflict] Local is newer for ${memory.firestoreId}. Updating remote.");
-            }
-          } else {
-            // Remote is newer, discard local changes by doing nothing.
-             if (kDebugMode) {
-              print("[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping update.");
-            }
-          }
+            // Если документа нет, создаем его
+            transaction.set(docRef, dataForFirestore);
         }
       });
     } catch (e, stackTrace) {

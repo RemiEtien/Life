@@ -294,8 +294,9 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   Key _deriveKey(String password, Uint8List salt) {
+    // ИСПРАВЛЕНИЕ: Увеличено количество итераций до 600,000 (рекомендация OWASP 2024).
     final derivator = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
-      ..init(Pbkdf2Parameters(salt, 100000, 32)); // 32 bytes for AES-256
+      ..init(Pbkdf2Parameters(salt, 600000, 32)); // 32 bytes for AES-256
     return Key(derivator.process(Uint8List.fromList(utf8.encode(password))));
   }
 

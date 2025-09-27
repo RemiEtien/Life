@@ -174,14 +174,11 @@ exports.getTrackDetails = onCall(
  */
 exports.verifyPurchase = onCall(
     {
-      // **ИЗМЕНЕНО:** Включаем принудительную проверку App Check
       enforceAppCheck: true,
-      // **ИЗМЕНЕНО:** Добавляем секрет для iOS
       secrets: [APPLE_SHARED_SECRET],
       cors: true,
     },
     async (request) => {
-      // App Check уже выполнил проверку, если мы дошли досюда
       if (!request.auth) {
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
       }
@@ -195,9 +192,8 @@ exports.verifyPurchase = onCall(
 
       let isValid = false;
       let expiryDate = new Date();
-      // **ИЗМЕНЕНО:** Ожидаемые идентификаторы пакета/бандла
       const expectedPackageName = "com.momentic.lifeline";
-      const expectedBundleId = "com.momentic.lifeline"; // Замените на ваш Bundle ID, если он отличается
+      const expectedBundleId = "com.momentic.lifeline";
 
       try {
         if (platform === "android") {
@@ -216,7 +212,6 @@ exports.verifyPurchase = onCall(
         } else if (platform === "ios") {
           const isSandbox = (process.env.FUNCTIONS_EMULATOR === "true");
           const url = isSandbox ? "https://sandbox.itunes.apple.com/verifyReceipt" : "https://buy.itunes.apple.com/verifyReceipt";
-          // **ИЗМЕНЕНО:** Используем общий секрет
           const secret = APPLE_SHARED_SECRET.value();
           if (!secret) {
               throw new HttpsError("failed-precondition", "Apple Shared Secret is not configured.");
@@ -229,13 +224,19 @@ exports.verifyPurchase = onCall(
           });
 
           if (response.data && response.data.status === 0) {
-            // **ИЗМЕНЕНО:** Проверяем bundle_id и ищем последнюю транзакцию
              const receiptData = response.data.receipt;
              if (receiptData && receiptData.bundle_id === expectedBundleId && response.data.latest_receipt_info) {
-                 const latestTransaction = response.data.latest_receipt_info[0];
+                 // ИСПРАВЛЕНИЕ: Сортируем чеки и берем самый последний.
+                 const sortedReceipts = response.data.latest_receipt_info.sort((a, b) => {
+                     return parseInt(b.expires_date_ms) - parseInt(a.expires_date_ms);
+                 });
+                 const latestTransaction = sortedReceipts[0];
                  if (latestTransaction && latestTransaction.expires_date_ms) {
-                     isValid = true;
-                     expiryDate = new Date(parseInt(latestTransaction.expires_date_ms));
+                     const expiryTimestamp = parseInt(latestTransaction.expires_date_ms);
+                     if (expiryTimestamp > Date.now()) {
+                        isValid = true;
+                        expiryDate = new Date(expiryTimestamp);
+                     }
                  }
              }
           }
@@ -309,4 +310,3 @@ exports.deleteUserData = functions.auth.user().onDelete(async (user) => {
   console.log(`Finished cleanup for user: ${uid}`);
   return null;
 });
-
