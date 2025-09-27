@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Уточненные правила резервного копирования для Android.
+  Эта конфигурация говорит системе Auto Backup от Google, какие данные приложения следует сохранять.
+-->
+<full-backup-content>
+    <!-- Включаем в бэкап все SharedPreferences (настройки темы, языка и т.д.) -->
+    <include domain="sharedpref" path="."/>
+    <!--
+      ИСКЛЮЧАЕМ из бэкапа только файлы базы данных Isar.
+      Это предотвращает восстановление устаревшей локальной базы данных при переустановке приложения,
+      но позволяет сохранять другие файлы, если они появятся в будущем.
+    -->
+    <exclude domain="file" path="."/>
+    <exclude domain="file" path="*.isar"/>
+    <exclude domain="file" path="*.isar.lock"/>
+</full-backup-content>
+

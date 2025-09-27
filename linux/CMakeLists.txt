@@ -9,14 +9,6 @@ set(BINARY_NAME "lifeline")
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 set(APPLICATION_ID "com.example.lifeline")
 
-# Skip Linux-specific configuration when configuring on non-Linux hosts.
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  message(STATUS "Skipping Linux target configuration on non-Linux host.")
-  add_custom_target(flutter_assemble)
-  return()
-endif()
-
-
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
@@ -56,6 +48,16 @@ endfunction()
 
 # Flutter library and tool build rules.
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
+if (WIN32)
+  message(STATUS "Skipping Linux desktop project on Windows host.")
+  return()
+endif()
+
+if (NOT EXISTS "${FLUTTER_MANAGED_DIR}/ephemeral/generated_config.cmake")
+  message(STATUS "Skipping Linux desktop project: generated_config.cmake not found.")
+  return()
+endif()
+
 add_subdirectory(${FLUTTER_MANAGED_DIR})
 
 # System-level dependencies.

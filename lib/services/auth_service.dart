@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lifeline/providers/application_providers.dart';
+import 'package:lifeline/services/encryption_service.dart';
 import 'package:lifeline/services/isar_service.dart';
 import 'package:lifeline/services/user_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,11 +21,11 @@ class AuthService {
   GoogleSignInAccount? _currentUser;
   Completer<GoogleSignInAccount?>? _signInCompleter;
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authEventSubscription;
-  
+
   AuthService(this._ref);
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  
+
   UserService get _userService => _ref.read(userServiceProvider);
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
@@ -34,9 +35,10 @@ class AuthService {
     if (!_isInitialized) {
       try {
         await GoogleSignIn.instance.initialize();
-        
+
         // ИСПРАВЛЕНО: Подписываемся на события и правильно обрабатываем состояние
-        _authEventSubscription = GoogleSignIn.instance.authenticationEvents.listen((event) {
+        _authEventSubscription =
+            GoogleSignIn.instance.authenticationEvents.listen((event) {
           switch (event) {
             case GoogleSignInAuthenticationEventSignIn():
               _currentUser = event.user;
@@ -54,7 +56,7 @@ class AuthService {
               break;
           }
         });
-        
+
         // Обрабатываем ошибки отдельно
         _authEventSubscription!.onError((error) {
           if (kDebugMode) {
@@ -65,7 +67,7 @@ class AuthService {
             _signInCompleter!.completeError(error);
           }
         });
-        
+
         _isInitialized = true;
       } catch (e) {
         if (kDebugMode) {
@@ -113,61 +115,57 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    // ОПТИМИЗИРОВАНО: Максимально быстрый выход без лишних операций
-    
-    // Очищаем состояние Google Sign-In синхронно
+    // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Блокируем сессию шифрования ДО выхода из системы ***
+    // Это предотвращает состояние гонки, когда профиль пользователя исчезает
+    // до того, как сервис шифрования успеет перейти в состояние "locked".
+    await _ref.read(encryptionServiceProvider.notifier).lockSession();
+
     _currentUser = null;
     if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
       _signInCompleter!.complete(null);
       _signInCompleter = null;
     }
     
-    // Запускаем операции параллельно для ускорения
+    // Запускаем остальные операции по очистке параллельно для ускорения
     final futures = <Future>[];
-    
-    // 1. Google Sign-Out (если нужен)
+
     if (_isInitialized) {
-      futures.add(
-        GoogleSignIn.instance.signOut().catchError((e) {
-          // Игнорируем ошибки Google signOut - не критично
-          if (kDebugMode) print("Google signOut error (ignored): $e");
-        })
-      );
+      futures.add(GoogleSignIn.instance.signOut().catchError((e) {
+        if (kDebugMode) print("Google signOut error (ignored): $e");
+      }));
     }
     
-    // 2. Firebase Sign-Out (критично)
     futures.add(_firebaseAuth.signOut());
     
-    // 3. Isar close (может быть медленным, делаем неблокирующим)
     unawaited(IsarService.close().catchError((e) {
       if (kDebugMode) print("IsarService close error (ignored): $e");
     }));
-    
-    // Ждем только критичные операции (Google + Firebase)
+
     try {
       await Future.wait(futures, eagerError: false);
     } catch (e) {
-      // Даже если что-то пошло не так, продолжаем
-      if (kDebugMode) print("SignOut error (continuing): $e");
+      if (kDebugMode) print("SignOut cleanup error (continuing): $e");
     }
   }
 
   Future<UserCredential?> signInWithGoogle(BuildContext context) async {
     try {
       await _ensureGoogleSignInInitialized();
-      
+
       // ИСПРАВЛЕНО: Создаем Completer для ожидания результата аутентификации
       _signInCompleter = Completer<GoogleSignInAccount?>();
-      
+
       // Запускаем аутентификацию
       if (GoogleSignIn.instance.supportsAuthenticate()) {
         await GoogleSignIn.instance.authenticate();
       } else {
-        throw UnsupportedError('Google Sign-In authentication not supported on this platform');
+        throw UnsupportedError(
+            'Google Sign-In authentication not supported on this platform');
       }
 
       // ИСПРАВЛЕНО: Ждем событие аутентификации с таймаутом
-      final GoogleSignInAccount? googleUser = await _signInCompleter!.future.timeout(
+      final GoogleSignInAccount? googleUser =
+          await _signInCompleter!.future.timeout(
         const Duration(seconds: 30),
         onTimeout: () {
           if (kDebugMode) {
@@ -176,23 +174,23 @@ class AuthService {
           return null;
         },
       );
-      
+
       _signInCompleter = null;
-      
+
       if (googleUser == null) {
         return null; // Пользователь отменил вход или таймаут
       }
 
       // ИСПРАВЛЕНО: Получаем токены через новый API authorizationClient
       const scopes = ['email', 'profile', 'openid'];
-      
+
       // Пробуем получить существующую авторизацию
-      var authorization = await googleUser.authorizationClient
-          .authorizationForScopes(scopes);
-      
+      var authorization =
+          await googleUser.authorizationClient.authorizationForScopes(scopes);
+
       // Если нет существующей авторизации, запрашиваем новую
-      authorization ??= await googleUser.authorizationClient
-          .authorizeScopes(scopes);
+      authorization ??=
+          await googleUser.authorizationClient.authorizeScopes(scopes);
 
       // Создаем credential только с accessToken (idToken недоступен в v7.2.0)
       final credential = GoogleAuthProvider.credential(
@@ -231,7 +229,7 @@ class AuthService {
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
+          AppleIDAuthorizationScopes.fullName
         ],
       );
 
@@ -242,8 +240,8 @@ class AuthService {
 
       final userCredential =
           await _firebaseAuth.signInWithCredential(oAuthCredential);
-      
-      if(context.mounted) {
+
+      if (context.mounted) {
         await _userService.ensureUserProfileExists(userCredential.user!, context);
       }
 
@@ -320,7 +318,7 @@ class AuthService {
       email: user.email!,
       password: password,
     );
-    
+
     await user.reauthenticateWithCredential(credential);
   }
 
@@ -330,32 +328,33 @@ class AuthService {
     if (user == null) throw Exception('No user to reauthenticate.');
 
     await _ensureGoogleSignInInitialized();
-    
+
     // ИСПРАВЛЕНО: Используем тот же механизм ожидания событий
     _signInCompleter = Completer<GoogleSignInAccount?>();
-    
+
     if (GoogleSignIn.instance.supportsAuthenticate()) {
       await GoogleSignIn.instance.authenticate();
     } else {
       throw UnsupportedError('Google authentication not supported');
     }
 
-    final GoogleSignInAccount? googleUser = await _signInCompleter!.future.timeout(
+    final GoogleSignInAccount? googleUser =
+        await _signInCompleter!.future.timeout(
       const Duration(seconds: 30),
       onTimeout: () => throw Exception('Google reauthentication timeout'),
     );
-    
+
     _signInCompleter = null;
-    
+
     if (googleUser == null) throw Exception('User cancelled sign in.');
 
     // Получаем токены
     const scopes = ['email', 'profile', 'openid'];
-    var authorization = await googleUser.authorizationClient
-        .authorizationForScopes(scopes);
-    
-    authorization ??= await googleUser.authorizationClient
-        .authorizeScopes(scopes);
+    var authorization =
+        await googleUser.authorizationClient.authorizationForScopes(scopes);
+
+    authorization ??=
+        await googleUser.authorizationClient.authorizeScopes(scopes);
 
     final credential = GoogleAuthProvider.credential(
       accessToken: authorization.accessToken,
@@ -367,9 +366,12 @@ class AuthService {
   Future<void> reauthenticateWithApple() async {
     final user = _firebaseAuth.currentUser;
     if (user == null) throw Exception('No user to reauthenticate.');
-    
+
     final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName
+      ],
     );
     final credential = OAuthProvider("apple.com").credential(
       idToken: appleCredential.identityToken,
@@ -386,3 +388,4 @@ class AuthService {
     }
   }
 }
+

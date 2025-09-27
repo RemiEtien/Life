@@ -1,21 +1,17 @@
 # This file controls Flutter-level build steps. It should not be edited.
 cmake_minimum_required(VERSION 3.10)
 
-# Allow configuring this stub project on non-Linux hosts without requiring Linux tooling.
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  message(STATUS "Skipping Flutter linux build configuration on non-Linux host.")
-  add_library(flutter INTERFACE)
-  target_include_directories(flutter INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
-  add_custom_target(flutter_assemble)
-  set(FLUTTER_LIBRARY "${CMAKE_COMMAND}" PARENT_SCOPE)
-  set(FLUTTER_ICU_DATA_FILE "${CMAKE_COMMAND}" PARENT_SCOPE)
-  set(PROJECT_BUILD_DIR "${CMAKE_BINARY_DIR}/" PARENT_SCOPE)
-  set(AOT_LIBRARY "${CMAKE_COMMAND}" PARENT_SCOPE)
+set(EPHEMERAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ephemeral")
+
+if (WIN32)
+  message(STATUS "Skipping Linux desktop build setup on Windows host.")
   return()
 endif()
 
-set(EPHEMERAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ephemeral")
-
+if (NOT EXISTS "${EPHEMERAL_DIR}/generated_config.cmake")
+  message(STATUS "Skipping Linux desktop build setup: generated_config.cmake not found.")
+  return()
+endif()
 # Configuration provided via flutter tool.
 include(${EPHEMERAL_DIR}/generated_config.cmake)
 
@@ -99,4 +95,3 @@ add_custom_target(flutter_assemble DEPENDS
   "${FLUTTER_LIBRARY}"
   ${FLUTTER_LIBRARY_HEADERS}
 )
-

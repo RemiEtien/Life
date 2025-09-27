@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lifeline/memory.dart';
 import 'package:lifeline/widgets/device_performance_detector.dart';
+import 'package:collection/collection.dart';
 import 'package:lifeline/widgets/lifeline_widget.dart'; // Import for YearPosition
 
 // --- NEW: A dedicated class to hold performance timings ---
@@ -133,7 +134,8 @@ class BackgroundPainter extends CustomPainter {
       final center = Offset(
           (random.nextDouble() * size.width * 1.5) - (size.width * 0.25),
           (random.nextDouble() * size.height * 1.2) - (size.height * 0.1));
-      final animatedCenter = (capabilities.performance != DevicePerformance.low)
+      final animatedCenter = (capabilities.performance !=
+              DevicePerformance.low)
           ? center.translate(sin(progress * pi * 2 * 0.2 + i) * 100,
               cos(progress * pi * 2 * 0.3 + i) * 50)
           : center;
@@ -156,8 +158,8 @@ class BackgroundPainter extends CustomPainter {
 
     final starCount = DevicePerformanceDetector.getAdaptiveParticleCount(200);
     for (int i = 0; i < starCount; i++) {
-      final starPos = Offset(
-          random.nextDouble() * size.width, random.nextDouble() * size.height);
+      final starPos =
+          Offset(random.nextDouble() * size.width, random.nextDouble() * size.height);
       final twinkle = (capabilities.performance != DevicePerformance.low)
           ? sin(progress * pi * 2 * 1.0 + i * 0.1) * 0.5 + 0.5
           : 0.75;
@@ -252,23 +254,23 @@ class StructurePainter extends CustomPainter {
 
     if (maxLayers > 4) {
       paint.strokeWidth = (40.0 * pulse * width * intensity).clamp(1.0, 200.0);
-      paint.color = baseColor.withValues(alpha: 0.1 * intensity);
+      paint.color = baseColor.withOpacity(0.1 * intensity);
       canvas.drawPath(path, paint);
     }
     if (maxLayers > 2) {
       paint.strokeWidth = (15.0 * pulse * width * intensity).clamp(1.0, 100.0);
-      paint.color = baseColor.withValues(alpha: 0.2 * intensity);
+      paint.color = baseColor.withOpacity(0.2 * intensity);
       canvas.drawPath(path, paint);
     }
     if (maxLayers > 1) {
       paint.strokeWidth = (6.0 * pulse * width * intensity).clamp(1.0, 50.0);
-      paint.color = baseColor.withValues(alpha: 0.7 * intensity);
+      paint.color = baseColor.withOpacity(0.7 * intensity);
       canvas.drawPath(path, paint);
     }
     if (maxLayers > 0) {
       paint.strokeWidth = (2.0 * pulse * width).clamp(1.0, 10.0);
-      paint.color = Color.lerp(baseColor, Colors.white, 0.8)!
-          .withValues(alpha: 0.9 * intensity);
+      paint.color =
+          Color.lerp(baseColor, Colors.white, 0.8)!.withOpacity(0.9 * intensity);
       canvas.drawPath(path, paint);
     }
   }
@@ -297,8 +299,7 @@ class StructurePainter extends CustomPainter {
           fontFamily: textStyle.fontFamily,
           fontSize: textStyle.fontSize,
           fontWeight: textStyle.fontWeight,
-        ))
-          ..addText(yearPos.year.toString());
+        ))..addText(yearPos.year.toString());
         final paragraph = textBuilder.build()
           ..layout(const ui.ParagraphConstraints(width: 50));
         final textPos = Offset(yearPos.x - paragraph.width / 2, lineY - 25);
@@ -359,12 +360,8 @@ class LifelinePainter extends CustomPainter {
 
     final mainPath = renderData.mainPath;
     final placementResults = renderData.placementResults;
-    final visibleRect =
-        canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
-    final macroToDetail =
-        ((zoomScale - (kMacroDetailThreshold - kTransitionRange / 2)) /
-                kTransitionRange)
-            .clamp(0.0, 1.0);
+    final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
+    final macroToDetail = ((zoomScale - (kMacroDetailThreshold - kTransitionRange / 2)) / kTransitionRange).clamp(0.0, 1.0);
     final macroOpacity = 1.0 - macroToDetail;
     final detailOpacity = macroToDetail;
 
@@ -382,8 +379,7 @@ class LifelinePainter extends CustomPainter {
       final branches =
           renderData.branches; // These paths are pre-animated from the isolate
       const arteryColor = Color(0xFFFF8A80);
-      final branchLayerCount =
-          DevicePerformanceDetector.getAdaptiveLayerCount(4);
+      final branchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(4);
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
 
       for (final branchPath in branches) {
@@ -426,8 +422,8 @@ class LifelinePainter extends CustomPainter {
             final index = memories
                 .indexWhere((m) => m.universalId == item.memory.universalId);
             final image = images[item.memory.coverPath];
-            _drawSingleMemoryNode(canvas, item.nodePosition, item.memory, index,
-                detailOpacity, image);
+            _drawSingleMemoryNode(
+                canvas, item.nodePosition, item.memory, index, detailOpacity, image);
             onNodePosition?.call(item.memory.universalId, item.nodePosition);
           }
         } else if (item is DailyClusterPlacementInfo) {
@@ -435,8 +431,7 @@ class LifelinePainter extends CustomPainter {
               .inflate(kDailyClusterBaseRadius * 2)
               .contains(item.position)) {
             final image = images[item.memories.first.coverPath];
-            _drawDailyClusterNode(
-                canvas, item.position, item, detailOpacity, image);
+            _drawDailyClusterNode(canvas, item.position, item, detailOpacity, image);
             onDailyClusterPosition?.call(item.id, item.position, item.memories);
           }
         } else if (item is TimeGapPlacementInfo) {
@@ -484,8 +479,9 @@ class LifelinePainter extends CustomPainter {
     final maxCount = memoriesPerYear.values.reduce(max);
     memoriesPerYear.forEach((year, count) {
       final firstDayOfYear = DateTime(year);
-      final t = (firstDayOfYear.difference(minDate).inMilliseconds / totalSpan)
-          .clamp(0.0, 1.0);
+      final t =
+          (firstDayOfYear.difference(minDate).inMilliseconds / totalSpan)
+              .clamp(0.0, 1.0);
       final pos = metrics.getTangentForOffset(t * totalLen)?.position;
       if (pos != null) {
         final intensity = count / maxCount;
@@ -500,7 +496,6 @@ class LifelinePainter extends CustomPainter {
     });
   }
 
-  // ignore: unused_element
   Offset? _getPositionAtT(
       double t, List<ui.PathMetric> metrics, double totalLen) {
     final dist = t * totalLen;
@@ -552,13 +547,10 @@ class LifelinePainter extends CustomPainter {
 
       final textX = calculateTextX(nodePos);
 
-      final topRect = Rect.fromLTWH(
-          textX,
-          nodePos.dy - verticalOffset - paragraph.height,
-          paragraph.width,
-          paragraph.height);
-      final bottomRect = Rect.fromLTWH(textX, nodePos.dy + verticalOffset,
-          paragraph.width, paragraph.height);
+      final topRect = Rect.fromLTWH(textX,
+          nodePos.dy - verticalOffset - paragraph.height, paragraph.width, paragraph.height);
+      final bottomRect =
+          Rect.fromLTWH(textX, nodePos.dy + verticalOffset, paragraph.width, paragraph.height);
 
       bool placeAbove;
 
@@ -590,8 +582,8 @@ class LifelinePainter extends CustomPainter {
     }
   }
 
-  void _drawConnectorLine(Canvas canvas, Offset nodePos, Rect textRect,
-      bool isAbove, double opacity) {
+  void _drawConnectorLine(
+      Canvas canvas, Offset nodePos, Rect textRect, bool isAbove, double opacity) {
     final linePaint = Paint()
       ..color = Colors.white.withAlpha((255 * 0.4 * opacity).round())
       ..strokeWidth = 1.0
@@ -600,8 +592,8 @@ class LifelinePainter extends CustomPainter {
 
     final adjustedNodePos = nodePos.translate(0, kNodeVerticalOffset);
 
-    final startPoint = Offset(adjustedNodePos.dx,
-        adjustedNodePos.dy + (isAbove ? -nodeOffset : nodeOffset));
+    final startPoint = Offset(
+        adjustedNodePos.dx, adjustedNodePos.dy + (isAbove ? -nodeOffset : nodeOffset));
     final endPoint = isAbove
         ? Offset(adjustedNodePos.dx, textRect.bottom)
         : Offset(adjustedNodePos.dx, textRect.top);
@@ -609,8 +601,8 @@ class LifelinePainter extends CustomPainter {
     canvas.drawLine(startPoint, endPoint, linePaint);
   }
 
-  void _drawSingleMemoryNode(Canvas canvas, Offset pos, Memory memory,
-      int index, double opacity, ui.Image? image) {
+  void _drawSingleMemoryNode(Canvas canvas, Offset pos, Memory memory, int index,
+      double opacity, ui.Image? image) {
     final individualPulse = sin(pulseValue * pi * 2 + index * 0.8) * 0.3 + 0.7;
     final breathPulse = sin(progress * pi * 0.5 + index * 0.5) * 0.2 + 0.8;
     final combinedPulse = individualPulse * breathPulse;
@@ -620,8 +612,7 @@ class LifelinePainter extends CustomPainter {
     final adjustedPos = pos.translate(0, kNodeVerticalOffset);
 
     if (image != null) {
-      final imageRect =
-          Rect.fromCircle(center: adjustedPos, radius: nodeRadius);
+      final imageRect = Rect.fromCircle(center: adjustedPos, radius: nodeRadius);
       final imagePath = Path()..addOval(imageRect);
 
       final borderPaint = Paint()
@@ -643,8 +634,8 @@ class LifelinePainter extends CustomPainter {
             (imgWidth - croppedWidth) / 2, 0, croppedWidth, imgHeight);
       } else {
         final croppedHeight = imgWidth;
-        srcRect = Rect.fromLTWH(
-            0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
+        srcRect =
+            Rect.fromLTWH(0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
       }
 
       canvas.drawImageRect(image, srcRect, imageRect, Paint());
@@ -656,29 +647,29 @@ class LifelinePainter extends CustomPainter {
     }
   }
 
-  void _drawDefaultNode(Canvas canvas, Offset adjustedPos, double nodeRadius,
-      double opacity, int index) {
+  void _drawDefaultNode(
+      Canvas canvas, Offset adjustedPos, double nodeRadius, double opacity, int index) {
     final combinedPulse = nodeRadius / (kNodeBaseRadius * 1.5);
     final paint = Paint();
     const nodeColor = Color(0xFFFF6B6B);
 
-    paint.color = nodeColor.withValues(alpha: (0.6 * combinedPulse) * opacity);
+    paint.color = nodeColor.withOpacity((0.6 * combinedPulse) * opacity);
     canvas.drawCircle(adjustedPos, nodeRadius, paint);
 
     final coreColor = Color.lerp(nodeColor, Colors.white, 0.6)!;
-    paint.color = coreColor.withValues(alpha: (0.9 * combinedPulse) * opacity);
+    paint.color = coreColor.withOpacity((0.9 * combinedPulse) * opacity);
     canvas.drawCircle(adjustedPos, nodeRadius * 0.7, paint);
 
     final brightIntensity = 0.7 + sin(pulseValue * pi * 4 + index * 1.2) * 0.3;
-    paint.color = Colors.white
-        .withValues(alpha: 0.9 * brightIntensity * combinedPulse * opacity);
+    paint.color =
+        Colors.white.withOpacity(0.9 * brightIntensity * combinedPulse * opacity);
     canvas.drawCircle(adjustedPos, nodeRadius * 0.3, paint);
   }
 
   void _drawDailyClusterNode(Canvas canvas, Offset pos,
       DailyClusterPlacementInfo clusterInfo, double opacity, ui.Image? image) {
-    final index = memories.indexWhere(
-        (m) => m.universalId == clusterInfo.memories.first.universalId);
+    final index = memories
+        .indexWhere((m) => m.universalId == clusterInfo.memories.first.universalId);
     final individualPulse = sin(pulseValue * pi * 2 + index * 0.8) * 0.3 + 0.7;
     final breathPulse = sin(progress * pi * 0.5 + index * 0.5) * 0.2 + 0.8;
     final combinedPulse = individualPulse * breathPulse;
@@ -686,13 +677,12 @@ class LifelinePainter extends CustomPainter {
 
     final adjustedPos = pos.translate(0, kNodeVerticalOffset);
 
-    _drawSingleMemoryNode(
-        canvas, pos, clusterInfo.memories.first, index, opacity, image);
+    _drawSingleMemoryNode(canvas, pos, clusterInfo.memories.first, index, opacity, image);
 
     final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
 
     final ringPaint = Paint()
-      ..color = ringColor.withValues(alpha: 0.7 * combinedPulse * opacity)
+      ..color = ringColor.withOpacity(0.7 * combinedPulse * opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0 * combinedPulse;
     canvas.drawCircle(adjustedPos, nodeRadius * 1.5, ringPaint);
@@ -701,7 +691,7 @@ class LifelinePainter extends CustomPainter {
         DevicePerformanceDetector.getAdaptiveBlurRadius(10 * combinedPulse);
     if (ringBlur > 0) {
       final ringGlow = Paint()
-        ..color = ringColor.withValues(alpha: 0.3 * combinedPulse * opacity)
+        ..color = ringColor.withOpacity(0.3 * combinedPulse * opacity)
         ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, ringBlur)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 4.0;
@@ -709,24 +699,24 @@ class LifelinePainter extends CustomPainter {
     }
 
     final textStyle = GoogleFonts.orbitron(
-        color: ringColor.withValues(alpha: opacity),
+        color: ringColor.withOpacity(opacity),
         fontSize: 10.0,
         fontWeight: FontWeight.bold,
         shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)]);
-    final textSpan = TextSpan(
-        text: clusterInfo.memories.length.toString(), style: textStyle);
+    final textSpan =
+        TextSpan(text: clusterInfo.memories.length.toString(), style: textStyle);
     final textPainter = TextPainter(
         text: textSpan,
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr);
     textPainter.layout();
-    final textPos = Offset(adjustedPos.dx - textPainter.width / 2,
-        adjustedPos.dy - textPainter.height / 2);
+    final textPos = Offset(
+        adjustedPos.dx - textPainter.width / 2, adjustedPos.dy - textPainter.height / 2);
     textPainter.paint(canvas, textPos);
   }
 
-  void _drawTimeGapMarker(Canvas canvas, TimeGapPlacementInfo info,
-      Size canvasSize, double opacity) {
+  void _drawTimeGapMarker(
+      Canvas canvas, TimeGapPlacementInfo info, Size canvasSize, double opacity) {
     final pos = info.position.translate(0, 20.0);
 
     final textStyle = GoogleFonts.orbitron(
@@ -748,9 +738,8 @@ class LifelinePainter extends CustomPainter {
     textPainter.paint(canvas, textPos);
   }
 
-  // ignore: unused_element
-  void _drawNodeSparks(Canvas canvas, Offset center, double radius,
-      int nodeIndex, double intensity) {
+  void _drawNodeSparks(
+      Canvas canvas, Offset center, double radius, int nodeIndex, double intensity) {
     final random = Random(nodeIndex * 42);
     for (int i = 0; i < 6; i++) {
       final angle = (i * pi * 2 / 6) + progress * pi * 0.2;
@@ -762,9 +751,8 @@ class LifelinePainter extends CustomPainter {
           DevicePerformanceDetector.getAdaptiveBlurRadius(sparkSize);
       final sparkPaint = Paint()
         ..color = Colors.white.withAlpha((255 * 0.6 * intensity).round())
-        ..maskFilter = sparkBlur > 0
-            ? ui.MaskFilter.blur(ui.BlurStyle.normal, sparkBlur)
-            : null;
+        ..maskFilter =
+            sparkBlur > 0 ? ui.MaskFilter.blur(ui.BlurStyle.normal, sparkBlur) : null;
       canvas.drawCircle(sparkPos, sparkSize, sparkPaint);
     }
   }
@@ -780,3 +768,4 @@ class LifelinePainter extends CustomPainter {
         old.renderData != renderData;
   }
 }
+

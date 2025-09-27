@@ -10,7 +10,6 @@ part 'memory.g.dart';
 // flutter pub run build_runner build --delete-conflicting-outputs
 // ---------------------------------------------------------------------------
 
-
 /// **ИСПРАВЛЕНО:** Надежно извлекает базовый ключ файла из любого типа пути.
 String getFileKey(String path) {
   try {
@@ -32,7 +31,6 @@ String getFileKey(String path) {
   }
 }
 
-
 @collection
 class Memory {
   Id id = Isar.autoIncrement;
@@ -49,27 +47,26 @@ class Memory {
   String? userId;
 
   late String title;
-  
+
   String? content;
-  
+
   @Index()
   late DateTime date;
-  
+
   late DateTime lastModified;
 
   List<String> mediaPaths = [];
   List<String> videoPaths = [];
-  
+
   List<String> mediaUrls = [];
   List<String> videoUrls = [];
-  
+
   List<String> mediaThumbPaths = [];
   List<String> mediaThumbUrls = [];
 
-
   @ignore
   bool get isSynced => syncStatus == 'synced';
-  
+
   @Index()
   String syncStatus = 'pending';
 
@@ -96,7 +93,7 @@ class Memory {
   List<String> audioKeysOrder = [];
 
   List<String> emotionsData = [];
-  
+
   /// **НОВОЕ ПОЛЕ:** Временное поле для отслеживания миграции данных на лету.
   @ignore
   bool wasMigrated = false;
@@ -117,8 +114,10 @@ class Memory {
     return map;
   }
 
+  @ignore
   set emotions(Map<String, int> newEmotions) {
-    emotionsData = newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
+    emotionsData =
+        newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
   }
 
   Memory() {
@@ -135,81 +134,80 @@ class Memory {
   @ignore
   List<String> get displayableMediaPaths {
     final allPaths = [...mediaPaths, ...mediaUrls];
-    final pathMap = { for (var p in allPaths) getFileKey(p) : p };
-    
+    final pathMap = {for (var p in allPaths) getFileKey(p): p};
+
     final orderedPaths = <String>[];
     for (var key in mediaKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
         if (path.startsWith('http') || File(path).existsSync()) {
-            orderedPaths.add(path);
+          orderedPaths.add(path);
         }
       }
     }
     return orderedPaths;
   }
-  
+
   @ignore
   List<String> get displayableThumbPaths {
     final allThumbs = [...mediaThumbPaths, ...mediaThumbUrls];
-    
+
     // Primary logic: Try to find ordered thumbnails
     if (allThumbs.isNotEmpty && mediaKeysOrder.isNotEmpty) {
-        final thumbMap = { for (var p in allThumbs) getFileKey(p) : p };
-        final orderedThumbs = <String>[];
-        for (var key in mediaKeysOrder) {
-            if (thumbMap.containsKey(key)) {
-                final path = thumbMap[key]!;
-                if (path.startsWith('http') || File(path).existsSync()) {
-                    orderedThumbs.add(path);
-                }
-            }
+      final thumbMap = {for (var p in allThumbs) getFileKey(p): p};
+      final orderedThumbs = <String>[];
+      for (var key in mediaKeysOrder) {
+        if (thumbMap.containsKey(key)) {
+          final path = thumbMap[key]!;
+          if (path.startsWith('http') || File(path).existsSync()) {
+            orderedThumbs.add(path);
+          }
         }
-        
-        if (orderedThumbs.isNotEmpty) {
-            return orderedThumbs;
-        }
+      }
+
+      if (orderedThumbs.isNotEmpty) {
+        return orderedThumbs;
+      }
     }
-    
+
     // Fallback logic: If no thumbnails were found, use the main media paths.
     // This is crucial for old memories.
     final mainPaths = displayableMediaPaths;
     if (mainPaths.isNotEmpty) {
-        return mainPaths;
+      return mainPaths;
     }
-    
+
     return []; // Return empty list if nothing is found
   }
-
 
   @ignore
   List<String> get displayableVideoPaths {
     final allPaths = [...videoPaths, ...videoUrls];
-    final pathMap = { for (var p in allPaths) getFileKey(p) : p };
+    final pathMap = {for (var p in allPaths) getFileKey(p): p};
 
     final orderedPaths = <String>[];
     for (var key in videoKeysOrder) {
       if (pathMap.containsKey(key)) {
-         final path = pathMap[key]!;
+        final path = pathMap[key]!;
         if (path.startsWith('http') || File(path).existsSync()) {
-            orderedPaths.add(path);
+          orderedPaths.add(path);
         }
       }
     }
     return orderedPaths;
   }
-  
+
   @ignore
   List<String> get displayableAudioPaths {
     final allPaths = [...audioNotePaths, ...audioUrls];
-    final pathMap = { for (var p in allPaths) getFileKey(p) : p };
+    final pathMap = {for (var p in allPaths) getFileKey(p): p};
 
     final orderedPaths = <String>[];
     for (var key in audioKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
         if (path.startsWith('http') || File(path).existsSync()) {
-            orderedPaths.add(path);
+          orderedPaths.add(path);
         }
       }
     }
@@ -221,11 +219,11 @@ class Memory {
     final paths = displayableMediaPaths;
     return paths.isNotEmpty ? paths.first : null;
   }
-  
+
   @ignore
   String? get coverThumbPath {
-      final paths = displayableThumbPaths;
-      return paths.isNotEmpty ? paths.first : null;
+    final paths = displayableThumbPaths;
+    return paths.isNotEmpty ? paths.first : null;
   }
 
   Memory copyWith({
@@ -302,12 +300,11 @@ class Memory {
     if (emotions != null) {
       newMemory.emotions = emotions;
     } else {
-      newMemory.emotionsData = List.from(emotionsData);
+      newMemory.emotionsData = List.from(this.emotionsData);
     }
 
     return newMemory;
   }
-
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -319,7 +316,7 @@ class Memory {
       'mediaUrls': mediaUrls,
       'videoUrls': videoUrls,
       'audioUrls': audioUrls,
-      'mediaThumbUrls': mediaThumbUrls, 
+      'mediaThumbUrls': mediaThumbUrls,
       'syncStatus': syncStatus,
       'spotifyTrackIds': spotifyTrackIds,
       'ambientSound': ambientSound,
@@ -333,7 +330,7 @@ class Memory {
       'reflectionFollowUpAt': reflectionFollowUpAt != null
           ? Timestamp.fromDate(reflectionFollowUpAt!)
           : null,
-      'isEncrypted': isEncrypted, 
+      'isEncrypted': isEncrypted,
       'reflectionActionCompleted': reflectionActionCompleted,
       'emotions': emotions,
       'mediaKeysOrder': mediaKeysOrder.map((key) => getFileKey(key)).toList(),
@@ -342,21 +339,27 @@ class Memory {
     };
   }
 
-  factory Memory.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  factory Memory.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.data()!;
     final memory = Memory()
       ..firestoreId = snapshot.id
-      ..userId = data['userId']
+      ..userId =
+          (data['userId'] as String?) ?? snapshot.reference.parent.parent?.id
       ..title = data['title'] ?? ''
       ..content = data['content']
       ..date = (data['date'] as Timestamp).toDate()
-      ..lastModified = (data['lastModified'] as Timestamp? ?? data['date'] as Timestamp).toDate()
+      ..lastModified =
+          (data['lastModified'] as Timestamp? ?? data['date'] as Timestamp)
+              .toDate()
       ..mediaUrls = List<String>.from(data['mediaUrls'] ?? [])
       ..videoUrls = List<String>.from(data['videoUrls'] ?? [])
-      ..audioUrls = List<String>.from(data['audioUrls'] ?? (data['audioUrl'] != null ? [data['audioUrl']] : []))
+      ..audioUrls = List<String>.from(data['audioUrls'] ??
+          (data['audioUrl'] != null ? [data['audioUrl']] : []))
       ..mediaThumbUrls = List<String>.from(data['mediaThumbUrls'] ?? [])
       ..syncStatus = data['syncStatus'] ?? 'synced'
-      ..spotifyTrackIds = List<String>.from(data['spotifyTrackIds'] ?? (data['spotifyTrackId'] != null ? [data['spotifyTrackId']] : []))
+      ..spotifyTrackIds = List<String>.from(data['spotifyTrackIds'] ??
+          (data['spotifyTrackId'] != null ? [data['spotifyTrackId']] : []))
       ..ambientSound = data['ambientSound']
       ..reflectionImpact = data['reflectionImpact']
       ..reflectionLesson = data['reflectionLesson']
@@ -370,61 +373,76 @@ class Memory {
           : null
       ..isEncrypted = data['isEncrypted'] ?? data['reflectionPrivate'] ?? false
       ..reflectionActionCompleted = data['reflectionActionCompleted'] ?? false;
-      
-    memory.wasMigrated = false; // По умолчанию считаем, что миграция не требовалась
+
+    memory.wasMigrated =
+        false; // По умолчанию считаем, что миграция не требовалась
 
     final emotionsData = data['emotions'];
     if (emotionsData is List) {
       memory.emotions = {for (var e in emotionsData.cast<String>()) e: 50};
     } else if (emotionsData is Map) {
-      memory.emotions = Map<String, int>.from(
-          emotionsData.map((key, value) => MapEntry(key, (value as num).toInt())));
+      memory.emotions = Map<String, int>.from(emotionsData
+          .map((key, value) => MapEntry(key, (value as num).toInt())));
     } else {
       memory.emotions = {};
     }
 
     if (data.containsKey('audioNotePath') && data['audioNotePath'] != null) {
-        memory.audioNotePaths.add(data['audioNotePath']);
+      memory.audioNotePaths.add(data['audioNotePath']);
     }
 
     // --- ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ: Миграция и нормализация ключей и миниатюр при загрузке ---
-    
+
     // 1. Обработка КЛЮЧЕЙ МЕДИА
     final rawMediaKeysOrder = List<String>.from(data['mediaKeysOrder'] ?? []);
     if (rawMediaKeysOrder.isEmpty && memory.mediaUrls.isNotEmpty) {
-      if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.mediaUrls.length} media keys from mediaUrls.");
-      memory.mediaKeysOrder = memory.mediaUrls.map((url) => getFileKey(url)).toList();
+      if (kDebugMode)
+        print(
+            "[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.mediaUrls.length} media keys from mediaUrls.");
+      memory.mediaKeysOrder =
+          memory.mediaUrls.map((url) => getFileKey(url)).toList();
       memory.wasMigrated = true;
     } else {
-      memory.mediaKeysOrder = rawMediaKeysOrder.map((key) => getFileKey(key)).toList();
+      memory.mediaKeysOrder =
+          rawMediaKeysOrder.map((key) => getFileKey(key)).toList();
     }
 
     // 2. Обработка МИНИАТЮР
     // Если миниатюр нет, но есть основные фото, используем основные фото в качестве миниатюр.
     if (memory.mediaThumbUrls.isEmpty && memory.mediaUrls.isNotEmpty) {
-       if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: Using full images as thumbnails fallback.");
-       memory.mediaThumbUrls = List.from(memory.mediaUrls);
-       memory.wasMigrated = true;
+      if (kDebugMode)
+        print(
+            "[MIGRATION] Memory ${snapshot.id}: Using full images as thumbnails fallback.");
+      memory.mediaThumbUrls = List.from(memory.mediaUrls);
+      memory.wasMigrated = true;
     }
-    
+
     // 3. Обработка КЛЮЧЕЙ ВИДЕО
     final rawVideoKeysOrder = List<String>.from(data['videoKeysOrder'] ?? []);
     if (rawVideoKeysOrder.isEmpty && memory.videoUrls.isNotEmpty) {
-        if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.videoUrls.length} video keys from videoUrls.");
-        memory.videoKeysOrder = memory.videoUrls.map((url) => getFileKey(url)).toList();
-        memory.wasMigrated = true;
+      if (kDebugMode)
+        print(
+            "[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.videoUrls.length} video keys from videoUrls.");
+      memory.videoKeysOrder =
+          memory.videoUrls.map((url) => getFileKey(url)).toList();
+      memory.wasMigrated = true;
     } else {
-        memory.videoKeysOrder = rawVideoKeysOrder.map((key) => getFileKey(key)).toList();
+      memory.videoKeysOrder =
+          rawVideoKeysOrder.map((key) => getFileKey(key)).toList();
     }
 
     // 4. Обработка КЛЮЧЕЙ АУДИО
     final rawAudioKeysOrder = List<String>.from(data['audioKeysOrder'] ?? []);
     if (rawAudioKeysOrder.isEmpty && memory.audioUrls.isNotEmpty) {
-        if (kDebugMode) print("[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.audioUrls.length} audio keys from audioUrls.");
-        memory.audioKeysOrder = memory.audioUrls.map((url) => getFileKey(url)).toList();
-        memory.wasMigrated = true;
+      if (kDebugMode)
+        print(
+            "[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.audioUrls.length} audio keys from audioUrls.");
+      memory.audioKeysOrder =
+          memory.audioUrls.map((url) => getFileKey(url)).toList();
+      memory.wasMigrated = true;
     } else {
-        memory.audioKeysOrder = rawAudioKeysOrder.map((key) => getFileKey(key)).toList();
+      memory.audioKeysOrder =
+          rawAudioKeysOrder.map((key) => getFileKey(key)).toList();
     }
 
     return memory;

@@ -64,9 +64,9 @@ class _MessageCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: message.color.withValues(alpha: 0.6),
+            color: message.color.withOpacity(0.6),
             borderRadius: BorderRadius.circular(50),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -90,5 +90,4 @@ class _MessageCard extends StatelessWidget {
     );
   }
 }
-
 

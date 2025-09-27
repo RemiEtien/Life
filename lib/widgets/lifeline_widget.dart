@@ -147,8 +147,6 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   // НОВАЯ ПЕРЕМЕННАЯ: Для хранения позиции двойного тапа
   Offset _doubleTapLocalPosition = Offset.zero;
 
-  // НОВОЕ: Флаг для управления готовностью онбординга
-
   final ValueNotifier<PaintTimings?> _paintTimingsNotifier =
       ValueNotifier(null);
 
@@ -184,9 +182,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     _geometryController =
         AnimationController(vsync: this, duration: const Duration(seconds: 60))
           ..repeat(reverse: true);
-    _backgroundController =
-        AnimationController(vsync: this, duration: const Duration(minutes: 15))
-          ..repeat();
+    _backgroundController = AnimationController(
+        vsync: this, duration: const Duration(minutes: 15))
+      ..repeat();
     _branchController =
         AnimationController(vsync: this, duration: const Duration(seconds: 20))
           ..repeat();
@@ -260,9 +258,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                 .addMessage("Sync started...", type: MessageType.info);
           } else if (previous.isSyncing && !next.isSyncing) {
             if (next.currentStatus.contains("failed")) {
-              ref.read(messageProvider.notifier).addMessage(
-                  "Sync failed. Will retry later.",
-                  type: MessageType.error);
+              ref
+                  .read(messageProvider.notifier)
+                  .addMessage("Sync failed. Will retry later.",
+                      type: MessageType.error);
             } else {
               ref
                   .read(messageProvider.notifier)
@@ -538,8 +537,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     final sortedMemories = List<Memory>.from(memories)
       ..sort((a, b) => a.date.compareTo(b.date));
-    final groupedByDay = groupBy(
-        sortedMemories, (m) => DateTime(m.date.year, m.date.month, m.date.day));
+    final groupedByDay = groupBy(sortedMemories,
+        (m) => DateTime(m.date.year, m.date.month, m.date.day));
 
     final newPlacementResults = <dynamic>[];
     final sortedEntries = groupedByDay.entries.sortedBy((entry) => entry.key);
@@ -705,9 +704,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _requestFullRecalculation(List<Memory> memories) {
-    if (_isCalculating || !mounted || _lastKnownSize.isEmpty || _isDisposed) {
+    if (_isCalculating || !mounted || _lastKnownSize.isEmpty || _isDisposed)
       return;
-    }
 
     final layoutResult = _calculateLayout(_lastKnownSize, memories);
 
@@ -749,10 +747,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         final branches = message.branchPoints
             .map((p) => _buildLinePathFromPoints(p))
             .toList();
-        final roots = message.rootPoints
-            .map((p) => _buildCubicPathFromPoints(p))
-            .toList();
-        final yearPath = _createFlatYearLine(totalWidth, _lastKnownSize.height);
+        final roots =
+            message.rootPoints.map((p) => _buildCubicPathFromPoints(p)).toList();
+        final yearPath =
+            _createFlatYearLine(totalWidth, _lastKnownSize.height);
 
         final finalPlacementResults =
             _updateYCoordinates(layoutResult.placementResults, mainPath);
@@ -912,19 +910,17 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     final minScale = _calculateMinScale(totalWidth, screenWidth);
     final maxScale = _calculateMaxScale(minScale, screenWidth);
-
+    
     // Определяем целевой масштаб: если мы уже приближены, то отдаляем, иначе приближаем к максимальному уровню
-    final targetScale =
-        (currentScale - minScale).abs() > 0.1 ? minScale : maxScale;
-
+    final targetScale = (currentScale - minScale).abs() > 0.1 ? minScale : maxScale;
+    
     // Анимируем к новому масштабу, центрируясь на точке касания
     _animateZoomToPoint(targetScale, _doubleTapLocalPosition);
   }
 
   // ИСПРАВЛЕНИЕ: Полностью переписанная логика для корректного зума к точке.
   void _animateZoomToPoint(double targetScale, Offset focalPoint) {
-    _zoomAnimationController
-        ?.stop(); // Останавливаем любую текущую анимацию зума
+    _zoomAnimationController?.stop(); // Останавливаем любую текущую анимацию зума
 
     final currentMatrix = _transformationController.value;
     final currentScale = currentMatrix.getMaxScaleOnAxis();
@@ -942,8 +938,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     // Создаем новую целевую матрицу "с нуля"
     final targetMatrix = Matrix4.identity()
-      ..translateByDouble(tx, ty, 0, 1.0)
-      ..scaleByDouble(targetScale, targetScale, targetScale, 1.0);
+      ..translate(tx, ty)
+      ..scale(targetScale);
 
     // Запускаем анимацию к новой матрице
     _animateToMatrix(targetMatrix);
@@ -964,7 +960,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     _zoomAnimation!.addListener(() {
       _transformationController.value = _zoomAnimation!.value;
     });
-
+    
     _zoomAnimationController!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _zoomAnimationController?.dispose();
@@ -975,6 +971,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     _zoomAnimationController!.forward();
   }
+
 
   void _handleTappableItemAction(
       TappableItem item, Offset globalPosition, String userId) {
@@ -995,8 +992,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     }
   }
 
-  List<TappableItem> _findTappableItems(
-      Offset scenePosition, double hitRadius) {
+  List<TappableItem> _findTappableItems(Offset scenePosition, double hitRadius) {
     final memories = ref.read(memoriesStreamProvider).asData?.value ?? [];
     final List<TappableItem> hits = [];
     final List<String> processedNodeIds = [];
@@ -1033,8 +1029,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         transitionsBuilder: (_, animation, __, child) {
           final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
               .chain(CurveTween(curve: Curves.easeInOut));
-          return SlideTransition(
-              position: animation.drive(tween), child: child);
+          return SlideTransition(position: animation.drive(tween), child: child);
         }));
   }
 
@@ -1079,7 +1074,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   void _showFullTimeline() {
     if (!mounted || _isDisposed) return;
-
+    
     // Всегда устанавливаем флаг, чтобы показать намерение центрировать
     setState(() {
       _centerOnNextLayout = true;
@@ -1099,8 +1094,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           // Флаг _centerOnNextLayout остается true и центрирование произойдет
           // после готовности данных в _requestGeometryUpdate
           if (kDebugMode) {
-            print(
-                "[LifelineWidget] Data not ready for centering, requesting recalculation");
+            print("[LifelineWidget] Data not ready for centering, requesting recalculation");
           }
           _requestFullRecalculation(_currentMemories);
         }
@@ -1128,10 +1122,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final contentCenter = Offset(totalWidth / 2, contentCenterY);
 
     final targetMatrix = Matrix4.identity();
-    targetMatrix.translateByDouble(screenCenter.dx, screenCenter.dy, 0, 1.0);
-    targetMatrix.scaleByDouble(minScale, minScale, 1.0, 1.0);
-    targetMatrix.translateByDouble(
-        -contentCenter.dx, -contentCenter.dy, 0, 1.0);
+    targetMatrix.translate(screenCenter.dx, screenCenter.dy);
+    targetMatrix.scale(minScale, minScale);
+    targetMatrix.translate(-contentCenter.dx, -contentCenter.dy);
 
     _animateToMatrix(targetMatrix);
   }
@@ -1140,8 +1133,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   void _toggleAnimation() {
     setState(() {
       _animationEnabled = !_animationEnabled;
-      final canAnimate = DevicePerformanceDetector.capabilities.performance !=
-          DevicePerformance.low;
+      final canAnimate =
+          DevicePerformanceDetector.capabilities.performance !=
+              DevicePerformance.low;
       if (_animationEnabled && canAnimate) {
         _mainController.repeat(reverse: true);
         _pulseController.repeat(reverse: true);
@@ -1357,10 +1351,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                   behavior: HitTestBehavior.opaque,
                   onTapDown: isTimelineInteractionDisabled ? null : _onTapDown,
                   // НОВОЕ: Добавляем обработчики для двойного тапа
-                  onDoubleTapDown: (details) =>
-                      _doubleTapLocalPosition = details.localPosition,
-                  onDoubleTap:
-                      isTimelineInteractionDisabled ? null : _handleDoubleTap,
+                  onDoubleTapDown: (details) => _doubleTapLocalPosition = details.localPosition,
+                  onDoubleTap: isTimelineInteractionDisabled ? null : _handleDoubleTap,
                   child: InteractiveViewer(
                     transformationController: _transformationController,
                     boundaryMargin: const EdgeInsets.all(double.infinity),
@@ -1407,7 +1399,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                         zoomScale: currentScale,
                                         pulseValue: _pulseController.value,
                                         renderData: _renderData!,
-                                        timingsNotifier: _paintTimingsNotifier,
+                                        timingsNotifier:
+                                            _paintTimingsNotifier,
                                         images: _cachedImages,
                                         branchIntensity: _branchIntensity,
                                       ),
@@ -1524,7 +1517,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                         _toggleDebugMode();
                         break;
                       case 'profile_settings':
-                        // ИСПРАВЛЕНИЕ: Ожидаем результат от экрана профиля.
+                        // **ИСПРАВЛЕНО:** Логика упрощена.
+                        // Теперь мы просто ждем результат и вызываем центрирование.
+                        // Запуск онбординга произойдет автоматически благодаря Riverpod.
                         final result = await Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (_) => const ProfileScreen()));
@@ -1597,7 +1592,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                               fontWeight: FontWeight.w500)),
                       if (memoriesCount > 0) ...[
                         const SizedBox(height: 4),
-                        Text(l10n.lifelinePeriodRange(startYear, endYear),
+                        Text(
+                            l10n.lifelinePeriodRange(startYear, endYear),
                             style: const TextStyle(
                                 color: Colors.white70, fontSize: 10))
                       ],
@@ -1612,7 +1608,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                     CircularProgressIndicator(strokeWidth: 2)),
                             const SizedBox(width: 8),
                             Text(
-                                l10n.lifelineSyncStatus(syncState.currentStatus,
+                                l10n.lifelineSyncStatus(
+                                    syncState.currentStatus,
                                     syncState.pendingJobs),
                                 style: const TextStyle(
                                     color: Colors.lightBlueAccent,
@@ -1968,7 +1965,8 @@ class _SelectionItem extends StatelessWidget {
           child: ClipOval(
             child: image != null
                 ? RawImage(image: image!, fit: BoxFit.cover)
-                : Center(child: Icon(item.icon, color: Colors.white, size: 30)),
+                : Center(
+                    child: Icon(item.icon, color: Colors.white, size: 30)),
           ),
         ),
         const SizedBox(height: 4),
@@ -2009,3 +2007,4 @@ class PerformanceMonitor {
     fpsNotifier.dispose();
   }
 }
+

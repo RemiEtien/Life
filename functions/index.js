@@ -14,6 +14,9 @@ admin.initializeApp();
 // Определяем секреты
 const SPOTIFY_ID = defineSecret("SPOTIFY_ID");
 const SPOTIFY_SECRET = defineSecret("SPOTIFY_SECRET");
+// **НОВОЕ:** Секрет для проверки покупок в App Store
+const APPLE_SHARED_SECRET = defineSecret("APPLE_SHARED_SECRET");
+
 
 // Кеш для Spotify токена
 let spotifyTokenCache = {
@@ -171,9 +174,14 @@ exports.getTrackDetails = onCall(
  */
 exports.verifyPurchase = onCall(
     {
+      // **ИЗМЕНЕНО:** Включаем принудительную проверку App Check
+      enforceAppCheck: true,
+      // **ИЗМЕНЕНО:** Добавляем секрет для iOS
+      secrets: [APPLE_SHARED_SECRET],
       cors: true,
     },
     async (request) => {
+      // App Check уже выполнил проверку, если мы дошли досюда
       if (!request.auth) {
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
       }
@@ -187,6 +195,9 @@ exports.verifyPurchase = onCall(
 
       let isValid = false;
       let expiryDate = new Date();
+      // **ИЗМЕНЕНО:** Ожидаемые идентификаторы пакета/бандла
+      const expectedPackageName = "com.momentic.lifeline";
+      const expectedBundleId = "com.momentic.lifeline"; // Замените на ваш Bundle ID, если он отличается
 
       try {
         if (platform === "android") {
@@ -194,13 +205,8 @@ exports.verifyPurchase = onCall(
             scopes: "https://www.googleapis.com/auth/androidpublisher",
           });
           const authClient = await auth.getClient();
-
-          // --- ДИАГНОСТИЧЕСКАЯ СТРОКА ---
-          console.log(`[DIAGNOSTIC] Attempting to authenticate with Play API using service account: ${authClient.email || "Email not directly available"}`);
-
-          const packageName = "com.momentic.lifeline";
           const url = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/" +
-            `${packageName}/purchases/subscriptions/${productId}/tokens/${receipt}`;
+            `${expectedPackageName}/purchases/subscriptions/${productId}/tokens/${receipt}`;
           const response = await authClient.request({url});
 
           if (response.data && response.data.expiryTimeMillis) {
@@ -210,18 +216,33 @@ exports.verifyPurchase = onCall(
         } else if (platform === "ios") {
           const isSandbox = (process.env.FUNCTIONS_EMULATOR === "true");
           const url = isSandbox ? "https://sandbox.itunes.apple.com/verifyReceipt" : "https://buy.itunes.apple.com/verifyReceipt";
+          // **ИЗМЕНЕНО:** Используем общий секрет
+          const secret = APPLE_SHARED_SECRET.value();
+          if (!secret) {
+              throw new HttpsError("failed-precondition", "Apple Shared Secret is not configured.");
+          }
 
-          const response = await axios.post(url, {"receipt-data": receipt});
+          const response = await axios.post(url, {
+              "receipt-data": receipt,
+              "password": secret,
+              "exclude-old-transactions": true,
+          });
 
-          if (response.data && response.data.status === 0 && response.data.latest_receipt_info) {
-            const latestTransaction = response.data.latest_receipt_info[0];
-            isValid = true;
-            expiryDate = new Date(parseInt(latestTransaction.expires_date_ms));
+          if (response.data && response.data.status === 0) {
+            // **ИЗМЕНЕНО:** Проверяем bundle_id и ищем последнюю транзакцию
+             const receiptData = response.data.receipt;
+             if (receiptData && receiptData.bundle_id === expectedBundleId && response.data.latest_receipt_info) {
+                 const latestTransaction = response.data.latest_receipt_info[0];
+                 if (latestTransaction && latestTransaction.expires_date_ms) {
+                     isValid = true;
+                     expiryDate = new Date(parseInt(latestTransaction.expires_date_ms));
+                 }
+             }
           }
         }
       } catch (error) {
         const errorMessage = (error.response && error.response.data) || error.message;
-        console.error("Purchase verification failed:", errorMessage);
+        console.error(`Purchase verification failed for user ${uid} on platform ${platform}:`, errorMessage);
         throw new HttpsError("internal", "Verification request failed.");
       }
 

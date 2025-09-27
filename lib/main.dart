@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:lifeline/providers/application_providers.dart';
 import 'package:lifeline/screens/splash_screen.dart';
+import 'package:lifeline/services/encryption_service.dart';
 import 'package:lifeline/services/notification_service.dart';
 import 'package:lifeline/widgets/device_performance_detector.dart';
 import 'package:lifeline/l10n/app_localizations.dart';
@@ -53,7 +54,7 @@ void main() async {
     );
     
     if (kDebugMode) {
-      debugPrint('⚠️ App Check is using DEBUG providers.');
+       debugPrint('⚠️ App Check is using DEBUG providers.');
     } else {
       debugPrint('App Check activated with Play Integrity / App Attest.');
     }
@@ -139,7 +140,11 @@ class _LifelineAppState extends ConsumerState<LifelineApp> with WidgetsBindingOb
     super.didChangeAppLifecycleState(state);
     if (!mounted) return;
     
-    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+    // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Блокируем сессию шифрования при сворачивании или закрытии приложения ***
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      ref.read(encryptionServiceProvider.notifier).lockSession();
       ref.read(audioPlayerProvider.notifier).pauseAllAudio();
     }
   }

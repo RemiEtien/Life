@@ -436,12 +436,12 @@ class _FinalWordsDialog extends StatelessWidget {
 
 Widget _buildDialogBase({required Widget child}) {
   return Container(
-    color: Colors.black.withValues(alpha: 0.5),
+    color: Colors.black.withOpacity(0.5),
     child: Center(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: Dialog(
-          backgroundColor: _onboardingBackgroundColor.withValues(alpha: 0.9),
+          backgroundColor: _onboardingBackgroundColor.withOpacity(0.9),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
@@ -462,7 +462,7 @@ class SpotlightPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withValues(alpha: 0.8);
+    final paint = Paint()..color = Colors.black.withOpacity(0.8);
     final backgroundPath = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
 
@@ -489,7 +489,7 @@ class SpotlightPainter extends CustomPainter {
       final center = size.center(Offset.zero);
       final radius = size.width * 0.4;
       final radialGradient = RadialGradient(
-        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+        colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
         stops: const [0.5, 1.0],
       );
       final gradientPaint = Paint()
@@ -536,9 +536,9 @@ class _Coachmark extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: _onboardingBackgroundColor.withValues(alpha: 0.9),
+          color: _onboardingBackgroundColor.withOpacity(0.9),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -580,4 +580,3 @@ class _Coachmark extends StatelessWidget {
     );
   }
 }
-

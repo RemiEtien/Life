@@ -73,17 +73,15 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
     }
   }
 
-  // ИСПРАВЛЕНИЕ: Новый метод для принудительного запуска обучения, например, из профиля.
-  /// Force-starts the onboarding tour, regardless of completion status.
-  /// This is used for replaying the tutorial.
-  void startTour() {
-    if (kDebugMode) {
-      print("[OnboardingService] Forcing tour to start.");
+  /// **ИСПРАВЛЕНО:** Старый метод `startTour` переименован и улучшен.
+  /// Теперь он полностью инкапсулирует логику сброса и перезапуска.
+  Future<void> replayTour() async {
+    await reset(); // Сначала сбрасываем флаг завершения
+    if (mounted) {
+      // Затем активируем онбординг с первого шага
+      state = state.copyWith(isActive: true, currentStep: OnboardingStep.welcome);
     }
-    // Этот метод намеренно не проверяет hasCompleted, чтобы позволить повторный запуск.
-    state = state.copyWith(isActive: true, currentStep: OnboardingStep.welcome);
   }
-
 
   /// Advances the onboarding to the next step in the sequence.
   void nextStep() {
@@ -147,3 +145,4 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
     state = state.copyWith(hasCompleted: true);
   }
 }
+

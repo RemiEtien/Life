@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lifeline/memory.dart';
 import 'package:lifeline/providers/application_providers.dart';
 import 'package:lifeline/services/encryption_service.dart';
+import 'package:lifeline/services/firestore_service.dart';
+import 'package:lifeline/services/memory_repository.dart';
+import 'package:collection/collection.dart';
 
 @immutable
 class SyncState {
@@ -39,8 +42,8 @@ class SyncService {
   final Ref _ref;
   final List<int> _syncQueue = [];
   bool _isProcessing = false;
-  // НОВОЕ: Флаг для отслеживания паузы из-за шифрования
   bool _isPausedForUnlock = false;
+  bool _isReconciling = false;
 
   SyncService(this._ref) {
     _checkForUnsyncedMemories();
@@ -48,59 +51,87 @@ class SyncService {
 
   Future<void> syncFromCloudToLocal({bool isInitialSync = false}) async {
     final notifier = _ref.read(syncNotifierProvider.notifier);
-    if (!isInitialSync && _ref.read(syncNotifierProvider).isSyncing) return;
+    if (_isReconciling || (!isInitialSync && _ref.read(syncNotifierProvider).isSyncing)) return;
 
     final repo = _ref.read(memoryRepositoryProvider);
     final firestore = _ref.read(firestoreServiceProvider);
     final userId = repo?.userId;
 
-    if (userId == null) return;
+    if (userId == null || repo == null) return;
+
+    _isReconciling = true;
 
     if (!isInitialSync) {
       notifier.updateState(
-          isSyncing: true, currentStatus: "Fetching from cloud...");
+          isSyncing: true, currentStatus: "Reconciling with cloud...");
     }
 
     try {
       final cloudMemories = await firestore.fetchAllMemoriesOnce(userId);
-      // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №2: Получаем локальные данные в виде карты для сопоставления**
-      final localMemoriesMap = await repo!.getMemoriesMapByFirestoreId();
+      if (cloudMemories == null) {
+        throw Exception("Could not fetch memories from cloud.");
+      }
+      final cloudIds =
+          cloudMemories.map((m) => m.firestoreId).whereNotNull().toSet();
 
-      if (cloudMemories != null) {
-        if (!isInitialSync) {
-          notifier.updateState(currentStatus: "Merging with local data...");
-        }
-
-        final memoriesToUpsert = <Memory>[];
-        for (final cloudMemory in cloudMemories) {
-          final localMemory = localMemoriesMap[cloudMemory.firestoreId];
-
-          // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №3: Логика слияния**
-          if (localMemory == null) {
-            // Если локальной записи нет - это новая запись с другого устройства, добавляем ее.
-            memoriesToUpsert.add(cloudMemory);
-          } else if (cloudMemory.lastModified
-                  .isAfter(localMemory.lastModified) &&
-              localMemory.syncStatus != 'pending') {
-            // Если облачная запись новее и локальная не ожидает синхронизации, обновляем локальную.
-            // **КРИТИЧЕСКИ ВАЖНО: Сохраняем локальный ID!**
-            // Это говорит Isar, какую именно запись нужно обновить.
-            cloudMemory.id = localMemory.id;
-            memoriesToUpsert.add(cloudMemory);
-          }
-        }
-
-        if (memoriesToUpsert.isNotEmpty) {
-          // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ №4: Используем новый метод `upsert`**
-          await repo.upsertMemories(memoriesToUpsert);
+      final allLocalMemories = await repo.getAllMemories();
+      
+      // ИСПРАВЛЕНИЕ 1: Исключаем все несинхронизированные статусы из сверки
+      final Set<String> unsyncedStatuses = {'pending', 'draft', 'syncing', 'failed'};
+      final localMemoriesToReconcile = allLocalMemories.where((mem) => !unsyncedStatuses.contains(mem.syncStatus)).toList();
+      
+      final List<int> idsToDelete = [];
+      for (final localMemory in localMemoriesToReconcile) {
+        if (localMemory.firestoreId != null &&
+            !cloudIds.contains(localMemory.firestoreId)) {
+          idsToDelete.add(localMemory.id);
         }
       }
+
+      if (idsToDelete.isNotEmpty) {
+        final deletedCount = await repo.deleteAllByIds(idsToDelete);
+        if (kDebugMode) {
+          print(
+              "[SyncService] Deleted $deletedCount ghost memories from local DB.");
+        }
+      }
+
+      // ИСПРАВЛЕНИЕ 2: Оптимизация. Создаем карту из уже загруженных данных.
+      final localMemoriesMap = {
+        for (var m in allLocalMemories)
+          if (m.firestoreId != null) m.firestoreId!: m
+      };
+      
+      final memoriesToUpsert = <Memory>[];
+
+      for (final cloudMemory in cloudMemories) {
+        final localMemory = localMemoriesMap[cloudMemory.firestoreId];
+
+        if (localMemory == null) {
+          memoriesToUpsert.add(cloudMemory);
+        } else if (cloudMemory.lastModified.isAfter(localMemory.lastModified) &&
+            !unsyncedStatuses.contains(localMemory.syncStatus)) { // ИСПРАВЛЕНИЕ 1 (повторно)
+          cloudMemory.id = localMemory.id;
+          memoriesToUpsert.add(cloudMemory);
+        }
+      }
+
+      if (memoriesToUpsert.isNotEmpty) {
+        if (kDebugMode) {
+          print(
+              "[SyncService] Upserting ${memoriesToUpsert.length} memories from cloud.");
+        }
+        await repo.upsertMemories(memoriesToUpsert);
+      }
+      
+      await repo.repairOrphanedUserIds();
+
       if (!isInitialSync) {
         notifier.updateState(isSyncing: false, currentStatus: "Sync complete!");
       }
     } catch (e, stackTrace) {
       FirebaseCrashlytics.instance.recordError(e, stackTrace,
-          reason: "SyncService: syncFromCloudToLocal failed");
+          reason: "SyncService: syncFromCloudToLocal reconciliation failed");
       if (!isInitialSync) {
         notifier.updateState(
             isSyncing: false, currentStatus: "Sync from cloud failed.");
@@ -108,13 +139,13 @@ class SyncService {
         rethrow;
       }
     } finally {
+      _isReconciling = false;
       if (!isInitialSync) {
         _checkForUnsyncedMemories();
       }
     }
   }
 
-  // НОВЫЙ МЕТОД: Возобновляет очередь после разблокировки шифрования
   void resumeSync() {
     if (_isPausedForUnlock && !_isProcessing && _syncQueue.isNotEmpty) {
       if (kDebugMode) {
@@ -132,9 +163,6 @@ class SyncService {
             pendingJobs: _syncQueue.length,
             currentStatus: "Queued...",
           );
-      // ИЗМЕНЕНИЕ: Оборачиваем вызов в Future(), чтобы дать UI время
-      // отреагировать на локальное сохранение до начала синхронизации.
-      // Это гарантирует мгновенное появление узла на линии жизни.
       Future(_processQueue);
     }
   }
@@ -155,7 +183,10 @@ class SyncService {
   }
 
   Future<void> _processQueue() async {
-    if (_isProcessing || _syncQueue.isEmpty || _isPausedForUnlock) {
+    if (_isProcessing ||
+        _syncQueue.isEmpty ||
+        _isPausedForUnlock ||
+        _isReconciling) {
       if (_syncQueue.isEmpty) {
         _ref.read(syncNotifierProvider.notifier).updateState(
             pendingJobs: 0,
@@ -178,7 +209,6 @@ class SyncService {
 
     await _updateLocalStatus(memoryId, 'syncing');
 
-    // ИЗМЕНЕНО: Обработка исключения EncryptionLockedException
     try {
       final success = await _syncMemoryWithRetries(memoryId);
 
@@ -203,14 +233,12 @@ class SyncService {
       if (kDebugMode) {
         print("[SyncService] Queue processing paused. Waiting for unlock.");
       }
-      // Пауза обработки очереди
       _isProcessing = false;
       _isPausedForUnlock = true;
       _ref.read(syncNotifierProvider.notifier).updateState(
-          isSyncing: true, // Keep showing sync indicator
+          isSyncing: true,
           currentStatus: "Sync paused - unlock needed",
           progress: null);
-      // Не вызываем _processQueue() снова, ждем resumeSync()
     }
   }
 
@@ -223,7 +251,8 @@ class SyncService {
     }
   }
 
-  Future<bool> _syncMemoryWithRetries(int memoryId, {int maxRetries = 3}) async {
+  Future<bool> _syncMemoryWithRetries(int memoryId,
+      {int maxRetries = 3}) async {
     final repo = _ref.read(memoryRepositoryProvider);
     final firestore = _ref.read(firestoreServiceProvider);
     final userId = repo?.userId;
@@ -231,9 +260,7 @@ class SyncService {
     if (userId == null || repo == null) return false;
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
-      // ИЗМЕНЕНО: getDecryptedById теперь может выбросить исключение,
-      // которое будет поймано в _processQueue
-      final initialMemoryState = await repo.getDecryptedById(memoryId);
+      final initialMemoryState = await repo.getById(memoryId);
       if (initialMemoryState == null) {
         return true;
       }
@@ -289,6 +316,10 @@ class SyncService {
 
         return true;
       } catch (e, stackTrace) {
+        if (e is EncryptionLockedException) {
+          rethrow;
+        }
+
         if (kDebugMode) {
           print(
               "[SyncService] Attempt $attempt failed for memory $memoryId: $e");
@@ -300,8 +331,7 @@ class SyncService {
         if (attempt < maxRetries) {
           final delay = Duration(seconds: 5 * attempt);
           _ref.read(syncNotifierProvider.notifier).updateState(
-              currentStatus:
-                  "Sync failed. Retrying in ${delay.inSeconds}s...");
+              currentStatus: "Sync failed. Retrying in ${delay.inSeconds}s...");
           await Future.delayed(delay);
         }
       }
@@ -310,8 +340,6 @@ class SyncService {
     return false;
   }
 
-  /// **ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ:** Эта функция теперь безопасно объединяет списки URL,
-  /// предотвращая потерю данных.
   Memory _buildCloudReadyMemory({
     required Memory initialState,
     required List<String> newPhotoUrls,
@@ -319,14 +347,12 @@ class SyncService {
     required List<String> newVideoUrls,
     required List<String> newAudioUrls,
   }) {
-    // Используем Set для автоматического объединения и удаления дубликатов
     final allPhotoUrls = {...initialState.mediaUrls, ...newPhotoUrls}.toList();
     final allThumbUrls =
         {...initialState.mediaThumbUrls, ...newThumbUrls}.toList();
     final allVideoUrls = {...initialState.videoUrls, ...newVideoUrls}.toList();
     final allAudioUrls = {...initialState.audioUrls, ...newAudioUrls}.toList();
 
-    // Генерируем ключи из ОБЪЕДИНЕННЫХ списков URL
     final allMediaKeys = allPhotoUrls.map(getFileKey).toSet().toList();
     final allVideoKeys = allVideoUrls.map(getFileKey).toSet().toList();
     final allAudioKeys = allAudioUrls.map(getFileKey).toSet().toList();
@@ -339,13 +365,13 @@ class SyncService {
       mediaKeysOrder: allMediaKeys,
       videoKeysOrder: allVideoKeys,
       audioKeysOrder: allAudioKeys,
-      // Очищаем локальные пути, так как они теперь загружены
       mediaPaths: [],
       mediaThumbPaths: [],
       videoPaths: [],
       audioNotePaths: [],
       syncStatus: 'synced',
-    )..touch();
+    )
+      ..touch();
   }
 }
 

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lifeline/l10n/app_localizations.dart';
 import 'package:audioplayers/audioplayers.dart' as ap;
@@ -87,16 +86,14 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
     int initialPage = _infiniteScrollInitialPage;
     if (allMedia.isNotEmpty) {
-      initialPage = _infiniteScrollInitialPage -
-          (_infiniteScrollInitialPage % allMedia.length);
+      initialPage =
+          _infiniteScrollInitialPage - (_infiniteScrollInitialPage % allMedia.length);
     }
 
     _pageController = PageController(initialPage: initialPage);
     _pageController.addListener(() {
       if (_pageController.hasClients && _pageController.page != null) {
-        if (allMedia.isEmpty) {
-          return;
-        }
+        if (allMedia.isEmpty) return;
 
         final page = _pageController.page!.round();
         final effectivePage = page % allMedia.length;
@@ -116,42 +113,26 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   void _decryptContent() {
-    // ИЗМЕНЕНО: Добавлена обработка EncryptionLockedException
+    // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ ***
+    // Теперь мы отлавливаем исключение EncryptionLockedException.
+    // Если оно сработало, значит сервис заблокирован, и нужно запросить пароль.
     try {
       final encryptionService = ref.read(encryptionServiceProvider.notifier);
-      bool currentlyNeedsUnlock = false;
 
-      String? processField(String? value) {
-        if (!_currentMemory.isEncrypted) {
-          return value;
-        }
-
-        // Этот вызов теперь может выбросить исключение
-        final decrypted = encryptionService.decrypt(value);
-
-        return decrypted;
-      }
-
-      _decryptedContent['content'] = processField(_currentMemory.content);
-      _decryptedContent['reflectionImpact'] =
-          processField(_currentMemory.reflectionImpact);
-      _decryptedContent['reflectionLesson'] =
-          processField(_currentMemory.reflectionLesson);
-      _decryptedContent['reflectionAutoThought'] =
-          processField(_currentMemory.reflectionAutoThought);
-      _decryptedContent['reflectionEvidenceFor'] =
-          processField(_currentMemory.reflectionEvidenceFor);
-      _decryptedContent['reflectionEvidenceAgainst'] =
-          processField(_currentMemory.reflectionEvidenceAgainst);
-      _decryptedContent['reflectionReframe'] =
-          processField(_currentMemory.reflectionReframe);
-      _decryptedContent['reflectionAction'] =
-          processField(_currentMemory.reflectionAction);
+      // Эта функция теперь может выбросить исключение
+      _decryptedContent['content'] = encryptionService.decrypt(_currentMemory.content);
+      _decryptedContent['reflectionImpact'] = encryptionService.decrypt(_currentMemory.reflectionImpact);
+      _decryptedContent['reflectionLesson'] = encryptionService.decrypt(_currentMemory.reflectionLesson);
+      _decryptedContent['reflectionAutoThought'] = encryptionService.decrypt(_currentMemory.reflectionAutoThought);
+      _decryptedContent['reflectionEvidenceFor'] = encryptionService.decrypt(_currentMemory.reflectionEvidenceFor);
+      _decryptedContent['reflectionEvidenceAgainst'] = encryptionService.decrypt(_currentMemory.reflectionEvidenceAgainst);
+      _decryptedContent['reflectionReframe'] = encryptionService.decrypt(_currentMemory.reflectionReframe);
+      _decryptedContent['reflectionAction'] = encryptionService.decrypt(_currentMemory.reflectionAction);
 
       // Если мы дошли сюда без исключений, значит, разблокировка не нужна
-      if (mounted && _needsUnlock != currentlyNeedsUnlock) {
+      if (mounted && _needsUnlock) {
         setState(() {
-          _needsUnlock = currentlyNeedsUnlock; // Устанавливаем в false
+          _needsUnlock = false;
         });
       }
     } on EncryptionLockedException {
@@ -244,9 +225,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   Future<void> _playAudioNote() async {
     await _audioNotifier.pauseGlobalPlayer();
     final audioPaths = _currentMemory.displayableAudioPaths;
-    if (audioPaths.isEmpty) {
-      return;
-    }
+    if (audioPaths.isEmpty) return;
 
     if (_isAudioNotePlaying) {
       await _audioNotePlayer.pause();
@@ -281,10 +260,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     // ИЗМЕНЕНО: Убедимся, что данные расшифрованы перед редактированием
     if (_needsUnlock) {
       final unlocked = await _handleUnlockRequest();
-      if (!mounted || !unlocked) {
-        return;
-      }
-      // Если разблокировка не удалась, выходим
+      if (!mounted ||
+          !unlocked) return; // Если разблокировка не удалась, выходим
     }
 
     final memoryForEdit = _currentMemory.copyWith(
@@ -325,36 +302,33 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       builder: (context) => _HoldToDeleteDialog(l10n: l10n),
     );
 
-    if (!mounted || confirmed != true) {
-      return;
-    }
+    if (confirmed == true) {
+      final memoryRepo = ref.read(memoryRepositoryProvider);
+      final firestoreService = ref.read(firestoreServiceProvider);
+      final currentContext = context;
 
-    final memoryRepo = ref.read(memoryRepositoryProvider);
-    final firestoreService = ref.read(firestoreServiceProvider);
+      if (memoryRepo == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(currentContext).showSnackBar(
+              SnackBar(content: Text(l10n.memoryViewErrorLocalDb)));
+        }
+        return;
+      }
 
-    if (memoryRepo == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.memoryViewErrorLocalDb)),
-      );
-      return;
-    }
+      final memoryToDelete = _currentMemory;
+      await memoryRepo.delete(memoryToDelete.id);
 
-    final memoryToDelete = _currentMemory;
-    await memoryRepo.delete(memoryToDelete.id);
+      if (!mounted) return;
+      Navigator.of(currentContext).pop(true);
 
-    if (!mounted) {
-      return;
-    }
+      ref.read(messageProvider.notifier).addMessage(
+            l10n.memoryViewMemoryDeleted,
+            type: MessageType.info,
+          );
 
-    Navigator.of(context).pop(true);
-
-    ref.read(messageProvider.notifier).addMessage(
-          l10n.memoryViewMemoryDeleted,
-          type: MessageType.info,
-        );
-
-    if (memoryToDelete.firestoreId != null) {
-      await firestoreService.deleteMemory(widget.userId, memoryToDelete);
+      if (memoryToDelete.firestoreId != null) {
+        await firestoreService.deleteMemory(widget.userId, memoryToDelete);
+      }
     }
   }
 
@@ -373,11 +347,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   Future<void> _exportAndShare(String format) async {
-    if (_isExporting) {
-      return;
-    }
-
+    if (_isExporting) return;
     setState(() => _isExporting = true);
+    final currentContext = context;
+
     try {
       final ByteData fontRegular =
           await rootBundle.load('assets/fonts/Roboto-Regular.ttf');
@@ -410,9 +383,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             final file = await DefaultCacheManager().getSingleFile(path);
             localImagePaths.add(file.path);
           } catch (e) {
-            if (kDebugMode) {
-              debugPrint('Failed to download image for export: $path');
-            }
+            // ignore: avoid_print
+            print('Failed to download image for export: $path');
           }
         } else {
           localImagePaths.add(path);
@@ -449,18 +421,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       final file =
           await File('${tempDir.path}/$fileName').writeAsBytes(fileBytes);
 
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          text: _currentMemory.title,
-        ),
-      );
+      await Share.shareXFiles([XFile(file.path)], text: _currentMemory.title);
     } catch (e, stack) {
-      if (kDebugMode) {
-        debugPrint('Export failed: $e\n$stack');
-      }
+      // ignore: avoid_print
+      print('Export failed: $e\n$stack');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(currentContext).showSnackBar(
           SnackBar(content: Text('Export failed: $e')),
         );
       }
@@ -488,10 +454,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       final firestore = ref.read(firestoreServiceProvider);
       if (repo != null) {
         await repo.update(updatedMemory);
-        if (!context.mounted) {
-          return;
-        }
-
+        if (!mounted) return;
         await firestore.updateMemory(widget.userId, updatedMemory);
       }
       if (mounted) {
@@ -523,7 +486,6 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     bool isLoading = false;
     String? errorText;
 
-    // ИЗМЕНЕНО: возвращаем bool, чтобы знать результат
     final unlocked = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -556,10 +518,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         final success = await ref
                             .read(encryptionServiceProvider.notifier)
                             .unlockSession(passwordController.text);
-                        if (!context.mounted) {
-                          return;
-                        }
-
+                        if (!mounted) return;
                         if (success) {
                           Navigator.of(context).pop(true);
                         } else {
@@ -587,10 +546,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                           final success = await ref
                               .read(encryptionServiceProvider.notifier)
                               .unlockSession(passwordController.text);
-                          if (!context.mounted) {
-                            return;
-                          }
-
+                          if (!mounted) return;
                           if (success) {
                             Navigator.of(context).pop(true);
                           } else {
@@ -608,9 +564,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         );
       },
     );
-    // После закрытия диалога, listener на encryptionServiceProvider
-    // автоматически вызовет _decryptContent и перестроит UI.
-    // Если разблокировка не удалась, _needsUnlock останется true.
+
     if (unlocked == true && mounted) {
       ref.read(syncServiceProvider).resumeSync();
       _decryptContent();
@@ -620,9 +574,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   void _showMediaPopup(int initialIndex) {
     final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
-    if (allMedia.isEmpty) {
-      return;
-    }
+    if (allMedia.isEmpty) return;
 
     showDialog(
       context: context,
@@ -645,11 +597,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     ref.listen(encryptionServiceProvider, (previous, next) {
-      // ИЗМЕНЕНО: всегда пытаемся расшифровать при изменении состояния
       _decryptContent();
     });
 
-    // Первый вызов при построении виджета
     _decryptContent();
 
     final String? coverPath =
@@ -661,7 +611,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     Widget coverImageWidget = const SizedBox.shrink();
 
     if (hasCover) {
-      coverImageWidget = coverThumbPath.startsWith('http')
+      coverImageWidget = coverThumbPath!.startsWith('http')
           ? CachedNetworkImage(
               imageUrl: coverThumbPath,
               fit: BoxFit.cover,
@@ -682,21 +632,15 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (didPop) {
-          return;
-        }
-
-        final navigator = Navigator.of(context);
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
 
         await _audioNotifier.stopAmbientSound();
         await _audioNotifier.resumeGlobalPlayerIfNeeded();
 
-        if (!context.mounted) {
-          return;
+        if (mounted) {
+          Navigator.of(context).pop(_wasChanged);
         }
-
-        navigator.pop(_wasChanged);
       },
       child: DefaultTabController(
         length: 2,
@@ -718,8 +662,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                 Positioned.fill(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                    child: Container(
-                        color: Colors.black.withAlpha((255 * 0.2).round())),
+                    child: Container(color: Colors.black.withAlpha((255 * 0.2).round())),
                   ),
                 ),
               NestedScrollView(
@@ -743,8 +686,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                    child:
+                                        CircularProgressIndicator(strokeWidth: 2),
                                   ),
                                 )
                               : IconButton(
@@ -780,8 +723,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         indicatorColor: Theme.of(context).colorScheme.primary,
                         indicatorWeight: 3,
                         labelColor: Colors.white,
-                        unselectedLabelColor:
-                            Colors.white.withAlpha((255 * 0.6).round()),
+                        unselectedLabelColor: Colors.white.withAlpha((255 * 0.6).round()),
                         tabs: [
                           Tab(text: l10n.memoryViewTabMemory),
                           Tab(text: l10n.memoryViewTabInTheWorld),
@@ -821,8 +763,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             decoration: BoxDecoration(
               color: Colors.black.withAlpha((255 * 0.4).round()),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: Colors.white.withAlpha((255 * 0.2).round())),
+              border: Border.all(color: Colors.white.withAlpha((255 * 0.2).round())),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -865,7 +806,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                     ),
                   ),
                 if (_needsUnlock)
-                  _buildLockedContentPlaceholder(showUnlockButton: false)
+                  _buildLockedContentPlaceholder()
                 else if (content != null && content.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(
@@ -886,11 +827,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                           final trackAsyncValue =
                               ref.watch(spotifyTrackDetailsProvider(trackId));
                           return trackAsyncValue.when(
-                            loading: () => const _SpotifyTrackLoadingSkeleton(),
+                            loading: () =>
+                                const _SpotifyTrackLoadingSkeleton(),
                             error: (err, stack) => _SpotifyTrackError(
                               l10n: l10n,
-                              onRetry: () => ref.refresh(
-                                  spotifyTrackDetailsProvider(trackId)),
+                              onRetry: () => ref
+                                  .refresh(spotifyTrackDetailsProvider(trackId)),
                             ),
                             data: (track) {
                               if (track == null) {
@@ -920,8 +862,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final reframe = _decryptedContent['reflectionReframe'];
     final action = _decryptedContent['reflectionAction'];
 
-    final hasSimpleReflection =
-        (impact?.isNotEmpty ?? false) || (lesson?.isNotEmpty ?? false);
+    final hasSimpleReflection = (impact?.isNotEmpty ?? false) || (lesson?.isNotEmpty ?? false);
     final hasEmotions = _currentMemory.emotions.isNotEmpty;
     final hasAdvancedReflection = (autoThought?.isNotEmpty ?? false) ||
         (reframe?.isNotEmpty ?? false) ||
@@ -929,16 +870,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         (evidenceAgainst?.isNotEmpty ?? false);
     final hasAction = action?.isNotEmpty ?? false;
 
-    if (!hasSimpleReflection &&
-        !hasEmotions &&
-        !hasAdvancedReflection &&
-        !hasAction) {
+    if (!hasSimpleReflection && !hasEmotions && !hasAdvancedReflection && !hasAction) {
       return const SizedBox.shrink();
     }
 
     if (_needsUnlock) {
-      return _buildLockedContentPlaceholder(
-          isReflection: true, showUnlockButton: false);
+      return _buildLockedContentPlaceholder(isReflection: true, showUnlockButton: false);
     }
 
     return Padding(
@@ -953,8 +890,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             decoration: BoxDecoration(
               color: Colors.black.withAlpha((255 * 0.2).round()),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: Colors.white.withAlpha((255 * 0.1).round())),
+              border: Border.all(color: Colors.white.withAlpha((255 * 0.1).round())),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -971,12 +907,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   const SizedBox(height: 16),
                   if (impact?.isNotEmpty ?? false)
                     _buildReflectionItem(
-                        title: l10n.memoryViewReflectionImpact,
-                        content: impact!),
+                        title: l10n.memoryViewReflectionImpact, content: impact!),
                   if (lesson?.isNotEmpty ?? false)
                     _buildReflectionItem(
-                        title: l10n.memoryViewReflectionLesson,
-                        content: lesson!),
+                        title: l10n.memoryViewReflectionLesson, content: lesson!),
                 ],
                 if (hasEmotions) ...[
                   const SizedBox(height: 16),
@@ -991,8 +925,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                     children: _currentMemory.emotions.entries
                         .map((entry) => Chip(
                               label: Text('${entry.key} (${entry.value}%)'),
-                              backgroundColor:
-                                  Colors.white.withAlpha((255 * 0.1).round()),
+                              backgroundColor: Colors.white.withAlpha((255 * 0.1).round()),
                               labelStyle: const TextStyle(color: Colors.white),
                             ))
                         .toList(),
@@ -1006,7 +939,6 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                           fontWeight: FontWeight.bold,
                           fontSize: 16)),
                   const SizedBox(height: 16),
-                  // *** ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ №1: Проверяем каждое поле на null перед отрисовкой ***
                   _buildCbtStepItem(
                       step: 1,
                       title: l10n.memoryViewCbtStep1Title,
@@ -1050,10 +982,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              action!, // Мы уже знаем, что action не null
+                              action!,
                               style: TextStyle(
-                                color:
-                                    Colors.white.withAlpha((255 * 0.9).round()),
+                                color: Colors.white.withAlpha((255 * 0.9).round()),
                                 height: 1.5,
                                 decoration:
                                     _currentMemory.reflectionActionCompleted
@@ -1070,8 +1001,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                                       .format(_currentMemory
                                           .reflectionFollowUpAt!)),
                                   style: TextStyle(
-                                      color: Colors.white
-                                          .withAlpha((255 * 0.6).round()),
+                                      color: Colors.white.withAlpha((255 * 0.6).round()),
                                       fontSize: 12),
                                 ),
                               ),
@@ -1098,8 +1028,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     );
   }
 
-  Widget _buildReflectionItem(
-      {required String title, required String content}) {
+  Widget _buildReflectionItem({required String title, required String content}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -1111,9 +1040,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text(content,
-              style: TextStyle(
-                  color: Colors.white.withAlpha((255 * 0.8).round()),
-                  height: 1.5)),
+              style:
+                  TextStyle(color: Colors.white.withAlpha((255 * 0.8).round()), height: 1.5)),
         ],
       ),
     );
@@ -1184,8 +1112,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             Text(
               l10n.memoryViewUnlockDialogContent,
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(color: Colors.white.withAlpha((255 * 0.7).round())),
+              style: TextStyle(color: Colors.white.withAlpha((255 * 0.7).round())),
             ),
             if (showUnlockButton) ...[
               const SizedBox(height: 16),
@@ -1233,7 +1160,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 80),
       children: [
         if (_needsUnlock)
-          _buildLockedContentPlaceholder(isMedia: true)
+          _buildLockedContentPlaceholder(isMedia: true, showUnlockButton: false)
         else
           mediaWidget,
         if (allMedia.length > 1 && !_needsUnlock)
@@ -1316,8 +1243,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2)),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator(strokeWidth: 2)),
                   errorWidget: (context, url, error) =>
                       const Icon(Icons.music_note),
                 ),
@@ -1443,8 +1370,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             decoration: BoxDecoration(
               color: Colors.black.withAlpha((255 * 0.2).round()),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: Colors.white.withAlpha((255 * 0.1).round())),
+              border: Border.all(color: Colors.white.withAlpha((255 * 0.1).round())),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1476,8 +1402,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         max: 1.0,
                         onChanged: _changeVolume,
                         activeColor: Colors.white,
-                        inactiveColor:
-                            Colors.white.withAlpha((255 * 0.3).round()),
+                        inactiveColor: Colors.white.withAlpha((255 * 0.3).round()),
                       ),
                     ),
                   ],
@@ -1561,8 +1486,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             decoration: BoxDecoration(
               color: Colors.black.withAlpha((255 * 0.2).round()),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: Colors.white.withAlpha((255 * 0.1).round())),
+              border: Border.all(color: Colors.white.withAlpha((255 * 0.1).round())),
             ),
             child: Row(
               children: [
@@ -2009,8 +1933,7 @@ class _NewsCard extends StatelessWidget {
                     color: Colors.white)),
             const SizedBox(height: 8),
             Text(item.description,
-                style: TextStyle(
-                    color: Colors.white.withAlpha((255 * 0.8).round()))),
+                style: TextStyle(color: Colors.white.withAlpha((255 * 0.8).round()))),
             const SizedBox(height: 8),
             Text(l10n.memoryViewNewsSource(item.source),
                 style: const TextStyle(
@@ -2170,8 +2093,7 @@ class _HoldToDeleteDialogState extends State<_HoldToDeleteDialog>
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: _progressController.value,
-                        backgroundColor:
-                            Colors.red.withAlpha((255 * 0.2).round()),
+                        backgroundColor: Colors.red.withAlpha((255 * 0.2).round()),
                         valueColor:
                             const AlwaysStoppedAnimation<Color>(Colors.red),
                       ),
@@ -2327,3 +2249,4 @@ class _ShareMenu extends StatelessWidget {
     );
   }
 }
+

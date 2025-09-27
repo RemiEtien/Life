@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
@@ -25,6 +27,8 @@ class ImageProcessingService {
     try {
       final tempDir = await getTemporaryDirectory();
       final uuid = const Uuid().v4();
+      final originalExtension = p.extension(pickedFile.path);
+
       // --- 1. Обработка основного изображения ---
       final compressedImagePath = p.join(tempDir.path, '$uuid.webp');
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
@@ -49,8 +53,7 @@ class ImageProcessingService {
 
       if (compressedFile == null || thumbnailFile == null) {
         if (kDebugMode) {
-          debugPrint(
-              '[ImageProcessingService] Failed to compress one or both images.');
+          print("[ImageProcessingService] Failed to compress one or both images.");
         }
         return null;
       }
@@ -61,7 +64,7 @@ class ImageProcessingService {
       );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[ImageProcessingService] Error processing image: $e');
+        print('[ImageProcessingService] Error processing image: $e');
       }
       return null;
     }

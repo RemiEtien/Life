@@ -233,18 +233,26 @@ class HistoricalDataService {
   }
 
   Future<List<MusicAnchor>> _mapEntriesToSpotify(List<Map<String, String>> entries) async {
-      List<MusicAnchor> musicAnchors = [];
-      int rank = 1;
-      for (final entry in entries) {
-        final cleanTitleStr = _cleanTitle(entry['title']!);
-        final cleanArtistStr = _cleanArtist(entry['artist']!);
+    // 1. Создаем список асинхронных задач для поиска треков.
+    final futures = entries.map((entry) {
+      final cleanTitleStr = _cleanTitle(entry['title']!);
+      final cleanArtistStr = _cleanArtist(entry['artist']!);
+      return _spotifyService.findBestMatch(cleanTitleStr, cleanArtistStr);
+    }).toList();
 
-        final spotifyDetails = await _spotifyService.findBestMatch(cleanTitleStr, cleanArtistStr);
-        if (spotifyDetails != null) {
-          musicAnchors.add(MusicAnchor.fromSpotifyTrack(spotifyDetails, rank++));
-        }
+    // 2. Выполняем все запросы параллельно, что значительно ускоряет процесс.
+    final spotifyResults = await Future.wait(futures);
+
+    // 3. Собираем успешные результаты в итоговый список, отфильтровывая null (ненайденные треки).
+    final musicAnchors = <MusicAnchor>[];
+    for (int i = 0; i < spotifyResults.length; i++) {
+      final details = spotifyResults[i];
+      if (details != null) {
+        // Ранг присваивается после получения всех результатов, чтобы он был последовательным.
+        musicAnchors.add(MusicAnchor.fromSpotifyTrack(details, musicAnchors.length + 1));
       }
-      return musicAnchors;
+    }
+    return musicAnchors;
   }
 
   String _cleanTitle(String s) {
@@ -266,3 +274,4 @@ class HistoricalDataService {
     return DateFormat('MMMM d, yyyy', 'en_US').format(date);
   }
 }
+

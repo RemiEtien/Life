@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' hide Key;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lifeline/memory.dart';
 import 'package:lifeline/models/user_profile.dart';
@@ -46,16 +48,25 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   Future<void> _initializeState(UserProfile? userProfile) async {
-    if (userProfile == null || !userProfile.isEncryptionEnabled) {
-      _unlockedDEK = null;
-      state = EncryptionState.notConfigured;
+    // Если профиль пользователя отсутствует (например, при выходе из системы или при первом запуске)
+    if (userProfile == null) {
+      // Если состояние уже 'locked' (например, было установлено вручную при выходе), оставляем его.
+      // В противном случае, считаем, что шифрование не настроено.
+      if (state != EncryptionState.locked) {
+        state = EncryptionState.notConfigured;
+      }
+      _unlockedDEK = null; // Всегда очищаем ключ
       return;
     }
 
-    // **ИЗМЕНЕНО:** Логика инициализации теперь проще. Если шифрование включено,
-    // сервис всегда стартует в заблокированном состоянии.
-    _unlockedDEK = null;
-    state = EncryptionState.locked;
+    // Если профиль пользователя СУЩЕСТВУЕТ
+    if (!userProfile.isEncryptionEnabled) {
+      _unlockedDEK = null;
+      state = EncryptionState.notConfigured;
+    } else {
+      _unlockedDEK = null;
+      state = EncryptionState.locked;
+    }
   }
 
   /// Sets up encryption for the first time for a user.
@@ -109,13 +120,22 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       final encryptedDEK = Encrypted.fromBase64(wrappedDEKParts[1]);
 
       final kek = _deriveKey(masterPassword, salt);
-      // **ИЗМЕНЕНО:** Используем AESMode.gcm для дешифровки
-      final encrypter = Encrypter(AES(kek, mode: AESMode.gcm));
-
-      final decryptedDEKString = encrypter.decrypt(encryptedDEK, iv: iv);
+      final gcmEncrypter = Encrypter(AES(kek, mode: AESMode.gcm));
+      String decryptedDEKString;
+      try {
+        decryptedDEKString = gcmEncrypter.decrypt(encryptedDEK, iv: iv);
+      } catch (error) {
+        try {
+          final legacyEncrypter = Encrypter(AES(kek));
+          decryptedDEKString = legacyEncrypter.decrypt(encryptedDEK, iv: iv);
+        } catch (legacyError) {
+          if (kDebugMode) {
+            print("Failed to unlock session (likely wrong password): $legacyError");
+          }
+          return false;
+        }
+      }
       _unlockedDEK = Key.fromBase64(decryptedDEKString);
-
-      // **УДАЛЕНО:** Больше не сохраняем ключ в хранилище.
       state = EncryptionState.unlocked;
       return true;
     } catch (e) {
@@ -169,14 +189,15 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   /// Locks the session by clearing the cached DEK.
   Future<void> lockSession() async {
-    _unlockedDEK = null;
-    // **УДАЛЕНО:** Больше не нужно удалять ключ из хранилища.
-
-    final userProfile = _ref.read(userProfileProvider).value;
-    if (userProfile?.isEncryptionEnabled == true) {
+    // ИСПРАВЛЕНО: Состояние должно переходить в 'locked', если оно было 'unlocked',
+    // независимо от текущего профиля пользователя. Это предотвращает
+    // неправильный переход в 'notConfigured' во время выхода из системы.
+    if (state == EncryptionState.unlocked) {
+      _unlockedDEK = null;
       state = EncryptionState.locked;
-    } else {
-      state = EncryptionState.notConfigured;
+      if (kDebugMode) {
+        print("[EncryptionService] Session locked.");
+      }
     }
   }
 
@@ -203,22 +224,26 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         !isValueEncrypted(encryptedText)) {
       return encryptedText;
     }
-    // **ИЗМЕНЕНО:** Выбрасываем исключение, если сервис заблокирован.
     if (state != EncryptionState.unlocked || _unlockedDEK == null) {
       throw EncryptionLockedException();
     }
     try {
-      // **ИЗМЕНЕНО:** Обрабатываем новый формат с префиксом.
       final parts = encryptedText.split(':');
-      // parts[0] is 'gcm_v1'
-      final iv = IV.fromBase64(parts[1]);
-      final encrypted = Encrypted.fromBase64(parts[2]);
-      // **ИЗМЕНЕНО:** Используем AESMode.gcm
-      final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
-      return encrypter.decrypt(encrypted, iv: iv);
+      if (parts.length == 3 && parts.first == 'gcm_v1') {
+        final iv = IV.fromBase64(parts[1]);
+        final encrypted = Encrypted.fromBase64(parts[2]);
+        final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
+        return encrypter.decrypt(encrypted, iv: iv);
+      } else if (parts.length == 2) {
+        final iv = IV.fromBase64(parts[0]);
+        final encrypted = Encrypted.fromBase64(parts[1]);
+        final legacyEncrypter = Encrypter(AES(_unlockedDEK!));
+        return legacyEncrypter.decrypt(encrypted, iv: iv);
+      }
+      throw Exception('Unsupported encrypted payload format');
     } catch (e) {
-      if (kDebugMode) print("Decryption failed: $e");
-      return "[Decryption Error]";
+      if (kDebugMode) print('Decryption failed: $e');
+      return '[Decryption Error]';
     }
   }
 
@@ -239,19 +264,33 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   bool isValueEncrypted(String? value) {
     if (value == null || value.isEmpty) return false;
-    // **ИЗМЕНЕНО:** Проверяем наличие префикса и 3 частей.
-    if (!value.startsWith('gcm_v1:')) return false;
 
-    final parts = value.split(':');
-    if (parts.length != 3) return false;
-
-    try {
-      base64.decode(parts[1]); // iv
-      base64.decode(parts[2]); // encrypted data + tag
-      return true;
-    } catch (e) {
-      return false;
+    if (value.startsWith('gcm_v1:')) {
+      final parts = value.split(':');
+      if (parts.length != 3) return false;
+      try {
+        base64.decode(parts[1]); // iv
+        base64.decode(parts[2]); // encrypted data + tag
+        return true;
+      } catch (_) {
+        return false;
+      }
     }
+
+    final legacyParts = value.split(':');
+    if (legacyParts.length == 2) {
+      try {
+        final ivBytes = base64.decode(legacyParts[0]);
+        final cipherBytes = base64.decode(legacyParts[1]);
+        if (ivBytes.length == 16 && cipherBytes.isNotEmpty) {
+          return true;
+        }
+      } catch (_) {
+        // fall through to return false
+      }
+    }
+
+    return false;
   }
 
   Key _deriveKey(String password, Uint8List salt) {
@@ -264,3 +303,4 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     return IV.fromSecureRandom(length).bytes;
   }
 }
+

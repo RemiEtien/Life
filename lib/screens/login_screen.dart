@@ -199,14 +199,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           _isLogin
                               ? l10n.createAccount
                               : l10n.alreadyHaveAccount,
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                          style: TextStyle(color: Colors.white.withOpacity(0.7)),
                         ),
                       ),
                       const SizedBox(height: 20),
                       Text(
                         l10n.orSignInWith,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                        style: TextStyle(color: Colors.white.withOpacity(0.5)),
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -239,13 +239,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   InputDecoration _buildInputDecoration({required String labelText, required IconData icon}) {
     return InputDecoration(
       labelText: labelText,
-      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-      prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.6)),
+      labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+      prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.6)),
       filled: true,
-      fillColor: Colors.white.withValues(alpha: 0.05),
+      fillColor: Colors.white.withOpacity(0.05),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -276,7 +276,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -310,12 +310,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: 0.05),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          color: Colors.white.withOpacity(0.05),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
         child: Image.asset(assetPath, width: 28, height: 28),
       ),
     );
   }
 }
-

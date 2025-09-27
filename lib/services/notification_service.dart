@@ -31,7 +31,6 @@ class NotificationService {
       iOS: initializationSettingsIOS,
     );
 
-    // ИЗМЕНЕНО: Добавлен обработчик onDidReceiveNotificationResponse
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
@@ -45,25 +44,29 @@ class NotificationService {
   }
 
   Future<bool> _requestPermissions() async {
-    // Для Android 13+ требуется явное разрешение на уведомления
     if (defaultTargetPlatform == TargetPlatform.android) {
-        final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-            _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>();
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
 
-        final bool? notificationPermissionGranted =
-            await androidImplementation?.requestNotificationsPermission();
-        if (notificationPermissionGranted == false) return false;
+      final bool? notificationPermissionGranted =
+          await androidImplementation?.requestNotificationsPermission();
+      // Разрешение на уведомления является обязательным.
+      if (notificationPermissionGranted == false) return false;
 
-        final bool? exactAlarmPermissionGranted =
-            await androidImplementation?.requestExactAlarmsPermission();
-        return exactAlarmPermissionGranted ?? false;
+      // **ИСПРАВЛЕНО:** Обрабатываем запрос на точные будильники
+      final bool? exactAlarmPermissionGranted =
+          await androidImplementation?.requestExactAlarmsPermission();
+      
+      // На Android < 13 (API 33), `requestExactAlarmsPermission` вернет null,
+      // но разрешение считается выданным, если оно есть в манифесте.
+      // Поэтому мы считаем `null` или `true` как успех.
+      return exactAlarmPermissionGranted ?? true;
     }
     // Для iOS разрешения запрашиваются при инициализации
     return true;
   }
 
-  // ИЗМЕНЕНО: Метод теперь принимает payload
   Future<bool> scheduleNotification({
     required int id,
     required String title,
@@ -97,11 +100,8 @@ class NotificationService {
           ),
           iOS: DarwinNotificationDetails(),
         ),
-        payload: payload, // Передаем payload
+        payload: payload,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        // ИСПРАВЛЕНО: Этот параметр устарел и удален в новой версии пакета
-        // uiLocalNotificationDateInterpretation:
-        //     UILocalNotificationDateInterpretation.absoluteTime,
       );
       return true;
     } catch (e) {
