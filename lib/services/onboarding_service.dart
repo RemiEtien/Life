@@ -62,7 +62,7 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
   }
 
   /// Starts the onboarding process if it hasn't been completed before.
-  void startOnAppLaunch() async {
+  Future<void> startOnAppLaunch() async {
     if (!_isLoaded) {
       await _loadingFuture; // Ensure loading is finished before proceeding
     }

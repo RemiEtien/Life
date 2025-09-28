@@ -3,19 +3,21 @@ import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/main.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/login_screen.dart';
-import 'package:lifeline/screens/memory_edit_screen.dart';
-import 'package:lifeline/screens/memory_view_screen.dart';
-import 'package:lifeline/screens/select_memory_screen.dart';
-import 'package:lifeline/screens/verify_email_screen.dart';
-import 'package:lifeline/services/notification_service.dart';
-import 'package:lifeline/widgets/lifeline_widget.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
+import '../memory.dart';
+import '../providers/application_providers.dart';
+import 'login_screen.dart';
+import 'memory_edit_screen.dart';
+import 'memory_view_screen.dart';
+import 'select_memory_screen.dart';
+import 'verify_email_screen.dart';
+import '../services/notification_service.dart';
+import '../widgets/lifeline_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+// НОВЫЙ ИМПОРТ: для проверки платформы
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
@@ -44,21 +46,24 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         if (l10n != null) {
           _checkForDrafts(l10n);
         }
-      }
-    });
+        // ИЗОЛИРУЕМ ФУНКЦИОНАЛ "ПОДЕЛИТЬСЯ В ПРИЛОЖЕНИЕ" ТОЛЬКО ДЛЯ МОБИЛЬНЫХ
+        // Проверяем, что это не веб-платформа и что это либо Android, либо iOS
+        if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+          _sharingSubscription =
+              ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+            if (mounted) {
+              _handleSharedFiles(value);
+            }
+          }, onError: (err) {
+            debugPrint('getMediaStream error: $err');
+          });
 
-    _sharingSubscription =
-        ReceiveSharingIntent.instance.getMediaStream().listen((List<SharedMediaFile> value) {
-      if (mounted) {
-        _handleSharedFiles(value);
-      }
-    }, onError: (err) {
-      debugPrint("getMediaStream error: $err");
-    });
-
-    ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
-      if (mounted) {
-        _handleSharedFiles(value);
+          ReceiveSharingIntent.instance.getInitialMedia().then((value) {
+            if (mounted) {
+              _handleSharedFiles(value);
+            }
+          });
+        }
       }
     });
   }
@@ -222,7 +227,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     );
   }
 
-  void _checkForDrafts(AppLocalizations l10n) async {
+  Future<void> _checkForDrafts(AppLocalizations l10n) async {
     if (!mounted) return;
     FirebaseCrashlytics.instance.log('AuthGate: Checking for drafts.');
 
@@ -530,3 +535,4 @@ class _EmptyStateOverlay extends StatelessWidget {
     );
   }
 }
+

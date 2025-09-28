@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/memory_edit_screen.dart'; // For MediaItem
-import 'package:lifeline/services/message_service.dart';
+import '../l10n/app_localizations.dart';
+import '../memory.dart';
+import '../providers/application_providers.dart';
+import 'memory_edit_screen.dart'; // For MediaItem
+import '../services/message_service.dart';
 
 /// A screen to select an existing memory to add media to.
 class SelectMemoryScreen extends ConsumerStatefulWidget {
@@ -52,7 +52,7 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
     try {
       final repo = ref.read(memoryRepositoryProvider);
       if (repo == null) {
-        throw Exception("Memory repository is not available.");
+        throw Exception('Memory repository is not available.');
       }
 
       // ИЗМЕНЕНО: Обработка и фото, и видео
@@ -97,19 +97,19 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
       }
     } catch (e, stack) {
       if (kDebugMode) {
-        print("Error adding media to memory: $e\n$stack");
+        print('Error adding media to memory: $e\n$stack');
       }
       if (mounted) {
         Navigator.of(context).pop(); // Pop loading dialog on error
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Failed to add media: $e")));
+            .showSnackBar(SnackBar(content: Text('Failed to add media: $e')));
       }
     }
   }
 
   // Helper to get file key from path
   String _getFileKey(String path) {
-    String filename = path.split('/').last.split('?').first;
+    final String filename = path.split('/').last.split('?').first;
     return filename.replaceAll(RegExp(r'^\d{13}_'), '');
   }
 

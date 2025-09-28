@@ -8,10 +8,10 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/isar_service.dart';
-import 'package:lifeline/services/user_service.dart';
+import '../providers/application_providers.dart';
+import 'encryption_service.dart';
+import 'isar_service.dart';
+import 'user_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -131,20 +131,20 @@ class AuthService {
 
     if (_isInitialized) {
       futures.add(GoogleSignIn.instance.signOut().catchError((e) {
-        if (kDebugMode) print("Google signOut error (ignored): $e");
+        if (kDebugMode) print('Google signOut error (ignored): $e');
       }));
     }
     
     futures.add(_firebaseAuth.signOut());
     
     unawaited(IsarService.close().catchError((e) {
-      if (kDebugMode) print("IsarService close error (ignored): $e");
+      if (kDebugMode) print('IsarService close error (ignored): $e');
     }));
 
     try {
       await Future.wait(futures, eagerError: false);
     } catch (e) {
-      if (kDebugMode) print("SignOut cleanup error (continuing): $e");
+      if (kDebugMode) print('SignOut cleanup error (continuing): $e');
     }
   }
 
@@ -169,7 +169,7 @@ class AuthService {
         const Duration(seconds: 30),
         onTimeout: () {
           if (kDebugMode) {
-            print("Google Sign-In timeout");
+            print('Google Sign-In timeout');
           }
           return null;
         },
@@ -233,7 +233,7 @@ class AuthService {
         ],
       );
 
-      final oAuthCredential = OAuthProvider("apple.com").credential(
+      final oAuthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode,
       );
@@ -248,7 +248,7 @@ class AuthService {
       return userCredential;
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print("Apple sign-in failed: $e");
+        print('Apple sign-in failed: $e');
       }
       FirebaseCrashlytics.instance
           .recordError(e, stackTrace, reason: 'Apple Sign-In Failed');
@@ -286,19 +286,11 @@ class AuthService {
 
       // Delete the local database file to prevent conflicts on re-registration.
       final dir = await getApplicationDocumentsDirectory();
-      // ИСПОЛЬЗУЕМ ТОЛЬКО IsarService для работы с путями
-      final dbFile = File('${dir.path}/lifeline_$uid.isar'); 
+      final dbFile = File('${dir.path}/lifeline_$uid.isar');
       if (await dbFile.exists()) {
-        try {
-            await dbFile.delete();
-             if (kDebugMode) {
-                print("[AuthService] Deleted local database file for user $uid.");
-             }
-        } catch (e) {
-            // Ошибка удаления может произойти, если файл был переименован
-            if (kDebugMode) {
-                print("[AuthService] Could not delete DB file directly, it might have been migrated: $e");
-            }
+        await dbFile.delete();
+        if (kDebugMode) {
+          print('[AuthService] Deleted local database file for user $uid.');
         }
       }
 
@@ -381,7 +373,7 @@ class AuthService {
         AppleIDAuthorizationScopes.fullName
       ],
     );
-    final credential = OAuthProvider("apple.com").credential(
+    final credential = OAuthProvider('apple.com').credential(
       idToken: appleCredential.identityToken,
       accessToken: appleCredential.authorizationCode,
     );

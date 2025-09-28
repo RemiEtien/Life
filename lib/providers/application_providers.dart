@@ -4,23 +4,23 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/models/anchors/anchor_models.dart';
-import 'package:lifeline/models/user_profile.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/services/audio_service.dart';
-import 'package:lifeline/services/auth_service.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/export_service.dart';
-import 'package:lifeline/services/firestore_service.dart';
-import 'package:lifeline/services/historical_data_service.dart';
-import 'package:lifeline/services/image_processing_service.dart';
-import 'package:lifeline/services/memory_repository.dart';
-import 'package:lifeline/services/notification_service.dart';
-import 'package:lifeline/services/onboarding_service.dart';
-import 'package:lifeline/services/purchase_service.dart';
-import 'package:lifeline/services/spotify_service.dart';
-import 'package:lifeline/services/sync_service.dart';
-import 'package:lifeline/services/user_service.dart';
+import '../models/anchors/anchor_models.dart';
+import '../models/user_profile.dart';
+import '../memory.dart';
+import '../services/audio_service.dart';
+import '../services/auth_service.dart';
+import '../services/encryption_service.dart';
+import '../services/export_service.dart';
+import '../services/firestore_service.dart';
+import '../services/historical_data_service.dart';
+import '../services/image_processing_service.dart';
+import '../services/memory_repository.dart';
+import '../services/notification_service.dart';
+import '../services/onboarding_service.dart';
+import '../services/purchase_service.dart';
+import '../services/spotify_service.dart';
+import '../services/sync_service.dart';
+import '../services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // 0. Provider to track network state
@@ -294,7 +294,7 @@ class LocaleNotifier extends StateNotifier<Locale?> {
     }
   }
 
-  void setLocale(Locale newLocale) async {
+  Future<void> setLocale(Locale newLocale) async {
     if (_disposed) return;
 
     try {

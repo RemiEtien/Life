@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/services/message_service.dart';
+import '../services/message_service.dart';
 
 /// Виджет, который отображает всплывающие сообщения поверх основного контента.
 class FloatingMessageOverlay extends ConsumerWidget {

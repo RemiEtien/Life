@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:lifeline/l10n/app_localizations.dart';
 import 'package:audioplayers/audioplayers.dart' as ap;
@@ -350,6 +351,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     if (_isExporting) return;
     setState(() => _isExporting = true);
     final currentContext = context;
+    File? tempFile; // Файл для последующей очистки
 
     try {
       final ByteData fontRegular =
@@ -418,10 +420,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
       final fileName =
           'Lifeline_Memory_${DateFormat('yyyyMMdd').format(_currentMemory.date)}.$format';
-      final file =
+      tempFile =
           await File('${tempDir.path}/$fileName').writeAsBytes(fileBytes);
 
-      await Share.shareXFiles([XFile(file.path)], text: _currentMemory.title);
+      await Share.shareXFiles([XFile(tempFile.path)], text: _currentMemory.title);
     } catch (e, stack) {
       // ignore: avoid_print
       print('Export failed: $e\n$stack');
@@ -433,6 +435,21 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     } finally {
       if (mounted) {
         setState(() => _isExporting = false);
+      }
+      // Очищаем временный файл после завершения
+      if (tempFile != null && await tempFile.exists()) {
+        try {
+          await tempFile.delete();
+          if (kDebugMode) {
+            print(
+                '[MemoryViewScreen] Deleted temporary export file: ${tempFile.path}');
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print(
+                '[MemoryViewScreen] Error deleting temporary file: $e');
+          }
+        }
       }
     }
   }
@@ -492,6 +509,33 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            // Вспомогательная функция для избежания дублирования кода
+            Future<void> attemptUnlock() async {
+              setState(() {
+                isLoading = true;
+                errorText = null;
+              });
+              try {
+                await ref
+                    .read(encryptionServiceProvider.notifier)
+                    .unlockSession(passwordController.text);
+                if (!mounted) return;
+                Navigator.of(context).pop(true);
+              } on EncryptionUnlockException catch (e) {
+                if (!mounted) return;
+                setState(() {
+                  errorText = e.message;
+                  isLoading = false;
+                });
+              } catch (e) {
+                if (!mounted) return;
+                setState(() {
+                  errorText = l10n.memoryViewIncorrectPassword;
+                  isLoading = false;
+                });
+              }
+            }
+
             return AlertDialog(
               title: Text(l10n.memoryViewUnlockDialogTitle),
               content: Column(
@@ -510,24 +554,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         labelText: l10n.memoryEditMasterPasswordHint,
                         errorText: errorText,
                       ),
-                      onSubmitted: (_) async {
-                        setState(() {
-                          isLoading = true;
-                          errorText = null;
-                        });
-                        final success = await ref
-                            .read(encryptionServiceProvider.notifier)
-                            .unlockSession(passwordController.text);
-                        if (!mounted) return;
-                        if (success) {
-                          Navigator.of(context).pop(true);
-                        } else {
-                          setState(() {
-                            errorText = l10n.memoryViewIncorrectPassword;
-                            isLoading = false;
-                          });
-                        }
-                      },
+                      onSubmitted: (_) async => await attemptUnlock(),
                     ),
                 ],
               ),
@@ -536,26 +563,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                     onPressed: () => Navigator.of(context).pop(false),
                     child: Text(l10n.profileCancel)),
                 ElevatedButton(
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          setState(() {
-                            isLoading = true;
-                            errorText = null;
-                          });
-                          final success = await ref
-                              .read(encryptionServiceProvider.notifier)
-                              .unlockSession(passwordController.text);
-                          if (!mounted) return;
-                          if (success) {
-                            Navigator.of(context).pop(true);
-                          } else {
-                            setState(() {
-                              errorText = l10n.memoryViewIncorrectPassword;
-                              isLoading = false;
-                            });
-                          }
-                        },
+                  onPressed: isLoading ? null : attemptUnlock,
                   child: Text(l10n.memoryViewUnlockButton),
                 ),
               ],

@@ -54,7 +54,7 @@ void lifelineIsolateEntry(CalculationInput input) {
     final midY = size.height / 2;
     
     final segments = (size.width / 50).clamp(48, 500).round();
-    final startX = margin;
+    const startX = margin;
     
     double noise(double x, double y) => (sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1.0;
     

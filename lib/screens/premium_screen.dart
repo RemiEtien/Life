@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/services/purchase_service.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/application_providers.dart';
+import '../services/purchase_service.dart';
 // ИСПРАВЛЕНИЕ: Добавляем импорты для работы с локальными файлами и экраном документов
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:lifeline/screens/legal/document_screen.dart';
+import 'legal/document_screen.dart';
 
 
 class PremiumScreen extends ConsumerWidget {
   const PremiumScreen({super.key});
 
   // ИСПРАВЛЕНИЕ: Добавляем вспомогательный метод для открытия локальных документов
-  void _openDocument(BuildContext context, WidgetRef ref, String title, String docName) async {
+  Future<void> _openDocument(BuildContext context, WidgetRef ref, String title, String docName) async {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.read(localeProvider) ?? Localizations.localeOf(context);
     final languageCode = locale.languageCode;
@@ -77,17 +77,17 @@ class PremiumScreen extends ConsumerWidget {
               if (purchaseState.isLoading)
                 const Center(child: CircularProgressIndicator())
               else if (!purchaseState.isAvailable)
-                Center(
+                const Center(
                   child: Text(
-                    "In-app purchases are not available on this device.",
+                    'In-app purchases are not available on this device.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70),
                   ),
                 )
               else if (purchaseState.products.isEmpty)
-                Center(
+                const Center(
                   child: Text(
-                    "Could not load products. Please check your connection and try again.",
+                    'Could not load products. Please check your connection and try again.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70),
                   ),

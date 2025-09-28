@@ -1953,6 +1953,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Memory successfully updated!'**
   String get memoryUpdatedSuccess;
+
+  /// No description provided for @unlockFailedAttemptsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password. {count} attempts remaining.'**
+  String unlockFailedAttemptsRemaining(int count);
+
+  /// No description provided for @unlockTooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again in {seconds} seconds.'**
+  String unlockTooManyAttempts(int seconds);
+
+  /// No description provided for @unlocking.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocking...'**
+  String get unlocking;
+
+  /// No description provided for @exportingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing PDF...'**
+  String get exportingPdf;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String exportFailed(String error);
 }
 
 class _AppLocalizationsDelegate

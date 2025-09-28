@@ -2,10 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/auth_gate.dart';
-import 'package:lifeline/screens/legal/document_screen.dart';
+import '../../l10n/app_localizations.dart';
+import '../../providers/application_providers.dart';
+import '../auth_gate.dart';
+import 'document_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConsentScreen extends ConsumerStatefulWidget {
@@ -19,7 +19,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
   bool _agreedToTerms = false;
   bool _isLoading = false;
 
-  void _onContinue() async {
+  Future<void> _onContinue() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_agreedToTerms) return;
 
@@ -44,7 +44,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
     }
   }
 
-  void _openDocument(String title, String path, String languageCode) async {
+  Future<void> _openDocument(String title, String path, String languageCode) async {
     print('=== DOCUMENT DEBUG START ===');
     print('Title: $title');
     print('Original path: $path');
@@ -167,7 +167,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
                   ),
                 ),
                 value: _agreedToTerms,
-                onChanged: (bool? value) {
+                onChanged: (value) {
                   setState(() {
                     _agreedToTerms = value ?? false;
                   });

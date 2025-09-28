@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/isar_service.dart';
+import '../memory.dart';
+import 'encryption_service.dart';
+import 'isar_service.dart';
 
 class MemoryRepository {
   final String userId;
@@ -168,7 +168,7 @@ class MemoryRepository {
 
   Stream<List<Memory>> watchAllSortedByDate() async* {
     if (kDebugMode) {
-      print("[DIAGNOSTIC] Subscribing to memories for userId: $userId");
+      print('[DIAGNOSTIC] Subscribing to memories for userId: $userId');
     }
     final isar = await _db;
 
@@ -183,13 +183,13 @@ class MemoryRepository {
     if (kDebugMode) {
       final initialResults = await query.findAll();
       print(
-          "[DIAGNOSTIC] Initial fetch for userId: $userId found ${initialResults.length} memories.");
+          '[DIAGNOSTIC] Initial fetch for userId: $userId found ${initialResults.length} memories.');
     }
 
     yield* query.watch(fireImmediately: true).map((results) {
       if (kDebugMode) {
         print(
-            "[DIAGNOSTIC] Stream update for userId: $userId delivered ${results.length} memories.");
+            '[DIAGNOSTIC] Stream update for userId: $userId delivered ${results.length} memories.');
       }
       return results;
     });

@@ -1,22 +1,34 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/models/user_profile.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:pointycastle/key_derivators/api.dart';
+import 'package:pointycastle/digests/sha256.dart';
+import 'package:pointycastle/key_derivators/api.dart'; // ИСПРАВЛЕНО: Добавлен недостающий импорт
 import 'package:pointycastle/key_derivators/pbkdf2.dart';
 import 'package:pointycastle/macs/hmac.dart';
-import 'package:pointycastle/digests/sha256.dart';
+
+import '../memory.dart';
+import '../models/user_profile.dart';
+import '../providers/application_providers.dart';
+import 'crypto_isolate.dart';
 
 /// **НОВОЕ:** Исключение, выбрасываемое при попытке шифрования/дешифрования
 /// в заблокированном состоянии.
 class EncryptionLockedException implements Exception {
   final String message =
-      "Encryption service is locked. Unlock with master password before proceeding.";
+      'Encryption service is locked. Unlock with master password before proceeding.';
+  @override
+  String toString() => message;
+}
+
+/// Исключение для ошибок при разблокировке, включая защиту от брутфорса.
+class EncryptionUnlockException implements Exception {
+  final String message;
+  const EncryptionUnlockException(this.message);
   @override
   String toString() => message;
 }
@@ -39,6 +51,13 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   // **УДАЛЕНО:** Ключ больше не кэшируется в FlutterSecureStorage.
 
   Key? _unlockedDEK; // Data Encryption Key, cached in memory for the session.
+
+  // --- НОВЫЕ ПОЛЯ: Для защиты от брутфорса ---
+  int _failedAttempts = 0;
+  DateTime? _lockoutEndTime;
+  static const int _maxFailedAttempts = 5;
+  static const int _lockoutDurationSeconds = 30;
+  // --- КОНЕЦ НОВЫХ ПОЛЕЙ ---
 
   EncryptionService(this._ref) : super(EncryptionState.notConfigured) {
     // Listen to the user profile to initialize and update state reactively.
@@ -73,7 +92,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   /// Generates DEK, salt, and saves the wrapped DEK to the user's profile.
   Future<void> setupEncryption(String masterPassword) async {
     final userProfile = _ref.read(userProfileProvider).value;
-    if (userProfile == null) throw Exception("User profile not found.");
+    if (userProfile == null) throw Exception('User profile not found.');
 
     // 1. Generate a new random Data Encryption Key (DEK).
     final newDEK = Key.fromSecureRandom(32); // 256-bit
@@ -82,7 +101,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final salt = _generateRandomBytes(16);
 
     // 3. Derive the Key Encryption Key (KEK) from the master password and salt.
-    final kek = _deriveKey(masterPassword, salt);
+    final kek = await _deriveKey(masterPassword, salt, useIsolate: true);
 
     // 4. "Wrap" (encrypt) the DEK with the KEK using AES-GCM.
     final iv = IV.fromSecureRandom(12); // GCM standard is 12 bytes
@@ -107,42 +126,103 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   /// Attempts to unlock the session by decrypting the stored DEK.
-  Future<bool> unlockSession(String masterPassword) async {
+  Future<void> unlockSession(String masterPassword) async {
+    // 1. Проверка на блокировку из-за множества неудачных попыток
+    if (_lockoutEndTime != null && _lockoutEndTime!.isAfter(DateTime.now())) {
+      final remainingSeconds =
+          _lockoutEndTime!.difference(DateTime.now()).inSeconds;
+      throw EncryptionUnlockException(
+          'Too many attempts. Please try again in $remainingSeconds seconds.');
+    }
+
     final userProfile = _ref.read(userProfileProvider).value;
     if (userProfile?.wrappedDEK == null || userProfile?.salt == null) {
-      return false; // Encryption not configured
+      _handleFailedAttempt();
+      throw const EncryptionUnlockException('Incorrect password.');
     }
 
     try {
-      final salt = base64.decode(userProfile!.salt!);
-      final wrappedDEKParts = userProfile.wrappedDEK!.split(':');
-      final iv = IV.fromBase64(wrappedDEKParts[0]);
-      final encryptedDEK = Encrypted.fromBase64(wrappedDEKParts[1]);
-
-      final kek = _deriveKey(masterPassword, salt);
-      final gcmEncrypter = Encrypter(AES(kek, mode: AESMode.gcm));
-      String decryptedDEKString;
+      // 2. Попытка расшифровки с новыми, усиленными параметрами (в изоляте)
+      final dek = await _unwrapDek(masterPassword, userProfile!.salt!,
+          userProfile.wrappedDEK!, true);
+      _unlockedDEK = dek;
+      state = EncryptionState.unlocked;
+      _failedAttempts = 0; // Сброс счетчика при успехе
+      _lockoutEndTime = null;
+    } catch (e) {
+      // 3. Если не получилось, пробуем старый метод (для обратной совместимости)
       try {
-        decryptedDEKString = gcmEncrypter.decrypt(encryptedDEK, iv: iv);
-      } catch (error) {
-        try {
-          final legacyEncrypter = Encrypter(AES(kek));
-          decryptedDEKString = legacyEncrypter.decrypt(encryptedDEK, iv: iv);
-        } catch (legacyError) {
-          if (kDebugMode) {
-            print("Failed to unlock session (likely wrong password): $legacyError");
-          }
-          return false;
+        final dek = await _unwrapDek(masterPassword, userProfile!.salt!,
+            userProfile.wrappedDEK!, false);
+        _unlockedDEK = dek;
+
+        // 4. ПЛАВНАЯ МИГРАЦИЯ: Если старый метод сработал, перешифровываем ключ новыми параметрами
+        await _migrateEncryption(masterPassword, dek);
+
+        state = EncryptionState.unlocked;
+        _failedAttempts = 0;
+        _lockoutEndTime = null;
+      } catch (finalError) {
+        // 5. Если и старый метод не сработал - пароль неверный
+        _handleFailedAttempt();
+        final remaining = _maxFailedAttempts - _failedAttempts;
+        if (remaining > 0) {
+          throw EncryptionUnlockException(
+              'Incorrect password. $remaining attempts remaining.');
+        } else {
+          throw const EncryptionUnlockException('Incorrect password.');
         }
       }
-      _unlockedDEK = Key.fromBase64(decryptedDEKString);
-      state = EncryptionState.unlocked;
-      return true;
-    } catch (e) {
-      if (kDebugMode) {
-        print("Failed to unlock session (likely wrong password): $e");
-      }
-      return false;
+    }
+  }
+
+  void _handleFailedAttempt() {
+    _failedAttempts++;
+    if (_failedAttempts >= _maxFailedAttempts) {
+      _lockoutEndTime =
+          DateTime.now().add(const Duration(seconds: _lockoutDurationSeconds));
+      _failedAttempts = 0; // Сбрасываем счетчик после установки блокировки
+    }
+  }
+
+  Future<Key> _unwrapDek(String password, String saltB64, String wrappedDek,
+      bool useIsolate) async {
+    final salt = base64.decode(saltB64);
+    final wrappedDEKParts = wrappedDek.split(':');
+    final iv = IV.fromBase64(wrappedDEKParts[0]);
+    final encryptedDEK = Encrypted.fromBase64(wrappedDEKParts[1]);
+
+    final kek = await _deriveKey(password, salt, useIsolate: useIsolate);
+    final gcmEncrypter = Encrypter(AES(kek, mode: AESMode.gcm));
+    String decryptedDEKString;
+    try {
+      decryptedDEKString = gcmEncrypter.decrypt(encryptedDEK, iv: iv);
+    } catch (error) {
+      // Обратная совместимость с CBC
+      final legacyEncrypter = Encrypter(AES(kek));
+      decryptedDEKString = legacyEncrypter.decrypt(encryptedDEK, iv: iv);
+    }
+    return Key.fromBase64(decryptedDEKString);
+  }
+
+  Future<void> _migrateEncryption(String password, Key dek) async {
+    final userProfile = _ref.read(userProfileProvider).value;
+    if (userProfile == null) return; // Should not happen here
+
+    final newSalt = _generateRandomBytes(16);
+    final newKek = await _deriveKey(password, newSalt, useIsolate: true);
+    final iv = IV.fromSecureRandom(12);
+    final encrypter = Encrypter(AES(newKek, mode: AESMode.gcm));
+    final newEncryptedDEK = encrypter.encrypt(dek.base64, iv: iv);
+    final newWrappedDEK = '${iv.base64}:${newEncryptedDEK.base64}';
+
+    final updatedProfile = userProfile.copyWith(
+      salt: base64.encode(newSalt),
+      wrappedDEK: newWrappedDEK,
+    );
+    await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+    if (kDebugMode) {
+      print('[EncryptionService] User key migrated to stronger parameters.');
     }
   }
 
@@ -155,10 +235,11 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     }
 
     // 1. Verify the old password by trying to unlock the session
-    final unlocked = await unlockSession(oldPassword);
-    if (!unlocked || _unlockedDEK == null) {
-      // If unlock fails, the old password was incorrect.
-      return false;
+    try {
+      await unlockSession(oldPassword);
+      if (_unlockedDEK == null) return false;
+    } catch (e) {
+      return false; // Старый пароль неверный
     }
 
     // At this point, _unlockedDEK contains the decrypted Data Encryption Key.
@@ -167,7 +248,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final newSalt = _generateRandomBytes(16);
 
     // 3. Derive the new Key Encryption Key (KEK) from the new password and new salt.
-    final newKek = _deriveKey(newPassword, newSalt);
+    final newKek = await _deriveKey(newPassword, newSalt, useIsolate: true);
 
     // 4. Re-wrap (encrypt) the existing DEK with the NEW KEK using AES-GCM.
     final iv = IV.fromSecureRandom(12);
@@ -196,7 +277,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       _unlockedDEK = null;
       state = EncryptionState.locked;
       if (kDebugMode) {
-        print("[EncryptionService] Session locked.");
+        print('[EncryptionService] Session locked.');
       }
     }
   }
@@ -230,16 +311,19 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     try {
       final parts = encryptedText.split(':');
       if (parts.length == 3 && parts.first == 'gcm_v1') {
+        // Новый формат GCM
         final iv = IV.fromBase64(parts[1]);
         final encrypted = Encrypted.fromBase64(parts[2]);
         final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
         return encrypter.decrypt(encrypted, iv: iv);
       } else if (parts.length == 2) {
+        // Старый формат CBC для обратной совместимости
         final iv = IV.fromBase64(parts[0]);
         final encrypted = Encrypted.fromBase64(parts[1]);
         final legacyEncrypter = Encrypter(AES(_unlockedDEK!));
         return legacyEncrypter.decrypt(encrypted, iv: iv);
       }
+      // Если формат неизвестен, выбрасываем исключение
       throw Exception('Unsupported encrypted payload format');
     } catch (e) {
       if (kDebugMode) print('Decryption failed: $e');
@@ -265,6 +349,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   bool isValueEncrypted(String? value) {
     if (value == null || value.isEmpty) return false;
 
+    // Проверка нового формата GCM
     if (value.startsWith('gcm_v1:')) {
       final parts = value.split(':');
       if (parts.length != 3) return false;
@@ -277,11 +362,13 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       }
     }
 
+    // Проверка старого формата CBC
     final legacyParts = value.split(':');
     if (legacyParts.length == 2) {
       try {
         final ivBytes = base64.decode(legacyParts[0]);
         final cipherBytes = base64.decode(legacyParts[1]);
+        // IV for CBC is typically 16 bytes. Check this.
         if (ivBytes.length == 16 && cipherBytes.isNotEmpty) {
           return true;
         }
@@ -293,11 +380,27 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     return false;
   }
 
-  Key _deriveKey(String password, Uint8List salt) {
-    // ИСПРАВЛЕНИЕ: Увеличено количество итераций до 600,000 (рекомендация OWASP 2024).
-    final derivator = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
-      ..init(Pbkdf2Parameters(salt, 600000, 32)); // 32 bytes for AES-256
-    return Key(derivator.process(Uint8List.fromList(utf8.encode(password))));
+  Future<Key> _deriveKey(String password, Uint8List salt,
+      {required bool useIsolate}) async {
+    if (useIsolate && !kIsWeb) {
+      // --- ВЫПОЛНЕНИЕ В ИЗОЛЯТЕ ---
+      final port = ReceivePort();
+      final isolateData = IsolateDeriveKeyRequest(
+        password: password,
+        salt: salt,
+        sendPort: port.sendPort,
+      );
+      await Isolate.spawn(deriveKeyIsolateEntry, isolateData);
+      final keyBytes = await port.first as Uint8List;
+      return Key(keyBytes);
+    } else {
+      // --- ВЫПОЛНЕНИЕ В ОСНОВНОМ ПОТОКЕ (для Web и старого метода) ---
+      final iterations =
+          useIsolate ? 310000 : 100000; // Используем разное кол-во итераций
+      final derivator = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
+        ..init(Pbkdf2Parameters(salt, iterations, 32));
+      return Key(derivator.process(Uint8List.fromList(utf8.encode(password))));
+    }
   }
 
   Uint8List _generateRandomBytes(int length) {

@@ -41,15 +41,15 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
   bool _wasGlobalPlayerActiveBeforeAmbient = false;
 
   final List<GlobalTrackDetails> _playlist = [
-    GlobalTrackDetails(name: "Ambient Background", assetPath: "music/ambient-background-339939.mp3"),
-    GlobalTrackDetails(name: "Ambient Background II", assetPath: "music/ambient-background-347405.mp3"),
-    GlobalTrackDetails(name: "Ambient Music", assetPath: "music/ambient-music-349056.mp3"),
-    GlobalTrackDetails(name: "Blue Ice Ambient", assetPath: "music/blue-ice-ambient-background-music-365976.mp3"),
-    GlobalTrackDetails(name: "Midnight Forest", assetPath: "music/midnight-forest-184304.mp3"),
-    GlobalTrackDetails(name: "Relaxing Electronic", assetPath: "music/relaxing-electronic-ambient-music-354471.mp3"),
-    GlobalTrackDetails(name: "Solitude Dark Ambient", assetPath: "music/solitude-dark-ambient-music-354468.mp3"),
-    GlobalTrackDetails(name: "Space Ambient", assetPath: "music/space-ambient-351305.mp3"),
-    GlobalTrackDetails(name: "Space Ambient Cinematic", assetPath: "music/space-ambient-cinematic-351304.mp3"),
+    GlobalTrackDetails(name: 'Ambient Background', assetPath: 'music/ambient-background-339939.mp3'),
+    GlobalTrackDetails(name: 'Ambient Background II', assetPath: 'music/ambient-background-347405.mp3'),
+    GlobalTrackDetails(name: 'Ambient Music', assetPath: 'music/ambient-music-349056.mp3'),
+    GlobalTrackDetails(name: 'Blue Ice Ambient', assetPath: 'music/blue-ice-ambient-background-music-365976.mp3'),
+    GlobalTrackDetails(name: 'Midnight Forest', assetPath: 'music/midnight-forest-184304.mp3'),
+    GlobalTrackDetails(name: 'Relaxing Electronic', assetPath: 'music/relaxing-electronic-ambient-music-354471.mp3'),
+    GlobalTrackDetails(name: 'Solitude Dark Ambient', assetPath: 'music/solitude-dark-ambient-music-354468.mp3'),
+    GlobalTrackDetails(name: 'Space Ambient', assetPath: 'music/space-ambient-351305.mp3'),
+    GlobalTrackDetails(name: 'Space Ambient Cinematic', assetPath: 'music/space-ambient-cinematic-351304.mp3'),
   ];
   int _currentIndex = 0;
 

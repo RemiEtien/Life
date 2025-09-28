@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 import 'package:intl/intl.dart';
-import 'package:lifeline/models/anchors/anchor_models.dart';
-import 'package:lifeline/services/spotify_service.dart';
+import '../models/anchors/anchor_models.dart';
+import 'spotify_service.dart';
 
 class HistoricalDataService {
   final SpotifyService _spotifyService;
@@ -76,7 +76,7 @@ class HistoricalDataService {
       }
     } catch (e, stackTrace) {
        if (kDebugMode) {
-         print("Error in _fetchArticleForSpecificDate: $e");
+         print('Error in _fetchArticleForSpecificDate: $e');
        }
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia article fetch failed');
     }
@@ -98,7 +98,7 @@ class HistoricalDataService {
       }
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print("Error in _fetchOnThisDayEvents: $e");
+        print('Error in _fetchOnThisDayEvents: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia OnThisDay fetch failed');
     }
@@ -118,7 +118,7 @@ class HistoricalDataService {
   /// что делает его более отказоустойчивым.
   Future<List<MusicAnchor>> _fetchBillboardWeekWithRetries(DateTime date,
       {int maxWeeksBack = 8}) async {
-    DateTime chartDate = _normalizeToBillboardWeek(date);
+    final DateTime chartDate = _normalizeToBillboardWeek(date);
 
     for (int i = 0; i < maxWeeksBack; i++) {
       final tryDate = chartDate.subtract(Duration(days: 7 * i));
@@ -155,14 +155,14 @@ class HistoricalDataService {
           reason: 'Billboard week fetch failed for $formattedDate'
         );
         if (kDebugMode) {
-          print("Error fetching week $formattedDate, trying previous week. Error: $e");
+          print('Error fetching week $formattedDate, trying previous week. Error: $e');
         }
         // Не пробрасываем ошибку, а просто переходим к следующей неделе
       }
     }
     
     if (kDebugMode) {
-      print("Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.");
+      print('Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.');
     }
     return []; // Возвращаем пустой список вместо исключения
   }
@@ -219,13 +219,13 @@ class HistoricalDataService {
 
     } on TimeoutException catch(e, stackTrace) {
       if (kDebugMode) {
-        print("Timeout during Billboard fetch for $ymd: $e");
+        print('Timeout during Billboard fetch for $ymd: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Timeout for $ymd');
       rethrow;
     } catch(e, stackTrace) {
       if (kDebugMode) {
-        print("Exception during Billboard fetch/parse for $ymd: $e");
+        print('Exception during Billboard fetch/parse for $ymd: $e');
       }
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Fetch/Parse Exception for $ymd');
       rethrow;

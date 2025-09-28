@@ -3,10 +3,10 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/widgets/device_performance_detector.dart';
+import '../memory.dart';
+import 'device_performance_detector.dart';
 import 'package:collection/collection.dart';
-import 'package:lifeline/widgets/lifeline_widget.dart'; // Import for YearPosition
+import 'lifeline_widget.dart'; // Import for YearPosition
 
 // --- NEW: A dedicated class to hold performance timings ---
 class PaintTimings {
@@ -42,20 +42,20 @@ class PaintTimings {
   }
 
   String toDebugString() {
-    if (total == 0) return "No paint timings yet.";
+    if (total == 0) return 'No paint timings yet.';
 
     final bgPercent =
-        total > 0 ? (background / total * 100).toStringAsFixed(1) : "0.0";
+        total > 0 ? (background / total * 100).toStringAsFixed(1) : '0.0';
     final structPercent =
-        total > 0 ? (structure / total * 100).toStringAsFixed(1) : "0.0";
+        total > 0 ? (structure / total * 100).toStringAsFixed(1) : '0.0';
     final nodesPercent =
-        total > 0 ? (nodes / total * 100).toStringAsFixed(1) : "0.0";
+        total > 0 ? (nodes / total * 100).toStringAsFixed(1) : '0.0';
     final labelsPercent =
-        total > 0 ? (labels / total * 100).toStringAsFixed(1) : "0.0";
+        total > 0 ? (labels / total * 100).toStringAsFixed(1) : '0.0';
     final macroPercent =
-        total > 0 ? (macroView / total * 100).toStringAsFixed(1) : "0.0";
+        total > 0 ? (macroView / total * 100).toStringAsFixed(1) : '0.0';
 
-    return """
+    return '''
 --- PAINT TIMING (ms) ---
 Background: $background ms ($bgPercent%)
 Structure: $structure ms ($structPercent%)
@@ -63,7 +63,7 @@ Nodes: $nodes ms ($nodesPercent%)
 Labels: $labels ms ($labelsPercent%)
 Macro View: $macroView ms ($macroPercent%)
 Total: $total ms
-""";
+''';
   }
 }
 
@@ -645,6 +645,11 @@ class LifelinePainter extends CustomPainter {
     } else {
       _drawDefaultNode(canvas, adjustedPos, nodeRadius, opacity, index);
     }
+
+    // --- ИЗМЕНЕНИЕ: Рисуем замок, если воспоминание зашифровано ---
+    if (memory.isEncrypted) {
+      _drawLockIcon(canvas, adjustedPos, nodeRadius, opacity);
+    }
   }
 
   void _drawDefaultNode(
@@ -697,6 +702,12 @@ class LifelinePainter extends CustomPainter {
         ..strokeWidth = 4.0;
       canvas.drawCircle(adjustedPos, nodeRadius * 1.5, ringGlow);
     }
+    
+    // --- ИЗМЕНЕНИЕ: Проверяем, есть ли в кластере зашифрованные воспоминания ---
+    final bool isClusterEncrypted = clusterInfo.memories.any((m) => m.isEncrypted);
+    if(isClusterEncrypted) {
+      _drawLockIcon(canvas, adjustedPos, nodeRadius * 1.5, opacity);
+    }
 
     final textStyle = GoogleFonts.orbitron(
         color: ringColor.withOpacity(opacity),
@@ -714,6 +725,46 @@ class LifelinePainter extends CustomPainter {
         adjustedPos.dx - textPainter.width / 2, adjustedPos.dy - textPainter.height / 2);
     textPainter.paint(canvas, textPos);
   }
+
+  // --- НОВЫЙ МЕТОД: Рисует иконку замка ---
+  void _drawLockIcon(Canvas canvas, Offset center, double nodeRadius, double opacity) {
+    final iconSize = nodeRadius * 0.7;
+    final icon = Icons.lock_outline;
+    final textStyle = TextStyle(
+        color: Colors.white.withOpacity(0.9 * opacity),
+        fontSize: iconSize,
+        fontFamily: icon.fontFamily,
+        package: icon.fontPackage,
+    );
+    final textSpan = TextSpan(
+        text: String.fromCharCode(icon.codePoint),
+        style: textStyle,
+    );
+    final textPainter = TextPainter(
+        text: textSpan,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+
+    final iconPosition = Offset(
+        center.dx - textPainter.width / 2,
+        center.dy + nodeRadius - textPainter.height,
+    );
+    
+    final backgroundRect = Rect.fromCenter(
+        center: iconPosition.translate(textPainter.width / 2, textPainter.height / 2),
+        width: textPainter.width + 4,
+        height: textPainter.height + 4
+    );
+    final backgroundPaint = Paint()
+        ..color = Colors.black.withOpacity(0.4 * opacity)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 2.0);
+    canvas.drawRRect(RRect.fromRectAndRadius(backgroundRect, const Radius.circular(4)), backgroundPaint);
+
+    textPainter.paint(canvas, iconPosition);
+  }
+
 
   void _drawTimeGapMarker(
       Canvas canvas, TimeGapPlacementInfo info, Size canvasSize, double opacity) {
@@ -768,4 +819,3 @@ class LifelinePainter extends CustomPainter {
         old.renderData != renderData;
   }
 }
-

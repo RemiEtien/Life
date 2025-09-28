@@ -53,7 +53,7 @@ class ImageProcessingService {
 
       if (compressedFile == null || thumbnailFile == null) {
         if (kDebugMode) {
-          print("[ImageProcessingService] Failed to compress one or both images.");
+          print('[ImageProcessingService] Failed to compress one or both images.');
         }
         return null;
       }

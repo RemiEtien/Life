@@ -3,7 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:lifeline/providers/application_providers.dart';
+import '../providers/application_providers.dart';
 
 // Идентификаторы ваших подписок в Google Play и App Store
 const String _monthlySubscriptionId = 'lifeline_premium_monthly';
@@ -48,7 +48,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     }, onDone: () {
       _subscription.cancel();
     }, onError: (error) {
-      debugPrint("[PurchaseService] Purchase stream error: $error");
+      debugPrint('[PurchaseService] Purchase stream error: $error');
     });
     initialize();
   }
@@ -57,7 +57,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     final isAvailable = await _inAppPurchase.isAvailable();
     if (!isAvailable) {
       state = state.copyWith(isAvailable: false, isLoading: false);
-      debugPrint("[PurchaseService] In-app purchases not available.");
+      debugPrint('[PurchaseService] In-app purchases not available.');
       return;
     }
     state = state.copyWith(isAvailable: true);
@@ -69,7 +69,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     final ProductDetailsResponse response =
         await _inAppPurchase.queryProductDetails(_productIds);
     if (response.notFoundIDs.isNotEmpty) {
-      debugPrint("[PurchaseService] Not found IDs: ${response.notFoundIDs}");
+      debugPrint('[PurchaseService] Not found IDs: ${response.notFoundIDs}');
     }
     final products = response.productDetails;
     // Сортируем, чтобы годовая подписка всегда была второй
@@ -94,7 +94,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
           debugPrint(
-              "[PurchaseService] Purchase error: ${purchaseDetails.error}");
+              '[PurchaseService] Purchase error: ${purchaseDetails.error}');
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
           _verifyAndGrantPremium(purchaseDetails);
@@ -122,7 +122,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
           defaultTargetPlatform == TargetPlatform.android ? 'android' : 'ios';
       final receipt = purchaseDetails.verificationData.serverVerificationData;
 
-      debugPrint("[PurchaseService] Calling verifyPurchase function with receipt for product ${purchaseDetails.productID}...");
+      debugPrint('[PurchaseService] Calling verifyPurchase function with receipt for product ${purchaseDetails.productID}...');
       
       final result = await callable.call({
         'platform': platform,
@@ -130,13 +130,13 @@ class PurchaseService extends StateNotifier<PurchaseState> {
         'productId': purchaseDetails.productID,
       });
 
-      debugPrint("[PurchaseService] Cloud function call successful. Result: ${result.data}");
+      debugPrint('[PurchaseService] Cloud function call successful. Result: ${result.data}');
       
     } catch (e) {
       // ИЗМЕНЕНИЕ: Более детальное логирование ошибок
-      debugPrint("[PurchaseService] Error verifying purchase with cloud function: $e");
+      debugPrint('[PurchaseService] Error verifying purchase with cloud function: $e');
       if (e is FirebaseFunctionsException) {
-          debugPrint("[PurchaseService] Cloud function error details: code=${e.code}, message=${e.message}, details=${e.details}");
+          debugPrint('[PurchaseService] Cloud function error details: code=${e.code}, message=${e.message}, details=${e.details}');
       }
     }
   }

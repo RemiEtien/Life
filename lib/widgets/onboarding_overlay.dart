@@ -4,10 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/profile_screen.dart';
-import 'package:lifeline/services/onboarding_service.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/application_providers.dart';
+import '../screens/profile_screen.dart';
+import '../services/onboarding_service.dart';
 
 // --- НОВЫЙ ЦВЕТ ДЛЯ ЕДИНОГО СТИЛЯ ---
 const Color _onboardingBackgroundColor = Color(0xFF3a2e2d);
@@ -68,14 +68,14 @@ class _OnboardingOverlayState extends ConsumerState<OnboardingOverlay> {
   void initState() {
     super.initState();
     if (kDebugMode) {
-      print("[Onboarding] initState: Setting up listener.");
+      print('[Onboarding] initState: Setting up listener.');
     }
     // Using a direct stream subscription for more control
     _onboardingSubscription =
         ref.read(onboardingServiceProvider.notifier).stream.listen((next) {
       if (kDebugMode) {
         print(
-            "[Onboarding] Listener Fired! Step: ${next.currentStep}. IsActive: ${next.isActive}");
+            '[Onboarding] Listener Fired! Step: ${next.currentStep}. IsActive: ${next.isActive}');
       }
       if (_currentStep != next.currentStep || next.isActive) {
         _currentStep = next.currentStep;
@@ -97,7 +97,7 @@ class _OnboardingOverlayState extends ConsumerState<OnboardingOverlay> {
   void _calculateRect() {
     final step = ref.read(onboardingServiceProvider).currentStep;
     if (kDebugMode) {
-      print("[Onboarding] CALC_RECT START for $step");
+      print('[Onboarding] CALC_RECT START for $step');
     }
 
     final targetKey = _getTargetKey(step);
@@ -106,7 +106,7 @@ class _OnboardingOverlayState extends ConsumerState<OnboardingOverlay> {
     if (!mounted || overlayRenderBox == null) {
       if (kDebugMode) {
         print(
-            "[Onboarding] CALC_RECT ABORT: Not mounted or overlayRenderBox is null.");
+            '[Onboarding] CALC_RECT ABORT: Not mounted or overlayRenderBox is null.');
       }
       return;
     }
@@ -114,7 +114,7 @@ class _OnboardingOverlayState extends ConsumerState<OnboardingOverlay> {
     if (targetKey == null) {
       if (kDebugMode) {
         print(
-            "[Onboarding] CALC_RECT INFO: No target key for step $step. Clearing rect.");
+            '[Onboarding] CALC_RECT INFO: No target key for step $step. Clearing rect.');
       }
       if (_targetRect != null) {
         setState(() => _targetRect = null);
@@ -134,7 +134,7 @@ class _OnboardingOverlayState extends ConsumerState<OnboardingOverlay> {
 
       if (kDebugMode) {
         print(
-            "[Onboarding] CALC_RECT SUCCESS: Global=$globalRect, Local=$localRect");
+            '[Onboarding] CALC_RECT SUCCESS: Global=$globalRect, Local=$localRect');
       }
 
       if (_targetRect != localRect) {
@@ -143,7 +143,7 @@ class _OnboardingOverlayState extends ConsumerState<OnboardingOverlay> {
     } else {
       if (kDebugMode) {
         print(
-            "[Onboarding] CALC_RECT RETRY: Target RenderBox not ready for $step. Scheduling retry.");
+            '[Onboarding] CALC_RECT RETRY: Target RenderBox not ready for $step. Scheduling retry.');
       }
       // Retry on the next frame if the widget layout is not ready yet
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -531,7 +531,7 @@ class _Coachmark extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    Widget content = Material(
+    final Widget content = Material(
       color: Colors.transparent,
       child: Container(
         padding: const EdgeInsets.all(20),

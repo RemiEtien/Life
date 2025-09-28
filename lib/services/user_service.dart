@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/models/user_profile.dart';
+import '../models/user_profile.dart';
 import 'package:path_provider/path_provider.dart';
 
 class UserService {
@@ -44,19 +44,19 @@ class UserService {
       final currentLocale = Localizations.localeOf(context);
 
       if (kDebugMode) {
-        print("[UserService] Creating profile with locale from context: ${currentLocale.languageCode}");
+        print('[UserService] Creating profile with locale from context: ${currentLocale.languageCode}');
       }
       FirebaseCrashlytics.instance.setCustomKey('user_language_on_creation', currentLocale.languageCode);
 
       final userEmail = user.email;
       if (userEmail == null) {
         FirebaseCrashlytics.instance.recordError(
-          Exception("User tried to register without an email."),
+          Exception('User tried to register without an email.'),
           null,
-          reason: "UserService:createUserProfile user.email is null",
+          reason: 'UserService:createUserProfile user.email is null',
           fatal: true,
         );
-        throw Exception("Email is required for registration.");
+        throw Exception('Email is required for registration.');
       }
 
       final userProfile = UserProfile(
@@ -109,13 +109,13 @@ class UserService {
     try {
       final currentUser = _auth.currentUser;
       if (currentUser == null) {
-        debugPrint("[UserService] uploadAvatar: Current user is null. Aborting.");
+        debugPrint('[UserService] uploadAvatar: Current user is null. Aborting.');
         return null;
       }
       
-      debugPrint("[UserService] uploadAvatar: Forcing token refresh...");
+      debugPrint('[UserService] uploadAvatar: Forcing token refresh...');
       await currentUser.getIdToken(true);
-      debugPrint("[UserService] uploadAvatar: Token refreshed. Proceeding with upload.");
+      debugPrint('[UserService] uploadAvatar: Token refreshed. Proceeding with upload.');
 
       final ref = _storage.ref().child('users').child(uid).child('avatar.jpg');
 
@@ -158,7 +158,6 @@ class UserService {
       await _usersCollection.doc(uid).delete();
 
       final dir = await getApplicationDocumentsDirectory();
-      // ИСПОЛЬЗУЕМ ТОЛЬКО IsarService для работы с путями, здесь просто удаляем старый файл, если он есть
       final dbFile = File('${dir.path}/lifeline_$uid.isar');
       if (await dbFile.exists()) {
         await dbFile.delete();

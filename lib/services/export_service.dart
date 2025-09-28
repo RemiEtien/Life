@@ -1,20 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:typed_data';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import '../memory.dart';
+import '../models/anchors/anchor_models.dart';
 // ignore: depend_on_referenced_packages
 import 'package:pdf/pdf.dart';
 // ignore: depend_on_referenced_packages
 import 'package:pdf/widgets.dart' as pw;
-
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/models/anchors/anchor_models.dart';
+import 'dart:isolate';
 
 /// Сервис, отвечающий за логику генерации PDF и JSON файлов.
 class ExportService {
@@ -26,8 +23,8 @@ class ExportIsolateData {
   final SendPort sendPort;
   final List<Memory> memories;
   final String format;
-  final ByteData orbitronRegular;
-  final ByteData orbitronBold;
+  final ByteData orbitronRegular; // Оставлено для обратной совместимости, если понадобится
+  final ByteData orbitronBold;    // Оставлено для обратной совместимости
   final List<String> localImagePaths;
   final List<SpotifyTrackDetails> spotifyDetails;
 
@@ -51,40 +48,20 @@ Future<void> generateExportFile(ExportIsolateData data) async {
   if (data.format == 'pdf') {
     result = await _generatePdf(
       data.memories,
-      data.orbitronRegular,
-      data.orbitronBold,
+      data.orbitronRegular, // Теперь это Roboto Regular
+      data.orbitronBold,    // Теперь это Roboto Bold
       data.localImagePaths,
       data.spotifyDetails,
     );
-  } else if (data.format == 'json') {
-    result = await _generateJson(data.memories);
   } else {
+    // Логика для JSON удалена, но можно вернуть при необходимости
     result = Uint8List(0);
   }
 
   data.sendPort.send(result);
 }
 
-Future<Uint8List> _generateJson(List<Memory> memories) async {
-  final List<Map<String, dynamic>> memoriesJson = [];
-  for (final memory in memories) {
-    final firestoreMap = memory.toFirestore();
-    final jsonMap = <String, dynamic>{};
-
-    firestoreMap.forEach((key, value) {
-      if (value is Timestamp) {
-        jsonMap[key] = value.toDate().toIso8601String();
-      } else {
-        jsonMap[key] = value;
-      }
-    });
-    memoriesJson.add(jsonMap);
-  }
-
-  final jsonString = jsonEncode(memoriesJson);
-  return utf8.encode(jsonString);
-}
-
+// Хелпер для получения перевода эмоций (временное решение для изолята)
 String _getTranslatedEmotion(String key) {
   const translations = {
     'joy': 'Радость',
@@ -99,6 +76,7 @@ String _getTranslatedEmotion(String key) {
   return translations[key.toLowerCase()] ?? key;
 }
 
+/// Приватная функция для генерации PDF
 Future<Uint8List> _generatePdf(
   List<Memory> memories,
   ByteData fontRegular,
@@ -120,7 +98,7 @@ Future<Uint8List> _generatePdf(
   }
 
   final Map<String, pw.MemoryImage> spotifyArtworks = {};
-  await Future.wait(spotifyDetails.map((details) async {
+  for (final details in spotifyDetails) {
     if (details.albumArtUrl != null) {
       try {
         final response = await http.get(Uri.parse(details.albumArtUrl!));
@@ -132,7 +110,7 @@ Future<Uint8List> _generatePdf(
         print('Could not download spotify artwork: ${details.albumArtUrl}');
       }
     }
-  }));
+  }
 
   for (final memory in memories) {
     pdf.addPage(
@@ -143,7 +121,7 @@ Future<Uint8List> _generatePdf(
         ),
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
-        build: (pw.Context context) {
+        build: (context) {
           return [
             pw.Header(
               level: 0,

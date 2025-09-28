@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/premium_screen.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/application_providers.dart';
+import '../screens/premium_screen.dart';
 
 /// A prominent banner card to be placed on the profile screen.
 class PremiumBannerCard extends ConsumerWidget {

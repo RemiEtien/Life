@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -265,19 +266,27 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final repo = ref.read(memoryRepositoryProvider);
     if (repo == null) return;
     
-    final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'draft');
+    try {
+      final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'draft');
+      final updatedDraft = await repo.update(memoryToSave);
+      if(mounted) {
+         setState(() {
+           _draftMemory = updatedDraft;
+         });
+      }
 
-    final updatedDraft = await repo.update(memoryToSave);
-    if(mounted) {
-       setState(() {
-         _draftMemory = updatedDraft;
-       });
-    }
-
-    if (mounted && isTimerBased) {
-      ref
-          .read(messageProvider.notifier)
-          .addMessage(l10n.memoryEditDraftSavedMessage, type: MessageType.success);
+      if (mounted && isTimerBased) {
+        ref
+            .read(messageProvider.notifier)
+            .addMessage(l10n.memoryEditDraftSavedMessage, type: MessageType.success);
+      }
+    } on EncryptionLockedException {
+      // Autosave is skipped because the encryption service is locked.
+      // This is expected if the user has not entered their master password.
+      // The user will be prompted upon manual save.
+      if (kDebugMode) {
+        print('[MemoryEditScreen] Autosave skipped: Encryption service is locked.');
+      }
     }
   }
 
@@ -547,13 +556,27 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'pending');
 
     try {
-      await memoryRepository.update(memoryToSave);
-      ref.read(syncServiceProvider).queueSync(memoryToSave.id);
-      await _handleReflectionReminder(memoryToSave);
+      // ИЗМЕНЕНИЕ: Разделяем локальное сохранение и фоновые задачи
+      // 1. Сначала сохраняем локально, чтобы UI мог немедленно обновиться.
+      final savedMemory = await memoryRepository.update(memoryToSave);
+      if (savedMemory == null) {
+        throw Exception("Failed to save memory locally.");
+      }
 
+      // 2. Сразу выходим с экрана, чтобы пользователь увидел результат.
       if (mounted) {
         Navigator.of(context).pop(true);
       }
+
+      // 3. Запускаем фоновые задачи (синхронизация, напоминания) уже после того,
+      // как UI обновился. unawaited гарантирует, что мы не ждем их завершения.
+      unawaited(Future.microtask(() {
+        if (mounted) { // Проверяем, что виджет все еще существует
+          ref.read(syncServiceProvider).queueSync(savedMemory.id);
+          _handleReflectionReminder(savedMemory);
+        }
+      }));
+
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -629,15 +652,20 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final l10n = AppLocalizations.of(context)!;
     onLoading(true);
     onError(null);
-    final success = await ref
-        .read(encryptionServiceProvider.notifier)
-        .unlockSession(controller.text);
-    if (success) {
+    try {
+      await ref
+          .read(encryptionServiceProvider.notifier)
+          .unlockSession(controller.text);
       if (mounted) Navigator.of(context).pop(true);
-    } else {
-      onError(l10n.memoryViewIncorrectPassword);
+    } on EncryptionUnlockException catch (e) {
+      if (mounted) onError(e.message);
+    } catch (e) {
+      if (mounted) onError(l10n.memoryViewIncorrectPassword);
+    } finally {
+      if (mounted) {
+        onLoading(false);
+      }
     }
-    onLoading(false);
   }
 
   void _showEncryptionInfo() {
@@ -1445,4 +1473,3 @@ class _AutosavingTextFieldState extends State<_AutosavingTextField> {
     );
   }
 }
-

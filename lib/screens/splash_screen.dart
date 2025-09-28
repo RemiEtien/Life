@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/auth_gate.dart';
-import 'package:lifeline/screens/legal/consent_screen.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/application_providers.dart';
+import 'auth_gate.dart';
+import 'legal/consent_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -19,7 +19,7 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   late AudioPlayer _audioPlayer;
-  String _statusMessage = "";
+  String _statusMessage = '';
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       _audioPlayer.play(AssetSource('sounds/intro_phrase.mp3'));
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("Could not play intro sound: $e");
+        debugPrint('Could not play intro sound: $e');
       }
     }
 
@@ -125,7 +125,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       await ref.read(syncServiceProvider).syncFromCloudToLocal(isInitialSync: true);
     } catch (e, stack) {
       if (kDebugMode) {
-        print("[SplashScreen] Initial sync failed, proceeding with local data. Error: $e");
+        print('[SplashScreen] Initial sync failed, proceeding with local data. Error: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stack, reason: 'Initial sync failed on SplashScreen');
     }

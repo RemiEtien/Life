@@ -13,12 +13,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/splash_screen.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/notification_service.dart';
-import 'package:lifeline/widgets/device_performance_detector.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
+import 'providers/application_providers.dart';
+import 'screens/splash_screen.dart';
+import 'services/encryption_service.dart';
+import 'services/notification_service.dart';
+import 'widgets/device_performance_detector.dart';
+import 'l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

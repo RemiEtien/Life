@@ -9,24 +9,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/models/user_profile.dart';
-import 'package:lifeline/providers/application_providers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/user_profile.dart';
+import '../providers/application_providers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/screens/memory_edit_screen.dart';
-import 'package:lifeline/screens/memory_view_screen.dart';
-import 'package:lifeline/screens/profile_screen.dart';
-import 'package:lifeline/services/message_service.dart';
-import 'package:lifeline/widgets/floating_message_overlay.dart';
-import 'package:lifeline/widgets/global_audio_player_widget.dart';
-import 'package:lifeline/widgets/lifeline_painter.dart';
-import 'package:lifeline/widgets/device_performance_detector.dart';
-import 'package:lifeline/services/lifeline_calculator.dart';
-import 'package:lifeline/services/onboarding_service.dart';
-import 'package:lifeline/services/sync_service.dart';
-import 'package:lifeline/widgets/onboarding_overlay.dart';
+import '../memory.dart';
+import '../screens/memory_edit_screen.dart';
+import '../screens/memory_view_screen.dart';
+import '../screens/profile_screen.dart';
+import '../services/message_service.dart';
+import 'floating_message_overlay.dart';
+import 'global_audio_player_widget.dart';
+import 'lifeline_painter.dart';
+import 'device_performance_detector.dart';
+import '../services/lifeline_calculator.dart';
+import '../services/onboarding_service.dart';
+import '../services/sync_service.dart';
+import 'onboarding_overlay.dart';
 
 enum TappableType { singleNode, dailyCluster }
 
@@ -41,7 +41,7 @@ class TappableItem {
       return (data as Memory).title;
     } else {
       final memories = data as List<Memory>;
-      if (memories.isEmpty) return "Cluster";
+      if (memories.isEmpty) return 'Cluster';
       final date = memories.first.date;
       return 'Day: ${DateFormat.yMd().format(date)} (${memories.length})';
     }
@@ -146,6 +146,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   // НОВАЯ ПЕРЕМЕННАЯ: Для хранения позиции двойного тапа
   Offset _doubleTapLocalPosition = Offset.zero;
+
+  // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Переменные для очереди перерасчета ---
+  bool _recalculationNeeded = false;
+  List<Memory>? _pendingMemoriesForRecalculation;
+  // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
 
   final ValueNotifier<PaintTimings?> _paintTimingsNotifier =
       ValueNotifier(null);
@@ -252,20 +257,20 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         if (previous != null) {
           if (!previous.isSyncing &&
               next.isSyncing &&
-              next.currentStatus != "Idle") {
+              next.currentStatus != 'Idle') {
             ref
                 .read(messageProvider.notifier)
-                .addMessage("Sync started...", type: MessageType.info);
+                .addMessage('Sync started...', type: MessageType.info);
           } else if (previous.isSyncing && !next.isSyncing) {
-            if (next.currentStatus.contains("failed")) {
+            if (next.currentStatus.contains('failed')) {
               ref
                   .read(messageProvider.notifier)
-                  .addMessage("Sync failed. Will retry later.",
+                  .addMessage('Sync failed. Will retry later.',
                       type: MessageType.error);
             } else {
               ref
                   .read(messageProvider.notifier)
-                  .addMessage("Sync complete!", type: MessageType.success);
+                  .addMessage('Sync complete!', type: MessageType.success);
             }
           }
         }
@@ -359,7 +364,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         final thumbPath = memory.coverThumbPath;
         if (thumbPath == null) continue;
 
-        ImageProvider provider = thumbPath.startsWith('http')
+        final ImageProvider provider = thumbPath.startsWith('http')
             ? CachedNetworkImageProvider(thumbPath)
             : FileImage(File(thumbPath));
 
@@ -384,7 +389,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final stream = provider.resolve(const ImageConfiguration());
 
     final listener = ImageStreamListener(
-      (ImageInfo imageInfo, bool synchronousCall) {
+      (imageInfo, synchronousCall) {
         if (!completer.isCompleted) {
           completer.complete(imageInfo.image);
         }
@@ -392,7 +397,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       onError: (exception, stackTrace) {
         if (!completer.isCompleted) {
           if (kDebugMode) {
-            print("Error loading ui.Image: $exception");
+            print('Error loading ui.Image: $exception');
           }
           completer.complete(null);
         }
@@ -420,7 +425,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       ];
       for (final controller in controllers) {
         if (isResumed) {
-          bool shouldReverse =
+          final bool shouldReverse =
               controller == _mainController || controller == _pulseController;
           controller.repeat(reverse: shouldReverse);
         } else {
@@ -543,14 +548,14 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final newPlacementResults = <dynamic>[];
     final sortedEntries = groupedByDay.entries.sortedBy((entry) => entry.key);
 
-    int itemCount = sortedEntries.length;
+    final int itemCount = sortedEntries.length;
 
     double nodeSpacing;
     double totalWidth;
 
     if (itemCount < 10) {
-      double baseWidth = max(800.0, availableSize.width);
-      double availableSpace = baseWidth - 2 * margin;
+      final double baseWidth = max(800.0, availableSize.width);
+      final double availableSpace = baseWidth - 2 * margin;
 
       if (itemCount <= 1) {
         nodeSpacing = 0;
@@ -704,8 +709,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _requestFullRecalculation(List<Memory> memories) {
-    if (_isCalculating || !mounted || _lastKnownSize.isEmpty || _isDisposed)
+    if (_isCalculating || !mounted || _lastKnownSize.isEmpty || _isDisposed) {
+      // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Если расчет уже идет, ставим в очередь новый ---
+      if (_isCalculating) {
+        _recalculationNeeded = true;
+        _pendingMemoriesForRecalculation = memories;
+      }
+      // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
       return;
+    }
 
     final layoutResult = _calculateLayout(_lastKnownSize, memories);
 
@@ -719,7 +731,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   void _requestGeometryUpdate(
       LayoutResult layoutResult, List<Memory> memories) {
-    if (_isCalculating || !mounted || _isDisposed) return;
+    if (!mounted || _isDisposed) return; // Убрали проверку _isCalculating отсюда
 
     if (mounted && !_isDisposed) setState(() => _isCalculating = true);
 
@@ -771,7 +783,22 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                 Size(totalWidth, _lastKnownSize.height), memories);
             _isCalculating = false;
 
-            if (_centerOnNextLayout) {
+            // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Проверяем, не нужно ли пересчитать снова ---
+            if (_recalculationNeeded) {
+              final pendingMemories = _pendingMemoriesForRecalculation;
+              _recalculationNeeded = false;
+              _pendingMemoriesForRecalculation = null;
+
+              if (pendingMemories != null) {
+                // Запускаем перерасчет в следующем кадре, чтобы избежать конфликтов состояния
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted && !_isDisposed) {
+                    _requestFullRecalculation(pendingMemories);
+                  }
+                });
+              }
+            } else if (_centerOnNextLayout) {
+              // Центрируем только если нет ожидающего перерасчета
               _centerOnNextLayout = false; // Сбрасываем флаг
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted && !_isDisposed) {
@@ -779,6 +806,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                 }
               });
             }
+            // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
           });
         }
       }
@@ -1068,7 +1096,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     if (saved == true && mounted) {
       ref
           .read(messageProvider.notifier)
-          .addMessage("Memory saved successfully!", type: MessageType.success);
+          .addMessage('Memory saved successfully!', type: MessageType.success);
     }
   }
 
@@ -1094,7 +1122,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           // Флаг _centerOnNextLayout остается true и центрирование произойдет
           // после готовности данных в _requestGeometryUpdate
           if (kDebugMode) {
-            print("[LifelineWidget] Data not ready for centering, requesting recalculation");
+            print('[LifelineWidget] Data not ready for centering, requesting recalculation');
           }
           _requestFullRecalculation(_currentMemories);
         }
@@ -1345,7 +1373,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
             memoriesAsyncValue.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, stack) =>
-                  Center(child: Text("Error loading memories: $err")),
+                  Center(child: Text('Error loading memories: $err')),
               data: (memories) {
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -1829,6 +1857,11 @@ class _MemoriesListPopupState extends State<MemoriesListPopup> {
                                 fontWeight: FontWeight.bold)),
                         subtitle: Text(DateFormat.yMMMd().format(memory.date),
                             style: const TextStyle(color: Colors.white60)),
+                        // --- ИЗМЕНЕНИЕ: Добавлен замок для зашифрованных воспоминаний ---
+                        trailing: memory.isEncrypted
+                            ? Icon(Icons.lock_outline,
+                                color: Colors.white54, size: 20)
+                            : null,
                         onTap: () => widget.onMemorySelected(memory));
                   }))
         ]));

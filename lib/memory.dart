@@ -300,7 +300,7 @@ class Memory {
     if (emotions != null) {
       newMemory.emotions = emotions;
     } else {
-      newMemory.emotionsData = List.from(this.emotionsData);
+      newMemory.emotionsData = List.from(emotionsData);
     }
 
     return newMemory;
@@ -396,9 +396,10 @@ class Memory {
     // 1. Обработка КЛЮЧЕЙ МЕДИА
     final rawMediaKeysOrder = List<String>.from(data['mediaKeysOrder'] ?? []);
     if (rawMediaKeysOrder.isEmpty && memory.mediaUrls.isNotEmpty) {
-      if (kDebugMode)
+      if (kDebugMode) {
         print(
-            "[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.mediaUrls.length} media keys from mediaUrls.");
+            '[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.mediaUrls.length} media keys from mediaUrls.');
+      }
       memory.mediaKeysOrder =
           memory.mediaUrls.map((url) => getFileKey(url)).toList();
       memory.wasMigrated = true;
@@ -410,9 +411,10 @@ class Memory {
     // 2. Обработка МИНИАТЮР
     // Если миниатюр нет, но есть основные фото, используем основные фото в качестве миниатюр.
     if (memory.mediaThumbUrls.isEmpty && memory.mediaUrls.isNotEmpty) {
-      if (kDebugMode)
+      if (kDebugMode) {
         print(
-            "[MIGRATION] Memory ${snapshot.id}: Using full images as thumbnails fallback.");
+            '[MIGRATION] Memory ${snapshot.id}: Using full images as thumbnails fallback.');
+      }
       memory.mediaThumbUrls = List.from(memory.mediaUrls);
       memory.wasMigrated = true;
     }
@@ -420,9 +422,10 @@ class Memory {
     // 3. Обработка КЛЮЧЕЙ ВИДЕО
     final rawVideoKeysOrder = List<String>.from(data['videoKeysOrder'] ?? []);
     if (rawVideoKeysOrder.isEmpty && memory.videoUrls.isNotEmpty) {
-      if (kDebugMode)
+      if (kDebugMode) {
         print(
-            "[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.videoUrls.length} video keys from videoUrls.");
+            '[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.videoUrls.length} video keys from videoUrls.');
+      }
       memory.videoKeysOrder =
           memory.videoUrls.map((url) => getFileKey(url)).toList();
       memory.wasMigrated = true;
@@ -434,9 +437,10 @@ class Memory {
     // 4. Обработка КЛЮЧЕЙ АУДИО
     final rawAudioKeysOrder = List<String>.from(data['audioKeysOrder'] ?? []);
     if (rawAudioKeysOrder.isEmpty && memory.audioUrls.isNotEmpty) {
-      if (kDebugMode)
+      if (kDebugMode) {
         print(
-            "[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.audioUrls.length} audio keys from audioUrls.");
+            '[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.audioUrls.length} audio keys from audioUrls.');
+      }
       memory.audioKeysOrder =
           memory.audioUrls.map((url) => getFileKey(url)).toList();
       memory.wasMigrated = true;

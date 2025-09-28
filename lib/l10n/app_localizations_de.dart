@@ -1025,4 +1025,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get memoryUpdatedSuccess => 'Erinnerung erfolgreich aktualisiert!';
+
+  @override
+  String unlockFailedAttemptsRemaining(int count) {
+    return 'Incorrect password. $count attempts remaining.';
+  }
+
+  @override
+  String unlockTooManyAttempts(int seconds) {
+    return 'Too many attempts. Please try again in $seconds seconds.';
+  }
+
+  @override
+  String get unlocking => 'Unlocking...';
+
+  @override
+  String get exportingPdf => 'Preparing PDF...';
+
+  @override
+  String exportFailed(String error) {
+    return 'Export failed: $error';
+  }
 }

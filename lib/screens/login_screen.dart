@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/application_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -49,7 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
         if (!mounted) return;
         setState(() {
-          _errorMessage = e.message ?? "An unknown error occurred";
+          _errorMessage = e.message ?? 'An unknown error occurred';
         });
       } finally {
         if (mounted) {

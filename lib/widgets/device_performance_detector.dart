@@ -113,7 +113,7 @@ class DevicePerformanceDetector {
       final deviceInfo = DeviceInfoPlugin();
       final iosInfo = await deviceInfo.iosInfo;
 
-      if (!iosInfo.model.contains("iPhone") && !iosInfo.isPhysicalDevice) {
+      if (!iosInfo.model.contains('iPhone') && !iosInfo.isPhysicalDevice) {
         return DeviceCapabilities.high;
       }
       final modelVersion = int.tryParse(iosInfo.utsname.machine.split(',')[0].replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;

@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/providers/application_providers.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/application_providers.dart';
 
 class GlobalAudioPlayerWidget extends ConsumerWidget {
   const GlobalAudioPlayerWidget({super.key});

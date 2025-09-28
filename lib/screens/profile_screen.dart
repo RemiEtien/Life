@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/models/user_profile.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/onboarding_service.dart';
-import 'package:lifeline/widgets/premium_upsell_widgets.dart';
+import '../l10n/app_localizations.dart';
+import '../models/user_profile.dart';
+import '../providers/application_providers.dart';
+import '../services/encryption_service.dart';
+import '../services/onboarding_service.dart';
+import '../widgets/premium_upsell_widgets.dart';
 import 'package:collection/collection.dart';
 
 Future<bool> showCreateMasterPasswordDialog(BuildContext context, WidgetRef ref) async {
@@ -290,7 +290,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
           title: Text(l10n.profileChangeNameTitle),
           content: TextField(
@@ -328,7 +328,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     
     showCountryPicker(
       context: context,
-      onSelect: (Country country) async {
+      onSelect: (country) async {
         final updatedProfile =
             profile.copyWith(countryCode: country.countryCode);
         // Используем заранее прочитанный сервис
@@ -344,7 +344,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return SimpleDialog(
           title: Text(l10n.profileSelectLanguage),
           children: _supportedLanguages.entries.map((entry) {
@@ -438,7 +438,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         if (!mounted) return;
         FirebaseCrashlytics.instance.recordError(e, s, reason: 'Error during re-authentication flow.');
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+            .showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
 
       if (mounted) {
@@ -581,7 +581,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _showDeleteAccountDialog(AppLocalizations l10n) async {
      final confirmed = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return _HoldToDeleteAccountDialog(l10n: l10n);
       },
     );
@@ -827,7 +827,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Text(l10n.profileReminders, style: const TextStyle(fontSize: 16)),
       subtitle: Text(l10n.profileRemindersSubtitle),
       value: profile.notificationsEnabled,
-      onChanged: (bool value) {
+      onChanged: (value) {
         final updatedProfile = profile.copyWith(notificationsEnabled: value);
         ref.read(userServiceProvider).updateUserProfile(updatedProfile);
       },

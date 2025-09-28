@@ -190,6 +190,12 @@ exports.verifyPurchase = onCall(
         throw new HttpsError("invalid-argument", "Missing required parameters for purchase verification.");
       }
 
+      const VALID_PRODUCT_IDS = ["lifeline_premium_monthly", "lifeline_premium_yearly"];
+      if (!VALID_PRODUCT_IDS.includes(productId)) {
+        console.warn(`User ${uid} tried to verify an invalid productId: ${productId}`);
+        throw new HttpsError("invalid-argument", "The provided product ID is not valid.");
+      }
+
       let isValid = false;
       let expiryDate = new Date();
       const expectedPackageName = "com.momentic.lifeline";
@@ -205,10 +211,30 @@ exports.verifyPurchase = onCall(
             `${expectedPackageName}/purchases/subscriptions/${productId}/tokens/${receipt}`;
           const response = await authClient.request({url});
 
+          // --- ИЗМЕНЕНИЕ: Усиленная проверка ответа от Google Play ---
           if (response.data && response.data.expiryTimeMillis) {
-            isValid = true;
-            expiryDate = new Date(parseInt(response.data.expiryTimeMillis));
+            const purchase = response.data;
+            const isExpired = parseInt(purchase.expiryTimeMillis) <= Date.now();
+            const isPurchaseStateValid = purchase.purchaseState === 0; // 0 = PURCHASED
+            const isAcknowledged = purchase.acknowledgementState === 1; // 1 = ACKNOWLEDGED
+
+            if (!isExpired && isPurchaseStateValid && isAcknowledged) {
+              isValid = true;
+              expiryDate = new Date(parseInt(purchase.expiryTimeMillis));
+            } else {
+              // Логируем, почему покупка недействительна, даже если ответ получен
+              console.warn(`[Android] Purchase for user ${uid} is invalid. Details:`, {
+                productId: productId,
+                isExpired: isExpired,
+                expiryTimeMillis: purchase.expiryTimeMillis,
+                isPurchaseStateValid: isPurchaseStateValid,
+                purchaseState: purchase.purchaseState,
+                isAcknowledged: isAcknowledged,
+                acknowledgementState: purchase.acknowledgementState,
+              });
+            }
           }
+          // --- КОНЕЦ ИЗМЕНЕНИЯ ---
         } else if (platform === "ios") {
           const isSandbox = (process.env.FUNCTIONS_EMULATOR === "true");
           const url = isSandbox ? "https://sandbox.itunes.apple.com/verifyReceipt" : "https://buy.itunes.apple.com/verifyReceipt";
@@ -226,25 +252,44 @@ exports.verifyPurchase = onCall(
           if (response.data && response.data.status === 0) {
              const receiptData = response.data.receipt;
              if (receiptData && receiptData.bundle_id === expectedBundleId && response.data.latest_receipt_info) {
-                 // ИСПРАВЛЕНИЕ: Сортируем чеки и берем самый последний.
-                 const sortedReceipts = response.data.latest_receipt_info.sort((a, b) => {
-                     return parseInt(b.expires_date_ms) - parseInt(a.expires_date_ms);
-                 });
-                 const latestTransaction = sortedReceipts[0];
+                 // --- ИЗМЕНЕНИЕ: Фильтруем по productId и берем самую последнюю транзакцию ---
+                 const sortedReceipts = response.data.latest_receipt_info
+                    .filter((t) => t.product_id === productId) // Фильтруем по ID продукта
+                    .sort((a, b) => parseInt(b.expires_date_ms) - parseInt(a.expires_date_ms));
+
+                 const latestTransaction = sortedReceipts.length > 0 ? sortedReceipts[0] : null;
+                 // --- КОНЕЦ ИЗМЕНЕНИЯ ---
+
                  if (latestTransaction && latestTransaction.expires_date_ms) {
                      const expiryTimestamp = parseInt(latestTransaction.expires_date_ms);
                      if (expiryTimestamp > Date.now()) {
                         isValid = true;
                         expiryDate = new Date(expiryTimestamp);
+                     } else {
+                       console.warn(`[iOS] Latest transaction for user ${uid} and product ${productId} is expired.`);
                      }
+                 } else {
+                    console.warn(`[iOS] No matching active transaction found for user ${uid} and product ${productId}.`);
                  }
              }
+          } else {
+             // --- ИЗМЕНЕНИЕ: Улучшенное логирование ошибок от Apple ---
+             console.warn(`[iOS] Apple receipt verification failed for user ${uid}. Status: ${response.data.status}`);
+             // В реальном проекте здесь можно было бы отправить ошибку в систему мониторинга.
+             // --- КОНЕЦ ИЗМЕНЕНИЯ ---
           }
         }
       } catch (error) {
-        const errorMessage = (error.response && error.response.data) || error.message;
-        console.error(`Purchase verification failed for user ${uid} on platform ${platform}:`, errorMessage);
+        // --- ИЗМЕНЕНИЕ: Улучшенное логирование ошибок ---
+        const errorMessage = (error.response && error.response.data) ? JSON.stringify(error.response.data) : error.message;
+        console.error(`Purchase verification failed for user ${uid} on platform ${platform}. Error: ${errorMessage}`, {
+          uid: uid,
+          productId: productId,
+          platform: platform,
+        });
+
         throw new HttpsError("internal", "Verification request failed.");
+        // --- КОНЕЦ ИЗМЕНЕНИЯ ---
       }
 
       if (isValid) {
@@ -264,6 +309,7 @@ exports.verifyPurchase = onCall(
       }
     },
 );
+
 
 /**
  * Удаление данных пользователя при удалении аккаунта

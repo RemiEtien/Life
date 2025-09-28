@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:lifeline/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
 class DocumentScreen extends StatelessWidget {

@@ -33,7 +33,7 @@ class NotificationService {
 
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+      onDidReceiveNotificationResponse: (response) async {
         if (response.payload != null) {
           // Отправляем payload (ID воспоминания) в поток
           onNotificationTap.add(response.payload);
@@ -78,7 +78,7 @@ class NotificationService {
 
     if (!permissionsGranted) {
       if (kDebugMode) {
-        print("Notification permissions not granted. Aborting schedule.");
+        print('Notification permissions not granted. Aborting schedule.');
       }
       return false;
     }
@@ -106,7 +106,7 @@ class NotificationService {
       return true;
     } catch (e) {
       if (kDebugMode) {
-        print("Error scheduling notification: $e");
+        print('Error scheduling notification: $e');
       }
       return false;
     }

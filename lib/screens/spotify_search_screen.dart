@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/models/anchors/anchor_models.dart';
-import 'package:lifeline/providers/application_providers.dart';
+import '../l10n/app_localizations.dart';
+import '../models/anchors/anchor_models.dart';
+import '../providers/application_providers.dart';
 
 class SpotifySearchScreen extends ConsumerStatefulWidget {
   const SpotifySearchScreen({super.key});
@@ -17,7 +17,7 @@ class _SpotifySearchScreenState extends ConsumerState<SpotifySearchScreen> {
   List<SpotifyTrackDetails> _searchResults = [];
   bool _isLoading = false;
 
-  void _search() async {
+  Future<void> _search() async {
     if (_searchController.text.trim().isEmpty) return;
 
     setState(() {

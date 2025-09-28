@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/firestore_service.dart';
-import 'package:lifeline/services/memory_repository.dart';
+import '../memory.dart';
+import '../providers/application_providers.dart';
+import 'encryption_service.dart';
+import 'firestore_service.dart';
+import 'memory_repository.dart';
 import 'package:collection/collection.dart';
 
 @immutable
@@ -19,7 +19,7 @@ class SyncState {
   const SyncState({
     this.pendingJobs = 0,
     this.isSyncing = false,
-    this.currentStatus = "Idle",
+    this.currentStatus = 'Idle',
     this.progress,
   });
 
@@ -63,13 +63,13 @@ class SyncService {
 
     if (!isInitialSync) {
       notifier.updateState(
-          isSyncing: true, currentStatus: "Reconciling with cloud...");
+          isSyncing: true, currentStatus: 'Reconciling with cloud...');
     }
 
     try {
       final cloudMemories = await firestore.fetchAllMemoriesOnce(userId);
       if (cloudMemories == null) {
-        throw Exception("Could not fetch memories from cloud.");
+        throw Exception('Could not fetch memories from cloud.');
       }
       final cloudIds =
           cloudMemories.map((m) => m.firestoreId).whereNotNull().toSet();
@@ -92,7 +92,7 @@ class SyncService {
         final deletedCount = await repo.deleteAllByIds(idsToDelete);
         if (kDebugMode) {
           print(
-              "[SyncService] Deleted $deletedCount ghost memories from local DB.");
+              '[SyncService] Deleted $deletedCount ghost memories from local DB.');
         }
       }
 
@@ -119,7 +119,7 @@ class SyncService {
       if (memoriesToUpsert.isNotEmpty) {
         if (kDebugMode) {
           print(
-              "[SyncService] Upserting ${memoriesToUpsert.length} memories from cloud.");
+              '[SyncService] Upserting ${memoriesToUpsert.length} memories from cloud.');
         }
         await repo.upsertMemories(memoriesToUpsert);
       }
@@ -127,14 +127,14 @@ class SyncService {
       await repo.repairOrphanedUserIds();
 
       if (!isInitialSync) {
-        notifier.updateState(isSyncing: false, currentStatus: "Sync complete!");
+        notifier.updateState(isSyncing: false, currentStatus: 'Sync complete!');
       }
     } catch (e, stackTrace) {
       FirebaseCrashlytics.instance.recordError(e, stackTrace,
-          reason: "SyncService: syncFromCloudToLocal reconciliation failed");
+          reason: 'SyncService: syncFromCloudToLocal reconciliation failed');
       if (!isInitialSync) {
         notifier.updateState(
-            isSyncing: false, currentStatus: "Sync from cloud failed.");
+            isSyncing: false, currentStatus: 'Sync from cloud failed.');
       } else {
         rethrow;
       }
@@ -149,7 +149,7 @@ class SyncService {
   void resumeSync() {
     if (_isPausedForUnlock && !_isProcessing && _syncQueue.isNotEmpty) {
       if (kDebugMode) {
-        print("[SyncService] Resuming sync queue processing after unlock.");
+        print('[SyncService] Resuming sync queue processing after unlock.');
       }
       _isPausedForUnlock = false;
       _processQueue();
@@ -161,7 +161,7 @@ class SyncService {
       _syncQueue.add(memoryId);
       _ref.read(syncNotifierProvider.notifier).updateState(
             pendingJobs: _syncQueue.length,
-            currentStatus: "Queued...",
+            currentStatus: 'Queued...',
           );
       Future(_processQueue);
     }
@@ -174,7 +174,7 @@ class SyncService {
     final toSync = await repo.getMemoriesToSync();
     if (toSync.isNotEmpty) {
       if (kDebugMode) {
-        print("[SyncService] Found ${toSync.length} memories to sync.");
+        print('[SyncService] Found ${toSync.length} memories to sync.');
       }
       for (final memory in toSync) {
         queueSync(memory.id);
@@ -191,7 +191,7 @@ class SyncService {
         _ref.read(syncNotifierProvider.notifier).updateState(
             pendingJobs: 0,
             isSyncing: false,
-            currentStatus: "Idle",
+            currentStatus: 'Idle',
             progress: null);
       }
       return;
@@ -203,7 +203,7 @@ class SyncService {
     _ref.read(syncNotifierProvider.notifier).updateState(
           isSyncing: true,
           pendingJobs: _syncQueue.length,
-          currentStatus: "Syncing memory...",
+          currentStatus: 'Syncing memory...',
           progress: 0.0,
         );
 
@@ -218,12 +218,12 @@ class SyncService {
       if (success) {
         _ref.read(syncNotifierProvider.notifier).updateState(
             pendingJobs: _syncQueue.length,
-            currentStatus: "Sync complete!",
+            currentStatus: 'Sync complete!',
             progress: 1.0);
       } else {
         _ref.read(syncNotifierProvider.notifier).updateState(
             pendingJobs: _syncQueue.length,
-            currentStatus: "Sync failed. Will retry later.",
+            currentStatus: 'Sync failed. Will retry later.',
             progress: null);
       }
 
@@ -231,13 +231,13 @@ class SyncService {
       _processQueue();
     } on EncryptionLockedException {
       if (kDebugMode) {
-        print("[SyncService] Queue processing paused. Waiting for unlock.");
+        print('[SyncService] Queue processing paused. Waiting for unlock.');
       }
       _isProcessing = false;
       _isPausedForUnlock = true;
       _ref.read(syncNotifierProvider.notifier).updateState(
           isSyncing: true,
-          currentStatus: "Sync paused - unlock needed",
+          currentStatus: 'Sync paused - unlock needed',
           progress: null);
     }
   }
@@ -268,27 +268,38 @@ class SyncService {
       try {
         final notifier = _ref.read(syncNotifierProvider.notifier);
 
-        // ИСПРАВЛЕНИЕ: Параллельная загрузка всех медиафайлов.
-        notifier.updateState(currentStatus: "Uploading media...", progress: 0.1);
+        notifier.updateState(
+            currentStatus: 'Uploading thumbnails...', progress: 0.1);
+        final newThumbUrls = await firestore.uploadFiles(
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.mediaThumbPaths,
+            'thumbs');
 
-        final results = await Future.wait([
-          firestore.uploadFiles(userId, initialMemoryState.universalId,
-              initialMemoryState.mediaThumbPaths, 'thumbs'),
-          firestore.uploadFiles(userId, initialMemoryState.universalId,
-              initialMemoryState.mediaPaths, 'photos'),
-          firestore.uploadFiles(userId, initialMemoryState.universalId,
-              initialMemoryState.videoPaths, 'videos'),
-          firestore.uploadFiles(userId, initialMemoryState.universalId,
-              initialMemoryState.audioNotePaths, 'audio'),
-        ]);
+        notifier.updateState(
+            currentStatus: 'Uploading photos...', progress: 0.3);
+        final newPhotoUrls = await firestore.uploadFiles(
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.mediaPaths,
+            'photos');
 
-        final newThumbUrls = results[0];
-        final newPhotoUrls = results[1];
-        final newVideoUrls = results[2];
-        final newAudioUrls = results[3];
-        
-        notifier.updateState(currentStatus: "Saving to cloud...", progress: 0.9);
-        
+        notifier.updateState(
+            currentStatus: 'Uploading videos...', progress: 0.6);
+        final newVideoUrls = await firestore.uploadFiles(
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.videoPaths,
+            'videos');
+
+        notifier.updateState(
+            currentStatus: 'Uploading audio...', progress: 0.8);
+        final newAudioUrls = await firestore.uploadFiles(
+            userId,
+            initialMemoryState.universalId,
+            initialMemoryState.audioNotePaths,
+            'audio');
+
         final memoryForCloud = _buildCloudReadyMemory(
           initialState: initialMemoryState,
           newPhotoUrls: newPhotoUrls,
@@ -297,7 +308,10 @@ class SyncService {
           newAudioUrls: newAudioUrls,
         );
 
+        notifier.updateState(
+            currentStatus: 'Saving to cloud...', progress: 0.9);
         await firestore.setMemory(userId, memoryForCloud);
+
         await repo.updateAfterSync(memoryForCloud);
 
         return true;
@@ -308,7 +322,7 @@ class SyncService {
 
         if (kDebugMode) {
           print(
-              "[SyncService] Attempt $attempt failed for memory $memoryId: $e");
+              '[SyncService] Attempt $attempt failed for memory $memoryId: $e');
         }
         FirebaseCrashlytics.instance.recordError(e, stackTrace,
             reason:
@@ -317,7 +331,7 @@ class SyncService {
         if (attempt < maxRetries) {
           final delay = Duration(seconds: 5 * attempt);
           _ref.read(syncNotifierProvider.notifier).updateState(
-              currentStatus: "Sync failed. Retrying in ${delay.inSeconds}s...");
+              currentStatus: 'Sync failed. Retrying in ${delay.inSeconds}s...');
           await Future.delayed(delay);
         }
       }
@@ -360,3 +374,4 @@ class SyncService {
       ..touch();
   }
 }
+
