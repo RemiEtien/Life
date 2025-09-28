@@ -433,5 +433,31 @@
 "selectMemoryTitle": "Seleccionar un recuerdo",
 "selectMemorySearchHint": "Buscar por título o contenido...",
 "selectMemoryEmpty": "No se encontraron recuerdos",
-"memoryUpdatedSuccess": "¡Recuerdo actualizado con éxito!"
+"memoryUpdatedSuccess": "¡Recuerdo actualizado con éxito!",
+"unlocking": "Desbloqueando...",
+"exportingPdf": "Preparando PDF...",
+"exportFailed": "Error al exportar: {error}",
+"@exportFailed": {
+    "placeholders": {
+        "error": {
+            "type": "String"
+        }
+    }
+},
+"unlockFailedAttemptsRemaining": "Contraseña incorrecta. Quedan {count} intentos.",
+"@unlockFailedAttemptsRemaining": {
+    "placeholders": {
+        "count": {
+            "type": "int"
+        }
+    }
+},
+"unlockTooManyAttempts": "Demasiados intentos. Inténtalo de nuevo en {seconds} segundos.",
+"@unlockTooManyAttempts": {
+    "placeholders": {
+        "seconds": {
+            "type": "int"
+        }
+    }
+}
 }

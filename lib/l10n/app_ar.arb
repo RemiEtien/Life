@@ -433,5 +433,31 @@
 "selectMemoryTitle": "تحديد ذاكرة",
 "selectMemorySearchHint": "البحث حسب العنوان أو المحتوى...",
 "selectMemoryEmpty": "لم يتم العثور على ذكريات",
-"memoryUpdatedSuccess": "تم تحديث الذاكرة بنجاح!"
+"memoryUpdatedSuccess": "تم تحديث الذاكرة بنجاح!",
+"unlocking": "جارٍ فتح القفل...",
+"exportingPdf": "جارٍ تحضير ملف PDF...",
+"exportFailed": "فشل التصدير: {error}",
+"@exportFailed": {
+    "placeholders": {
+        "error": {
+            "type": "String"
+        }
+    }
+},
+"unlockFailedAttemptsRemaining": "كلمة المرور غير صحيحة. تبقى {count} محاولة.",
+"@unlockFailedAttemptsRemaining": {
+    "placeholders": {
+        "count": {
+            "type": "int"
+        }
+    }
+},
+"unlockTooManyAttempts": "تم تجاوز عدد المحاولات. حاول مجدداً بعد {seconds} ثانية.",
+"@unlockTooManyAttempts": {
+    "placeholders": {
+        "seconds": {
+            "type": "int"
+        }
+    }
+}
 }

@@ -433,5 +433,31 @@
 "selectMemoryTitle": "Erinnerung auswählen",
 "selectMemorySearchHint": "Suche nach Titel oder Inhalt...",
 "selectMemoryEmpty": "Keine Erinnerungen gefunden",
-"memoryUpdatedSuccess": "Erinnerung erfolgreich aktualisiert!"
+"memoryUpdatedSuccess": "Erinnerung erfolgreich aktualisiert!",
+"unlocking": "Entsperren...",
+"exportingPdf": "PDF wird vorbereitet...",
+"exportFailed": "Export fehlgeschlagen: {error}",
+"@exportFailed": {
+    "placeholders": {
+        "error": {
+            "type": "String"
+        }
+    }
+},
+"unlockFailedAttemptsRemaining": "Falsches Passwort. Noch {count} Versuche.",
+"@unlockFailedAttemptsRemaining": {
+    "placeholders": {
+        "count": {
+            "type": "int"
+        }
+    }
+},
+"unlockTooManyAttempts": "Zu viele Versuche. Bitte versuche es in {seconds} Sekunden erneut.",
+"@unlockTooManyAttempts": {
+    "placeholders": {
+        "seconds": {
+            "type": "int"
+        }
+    }
+}
 }

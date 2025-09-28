@@ -433,5 +433,31 @@
 "selectMemoryTitle": "Выберите воспоминание",
 "selectMemorySearchHint": "Поиск по названию или содержанию...",
 "selectMemoryEmpty": "Воспоминания не найдены",
-"memoryUpdatedSuccess": "Воспоминание успешно дополнено!"
+"memoryUpdatedSuccess": "Воспоминание успешно дополнено!",
+"unlocking": "Разблокировка...",
+"exportingPdf": "Подготовка PDF...",
+"exportFailed": "Не удалось экспортировать: {error}",
+"@exportFailed": {
+    "placeholders": {
+        "error": {
+            "type": "String"
+        }
+    }
+},
+"unlockFailedAttemptsRemaining": "Неверный пароль. Осталось {count} попытки.",
+"@unlockFailedAttemptsRemaining": {
+    "placeholders": {
+        "count": {
+            "type": "int"
+        }
+    }
+},
+"unlockTooManyAttempts": "Слишком много попыток. Повторите через {seconds} секунд.",
+"@unlockTooManyAttempts": {
+    "placeholders": {
+        "seconds": {
+            "type": "int"
+        }
+    }
+}
 }

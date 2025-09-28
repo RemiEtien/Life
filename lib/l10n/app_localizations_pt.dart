@@ -1022,22 +1022,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String unlockFailedAttemptsRemaining(int count) {
-    return 'Incorrect password. $count attempts remaining.';
+    return 'Senha incorreta. Restam $count tentativas.';
   }
 
   @override
   String unlockTooManyAttempts(int seconds) {
-    return 'Too many attempts. Please try again in $seconds seconds.';
+    return 'Tentativas demais. Tente novamente em $seconds segundos.';
   }
 
   @override
-  String get unlocking => 'Unlocking...';
+  String get unlocking => 'Desbloqueando...';
 
   @override
-  String get exportingPdf => 'Preparing PDF...';
+  String get exportingPdf => 'Preparando PDF...';
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Falha ao exportar: $error';
   }
 }

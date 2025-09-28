@@ -37,6 +37,7 @@ kotlin {
 
 android {
     namespace "com.momentic.lifeline"
+    // Обновляем compileSdk до 36 — плагины и androidx требуют API 35+
     compileSdk 36
     ndkVersion "26.1.10909125" // ИСПРАВЛЕНИЕ: Указываем конкретную версию NDK
 
@@ -57,7 +58,8 @@ android {
     defaultConfig {
         applicationId "com.momentic.lifeline"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 36
+        // Финальный targetSdk, чтобы Play Console не считала сборку предпросмотром
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -117,4 +119,5 @@ dependencies {
     
     // ИСПРАВЛЕНИЕ: Добавляем поддержку AndroidX для Edge-to-Edge
     implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.activity:activity-ktx:1.9.0'
 }

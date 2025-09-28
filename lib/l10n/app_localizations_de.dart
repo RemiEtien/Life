@@ -1028,22 +1028,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String unlockFailedAttemptsRemaining(int count) {
-    return 'Incorrect password. $count attempts remaining.';
+    return 'Falsches Passwort. Noch $count Versuche.';
   }
 
   @override
   String unlockTooManyAttempts(int seconds) {
-    return 'Too many attempts. Please try again in $seconds seconds.';
+    return 'Zu viele Versuche. Bitte versuche es in $seconds Sekunden erneut.';
   }
 
   @override
-  String get unlocking => 'Unlocking...';
+  String get unlocking => 'Entsperren...';
 
   @override
-  String get exportingPdf => 'Preparing PDF...';
+  String get exportingPdf => 'PDF wird vorbereitet...';
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Export fehlgeschlagen: $error';
   }
 }

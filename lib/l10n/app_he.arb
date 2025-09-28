@@ -433,5 +433,31 @@
 "selectMemoryTitle": "בחר זיכרון",
 "selectMemorySearchHint": "חפש לפי כותרת או תוכן...",
 "selectMemoryEmpty": "לא נמצאו זיכרונות",
-"memoryUpdatedSuccess": "הזיכרון עודכן בהצלחה!"
+"memoryUpdatedSuccess": "הזיכרון עודכן בהצלחה!",
+"unlocking": "פותח נעילה...",
+"exportingPdf": "מכין קובץ PDF...",
+"exportFailed": "הייצוא נכשל: {error}",
+"@exportFailed": {
+    "placeholders": {
+        "error": {
+            "type": "String"
+        }
+    }
+},
+"unlockFailedAttemptsRemaining": "הסיסמא שגויה. נותרו {count} ניסיונות.",
+"@unlockFailedAttemptsRemaining": {
+    "placeholders": {
+        "count": {
+            "type": "int"
+        }
+    }
+},
+"unlockTooManyAttempts": "מידי נסיונות. נסה שוב בעוד {seconds} שניות.",
+"@unlockTooManyAttempts": {
+    "placeholders": {
+        "seconds": {
+            "type": "int"
+        }
+    }
+}
 }

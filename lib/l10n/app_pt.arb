@@ -433,5 +433,31 @@
 "selectMemoryTitle": "Selecionar uma Memória",
 "selectMemorySearchHint": "Pesquisar por título ou conteúdo...",
 "selectMemoryEmpty": "Nenhuma memória encontrada",
-"memoryUpdatedSuccess": "Memória atualizada com sucesso!"
+"memoryUpdatedSuccess": "Memória atualizada com sucesso!",
+"unlocking": "Desbloqueando...",
+"exportingPdf": "Preparando PDF...",
+"exportFailed": "Falha ao exportar: {error}",
+"@exportFailed": {
+    "placeholders": {
+        "error": {
+            "type": "String"
+        }
+    }
+},
+"unlockFailedAttemptsRemaining": "Senha incorreta. Restam {count} tentativas.",
+"@unlockFailedAttemptsRemaining": {
+    "placeholders": {
+        "count": {
+            "type": "int"
+        }
+    }
+},
+"unlockTooManyAttempts": "Tentativas demais. Tente novamente em {seconds} segundos.",
+"@unlockTooManyAttempts": {
+    "placeholders": {
+        "seconds": {
+            "type": "int"
+        }
+    }
+}
 }

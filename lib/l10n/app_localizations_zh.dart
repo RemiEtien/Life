@@ -976,22 +976,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String unlockFailedAttemptsRemaining(int count) {
-    return 'Incorrect password. $count attempts remaining.';
+    return '密码错误。还剩 $count 次尝试。';
   }
 
   @override
   String unlockTooManyAttempts(int seconds) {
-    return 'Too many attempts. Please try again in $seconds seconds.';
+    return '尝试次数过多。请 $seconds 秒后再试。';
   }
 
   @override
-  String get unlocking => 'Unlocking...';
+  String get unlocking => '正在解锁...';
 
   @override
-  String get exportingPdf => 'Preparing PDF...';
+  String get exportingPdf => '正在准备 PDF...';
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return '导出失败：$error';
   }
 }

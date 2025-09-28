@@ -503,9 +503,11 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
+        // ИСПРАВЛЕНИЕ: Переменная для состояния видимости пароля вынесена сюда.
+        // Она будет сохранять свое значение между перерисовками диалога.
+        bool obscurePassword = true;
         return StatefulBuilder(
           builder: (context, setState) {
-            bool obscurePassword = true;
             Future<void> attemptUnlock() async {
               setState(() {
                 isLoading = true;
@@ -2285,3 +2287,4 @@ class _ShareMenu extends StatelessWidget {
     );
   }
 }
+

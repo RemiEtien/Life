@@ -627,9 +627,10 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
+        bool obscurePassword = true; // ПЕРЕМЕЩЕНО СЮДА
         return StatefulBuilder(
           builder: (context, setState) {
-            bool obscurePassword = true;
+            // bool obscurePassword = true; // БЫЛО ЗДЕСЬ
             return AlertDialog(
               title: Text(l10n.memoryEditUnlockDialogTitle),
               content: Column(
@@ -1513,3 +1514,4 @@ class _AutosavingTextFieldState extends State<_AutosavingTextField> {
     );
   }
 }
+

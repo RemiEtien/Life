@@ -1007,22 +1007,22 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String unlockFailedAttemptsRemaining(int count) {
-    return 'Incorrect password. $count attempts remaining.';
+    return 'הסיסמא שגויה. נותרו $count ניסיונות.';
   }
 
   @override
   String unlockTooManyAttempts(int seconds) {
-    return 'Too many attempts. Please try again in $seconds seconds.';
+    return 'מידי נסיונות. נסה שוב בעוד $seconds שניות.';
   }
 
   @override
-  String get unlocking => 'Unlocking...';
+  String get unlocking => 'פותח נעילה...';
 
   @override
-  String get exportingPdf => 'Preparing PDF...';
+  String get exportingPdf => 'מכין קובץ PDF...';
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'הייצוא נכשל: $error';
   }
 }

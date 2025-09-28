@@ -1016,22 +1016,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String unlockFailedAttemptsRemaining(int count) {
-    return 'Incorrect password. $count attempts remaining.';
+    return 'كلمة المرور غير صحيحة. تبقى $count محاولة.';
   }
 
   @override
   String unlockTooManyAttempts(int seconds) {
-    return 'Too many attempts. Please try again in $seconds seconds.';
+    return 'تم تجاوز عدد المحاولات. حاول مجدداً بعد $seconds ثانية.';
   }
 
   @override
-  String get unlocking => 'Unlocking...';
+  String get unlocking => 'جارٍ فتح القفل...';
 
   @override
-  String get exportingPdf => 'Preparing PDF...';
+  String get exportingPdf => 'جارٍ تحضير ملف PDF...';
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'فشل التصدير: $error';
   }
 }
