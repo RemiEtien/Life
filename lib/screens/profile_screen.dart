@@ -15,75 +15,95 @@ import '../services/onboarding_service.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import 'package:collection/collection.dart';
 
-Future<bool> showCreateMasterPasswordDialog(BuildContext context, WidgetRef ref) async {
+Future<bool> showCreateMasterPasswordDialog(
+    BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context)!;
   final formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
 
-  // Читаем notifier ДО асинхронной операции (показа диалога)
   final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
 
   final confirmed = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
     builder: (context) {
-      return AlertDialog(
-        title: Text(l10n.profileCreateMasterPassword),
-        content: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l10n.profileMasterPasswordInfo),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration:
-                      InputDecoration(labelText: l10n.profileMasterPasswordHint),
-                  validator: (val) => (val?.length ?? 0) < 8
-                      ? l10n.profilePasswordMinLength
-                      : null,
-                ),
-                TextFormField(
-                  controller: confirmController,
-                  obscureText: true,
-                  decoration:
-                      InputDecoration(labelText: l10n.profileConfirmPasswordHint),
-                  validator: (val) =>
-                      val != passwordController.text ? l10n.profilePasswordsDoNotMatch : null,
-                ),
-              ],
+      return StatefulBuilder(builder: (context, setState) {
+        bool obscurePassword = true;
+        bool obscureConfirmPassword = true;
+        return AlertDialog(
+          title: Text(l10n.profileCreateMasterPassword),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.profileMasterPasswordInfo),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: passwordController,
+                    obscureText: obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: l10n.profileMasterPasswordHint,
+                      suffixIcon: IconButton(
+                        icon: Icon(obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () =>
+                            setState(() => obscurePassword = !obscurePassword),
+                      ),
+                    ),
+                    validator: (val) => (val?.length ?? 0) < 8
+                        ? l10n.profilePasswordMinLength
+                        : null,
+                  ),
+                  TextFormField(
+                    controller: confirmController,
+                    obscureText: obscureConfirmPassword,
+                    decoration: InputDecoration(
+                      labelText: l10n.profileConfirmPasswordHint,
+                      suffixIcon: IconButton(
+                        icon: Icon(obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () => setState(() =>
+                            obscureConfirmPassword = !obscureConfirmPassword),
+                      ),
+                    ),
+                    validator: (val) => val != passwordController.text
+                        ? l10n.profilePasswordsDoNotMatch
+                        : null,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.profileCancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (formKey.currentState?.validate() ?? false) {
-                if (!context.mounted) return;
-                // Используем заранее прочитанный notifier
-                await encryptionNotifier
-                    .setupEncryption(passwordController.text);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Encryption enabled successfully!')),
-                  );
-                  Navigator.of(context).pop(true);
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.profileCancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  if (!context.mounted) return;
+                  await encryptionNotifier
+                      .setupEncryption(passwordController.text);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Encryption enabled successfully!')),
+                    );
+                    Navigator.of(context).pop(true);
+                  }
                 }
-              }
-            },
-            child: Text(l10n.profileEnable),
-          ),
-        ],
-      );
+              },
+              child: Text(l10n.profileEnable),
+            ),
+          ],
+        );
+      });
     },
   );
   passwordController.dispose();
@@ -100,107 +120,141 @@ class _ChangeMasterPasswordDialog extends ConsumerStatefulWidget {
       __ChangeMasterPasswordDialogState();
 }
 
-class __ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswordDialog> {
-    final _formKey = GlobalKey<FormState>();
-    final _oldPasswordController = TextEditingController();
-    final _newPasswordController = TextEditingController();
-    final _confirmPasswordController = TextEditingController();
-    bool _isLoading = false;
-    String? _errorMessage;
+class __ChangeMasterPasswordDialogState
+    extends ConsumerState<_ChangeMasterPasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _oldPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+  bool _obscureOldPassword = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
 
-    @override
-    void dispose() {
-      _oldPasswordController.dispose();
-      _newPasswordController.dispose();
-      _confirmPasswordController.dispose();
-      super.dispose();
-    }
+  @override
+  void dispose() {
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
-    Future<void> _handleChangePassword() async {
-      if (!(_formKey.currentState?.validate() ?? false)) return;
+  Future<void> _handleChangePassword() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final success = await encryptionNotifier.changeMasterPassword(
+        _oldPasswordController.text, _newPasswordController.text);
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(widget.l10n.profileChangePasswordSuccess)),
+      );
+      Navigator.of(context).pop();
+    } else {
       setState(() {
-        _isLoading = true;
-        _errorMessage = null;
+        _errorMessage = widget.l10n.profileChangePasswordErrorIncorrect;
+        _isLoading = false;
       });
-
-      // Читаем notifier ДО асинхронной операции
-      final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
-      final success = await encryptionNotifier
-          .changeMasterPassword(
-              _oldPasswordController.text, _newPasswordController.text);
-      
-      if (!mounted) return;
-
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.l10n.profileChangePasswordSuccess)),
-        );
-        Navigator.of(context).pop();
-      } else {
-        setState(() {
-          _errorMessage = widget.l10n.profileChangePasswordErrorIncorrect;
-          _isLoading = false;
-        });
-      }
     }
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      return AlertDialog(
-        title: Text(widget.l10n.profileChangePassword),
-        content: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else ...[
-                  Text(widget.l10n.profileChangePasswordInfo),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _oldPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: widget.l10n.profileChangePasswordCurrentPasswordHint,
-                      errorText: _errorMessage,
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.l10n.profileChangePassword),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else ...[
+                Text(widget.l10n.profileChangePasswordInfo),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _oldPasswordController,
+                  obscureText: _obscureOldPassword,
+                  decoration: InputDecoration(
+                    labelText:
+                        widget.l10n.profileChangePasswordCurrentPasswordHint,
+                    errorText: _errorMessage,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureOldPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () => setState(
+                          () => _obscureOldPassword = !_obscureOldPassword),
                     ),
-                    validator: (val) => (val?.isEmpty ?? true) ? widget.l10n.profilePasswordCannotBeEmpty : null,
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _newPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: widget.l10n.profileChangePasswordNewPasswordHint),
-                    validator: (val) => (val?.length ?? 0) < 8 ? widget.l10n.profilePasswordMinLength : null,
+                  validator: (val) => (val?.isEmpty ?? true)
+                      ? widget.l10n.profilePasswordCannotBeEmpty
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _newPasswordController,
+                  obscureText: _obscureNewPassword,
+                  decoration: InputDecoration(
+                    labelText:
+                        widget.l10n.profileChangePasswordNewPasswordHint,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureNewPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () => setState(
+                          () => _obscureNewPassword = !_obscureNewPassword),
+                    ),
                   ),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: widget.l10n.profileConfirmPasswordHint),
-                    validator: (val) => val != _newPasswordController.text ? widget.l10n.profilePasswordsDoNotMatch : null,
+                  validator: (val) => (val?.length ?? 0) < 8
+                      ? widget.l10n.profilePasswordMinLength
+                      : null,
+                ),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  obscureText: _obscureConfirmPassword,
+                  decoration: InputDecoration(
+                    labelText: widget.l10n.profileConfirmPasswordHint,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureConfirmPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () => setState(() =>
+                          _obscureConfirmPassword = !_obscureConfirmPassword),
+                    ),
                   ),
-                ],
+                  validator: (val) => val != _newPasswordController.text
+                      ? widget.l10n.profilePasswordsDoNotMatch
+                      : null,
+                ),
               ],
-            ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-            child: Text(widget.l10n.profileCancel),
-          ),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _handleChangePassword,
-            child: Text(widget.l10n.profileSave),
-          ),
-        ],
-      );
-    }
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+          child: Text(widget.l10n.profileCancel),
+        ),
+        ElevatedButton(
+          onPressed: _isLoading ? null : _handleChangePassword,
+          child: Text(widget.l10n.profileSave),
+        ),
+      ],
+    );
+  }
 }
-
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -250,7 +304,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       return;
     }
 
-    // Читаем сервис ДО асинхронной операции
     final userService = ref.read(userServiceProvider);
 
     final picker = ImagePicker();
@@ -262,7 +315,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (image != null) {
       if (!mounted) return;
-      
+
       final String? photoUrl =
           await userService.uploadAvatar(currentUser.uid, File(image.path));
 
@@ -282,12 +335,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  Future<void> _showEditDisplayNameDialog(UserProfile profile, AppLocalizations l10n) async {
+  Future<void> _showEditDisplayNameDialog(
+      UserProfile profile, AppLocalizations l10n) async {
     _displayNameController.text = profile.displayName;
-    
-    // Читаем сервис ДО показа диалога
+
     final userService = ref.read(userServiceProvider);
-    
+
     return showDialog<void>(
       context: context,
       builder: (context) {
@@ -308,7 +361,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 final newName = _displayNameController.text.trim();
                 if (newName.isNotEmpty) {
                   final updatedProfile = profile.copyWith(displayName: newName);
-                  // Используем заранее прочитанный сервис
                   await userService.updateUserProfile(updatedProfile);
                 }
                 if (context.mounted) {
@@ -323,25 +375,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _showCountryPicker(UserProfile profile) {
-    // Читаем сервис ДО показа picker'а
     final userService = ref.read(userServiceProvider);
-    
+
     showCountryPicker(
       context: context,
       onSelect: (country) async {
         final updatedProfile =
             profile.copyWith(countryCode: country.countryCode);
-        // Используем заранее прочитанный сервис
         await userService.updateUserProfile(updatedProfile);
       },
     );
   }
 
-  Future<void> _showLanguagePickerDialog(UserProfile profile, AppLocalizations l10n) async {
-    // Читаем сервисы ДО показа диалога
+  Future<void> _showLanguagePickerDialog(
+      UserProfile profile, AppLocalizations l10n) async {
     final userService = ref.read(userServiceProvider);
     final localeNotifier = ref.read(localeProvider.notifier);
-    
+
     return showDialog<void>(
       context: context,
       builder: (context) {
@@ -352,7 +402,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               onPressed: () async {
                 final updatedProfile =
                     profile.copyWith(languageCode: entry.key);
-                // Используем заранее прочитанные сервисы
                 await userService.updateUserProfile(updatedProfile);
                 localeNotifier.setLocale(Locale(entry.key));
                 if (context.mounted) {
@@ -366,15 +415,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       },
     );
   }
-  
+
   Future<void> _handleDeleteAccount(AppLocalizations l10n) async {
     if (!mounted) return;
     setState(() => _isDeleting = true);
 
-    FirebaseCrashlytics.instance.log('ProfileScreen: Starting account deletion process.');
-    
+    FirebaseCrashlytics.instance
+        .log('ProfileScreen: Starting account deletion process.');
+
     if (!mounted) return;
-    // Читаем сервисы до асинхронных операций
     final audioNotifier = ref.read(audioPlayerProvider.notifier);
     final authService = ref.read(authServiceProvider);
 
@@ -382,23 +431,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final result = await authService.deleteAccount();
 
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('ProfileScreen: Unmounted during deleteAccount.');
+      FirebaseCrashlytics.instance
+          .log('ProfileScreen: Unmounted during deleteAccount.');
       return;
     }
 
     if (result == 'success') {
-      FirebaseCrashlytics.instance.log('ProfileScreen: Account deletion successful. Popping until first route.');
+      FirebaseCrashlytics.instance.log(
+          'ProfileScreen: Account deletion successful. Popping until first route.');
       Navigator.of(context).popUntil((route) => route.isFirst);
       return;
     }
 
     if (result == 'requires-recent-login') {
-      FirebaseCrashlytics.instance.log('ProfileScreen: Account deletion requires re-authentication.');
+      FirebaseCrashlytics.instance
+          .log('ProfileScreen: Account deletion requires re-authentication.');
       final user = FirebaseAuth.instance.currentUser;
       final providerId = user?.providerData.firstOrNull?.providerId;
       bool reauthSuccess = false;
-      
-      FirebaseCrashlytics.instance.log('ProfileScreen: Re-auth needed for provider: $providerId');
+
+      FirebaseCrashlytics.instance
+          .log('ProfileScreen: Re-auth needed for provider: $providerId');
 
       try {
         if (providerId == 'password') {
@@ -411,15 +464,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           reauthSuccess = didReauth ?? false;
         }
 
-        FirebaseCrashlytics.instance.log('ProfileScreen: Re-authentication success status: $reauthSuccess');
+        FirebaseCrashlytics.instance.log(
+            'ProfileScreen: Re-authentication success status: $reauthSuccess');
         if (reauthSuccess) {
-          FirebaseCrashlytics.instance.log('ProfileScreen: Retrying delete after successful re-auth.');
+          FirebaseCrashlytics.instance
+              .log('ProfileScreen: Retrying delete after successful re-auth.');
           if (!mounted) return;
           final finalResult = await authService.deleteAccount();
           if (!mounted) return;
 
           if (finalResult == 'success') {
-             FirebaseCrashlytics.instance.log('ProfileScreen: Second deletion attempt successful.');
+            FirebaseCrashlytics.instance
+                .log('ProfileScreen: Second deletion attempt successful.');
             Navigator.of(context).popUntil((route) => route.isFirst);
             return;
           } else {
@@ -432,11 +488,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 .showSnackBar(SnackBar(content: Text(finalResult)));
           }
         } else {
-           FirebaseCrashlytics.instance.log('ProfileScreen: Re-authentication was cancelled or failed.');
+          FirebaseCrashlytics.instance
+              .log('ProfileScreen: Re-authentication was cancelled or failed.');
         }
       } catch (e, s) {
         if (!mounted) return;
-        FirebaseCrashlytics.instance.recordError(e, s, reason: 'Error during re-authentication flow.');
+        FirebaseCrashlytics.instance.recordError(e, s,
+            reason: 'Error during re-authentication flow.');
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
@@ -450,11 +508,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         null,
         reason: result,
       );
-      if(mounted){
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result)),
-          );
-          setState(() => _isDeleting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result)),
+        );
+        setState(() => _isDeleting = false);
       }
     }
   }
@@ -464,8 +522,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final formKey = GlobalKey<FormState>();
     String? errorMessage;
     bool isLoading = false;
-    
-    // Читаем сервис до показа диалога
+
     final authService = ref.read(authServiceProvider);
 
     return showDialog<bool>(
@@ -473,6 +530,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(builder: (context, setState) {
+          bool obscurePassword = true;
           return AlertDialog(
             title: Text(l10n.profileReauthPasswordDialogTitle),
             content: Form(
@@ -480,20 +538,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                   if (isLoading)
+                  if (isLoading)
                     const Center(child: CircularProgressIndicator())
-                   else ...[
+                  else ...[
                     Text(l10n.profileReauthPasswordDialogContent),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: obscurePassword,
                       autofocus: true,
                       decoration: InputDecoration(
                         labelText: l10n.password,
                         errorText: errorMessage,
+                        suffixIcon: IconButton(
+                          icon: Icon(obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () =>
+                              setState(() => obscurePassword = !obscurePassword),
+                        ),
                       ),
-                      validator: (val) => (val?.isEmpty ?? true) ? l10n.profilePasswordCannotBeEmpty : null,
+                      validator: (val) => (val?.isEmpty ?? true)
+                          ? l10n.profilePasswordCannotBeEmpty
+                          : null,
                     ),
                   ]
                 ],
@@ -501,32 +568,39 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             actions: [
               TextButton(
-                onPressed: isLoading ? null : () => Navigator.of(context).pop(false),
+                onPressed:
+                    isLoading ? null : () => Navigator.of(context).pop(false),
                 child: Text(l10n.profileCancel),
               ),
               ElevatedButton(
-                onPressed: isLoading ? null : () async {
-                  if (formKey.currentState?.validate() ?? false) {
-                    setState(() => isLoading = true);
-                    try {
-                      if(!mounted) return;
-                      await authService.reauthenticateWithPassword(passwordController.text);
-                      if (context.mounted) Navigator.of(context).pop(true);
-                    } on FirebaseAuthException catch(e) {
-                       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-                          setState(() {
-                            errorMessage = l10n.profileChangePasswordErrorIncorrect;
-                          });
-                       } else {
-                          setState(() {
-                             errorMessage = e.message;
-                          });
-                       }
-                    } finally {
-                      if(mounted) setState(() => isLoading = false);
-                    }
-                  }
-                },
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        if (formKey.currentState?.validate() ?? false) {
+                          setState(() => isLoading = true);
+                          try {
+                            if (!mounted) return;
+                            await authService.reauthenticateWithPassword(
+                                passwordController.text);
+                            if (context.mounted)
+                              Navigator.of(context).pop(true);
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'wrong-password' ||
+                                e.code == 'invalid-credential') {
+                              setState(() {
+                                errorMessage =
+                                    l10n.profileChangePasswordErrorIncorrect;
+                              });
+                            } else {
+                              setState(() {
+                                errorMessage = e.message;
+                              });
+                            }
+                          } finally {
+                            if (mounted) setState(() => isLoading = false);
+                          }
+                        }
+                      },
                 child: Text(l10n.profileSave),
               ),
             ],
@@ -536,14 +610,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Future<bool?> _showSocialReauthDialog(AppLocalizations l10n, String? providerId) async {
+  Future<bool?> _showSocialReauthDialog(
+      AppLocalizations l10n, String? providerId) async {
     if (!mounted) return false;
-    // Читаем сервис до показа диалога
     final authService = ref.read(authServiceProvider);
-    
+
     return showDialog<bool>(
       context: context,
-      barrierDismissible: false, 
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           title: Text(l10n.profileReauthTitle),
@@ -565,7 +639,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 } catch (e) {
                   if (context.mounted) {
                     Navigator.of(context).pop(false);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Re-authentication failed: $e')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Re-authentication failed: $e')));
                   }
                 }
               },
@@ -577,16 +652,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-
   Future<void> _showDeleteAccountDialog(AppLocalizations l10n) async {
-     final confirmed = await showDialog<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return _HoldToDeleteAccountDialog(l10n: l10n);
       },
     );
-    if(confirmed == true) {
-      if(mounted) {
+    if (confirmed == true) {
+      if (mounted) {
         _handleDeleteAccount(l10n);
       }
     }
@@ -613,12 +687,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (confirmed == true) {
       if (!mounted) return;
-
-      // **ИСПРАВЛЕНО:** Вызываем новый, более надежный метод `replayTour`.
       final notifier = ref.read(onboardingServiceProvider.notifier);
       await notifier.replayTour();
-
-      // Возвращаем результат, чтобы главный экран мог среагировать (например, сбросить вид).
       Navigator.of(context).pop('replay_onboarding');
     }
   }
@@ -632,6 +702,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (rest of the build method is unchanged)
     final userProfileAsyncValue = ref.watch(userProfileProvider);
     final currentUser = ref.watch(authStateChangesProvider).asData?.value;
     final isPremium = ref.watch(isPremiumProvider);
@@ -645,13 +716,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ? _DeletingScreen(l10n: l10n)
           : userProfileAsyncValue.when(
               loading: () => const _LoadingScreen(),
-              error: (err, stack) =>
-                  _ErrorScreen(l10n: l10n, onRetry: () => ref.refresh(userProfileProvider)),
+              error: (err, stack) => _ErrorScreen(
+                  l10n: l10n,
+                  onRetry: () => ref.refresh(userProfileProvider)),
               data: (profile) {
                 if (profile == null) {
                   if (currentUser != null) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if(mounted) {
+                      if (mounted) {
                         ref
                             .read(userServiceProvider)
                             .ensureUserProfileExists(currentUser, context);
@@ -725,7 +797,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     _buildInfoTile(
                       icon: Icons.public_outlined,
                       title: l10n.profileCountry,
-                      subtitle: profile.countryCode ?? l10n.profileCountryNotSelected,
+                      subtitle:
+                          profile.countryCode ?? l10n.profileCountryNotSelected,
                       onTap: () => _showCountryPicker(profile),
                     ),
                     _buildInfoTile(
@@ -821,7 +894,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildNotificationsSetting(UserProfile profile, AppLocalizations l10n) {
+  Widget _buildNotificationsSetting(
+      UserProfile profile, AppLocalizations l10n) {
     return SwitchListTile(
       title:
           Text(l10n.profileReminders, style: const TextStyle(fontSize: 16)),
@@ -849,7 +923,8 @@ class _ErrorScreen extends StatelessWidget {
   final VoidCallback onRetry;
   final AppLocalizations l10n;
 
-  const _ErrorScreen({this.message, required this.onRetry, required this.l10n});
+  const _ErrorScreen(
+      {this.message, required this.onRetry, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -910,10 +985,12 @@ class _HoldToDeleteAccountDialog extends StatefulWidget {
   const _HoldToDeleteAccountDialog({required this.l10n});
 
   @override
-  State<_HoldToDeleteAccountDialog> createState() => __HoldToDeleteAccountDialogState();
+  State<_HoldToDeleteAccountDialog> createState() =>
+      __HoldToDeleteAccountDialogState();
 }
 
-class __HoldToDeleteAccountDialogState extends State<_HoldToDeleteAccountDialog> with SingleTickerProviderStateMixin {
+class __HoldToDeleteAccountDialogState extends State<_HoldToDeleteAccountDialog>
+    with SingleTickerProviderStateMixin {
   late AnimationController _progressController;
   Timer? _deleteTimer;
   static const int _holdDurationSeconds = 5;
@@ -975,7 +1052,8 @@ class __HoldToDeleteAccountDialogState extends State<_HoldToDeleteAccountDialog>
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: _progressController.value,
-                        backgroundColor: Colors.red.withAlpha((255 * 0.2).round()),
+                        backgroundColor:
+                            Colors.red.withAlpha((255 * 0.2).round()),
                         valueColor:
                             const AlwaysStoppedAnimation<Color>(Colors.red),
                       ),
@@ -997,4 +1075,3 @@ class __HoldToDeleteAccountDialogState extends State<_HoldToDeleteAccountDialog>
     );
   }
 }
-

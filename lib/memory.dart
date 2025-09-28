@@ -140,9 +140,9 @@ class Memory {
     for (var key in mediaKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
-        if (path.startsWith('http') || File(path).existsSync()) {
-          orderedPaths.add(path);
-        }
+        // ИЗМЕНЕНИЕ: Удалена синхронная проверка существования файла для повышения производительности.
+        // Обработка ошибок отсутствия файла переносится на уровень виджетов (UI).
+        orderedPaths.add(path);
       }
     }
     return orderedPaths;
@@ -159,9 +159,8 @@ class Memory {
       for (var key in mediaKeysOrder) {
         if (thumbMap.containsKey(key)) {
           final path = thumbMap[key]!;
-          if (path.startsWith('http') || File(path).existsSync()) {
-            orderedThumbs.add(path);
-          }
+          // ИЗМЕНЕНИЕ: Удалена синхронная проверка существования файла.
+          orderedThumbs.add(path);
         }
       }
 
@@ -189,9 +188,8 @@ class Memory {
     for (var key in videoKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
-        if (path.startsWith('http') || File(path).existsSync()) {
-          orderedPaths.add(path);
-        }
+        // ИЗМЕНЕНИЕ: Удалена синхронная проверка существования файла.
+        orderedPaths.add(path);
       }
     }
     return orderedPaths;
@@ -206,9 +204,8 @@ class Memory {
     for (var key in audioKeysOrder) {
       if (pathMap.containsKey(key)) {
         final path = pathMap[key]!;
-        if (path.startsWith('http') || File(path).existsSync()) {
-          orderedPaths.add(path);
-        }
+        // ИЗМЕНЕНИЕ: Удалена синхронная проверка существования файла.
+        orderedPaths.add(path);
       }
     }
     return orderedPaths;
@@ -379,8 +376,10 @@ class Memory {
 
     final emotionsData = data['emotions'];
     if (emotionsData is List) {
+      // ОБНОВЛЕННАЯ ЛОГИКА: Обрабатываем старый формат (список строк)
       memory.emotions = {for (var e in emotionsData.cast<String>()) e: 50};
     } else if (emotionsData is Map) {
+      // ОБНОВЛЕННАЯ ЛОГИКА: Напрямую обрабатываем новый, правильный формат (карта)
       memory.emotions = Map<String, int>.from(emotionsData
           .map((key, value) => MapEntry(key, (value as num).toInt())));
     } else {
@@ -478,3 +477,5 @@ class Memory {
     return score;
   }
 }
+
+

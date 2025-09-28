@@ -20,6 +20,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLogin = true;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true; // Состояние для видимости пароля
 
   Future<void> _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -43,10 +44,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             context,
           );
         }
-        // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует после асинхронной операции
         if (!mounted) return;
       } on FirebaseAuthException catch (e) {
-        // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
         if (!mounted) return;
         setState(() {
           _errorMessage = e.message ?? 'An unknown error occurred';
@@ -67,7 +66,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       await authService.signInWithGoogle(context);
-      // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
       if (!mounted) return;
     } catch (e) {
       if (mounted) {
@@ -90,7 +88,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       await authService.signInWithApple(context);
-      // ИСПРАВЛЕНИЕ: Проверяем, что виджет все еще существует
       if (!mounted) return;
     } catch (e) {
       if (mounted) {
@@ -165,8 +162,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       decoration: _buildInputDecoration(
                         labelText: l10n.password,
                         icon: Icons.lock_outline,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.white.withOpacity(0.6),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                       ),
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       validator: (value) {
                         if (value == null || value.length < 6) {
                           return l10n.passwordTooShort;
@@ -236,11 +246,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  InputDecoration _buildInputDecoration({required String labelText, required IconData icon}) {
+  InputDecoration _buildInputDecoration(
+      {required String labelText,
+      required IconData icon,
+      Widget? suffixIcon}) {
     return InputDecoration(
       labelText: labelText,
       labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
       prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.6)),
+      suffixIcon: suffixIcon,
       filled: true,
       fillColor: Colors.white.withOpacity(0.05),
       enabledBorder: OutlineInputBorder(
@@ -261,7 +275,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-  
+
   Widget _buildSubmitButton(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
@@ -288,7 +302,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(
           _isLogin ? l10n.signIn : l10n.register,
@@ -302,7 +317,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildSocialButton({required String assetPath, required VoidCallback onPressed}) {
+  Widget _buildSocialButton(
+      {required String assetPath, required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(24),

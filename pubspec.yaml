@@ -1,7 +1,7 @@
 name: lifeline
 description: Lifeline MVP
 publish_to: "none"
-version: 1.0.99+99
+version: 1.0.100+100
 
 
 environment:

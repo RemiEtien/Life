@@ -161,7 +161,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         final fullPath = fullImages[i];
         final thumbPath = i < thumbnails.length ? thumbnails[i] : fullPath;
         _mediaItems.add(MediaItem(
-            path: fullPath, thumbPath: thumbPath, isLocal: !fullPath.startsWith('http')));
+            path: fullPath,
+            thumbPath: thumbPath,
+            isLocal: !fullPath.startsWith('http')));
       }
 
       _videoItems.addAll(_draftMemory!.displayableVideoPaths
@@ -220,59 +222,87 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         }
       }
     }
-    _autosaveTimer =
-        Timer.periodic(const Duration(seconds: 20), (_) => _autoSaveDraft(isTimerBased: true));
+    _autosaveTimer = Timer.periodic(
+        const Duration(seconds: 20), (_) => _autoSaveDraft(isTimerBased: true));
   }
-  
+
   Memory _buildMemoryFromState() {
     final baseMemory = _draftMemory ?? Memory();
 
     return baseMemory.copyWith(
       userId: widget.userId,
       title: _titleCtrl.text.trim(),
-      content: _contentCtrl.text.trim().isEmpty ? null : _contentCtrl.text.trim(),
+      content:
+          _contentCtrl.text.trim().isEmpty ? null : _contentCtrl.text.trim(),
       date: _date,
-      mediaPaths: _mediaItems.where((i) => i.isLocal).map((i) => i.path).toList(),
-      mediaUrls: _mediaItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
-      mediaThumbPaths: _mediaItems.where((i) => i.isLocal).map((i) => i.thumbPath).toList(),
-      mediaThumbUrls: _mediaItems.where((i) => !i.isLocal).map((i) => i.thumbPath).toList(),
-      videoPaths: _videoItems.where((i) => i.isLocal).map((i) => i.path).toList(),
-      videoUrls: _videoItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
-      audioNotePaths: _audioNoteItems.where((i) => i.isLocal).map((i) => i.path).toList(),
-      audioUrls: _audioNoteItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
+      mediaPaths:
+          _mediaItems.where((i) => i.isLocal).map((i) => i.path).toList(),
+      mediaUrls:
+          _mediaItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
+      mediaThumbPaths: _mediaItems
+          .where((i) => i.isLocal)
+          .map((i) => i.thumbPath)
+          .toList(),
+      mediaThumbUrls: _mediaItems
+          .where((i) => !i.isLocal)
+          .map((i) => i.thumbPath)
+          .toList(),
+      videoPaths:
+          _videoItems.where((i) => i.isLocal).map((i) => i.path).toList(),
+      videoUrls:
+          _videoItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
+      audioNotePaths:
+          _audioNoteItems.where((i) => i.isLocal).map((i) => i.path).toList(),
+      audioUrls:
+          _audioNoteItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
       spotifyTrackIds: _spotifyTrackIds,
       ambientSound: _ambientSound == 'None' ? null : _ambientSound,
-      reflectionImpact: _impactCtrl.text.trim().isEmpty ? null : _impactCtrl.text.trim(),
-      reflectionLesson: _lessonCtrl.text.trim().isEmpty ? null : _lessonCtrl.text.trim(),
-      reflectionAutoThought: _autoThoughtCtrl.text.trim().isEmpty ? null : _autoThoughtCtrl.text.trim(),
-      reflectionEvidenceFor: _evidenceForCtrl.text.trim().isEmpty ? null : _evidenceForCtrl.text.trim(),
-      reflectionEvidenceAgainst: _evidenceAgainstCtrl.text.trim().isEmpty ? null : _evidenceAgainstCtrl.text.trim(),
-      reflectionReframe: _reframeCtrl.text.trim().isEmpty ? null : _reframeCtrl.text.trim(),
-      reflectionAction: _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text.trim(),
+      reflectionImpact: _impactCtrl.text.trim().isEmpty
+          ? null
+          : _impactCtrl.text.trim(),
+      reflectionLesson: _lessonCtrl.text.trim().isEmpty
+          ? null
+          : _lessonCtrl.text.trim(),
+      reflectionAutoThought: _autoThoughtCtrl.text.trim().isEmpty
+          ? null
+          : _autoThoughtCtrl.text.trim(),
+      reflectionEvidenceFor: _evidenceForCtrl.text.trim().isEmpty
+          ? null
+          : _evidenceForCtrl.text.trim(),
+      reflectionEvidenceAgainst: _evidenceAgainstCtrl.text.trim().isEmpty
+          ? null
+          : _evidenceAgainstCtrl.text.trim(),
+      reflectionReframe: _reframeCtrl.text.trim().isEmpty
+          ? null
+          : _reframeCtrl.text.trim(),
+      reflectionAction:
+          _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text.trim(),
       reflectionFollowUpAt: _followUpDate,
       isEncrypted: _isEncrypted,
       emotions: _selectedEmotionsWithIntensity,
       mediaKeysOrder: _mediaItems.map((item) => getFileKey(item.path)).toList(),
       videoKeysOrder: _videoItems.map((item) => getFileKey(item.path)).toList(),
-      audioKeysOrder: _audioNoteItems.map((item) => getFileKey(item.path)).toList(),
+      audioKeysOrder:
+          _audioNoteItems.map((item) => getFileKey(item.path)).toList(),
     );
   }
 
-
   Future<void> _autoSaveDraft({bool isTimerBased = false}) async {
-    if (!mounted || _draftMemory == null || !(_formKey.currentState?.validate() ?? true)) return;
-    
+    if (!mounted ||
+        _draftMemory == null ||
+        !(_formKey.currentState?.validate() ?? true)) return;
+
     final l10n = AppLocalizations.of(context)!;
     final repo = ref.read(memoryRepositoryProvider);
     if (repo == null) return;
-    
+
     try {
       final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'draft');
       final updatedDraft = await repo.update(memoryToSave);
-      if(mounted) {
-         setState(() {
-           _draftMemory = updatedDraft;
-         });
+      if (mounted) {
+        setState(() {
+          _draftMemory = updatedDraft;
+        });
       }
 
       if (mounted && isTimerBased) {
@@ -281,11 +311,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
             .addMessage(l10n.memoryEditDraftSavedMessage, type: MessageType.success);
       }
     } on EncryptionLockedException {
-      // Autosave is skipped because the encryption service is locked.
-      // This is expected if the user has not entered their master password.
-      // The user will be prompted upon manual save.
       if (kDebugMode) {
-        print('[MemoryEditScreen] Autosave skipped: Encryption service is locked.');
+        print(
+            '[MemoryEditScreen] Autosave skipped: Encryption service is locked.');
       }
     }
   }
@@ -316,7 +344,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       }
     }
   }
-  
+
   Future<void> _pickImage() async {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -324,34 +352,39 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final picker = ImagePicker();
     final pickedFiles = await picker.pickMultiImage();
     if (!mounted || pickedFiles.isEmpty) return;
-    
-    if (!isPremium && (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
+
+    if (!isPremium &&
+        (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
       await showPremiumDialog(context, l10n.premiumFeaturePhotos);
       return;
     }
-    
+
     setState(() => _isProcessingImages = true);
 
     try {
       final imageProcessor = ref.read(imageProcessingServiceProvider);
-      
-      final processingFutures = pickedFiles.map((file) => imageProcessor.processPickedImage(file)).toList();
+
+      final processingFutures = pickedFiles
+          .map((file) => imageProcessor.processPickedImage(file))
+          .toList();
       final results = await Future.wait(processingFutures);
 
       if (!mounted) return;
 
-      final newMediaItems = results.whereType<ProcessedImageResult>().map((result) => MediaItem(
-        path: result.compressedImagePath,
-        thumbPath: result.thumbnailPath,
-        isLocal: true,
-      )).toList();
-      
+      final newMediaItems = results
+          .whereType<ProcessedImageResult>()
+          .map((result) => MediaItem(
+                path: result.compressedImagePath,
+                thumbPath: result.thumbnailPath,
+                isLocal: true,
+              ))
+          .toList();
+
       setState(() {
         _mediaItems.addAll(newMediaItems);
       });
-      
-      await _autoSaveDraft();
 
+      await _autoSaveDraft();
     } catch (e) {
       // Handle errors if necessary
     } finally {
@@ -376,8 +409,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       final picker = ImagePicker();
       final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
       if (pickedFile != null) {
-        setState(
-            () => _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
+        setState(() =>
+            _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
         _autoSaveDraft();
       }
     } else if (status.isPermanentlyDenied) {
@@ -552,31 +585,26 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       }
       return;
     }
-    
-    final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'pending');
+
+    final memoryToSave =
+        _buildMemoryFromState().copyWith(syncStatus: 'pending');
 
     try {
-      // ИЗМЕНЕНИЕ: Разделяем локальное сохранение и фоновые задачи
-      // 1. Сначала сохраняем локально, чтобы UI мог немедленно обновиться.
       final savedMemory = await memoryRepository.update(memoryToSave);
       if (savedMemory == null) {
         throw Exception("Failed to save memory locally.");
       }
 
-      // 2. Сразу выходим с экрана, чтобы пользователь увидел результат.
       if (mounted) {
         Navigator.of(context).pop(true);
       }
 
-      // 3. Запускаем фоновые задачи (синхронизация, напоминания) уже после того,
-      // как UI обновился. unawaited гарантирует, что мы не ждем их завершения.
       unawaited(Future.microtask(() {
-        if (mounted) { // Проверяем, что виджет все еще существует
+        if (mounted) {
           ref.read(syncServiceProvider).queueSync(savedMemory.id);
           _handleReflectionReminder(savedMemory);
         }
       }));
-
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -601,6 +629,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            bool obscurePassword = true;
             return AlertDialog(
               title: Text(l10n.memoryEditUnlockDialogTitle),
               content: Column(
@@ -613,10 +642,17 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                   else
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: obscurePassword,
                       decoration: InputDecoration(
                         labelText: l10n.memoryEditMasterPasswordHint,
                         errorText: errorText,
+                        suffixIcon: IconButton(
+                          icon: Icon(obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () => setState(
+                              () => obscurePassword = !obscurePassword),
+                        ),
                       ),
                       onSubmitted: (_) => _performUnlock(
                           passwordController,
@@ -695,6 +731,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   // --- BUILD METHOD ---
   @override
   Widget build(BuildContext context) {
+    // ... (rest of the build method is unchanged)
     final l10n = AppLocalizations.of(context)!;
     final userProfile = ref.watch(userProfileProvider).value;
     final isEncryptionGloballyEnabled =
@@ -1063,7 +1100,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
           const SizedBox(height: 4),
           Text(subtitle,
               style: TextStyle(
-                  color: Colors.white.withAlpha((255 * 0.6).round()), fontSize: 12)),
+                  color: Colors.white.withAlpha((255 * 0.6).round()),
+                  fontSize: 12)),
           const SizedBox(height: 12),
           _AutosavingTextField(
             controller: controller,
@@ -1110,8 +1148,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                         : CachedNetworkImage(
                             imageUrl: displayPath,
                             fit: BoxFit.cover,
-                            placeholder: (context, url) =>
-                                const Center(child: CircularProgressIndicator()),
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
                           ),
@@ -1259,15 +1297,16 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     );
   }
 
-  void _showEmotionIntensityDialog(String emotionKey, String translatedEmotion) {
+  void _showEmotionIntensityDialog(
+      String emotionKey, String translatedEmotion) {
     final l10n = AppLocalizations.of(context)!;
     int currentIntensity = _selectedEmotionsWithIntensity[emotionKey] ?? 50;
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-              title:
-                  Text(l10n.memoryEditEmotionIntensityDialogTitle(translatedEmotion)),
+              title: Text(
+                  l10n.memoryEditEmotionIntensityDialogTitle(translatedEmotion)),
               content: StatefulBuilder(builder: (context, setStateInDialog) {
                 return Column(mainAxisSize: MainAxisSize.min, children: [
                   Slider(
@@ -1276,8 +1315,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                       max: 100,
                       divisions: 10,
                       label: currentIntensity.toString(),
-                      onChanged: (newValue) =>
-                          setStateInDialog(() => currentIntensity = newValue.round()))
+                      onChanged: (newValue) => setStateInDialog(
+                          () => currentIntensity = newValue.round()))
                 ]);
               }),
               actions: [
@@ -1321,7 +1360,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         },
         items: AudioNotifier.availableSounds
             .map<DropdownMenuItem<String>>(
-                (String value) => DropdownMenuItem<String>(value: value, child: Text(value)))
+                (String value) => DropdownMenuItem<String>(
+                    value: value, child: Text(value)))
             .toList());
   }
 
