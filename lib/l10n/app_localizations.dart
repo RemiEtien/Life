@@ -1983,6 +1983,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export failed: {error}'**
   String exportFailed(String error);
+
+  /// No description provided for @profileEnableQuickUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Quick Unlock'**
+  String get profileEnableQuickUnlock;
+
+  /// No description provided for @profileQuickUnlockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your fingerprint, face, or device PIN to unlock.'**
+  String get profileQuickUnlockSubtitle;
+
+  /// No description provided for @profileRequireBiometricsForMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Require Biometrics for Each Memory'**
+  String get profileRequireBiometricsForMemoryTitle;
+
+  /// No description provided for @profileRequireBiometricsForMemorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If enabled, require authentication to open or edit individual encrypted memories, even when the app is unlocked.'**
+  String get profileRequireBiometricsForMemorySubtitle;
+
+  /// No description provided for @quickUnlockPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to unlock Lifeline'**
+  String get quickUnlockPrompt;
+
+  /// No description provided for @quickUnlockEnablePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to enable Quick Unlock'**
+  String get quickUnlockEnablePrompt;
+
+  /// No description provided for @masterPasswordRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Master Password Required'**
+  String get masterPasswordRequiredTitle;
+
+  /// No description provided for @masterPasswordRequiredContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your Master Password to enable this feature.'**
+  String get masterPasswordRequiredContent;
+
+  /// No description provided for @unlockScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Lifeline'**
+  String get unlockScreenTitle;
+
+  /// No description provided for @unlockWithBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with Biometrics'**
+  String get unlockWithBiometrics;
+
+  /// No description provided for @unlockEnterMasterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Master Password'**
+  String get unlockEnterMasterPassword;
 }
 
 class _AppLocalizationsDelegate

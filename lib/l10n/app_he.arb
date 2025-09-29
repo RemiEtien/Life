@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "הפעל נעילה מהירה",
+"profileQuickUnlockSubtitle": "השתמש בטביעת אצבע, בזיהוי פנים או בקוד ה-PIN של המכשיר כדי לפתוח.",
+"profileRequireBiometricsForMemoryTitle": "דרוש אימות ביומטרי לכל זיכרון",
+"profileRequireBiometricsForMemorySubtitle": "כאשר האפשרות מופעלת, יידרש אימות כדי לפתוח או לערוך זיכרונות מוצפנים בודדים, גם כאשר האפליקציה פתוחה.",
+"quickUnlockPrompt": "אמת את זהותך כדי לפתוח את Lifeline",
+"quickUnlockEnablePrompt": "אמת את זהותך כדי להפעיל נעילה מהירה",
+"masterPasswordRequiredTitle": "נדרשת סיסמת-על",
+"masterPasswordRequiredContent": "הזן את סיסמת-העל שלך כדי להפעיל את התכונה.",
+"unlockScreenTitle": "פתח את Lifeline",
+"unlockWithBiometrics": "פתח באמצעות אימות ביומטרי",
+"unlockEnterMasterPassword": "הזן סיסמת-על"
 }

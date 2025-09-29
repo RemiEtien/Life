@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../providers/application_providers.dart';
-import 'encryption_service.dart';
 import 'isar_service.dart';
 import 'user_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -115,17 +114,17 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Блокируем сессию шифрования ДО выхода из системы ***
-    // Это предотвращает состояние гонки, когда профиль пользователя исчезает
-    // до того, как сервис шифрования успеет перейти в состояние "locked".
-    await _ref.read(encryptionServiceProvider.notifier).lockSession();
+    // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Вызываем полный сброс состояния шифрования ***
+    // Это гарантирует, что при следующем запуске приложение не будет считать
+    // себя заблокированным, а перейдет в состояние "notConfigured".
+    _ref.read(encryptionServiceProvider.notifier).resetOnSignOut();
 
     _currentUser = null;
     if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
       _signInCompleter!.complete(null);
       _signInCompleter = null;
     }
-    
+
     // Запускаем остальные операции по очистке параллельно для ускорения
     final futures = <Future>[];
 
@@ -134,9 +133,9 @@ class AuthService {
         if (kDebugMode) print('Google signOut error (ignored): $e');
       }));
     }
-    
+
     futures.add(_firebaseAuth.signOut());
-    
+
     unawaited(IsarService.close().catchError((e) {
       if (kDebugMode) print('IsarService close error (ignored): $e');
     }));

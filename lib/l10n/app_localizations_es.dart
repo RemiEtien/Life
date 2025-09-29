@@ -1048,4 +1048,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String exportFailed(String error) {
     return 'Error al exportar: $error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => 'Activar desbloqueo rápido';
+
+  @override
+  String get profileQuickUnlockSubtitle =>
+      'Usa tu huella, rostro o PIN del dispositivo para desbloquear.';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle =>
+      'Requerir biometría para cada recuerdo';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      'Si se activa, se requerirá autenticación para abrir o editar recuerdos cifrados individuales, incluso cuando la app esté desbloqueada.';
+
+  @override
+  String get quickUnlockPrompt => 'Autentícate para desbloquear Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt =>
+      'Autentícate para activar el desbloqueo rápido';
+
+  @override
+  String get masterPasswordRequiredTitle => 'Se requiere la contraseña maestra';
+
+  @override
+  String get masterPasswordRequiredContent =>
+      'Ingresa tu contraseña maestra para habilitar esta función.';
+
+  @override
+  String get unlockScreenTitle => 'Desbloquear Lifeline';
+
+  @override
+  String get unlockWithBiometrics => 'Desbloquear con biometría';
+
+  @override
+  String get unlockEnterMasterPassword => 'Introduce la contraseña maestra';
 }

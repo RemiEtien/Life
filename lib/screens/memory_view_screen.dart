@@ -5,21 +5,21 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 import 'package:audioplayers/audioplayers.dart' as ap;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/models/anchors/anchor_models.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/memory_edit_screen.dart';
-import 'package:lifeline/services/audio_service.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/export_service.dart';
-import 'package:lifeline/services/message_service.dart';
+import '../memory.dart';
+import '../models/anchors/anchor_models.dart';
+import '../providers/application_providers.dart';
+import 'memory_edit_screen.dart';
+import '../services/audio_service.dart';
+import '../services/encryption_service.dart';
+import '../services/export_service.dart';
+import '../services/message_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -116,6 +116,14 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   void _decryptContent() {
     try {
       final encryptionService = ref.read(encryptionServiceProvider.notifier);
+      final profile = ref.read(userProfileProvider).value;
+
+      // NEW: Check if per-memory unlock is required and if it's already unlocked for the session
+      if (_currentMemory.isEncrypted &&
+          (profile?.requireBiometricForMemory ?? false) &&
+          !encryptionService.isMemoryUnlocked(_currentMemory.id)) {
+        throw PerMemoryAuthenticationRequiredException(_currentMemory.id);
+      }
 
       _decryptedContent['content'] =
           encryptionService.decrypt(_currentMemory.content);
@@ -140,6 +148,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         });
       }
     } on EncryptionLockedException {
+      if (mounted && !_needsUnlock) {
+        setState(() {
+          _needsUnlock = true;
+        });
+      }
+    } on PerMemoryAuthenticationRequiredException {
       if (mounted && !_needsUnlock) {
         setState(() {
           _needsUnlock = true;
@@ -493,7 +507,69 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     }
   }
 
+  // MODIFIED: This function now handles both session and per-memory unlock flows.
   Future<bool> _handleUnlockRequest() async {
+    final l10n = AppLocalizations.of(context)!;
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final biometricService = ref.read(biometricServiceProvider);
+    final profile = ref.read(userProfileProvider).value;
+
+    bool needsBiometrics = _currentMemory.isEncrypted &&
+        (profile?.requireBiometricForMemory ?? false) &&
+        !encryptionNotifier.isMemoryUnlocked(_currentMemory.id);
+
+    // 1. If session is locked, we need to unlock it first.
+    if (encryptionNotifier.state == EncryptionState.locked) {
+      final unlocked = await _triggerSessionUnlockFlow();
+      if (!unlocked) return false;
+    }
+    
+    // 2. If per-memory unlock is also required, do that now.
+    if (needsBiometrics) {
+       encryptionNotifier.prepareForUnlockAttempt();
+       final didAuthenticate = await biometricService.authenticate(l10n.quickUnlockPrompt);
+       encryptionNotifier.finishUnlockAttempt();
+       
+       if(didAuthenticate) {
+         encryptionNotifier.markMemoryAsUnlocked(_currentMemory.id);
+         _decryptContent();
+         return true;
+       } else {
+         return false; // User cancelled biometric prompt
+       }
+    }
+
+    _decryptContent();
+    return true;
+  }
+
+  // NEW: A unified flow to unlock the session (app-level).
+  Future<bool> _triggerSessionUnlockFlow() async {
+    final l10n = AppLocalizations.of(context)!;
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final biometricService = ref.read(biometricServiceProvider);
+    final profile = ref.read(userProfileProvider).value;
+
+    if (profile?.isQuickUnlockEnabled ?? false) {
+      final isAvailable = await biometricService.isBiometricsAvailable();
+      if (isAvailable) {
+        // FIX: Notify the encryption service before showing the prompt
+        encryptionNotifier.prepareForUnlockAttempt();
+        final didAuthenticate = await biometricService.authenticate(l10n.quickUnlockPrompt);
+        encryptionNotifier.finishUnlockAttempt(); // Notify that the attempt is over
+
+        if (didAuthenticate && mounted) {
+          final success = await encryptionNotifier.attemptQuickUnlock();
+          if (success) return true;
+        }
+      }
+    }
+    // Fallback to master password
+    return await _showMasterPasswordDialog();
+  }
+
+  // MODIFIED: Extracted master password dialog logic into its own method.
+  Future<bool> _showMasterPasswordDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final passwordController = TextEditingController();
     bool isLoading = false;
@@ -503,8 +579,6 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        // ИСПРАВЛЕНИЕ: Переменная для состояния видимости пароля вынесена сюда.
-        // Она будет сохранять свое значение между перерисовками диалога.
         bool obscurePassword = true;
         return StatefulBuilder(
           builder: (context, setState) {
@@ -549,7 +623,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                       obscureText: obscurePassword,
                       autofocus: true,
                       decoration: InputDecoration(
-                        labelText: l10n.memoryEditMasterPasswordHint,
+                        labelText: l10n.profileMasterPasswordHint,
                         errorText: errorText,
                         suffixIcon: IconButton(
                           icon: Icon(obscurePassword
@@ -580,10 +654,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
     if (unlocked == true && mounted) {
       ref.read(syncServiceProvider).resumeSync();
-      _decryptContent();
     }
     return unlocked ?? false;
   }
+
 
   void _showMediaPopup(int initialIndex) {
     // ... (rest of the method is unchanged)
@@ -626,7 +700,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     Widget coverImageWidget = const SizedBox.shrink();
 
     if (hasCover) {
-      coverImageWidget = coverThumbPath!.startsWith('http')
+      coverImageWidget = coverThumbPath.startsWith('http')
           ? CachedNetworkImage(
               imageUrl: coverThumbPath,
               fit: BoxFit.cover,
@@ -683,7 +757,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                 ),
               NestedScrollView(
                 headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
+                    (context, innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
                       leading: IconButton(
@@ -1192,7 +1266,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       children: [
         if (_needsUnlock)
           _buildLockedContentPlaceholder(
-              isMedia: true, showUnlockButton: false)
+              isMedia: true, showUnlockButton: true) // show button here
         else
           mediaWidget,
         if (allMedia.length > 1 && !_needsUnlock)
@@ -1485,7 +1559,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   Widget _buildPageIndicator(int count) {
     if (count <= 1) return const SizedBox.shrink();
-    List<Widget> dots = [];
+    final List<Widget> dots = [];
     for (int i = 0; i < count; i++) {
       dots.add(
         AnimatedContainer(
@@ -2005,7 +2079,7 @@ class _MusicChart extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("#${track.rank}",
+                Text('#${track.rank}',
                     style: GoogleFonts.oswald(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

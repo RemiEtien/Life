@@ -7,17 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:lifeline/l10n/app_localizations.dart';
-import 'package:lifeline/memory.dart';
-import 'package:lifeline/models/anchors/anchor_models.dart';
-import 'package:lifeline/providers/application_providers.dart';
-import 'package:lifeline/screens/profile_screen.dart';
-import 'package:lifeline/screens/spotify_search_screen.dart';
-import 'package:lifeline/services/audio_service.dart';
-import 'package:lifeline/services/encryption_service.dart';
-import 'package:lifeline/services/image_processing_service.dart';
-import 'package:lifeline/services/message_service.dart';
-import 'package:lifeline/widgets/premium_upsell_widgets.dart';
+import '../l10n/app_localizations.dart';
+import '../memory.dart';
+import '../models/anchors/anchor_models.dart';
+import '../providers/application_providers.dart';
+import 'profile_screen.dart';
+import 'spotify_search_screen.dart';
+import '../services/audio_service.dart';
+import '../services/encryption_service.dart';
+import '../services/image_processing_service.dart';
+import '../services/message_service.dart';
+import '../widgets/premium_upsell_widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -290,7 +290,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Future<void> _autoSaveDraft({bool isTimerBased = false}) async {
     if (!mounted ||
         _draftMemory == null ||
-        !(_formKey.currentState?.validate() ?? true)) return;
+        !(_formKey.currentState?.validate() ?? true)) {
+      return;
+    }
 
     final l10n = AppLocalizations.of(context)!;
     final repo = ref.read(memoryRepositoryProvider);
@@ -559,46 +561,108 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     }
   }
 
+  /// **NEW:** A unified unlock flow that prioritizes biometrics.
+  Future<bool> _triggerUnlockFlow() async {
+    final l10n = AppLocalizations.of(context)!;
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final biometricService = ref.read(biometricServiceProvider);
+    final profile = ref.read(userProfileProvider).value;
+
+    final memoryId = _draftMemory?.id;
+    if (memoryId == null) return false;
+
+    bool needsPerMemoryUnlock = _isEncrypted &&
+        (profile?.requireBiometricForMemory ?? false) &&
+        !encryptionNotifier.isMemoryUnlocked(memoryId);
+
+    // 1. If session is locked, we must unlock it first.
+    if (encryptionNotifier.state == EncryptionState.locked) {
+      // Set a flag to prevent auto-locking during the prompt
+      encryptionNotifier.prepareForUnlockAttempt();
+      final sessionUnlocked = await _triggerSessionUnlockFlow();
+      encryptionNotifier.finishUnlockAttempt(); // Clear the flag
+
+      if (!sessionUnlocked) return false; // User cancelled session unlock
+    }
+
+    // 2. If per-memory unlock is still required after session unlock
+    if (needsPerMemoryUnlock) {
+      encryptionNotifier.prepareForUnlockAttempt();
+      final didAuthenticate =
+          await biometricService.authenticate(l10n.quickUnlockPrompt);
+      encryptionNotifier.finishUnlockAttempt();
+
+      if (didAuthenticate) {
+        encryptionNotifier.markMemoryAsUnlocked(memoryId);
+        return true;
+      } else {
+        return false; // User cancelled per-memory unlock
+      }
+    }
+    
+    return true; // No unlock needed or already unlocked
+  }
+
+  // NEW: A separate flow for just the session unlock part.
+  Future<bool> _triggerSessionUnlockFlow() async {
+    final l10n = AppLocalizations.of(context)!;
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final biometricService = ref.read(biometricServiceProvider);
+    final profile = ref.read(userProfileProvider).value;
+
+    if (profile?.isQuickUnlockEnabled ?? false) {
+      final isAvailable = await biometricService.isBiometricsAvailable();
+      if (isAvailable) {
+        final didAuthenticate =
+            await biometricService.authenticate(l10n.quickUnlockPrompt);
+        if (didAuthenticate && mounted) {
+          final success = await encryptionNotifier.attemptQuickUnlock();
+          if (success) return true;
+        }
+      }
+    }
+    return await _showUnlockDialog();
+  }
+
+
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
-    if (!_formKey.currentState!.validate() || _isSaving) return;
-
-    if (_isEncrypted &&
-        ref.read(encryptionServiceProvider) == EncryptionState.locked) {
-      final unlocked = await _showUnlockDialog();
-      if (!unlocked) return;
-    }
+    if (!(_formKey.currentState?.validate() ?? false) || _isSaving) return;
 
     setState(() => _isSaving = true);
 
-    if (_draftMemory == null) {
-      setState(() => _isSaving = false);
-      return;
-    }
-
-    final memoryRepository = ref.read(memoryRepositoryProvider);
-    if (memoryRepository == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.memoryEditErrorRepoUnavailable)));
-        setState(() => _isSaving = false);
-      }
-      return;
-    }
-
-    final memoryToSave =
-        _buildMemoryFromState().copyWith(syncStatus: 'pending');
-
     try {
-      final savedMemory = await memoryRepository.update(memoryToSave);
-      if (savedMemory == null) {
-        throw Exception("Failed to save memory locally.");
+      final memoryRepository = ref.read(memoryRepositoryProvider);
+      if (memoryRepository == null) {
+        throw Exception(l10n.memoryEditErrorRepoUnavailable);
       }
+
+      // Check if we need to unlock BEFORE trying to save.
+      if (_isEncrypted) {
+        final unlocked = await _triggerUnlockFlow();
+        if (!unlocked) {
+          // User cancelled unlock, so we stop and don't save.
+          if(mounted) {
+            setState(() => _isSaving = false);
+          }
+          return;
+        }
+      }
+      
+      // Now, we are sure we are unlocked if we need to be. Proceed with saving.
+      final memoryToSave = _buildMemoryFromState().copyWith(syncStatus: 'pending');
+      final savedMemory = await memoryRepository.update(memoryToSave);
+
+      if (savedMemory == null) {
+        throw Exception('Failed to save memory locally.');
+      }
+      _autosaveTimer?.cancel(); // Stop autosave after a successful final save.
 
       if (mounted) {
         Navigator.of(context).pop(true);
       }
 
+      // Start async tasks after the screen is closed
       unawaited(Future.microtask(() {
         if (mounted) {
           ref.read(syncServiceProvider).queueSync(savedMemory.id);
@@ -627,10 +691,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        bool obscurePassword = true; // ПЕРЕМЕЩЕНО СЮДА
+        bool obscurePassword = true;
         return StatefulBuilder(
           builder: (context, setState) {
-            // bool obscurePassword = true; // БЫЛО ЗДЕСЬ
             return AlertDialog(
               title: Text(l10n.memoryEditUnlockDialogTitle),
               content: Column(
@@ -741,7 +804,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+      onPopInvokedWithResult: (didPop, dynamic result) async {
         if (didPop) return;
         _autosaveTimer?.cancel();
         Navigator.of(context).pop(false);
@@ -1352,8 +1415,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         decoration: InputDecoration(
             labelText: l10n.memoryEditAmbientSoundDropdownHint,
             border: const OutlineInputBorder()),
-        value: _ambientSound,
-        onChanged: (String? newValue) {
+        initialValue: _ambientSound,
+        onChanged: (newValue) {
           if (newValue != null) {
             setState(() => _ambientSound = newValue);
             _autoSaveDraft();
@@ -1361,7 +1424,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         },
         items: AudioNotifier.availableSounds
             .map<DropdownMenuItem<String>>(
-                (String value) => DropdownMenuItem<String>(
+                (value) => DropdownMenuItem<String>(
                     value: value, child: Text(value)))
             .toList());
   }
@@ -1372,7 +1435,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         ..._spotifyTrackIds.map((trackId) {
           final details = _spotifyTrackDetailsMap[trackId];
           if (details == null) {
-            return const ListTile(title: Text("Loading track..."));
+            return const ListTile(title: Text('Loading track...'));
           }
           return ListTile(
             leading: details.albumArtUrl != null

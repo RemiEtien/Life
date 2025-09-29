@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/user_profile.dart';
+import '../services/encryption_service.dart';
+import 'unlock_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../memory.dart';
@@ -16,7 +19,6 @@ import '../services/notification_service.dart';
 import '../widgets/lifeline_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-// НОВЫЙ ИМПОРТ: для проверки платформы
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthGate extends ConsumerStatefulWidget {
@@ -46,8 +48,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         if (l10n != null) {
           _checkForDrafts(l10n);
         }
-        // ИЗОЛИРУЕМ ФУНКЦИОНАЛ "ПОДЕЛИТЬСЯ В ПРИЛОЖЕНИЕ" ТОЛЬКО ДЛЯ МОБИЛЬНЫХ
-        // Проверяем, что это не веб-платформа и что это либо Android, либо iOS
+
         if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
           _sharingSubscription =
               ReceiveSharingIntent.instance.getMediaStream().listen((value) {
@@ -79,7 +80,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   Future<void> _handleSharedFiles(List<SharedMediaFile> files) async {
     if (files.isEmpty || !mounted) return;
 
-    // Читаем все необходимые значения ДО асинхронных операций
     final authValue = ref.read(authStateChangesProvider);
     final user = authValue.asData?.value;
     if (user == null) {
@@ -87,7 +87,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
 
     final imageProcessor = ref.read(imageProcessingServiceProvider);
-    // ИЗМЕНЕНО: Создаем список, который может содержать и MediaItem, и VideoMediaItem
     final List<dynamic> processedMedia = [];
 
     showDialog(
@@ -98,7 +97,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
     for (var file in files) {
       if (file.type == SharedMediaType.image) {
-        final result = await imageProcessor.processPickedImage(XFile(file.path));
+        final result =
+            await imageProcessor.processPickedImage(XFile(file.path));
         if (result != null) {
           processedMedia.add(MediaItem(
             path: result.compressedImagePath,
@@ -106,8 +106,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             isLocal: true,
           ));
         }
-      } else if (file.type == SharedMediaType.video) { // ДОБАВЛЕНО: Обработка видео
-        // Для видео мы не обрабатываем их здесь, просто создаем элемент.
+      } else if (file.type == SharedMediaType.video) {
         processedMedia.add(VideoMediaItem(path: file.path, isLocal: true));
       }
     }
@@ -120,7 +119,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
   }
 
-  // ИЗМЕНЕНО: Теперь принимает List<dynamic>
   void _showShareActionSheet(List<dynamic> media, String userId) {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
@@ -158,7 +156,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                         child: SizedBox(
                           width: 100,
                           height: 100,
-                          // ИЗМЕНЕНО: Различаем фото и видео для превью
                           child: item is MediaItem
                               ? Image.file(File(item.thumbPath),
                                   fit: BoxFit.cover)
@@ -188,7 +185,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                     MaterialPageRoute(
                       builder: (_) => MemoryEditScreen(
                         userId: userId,
-                        // ИЗМЕНЕНО: Передаем оба списка в MemoryEditScreen
                         initialMedia: media.whereType<MediaItem>().toList(),
                         initialVideos:
                             media.whereType<VideoMediaItem>().toList(),
@@ -212,7 +208,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => SelectMemoryScreen(
-                        // ИЗМЕНЕНО: Передаем оба списка в SelectMemoryScreen
                         mediaToAdd: media.whereType<MediaItem>().toList(),
                         videosToAdd: media.whereType<VideoMediaItem>().toList(),
                       ),
@@ -231,7 +226,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (!mounted) return;
     FirebaseCrashlytics.instance.log('AuthGate: Checking for drafts.');
 
-    // Читаем repo один раз
     final repo = ref.read(memoryRepositoryProvider);
     if (repo == null) {
       FirebaseCrashlytics.instance
@@ -247,7 +241,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       return;
     }
 
-    // Проверяем auth state заново после асинхронной операции
     final currentAuthValue = ref.read(authStateChangesProvider);
     if (currentAuthValue.asData?.value == null) {
       FirebaseCrashlytics.instance
@@ -266,10 +259,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   void _showDraftDialog(Memory draft, AppLocalizations l10n) {
     if (!mounted) return;
-
-    // Читаем repo заранее
     final repo = ref.read(memoryRepositoryProvider);
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -283,7 +273,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             onPressed: () {
               FirebaseCrashlytics.instance
                   .log('AuthGate: Discarding draft ${draft.id}.');
-              // Используем заранее прочитанный repo
               repo?.delete(draft.id);
               Navigator.of(context).pop();
             },
@@ -339,8 +328,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
 
     if (memory != null && navigatorKey.currentContext != null) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Navigating to MemoryViewScreen for memory ${memory.id}.');
+      FirebaseCrashlytics.instance.log(
+          'AuthGate: Navigating to MemoryViewScreen for memory ${memory.id}.');
       Navigator.of(navigatorKey.currentContext!).push(
         MaterialPageRoute(
             builder: (_) =>
@@ -355,18 +344,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateChangesProvider);
-    final onboardingState = ref.watch(onboardingServiceProvider);
     final l10n = AppLocalizations.of(context)!;
 
     return authState.when(
       loading: () {
-        FirebaseCrashlytics.instance
-            .log('AuthGate: Build state is authState.loading');
+        FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.loading');
         return _LoadingScreen(message: l10n.authGateAuthenticating);
       },
       error: (error, stack) {
-        FirebaseCrashlytics.instance
-            .recordError(error, stack, reason: 'AuthGate: authState.error');
+        FirebaseCrashlytics.instance.recordError(error, stack, reason: 'AuthGate: authState.error');
         return _ErrorScreen(
           l10n: l10n,
           error: error.toString(),
@@ -375,56 +361,80 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       },
       data: (user) {
         if (user == null) {
-          FirebaseCrashlytics.instance.log(
-              'AuthGate: Build state is authState.data (user is null). Navigating to LoginScreen.');
+          FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user is null). Navigating to LoginScreen.');
           return const LoginScreen();
         }
 
         final isEmailPasswordProvider = user.providerData
             .any((userInfo) => userInfo.providerId == 'password');
         if (isEmailPasswordProvider && !user.emailVerified) {
-          FirebaseCrashlytics.instance.log(
-              'AuthGate: Build state is authState.data (user not verified). Navigating to VerifyEmailScreen.');
+          FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user not verified). Navigating to VerifyEmailScreen.');
           return const VerifyEmailScreen();
         }
 
-        FirebaseCrashlytics.instance.log(
-            'AuthGate: Build state is authState.data (user is authenticated). Watching memories...');
-        final memoriesState = ref.watch(memoriesStreamProvider);
-        return memoriesState.when(
-          loading: () {
-            FirebaseCrashlytics.instance
-                .log('AuthGate: Build state is memoriesState.loading');
-            return _LoadingScreen(message: l10n.authGateLoadingMemories);
-          },
-          error: (error, stack) {
-            FirebaseCrashlytics.instance.recordError(error, stack,
-                reason: 'AuthGate: memoriesState.error');
-            return _ErrorScreen(
-              l10n: l10n,
-              error: error.toString(),
-              onRetry: () => ref.refresh(memoriesStreamProvider),
-            );
-          },
-          data: (memories) {
-            if (memories.isEmpty && !onboardingState.isActive) {
-              FirebaseCrashlytics.instance.log(
-                  'AuthGate: Build state is memoriesState.data (memories are empty).');
-              return Scaffold(
-                body: Stack(
-                  children: [
-                    SafeArea(child: LifelineWidget(key: ValueKey(user.uid))),
-                    _EmptyStateOverlay(l10n: l10n),
-                  ],
-                ),
-              );
+        // --- FIX for problems 1 & 3: Watch providers directly to drive the UI state ---
+        final userProfileAsync = ref.watch(userProfileProvider);
+        final encryptionState = ref.watch(encryptionServiceProvider);
+
+        return userProfileAsync.when(
+          loading: () => _LoadingScreen(message: l10n.authGateAuthenticating),
+          error: (err, stack) => _ErrorScreen(
+            l10n: l10n,
+            error: err.toString(),
+            onRetry: () => ref.refresh(userProfileProvider),
+          ),
+          data: (profile) {
+            if (profile == null) {
+              // This can happen briefly when a user is created but the profile isn't yet.
+              // Show a loading screen while `ensureUserProfileExists` runs.
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  ref
+                      .read(userServiceProvider)
+                      .ensureUserProfileExists(user, context);
+                }
+              });
+              return _LoadingScreen(message: l10n.authGateLoadingMemories);
             }
-            FirebaseCrashlytics.instance.log(
-                'AuthGate: Build state is memoriesState.data (showing ${memories.length} memories).');
-            return Scaffold(
-              body: SafeArea(
-                child: LifelineWidget(key: ValueKey(user.uid)),
+
+            // **CRITICAL LOGIC**: Show UnlockScreen if encryption is enabled and state is locked.
+            if (profile.isEncryptionEnabled &&
+                encryptionState == EncryptionState.locked) {
+              return const UnlockScreen();
+            }
+
+            // If not locked, proceed to show the main app content.
+            final memoriesState = ref.watch(memoriesStreamProvider);
+            return memoriesState.when(
+              loading: () =>
+                  _LoadingScreen(message: l10n.authGateLoadingMemories),
+              error: (error, stack) => _ErrorScreen(
+                l10n: l10n,
+                error: error.toString(),
+                onRetry: () => ref.refresh(memoriesStreamProvider),
               ),
+              data: (memories) {
+                final onboardingState = ref.watch(onboardingServiceProvider);
+                if (memories.isEmpty && !onboardingState.isActive) {
+                  FirebaseCrashlytics.instance.log(
+                      'AuthGate: Build state is memoriesState.data (memories are empty).');
+                  return Scaffold(
+                    body: Stack(
+                      children: [
+                        SafeArea(child: LifelineWidget(key: ValueKey(user.uid))),
+                        _EmptyStateOverlay(l10n: l10n),
+                      ],
+                    ),
+                  );
+                }
+                FirebaseCrashlytics.instance.log(
+                    'AuthGate: Build state is memoriesState.data (showing ${memories.length} memories).');
+                return Scaffold(
+                  body: SafeArea(
+                    child: LifelineWidget(key: ValueKey(user.uid)),
+                  ),
+                );
+              },
             );
           },
         );
@@ -432,6 +442,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     );
   }
 }
+
+// --- Helper Widgets ---
 
 class _LoadingScreen extends StatelessWidget {
   final String message;
@@ -451,8 +463,15 @@ class _LoadingScreen extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation(Colors.white),
             ),
             const SizedBox(height: 20),
-            Text(message,
-                style: TextStyle(color: Colors.white.withAlpha((255 * 0.7).round()))),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Text(
+                message,
+                key: ValueKey(message),
+                style:
+                    TextStyle(color: Colors.white.withAlpha((255 * 0.7).round())),
+              ),
+            ),
           ],
         ),
       ),
@@ -490,7 +509,8 @@ class _ErrorScreen extends StatelessWidget {
               Text(
                 l10n.authGateCouldNotLoad,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withAlpha((255 * 0.7).round())),
+                style:
+                    TextStyle(color: Colors.white.withAlpha((255 * 0.7).round())),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -522,17 +542,18 @@ class _EmptyStateOverlay extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.black.withAlpha((255 * 0.7).round()),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withAlpha((255 * 0.2).round())),
+            border:
+                Border.all(color: Colors.white.withAlpha((255 * 0.2).round())),
           ),
           child: Text(
             l10n.authGateEmptyState,
             textAlign: TextAlign.center,
-            style:
-                TextStyle(color: Colors.white.withAlpha((255 * 0.8).round()), height: 1.5),
+            style: TextStyle(
+                color: Colors.white.withAlpha((255 * 0.8).round()),
+                height: 1.5),
           ),
         ),
       ),
     );
   }
 }
-

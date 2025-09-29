@@ -1031,4 +1031,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String exportFailed(String error) {
     return 'Export failed: $error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => 'Enable Quick Unlock';
+
+  @override
+  String get profileQuickUnlockSubtitle =>
+      'Use your fingerprint, face, or device PIN to unlock.';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle =>
+      'Require Biometrics for Each Memory';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      'If enabled, require authentication to open or edit individual encrypted memories, even when the app is unlocked.';
+
+  @override
+  String get quickUnlockPrompt => 'Authenticate to unlock Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt => 'Authenticate to enable Quick Unlock';
+
+  @override
+  String get masterPasswordRequiredTitle => 'Master Password Required';
+
+  @override
+  String get masterPasswordRequiredContent =>
+      'Please enter your Master Password to enable this feature.';
+
+  @override
+  String get unlockScreenTitle => 'Unlock Lifeline';
+
+  @override
+  String get unlockWithBiometrics => 'Unlock with Biometrics';
+
+  @override
+  String get unlockEnterMasterPassword => 'Enter Master Password';
 }

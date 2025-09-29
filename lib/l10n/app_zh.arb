@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "启用快速解锁",
+"profileQuickUnlockSubtitle": "使用指纹、面容或设备 PIN 码进行解锁。",
+"profileRequireBiometricsForMemoryTitle": "为每条记忆要求生物识别",
+"profileRequireBiometricsForMemorySubtitle": "启用后，即使应用已解锁，打开或编辑单条加密记忆时仍需进行身份验证。",
+"quickUnlockPrompt": "验证身份以解锁 Lifeline",
+"quickUnlockEnablePrompt": "验证身份以启用快速解锁",
+"masterPasswordRequiredTitle": "需要主密码",
+"masterPasswordRequiredContent": "请输入主密码以启用此功能。",
+"unlockScreenTitle": "解锁 Lifeline",
+"unlockWithBiometrics": "通过生物识别解锁",
+"unlockEnterMasterPassword": "输入主密码"
 }

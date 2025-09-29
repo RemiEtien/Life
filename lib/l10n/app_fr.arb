@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "Activer le déverrouillage rapide",
+"profileQuickUnlockSubtitle": "Utilisez votre empreinte digitale, votre visage ou le code PIN de l’appareil pour déverrouiller.",
+"profileRequireBiometricsForMemoryTitle": "Exiger la biométrie pour chaque souvenir",
+"profileRequireBiometricsForMemorySubtitle": "Si activé, une authentification est requise pour ouvrir ou modifier des souvenirs chiffrés individuellement, même lorsque l’application est déverrouillée.",
+"quickUnlockPrompt": "Authentifiez-vous pour déverrouiller Lifeline",
+"quickUnlockEnablePrompt": "Authentifiez-vous pour activer le déverrouillage rapide",
+"masterPasswordRequiredTitle": "Mot de passe maître requis",
+"masterPasswordRequiredContent": "Veuillez saisir votre mot de passe maître pour activer cette fonctionnalité.",
+"unlockScreenTitle": "Déverrouiller Lifeline",
+"unlockWithBiometrics": "Déverrouiller avec la biométrie",
+"unlockEnterMasterPassword": "Saisir le mot de passe maître"
 }

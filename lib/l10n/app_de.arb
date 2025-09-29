@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "Schnellentsperren aktivieren",
+"profileQuickUnlockSubtitle": "Verwende deinen Fingerabdruck, dein Gesicht oder die Geräte-PIN zum Entsperren.",
+"profileRequireBiometricsForMemoryTitle": "Biometrie für jede Erinnerung anfordern",
+"profileRequireBiometricsForMemorySubtitle": "Wenn aktiviert, ist eine Authentifizierung erforderlich, um einzelne verschlüsselte Erinnerungen zu öffnen oder zu bearbeiten – selbst wenn die App entsperrt ist.",
+"quickUnlockPrompt": "Authentifiziere dich, um Lifeline zu entsperren",
+"quickUnlockEnablePrompt": "Authentifiziere dich, um Schnellentsperren zu aktivieren",
+"masterPasswordRequiredTitle": "Master-Passwort erforderlich",
+"masterPasswordRequiredContent": "Bitte gib dein Master-Passwort ein, um diese Funktion zu aktivieren.",
+"unlockScreenTitle": "Lifeline entsperren",
+"unlockWithBiometrics": "Mit Biometrie entsperren",
+"unlockEnterMasterPassword": "Master-Passwort eingeben"
 }

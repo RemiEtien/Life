@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "تفعيل الفتح السريع",
+"profileQuickUnlockSubtitle": "استخدم بصمتك أو وجهك أو رقم التعريف الشخصي للجهاز لفتحه.",
+"profileRequireBiometricsForMemoryTitle": "طلب القياسات الحيوية لكل ذكرى",
+"profileRequireBiometricsForMemorySubtitle": "عند التفعيل، سيُطلب التحقق لفتح أو تعديل الذكريات المشفّرة الفردية حتى عندما يكون التطبيق مفتوحًا.",
+"quickUnlockPrompt": "قم بالمصادقة لفتح Lifeline",
+"quickUnlockEnablePrompt": "قم بالمصادقة لتفعيل الفتح السريع",
+"masterPasswordRequiredTitle": "كلمة المرور الرئيسية مطلوبة",
+"masterPasswordRequiredContent": "يرجى إدخال كلمة المرور الرئيسية لتفعيل هذه الميزة.",
+"unlockScreenTitle": "فتح Lifeline",
+"unlockWithBiometrics": "افتح باستخدام القياسات الحيوية",
+"unlockEnterMasterPassword": "أدخل كلمة المرور الرئيسية"
 }

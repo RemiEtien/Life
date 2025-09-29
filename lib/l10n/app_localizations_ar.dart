@@ -1034,4 +1034,41 @@ class AppLocalizationsAr extends AppLocalizations {
   String exportFailed(String error) {
     return 'فشل التصدير: $error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => 'تفعيل الفتح السريع';
+
+  @override
+  String get profileQuickUnlockSubtitle =>
+      'استخدم بصمتك أو وجهك أو رقم التعريف الشخصي للجهاز لفتحه.';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle =>
+      'طلب القياسات الحيوية لكل ذكرى';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      'عند التفعيل، سيُطلب التحقق لفتح أو تعديل الذكريات المشفّرة الفردية حتى عندما يكون التطبيق مفتوحًا.';
+
+  @override
+  String get quickUnlockPrompt => 'قم بالمصادقة لفتح Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt => 'قم بالمصادقة لتفعيل الفتح السريع';
+
+  @override
+  String get masterPasswordRequiredTitle => 'كلمة المرور الرئيسية مطلوبة';
+
+  @override
+  String get masterPasswordRequiredContent =>
+      'يرجى إدخال كلمة المرور الرئيسية لتفعيل هذه الميزة.';
+
+  @override
+  String get unlockScreenTitle => 'فتح Lifeline';
+
+  @override
+  String get unlockWithBiometrics => 'افتح باستخدام القياسات الحيوية';
+
+  @override
+  String get unlockEnterMasterPassword => 'أدخل كلمة المرور الرئيسية';
 }

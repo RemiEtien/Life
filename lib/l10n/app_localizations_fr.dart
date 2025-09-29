@@ -1051,4 +1051,43 @@ class AppLocalizationsFr extends AppLocalizations {
   String exportFailed(String error) {
     return 'Échec de l\'exportation : $error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => 'Activer le déverrouillage rapide';
+
+  @override
+  String get profileQuickUnlockSubtitle =>
+      'Utilisez votre empreinte digitale, votre visage ou le code PIN de l’appareil pour déverrouiller.';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle =>
+      'Exiger la biométrie pour chaque souvenir';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      'Si activé, une authentification est requise pour ouvrir ou modifier des souvenirs chiffrés individuellement, même lorsque l’application est déverrouillée.';
+
+  @override
+  String get quickUnlockPrompt =>
+      'Authentifiez-vous pour déverrouiller Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt =>
+      'Authentifiez-vous pour activer le déverrouillage rapide';
+
+  @override
+  String get masterPasswordRequiredTitle => 'Mot de passe maître requis';
+
+  @override
+  String get masterPasswordRequiredContent =>
+      'Veuillez saisir votre mot de passe maître pour activer cette fonctionnalité.';
+
+  @override
+  String get unlockScreenTitle => 'Déverrouiller Lifeline';
+
+  @override
+  String get unlockWithBiometrics => 'Déverrouiller avec la biométrie';
+
+  @override
+  String get unlockEnterMasterPassword => 'Saisir le mot de passe maître';
 }

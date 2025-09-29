@@ -1,7 +1,7 @@
 name: lifeline
 description: Lifeline MVP
 publish_to: "none"
-version: 1.0.103+103
+version: 1.0.108+108
 
 
 environment:
@@ -69,6 +69,7 @@ dependencies:
   cached_network_image: ^3.3.1     # Для кэширования изображений
   flutter_cache_manager: ^3.3.1
   receive_sharing_intent: ^1.4.5   # ДОБАВЛЕНО: для приёма медиа
+  local_auth: ^2.2.0               # ДОБАВЛЕНО: для биометрии
   
   # --- НОВЫЕ ЗАВИСИМОСТИ ДЛЯ ЭКСПОРТА ---
   pdf: ^3.10.8

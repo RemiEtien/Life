@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "Включить быстрый доступ",
+"profileQuickUnlockSubtitle": "Используйте отпечаток пальца, лицо или PIN-код устройства, чтобы разблокировать.",
+"profileRequireBiometricsForMemoryTitle": "Требовать биометрию для каждой записи",
+"profileRequireBiometricsForMemorySubtitle": "Если включено, потребуется аутентификация для открытия или редактирования отдельных зашифрованных воспоминаний даже при разблокированном приложении.",
+"quickUnlockPrompt": "Пройдите проверку, чтобы разблокировать Lifeline",
+"quickUnlockEnablePrompt": "Пройдите проверку, чтобы включить быстрый доступ",
+"masterPasswordRequiredTitle": "Требуется мастер-пароль",
+"masterPasswordRequiredContent": "Введите мастер-пароль, чтобы включить эту функцию.",
+"unlockScreenTitle": "Разблокировать Lifeline",
+"unlockWithBiometrics": "Разблокировать с помощью биометрии",
+"unlockEnterMasterPassword": "Введите мастер-пароль"
 }

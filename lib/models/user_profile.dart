@@ -16,7 +16,9 @@ class UserProfile {
   // --- ENCRYPTION FIELDS ---
   final bool isEncryptionEnabled;
   final String? wrappedDEK; // Data Encryption Key, encrypted with KEK
-  final String? salt;       // Salt for deriving KEK from master password
+  final String? salt; // Salt for deriving KEK from master password
+  final bool isQuickUnlockEnabled; // NEW: Flag for biometric/PIN unlock
+  final bool requireBiometricForMemory; // NEW: Flag for per-memory unlock
 
   // --- PREMIUM FIELDS ---
   final bool isPremium;
@@ -30,7 +32,6 @@ class UserProfile {
   final double visualBranchDensity;
   final double visualBranchIntensity;
   final bool visualAnimationEnabled;
-
 
   const UserProfile({
     required this.uid,
@@ -46,6 +47,8 @@ class UserProfile {
     this.isEncryptionEnabled = false,
     this.wrappedDEK,
     this.salt,
+    this.isQuickUnlockEnabled = false, // Default to false
+    this.requireBiometricForMemory = false, // Default to false
     this.isPremium = false,
     this.premiumUntil,
     this.trialStartedAt,
@@ -70,6 +73,8 @@ class UserProfile {
     bool? isEncryptionEnabled,
     String? wrappedDEK,
     String? salt,
+    bool? isQuickUnlockEnabled,
+    bool? requireBiometricForMemory,
     bool? isPremium,
     DateTime? premiumUntil,
     DateTime? trialStartedAt,
@@ -96,6 +101,9 @@ class UserProfile {
       isEncryptionEnabled: isEncryptionEnabled ?? this.isEncryptionEnabled,
       wrappedDEK: wrappedDEK ?? this.wrappedDEK,
       salt: salt ?? this.salt,
+      isQuickUnlockEnabled: isQuickUnlockEnabled ?? this.isQuickUnlockEnabled,
+      requireBiometricForMemory:
+          requireBiometricForMemory ?? this.requireBiometricForMemory,
       isPremium: isPremium ?? this.isPremium,
       premiumUntil: premiumUntil ?? this.premiumUntil,
       trialStartedAt: trialStartedAt ?? this.trialStartedAt,
@@ -105,7 +113,8 @@ class UserProfile {
       visualYearLinePosition:
           visualYearLinePosition ?? this.visualYearLinePosition,
       visualBranchDensity: visualBranchDensity ?? this.visualBranchDensity,
-      visualBranchIntensity: visualBranchIntensity ?? this.visualBranchIntensity,
+      visualBranchIntensity:
+          visualBranchIntensity ?? this.visualBranchIntensity,
       visualAnimationEnabled:
           visualAnimationEnabled ?? this.visualAnimationEnabled,
     );
@@ -125,9 +134,13 @@ class UserProfile {
       'isEncryptionEnabled': isEncryptionEnabled,
       'wrappedDEK': wrappedDEK,
       'salt': salt,
+      'isQuickUnlockEnabled': isQuickUnlockEnabled,
+      'requireBiometricForMemory': requireBiometricForMemory,
       'isPremium': isPremium,
-      'premiumUntil': premiumUntil != null ? Timestamp.fromDate(premiumUntil!) : null,
-      'trialStartedAt': trialStartedAt != null ? Timestamp.fromDate(trialStartedAt!) : null,
+      'premiumUntil':
+          premiumUntil != null ? Timestamp.fromDate(premiumUntil!) : null,
+      'trialStartedAt':
+          trialStartedAt != null ? Timestamp.fromDate(trialStartedAt!) : null,
       // --- NEW toJson FIELDS ---
       'visualSpeed': visualSpeed,
       'visualAmplitude': visualAmplitude,
@@ -153,6 +166,9 @@ class UserProfile {
       isEncryptionEnabled: json['isEncryptionEnabled'] as bool? ?? false,
       wrappedDEK: json['wrappedDEK'] as String?,
       salt: json['salt'] as String?,
+      isQuickUnlockEnabled: json['isQuickUnlockEnabled'] as bool? ?? false,
+      requireBiometricForMemory:
+          json['requireBiometricForMemory'] as bool? ?? false,
       isPremium: json['isPremium'] as bool? ?? false,
       premiumUntil: (json['premiumUntil'] as Timestamp?)?.toDate(),
       trialStartedAt: (json['trialStartedAt'] as Timestamp?)?.toDate(),
@@ -169,4 +185,3 @@ class UserProfile {
     );
   }
 }
-

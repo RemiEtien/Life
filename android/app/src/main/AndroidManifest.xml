@@ -11,6 +11,9 @@
     <!-- Permission for microphone -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     
+    <!-- Permission for biometric authentication -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    
     <!-- Разрешение на точные уведомления -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!-- Разрешение на показ уведомлений (для Android 13+) -->

@@ -1025,4 +1025,41 @@ class AppLocalizationsHe extends AppLocalizations {
   String exportFailed(String error) {
     return 'הייצוא נכשל: $error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => 'הפעל נעילה מהירה';
+
+  @override
+  String get profileQuickUnlockSubtitle =>
+      'השתמש בטביעת אצבע, בזיהוי פנים או בקוד ה-PIN של המכשיר כדי לפתוח.';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle =>
+      'דרוש אימות ביומטרי לכל זיכרון';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      'כאשר האפשרות מופעלת, יידרש אימות כדי לפתוח או לערוך זיכרונות מוצפנים בודדים, גם כאשר האפליקציה פתוחה.';
+
+  @override
+  String get quickUnlockPrompt => 'אמת את זהותך כדי לפתוח את Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt => 'אמת את זהותך כדי להפעיל נעילה מהירה';
+
+  @override
+  String get masterPasswordRequiredTitle => 'נדרשת סיסמת-על';
+
+  @override
+  String get masterPasswordRequiredContent =>
+      'הזן את סיסמת-העל שלך כדי להפעיל את התכונה.';
+
+  @override
+  String get unlockScreenTitle => 'פתח את Lifeline';
+
+  @override
+  String get unlockWithBiometrics => 'פתח באמצעות אימות ביומטרי';
+
+  @override
+  String get unlockEnterMasterPassword => 'הזן סיסמת-על';
 }

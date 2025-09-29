@@ -6,8 +6,9 @@ import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pointycastle/digests/sha256.dart';
-import 'package:pointycastle/key_derivators/api.dart'; // ИСПРАВЛЕНО: Добавлен недостающий импорт
+import 'package:pointycastle/key_derivators/api.dart';
 import 'package:pointycastle/key_derivators/pbkdf2.dart';
 import 'package:pointycastle/macs/hmac.dart';
 
@@ -16,8 +17,11 @@ import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
 import 'crypto_isolate.dart';
 
-/// **НОВОЕ:** Исключение, выбрасываемое при попытке шифрования/дешифрования
-/// в заблокированном состоянии.
+// --- NEW KEYS FOR SECURE STORAGE ---
+const String _kEncryptedDekKey = 'lifeline_encrypted_dek_v2';
+const String _kSessionKey = 'lifeline_session_key_v2';
+
+/// Exception thrown when trying to encrypt/decrypt while the service is locked.
 class EncryptionLockedException implements Exception {
   final String message =
       'Encryption service is locked. Unlock with master password before proceeding.';
@@ -25,7 +29,15 @@ class EncryptionLockedException implements Exception {
   String toString() => message;
 }
 
-/// Исключение для ошибок при разблокировке, включая защиту от брутфорса.
+/// NEW: Exception for when per-memory auth is needed.
+class PerMemoryAuthenticationRequiredException implements Exception {
+  final int memoryId;
+  const PerMemoryAuthenticationRequiredException(this.memoryId);
+  @override
+  String toString() => 'This memory requires individual authentication.';
+}
+
+/// Exception for unlock errors, including brute-force protection.
 class EncryptionUnlockException implements Exception {
   final String message;
   const EncryptionUnlockException(this.message);
@@ -35,83 +47,130 @@ class EncryptionUnlockException implements Exception {
 
 // Represents the state of encryption for the current user session.
 enum EncryptionState {
-  // Encryption has not been set up by the user.
   notConfigured,
-  // Encryption is configured, but the master password hasn't been entered yet.
   locked,
-  // The master password has been entered, and the app can encrypt/decrypt.
   unlocked,
 }
 
 /// A service to handle client-side AES-256 end-to-end encryption.
-/// The encryption key is derived from a user's master password and stored
-/// securely, encrypted, in their profile.
 class EncryptionService extends StateNotifier<EncryptionState> {
   final Ref _ref;
-  // **УДАЛЕНО:** Ключ больше не кэшируется в FlutterSecureStorage.
-
+  final _secureStorage = const FlutterSecureStorage();
   Key? _unlockedDEK; // Data Encryption Key, cached in memory for the session.
+  final Set<int> _unlockedMemoryIdsInSession = {};
 
-  // --- НОВЫЕ ПОЛЯ: Для защиты от брутфорса ---
+  // --- Brute-force protection fields ---
   int _failedAttempts = 0;
   DateTime? _lockoutEndTime;
   static const int _maxFailedAttempts = 5;
   static const int _lockoutDurationSeconds = 30;
-  // --- КОНЕЦ НОВЫХ ПОЛЕЙ ---
+  String? _currentUserId;
+
+  bool _isAttemptingUnlock = false;
 
   EncryptionService(this._ref) : super(EncryptionState.notConfigured) {
-    // Listen to the user profile to initialize and update state reactively.
-    _ref.listen(userProfileProvider, (previous, next) {
-      _initializeState(next.asData?.value);
+    _ref.listen<AsyncValue<UserProfile?>>(userProfileProvider, (previous, next) {
+      final prevProfile = previous?.asData?.value;
+      final nextProfile = next.asData?.value;
+      _initializeState(prevProfile, nextProfile);
     }, fireImmediately: true);
   }
 
-  Future<void> _initializeState(UserProfile? userProfile) async {
-    // Если профиль пользователя отсутствует (например, при выходе из системы или при первом запуске)
-    if (userProfile == null) {
-      // Если состояние уже 'locked' (например, было установлено вручную при выходе), оставляем его.
-      // В противном случае, считаем, что шифрование не настроено.
-      if (state != EncryptionState.locked) {
-        state = EncryptionState.notConfigured;
-      }
-      _unlockedDEK = null; // Всегда очищаем ключ
-      return;
-    }
-
-    // Если профиль пользователя СУЩЕСТВУЕТ
-    if (!userProfile.isEncryptionEnabled) {
-      _unlockedDEK = null;
-      state = EncryptionState.notConfigured;
-    } else {
-      _unlockedDEK = null;
-      state = EncryptionState.locked;
+  /// NEW: Resets the entire service to its initial state upon user sign-out.
+  void resetOnSignOut() {
+    state = EncryptionState.notConfigured;
+    _unlockedDEK = null;
+    _currentUserId = null;
+    _isAttemptingUnlock = false;
+    _unlockedMemoryIdsInSession.clear();
+    _failedAttempts = 0;
+    _lockoutEndTime = null;
+    if (kDebugMode) {
+      print('[EncryptionService] Service state has been completely reset for sign-out.');
     }
   }
 
-  /// Sets up encryption for the first time for a user.
-  /// Generates DEK, salt, and saves the wrapped DEK to the user's profile.
+  /// Signals the start of an unlock attempt to prevent auto-locking.
+  void prepareForUnlockAttempt() {
+    _isAttemptingUnlock = true;
+    if (kDebugMode) {
+      print(
+          '[EncryptionService] Preparing for unlock attempt. Auto-lock disabled.');
+    }
+  }
+
+  /// Signals the end of an unlock attempt to re-enable auto-locking.
+  void finishUnlockAttempt() {
+    _isAttemptingUnlock = false;
+    if (kDebugMode) {
+      print(
+          '[EncryptionService] Finished unlock attempt. Auto-lock re-enabled.');
+    }
+  }
+
+  /// Checks if a specific memory has been unlocked during this session.
+  bool isMemoryUnlocked(int memoryId) =>
+      _unlockedMemoryIdsInSession.contains(memoryId);
+
+  /// Marks a memory as unlocked for the current session.
+  void markMemoryAsUnlocked(int memoryId) {
+    _unlockedMemoryIdsInSession.add(memoryId);
+  }
+
+  void _initializeState(UserProfile? previousProfile, UserProfile? newProfile) {
+    // Condition 1: User logged out. Reset everything.
+    if (newProfile == null) {
+      if (state != EncryptionState.notConfigured) {
+        _unlockedDEK = null;
+        _currentUserId = null;
+        _isAttemptingUnlock = false;
+        state = EncryptionState.notConfigured;
+      }
+      return;
+    }
+
+    // Condition 2: User has changed. Reset everything for the new user.
+    if (_currentUserId != newProfile.uid) {
+      _unlockedDEK = null;
+      _currentUserId = newProfile.uid;
+      _isAttemptingUnlock = false;
+      state = newProfile.isEncryptionEnabled
+          ? EncryptionState.locked
+          : EncryptionState.notConfigured;
+      return;
+    }
+
+    // Condition 3: Encryption was just disabled for the current user.
+    if ((previousProfile?.isEncryptionEnabled ?? false) &&
+        !newProfile.isEncryptionEnabled) {
+      _unlockedDEK = null;
+      state = EncryptionState.notConfigured;
+      disableQuickUnlock(); // Also disable quick unlock as a safety measure.
+      return;
+    }
+
+    // Condition 4: Encryption was just enabled for the current user.
+    if (!(previousProfile?.isEncryptionEnabled ?? false) &&
+        newProfile.isEncryptionEnabled) {
+      _unlockedDEK = null;
+      state = EncryptionState.locked;
+      return;
+    }
+  }
+
+  /// Sets up encryption for the first time.
   Future<void> setupEncryption(String masterPassword) async {
     final userProfile = _ref.read(userProfileProvider).value;
     if (userProfile == null) throw Exception('User profile not found.');
 
-    // 1. Generate a new random Data Encryption Key (DEK).
-    final newDEK = Key.fromSecureRandom(32); // 256-bit
-
-    // 2. Generate a new random salt.
+    final newDEK = Key.fromSecureRandom(32);
     final salt = _generateRandomBytes(16);
-
-    // 3. Derive the Key Encryption Key (KEK) from the master password and salt.
     final kek = await _deriveKey(masterPassword, salt, useIsolate: true);
-
-    // 4. "Wrap" (encrypt) the DEK with the KEK using AES-GCM.
-    final iv = IV.fromSecureRandom(12); // GCM standard is 12 bytes
-    // **ИЗМЕНЕНО:** Используем AESMode.gcm
+    final iv = IV.fromSecureRandom(12);
     final encrypter = Encrypter(AES(kek, mode: AESMode.gcm));
     final encryptedDEK = encrypter.encrypt(newDEK.base64, iv: iv);
-    // Структура хранит IV и зашифрованные данные (которые включают auth tag)
     final wrappedDEK = '${iv.base64}:${encryptedDEK.base64}';
 
-    // 5. Save the salt and wrapped DEK to Firestore.
     final updatedProfile = userProfile.copyWith(
       isEncryptionEnabled: true,
       salt: base64.encode(salt),
@@ -119,15 +178,12 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     );
     await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
 
-    // 6. Unlock the current session.
     _unlockedDEK = newDEK;
-    // **УДАЛЕНО:** Больше не сохраняем ключ в хранилище.
     state = EncryptionState.unlocked;
   }
 
-  /// Attempts to unlock the session by decrypting the stored DEK.
+  /// Attempts to unlock the session with the master password.
   Future<void> unlockSession(String masterPassword) async {
-    // 1. Проверка на блокировку из-за множества неудачных попыток
     if (_lockoutEndTime != null && _lockoutEndTime!.isAfter(DateTime.now())) {
       final remainingSeconds =
           _lockoutEndTime!.difference(DateTime.now()).inSeconds;
@@ -142,28 +198,22 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     }
 
     try {
-      // 2. Попытка расшифровки с новыми, усиленными параметрами (в изоляте)
       final dek = await _unwrapDek(masterPassword, userProfile!.salt!,
           userProfile.wrappedDEK!, true);
       _unlockedDEK = dek;
       state = EncryptionState.unlocked;
-      _failedAttempts = 0; // Сброс счетчика при успехе
+      _failedAttempts = 0;
       _lockoutEndTime = null;
     } catch (e) {
-      // 3. Если не получилось, пробуем старый метод (для обратной совместимости)
       try {
         final dek = await _unwrapDek(masterPassword, userProfile!.salt!,
             userProfile.wrappedDEK!, false);
         _unlockedDEK = dek;
-
-        // 4. ПЛАВНАЯ МИГРАЦИЯ: Если старый метод сработал, перешифровываем ключ новыми параметрами
         await _migrateEncryption(masterPassword, dek);
-
         state = EncryptionState.unlocked;
         _failedAttempts = 0;
         _lockoutEndTime = null;
       } catch (finalError) {
-        // 5. Если и старый метод не сработал - пароль неверный
         _handleFailedAttempt();
         final remaining = _maxFailedAttempts - _failedAttempts;
         if (remaining > 0) {
@@ -176,12 +226,100 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     }
   }
 
+  /// Attempts to unlock using biometrics/PIN.
+  Future<bool> attemptQuickUnlock() async {
+    try {
+      const aOptions = AndroidOptions(encryptedSharedPreferences: true);
+      final sessionKeyB64 =
+          await _secureStorage.read(key: _kSessionKey, aOptions: aOptions);
+      final encryptedDekB64 = await _secureStorage.read(
+          key: _kEncryptedDekKey, aOptions: aOptions);
+
+      if (sessionKeyB64 == null || encryptedDekB64 == null) {
+        // FIX as per friend's analysis
+        if (kDebugMode) {
+          print(
+              '[EncryptionService] Quick Unlock keys not found. Disabling feature.');
+        }
+        await disableQuickUnlock();
+        return false;
+      }
+
+      final sessionKey = Key.fromBase64(sessionKeyB64);
+      final encryptedDekParts = encryptedDekB64.split(':');
+      final iv = IV.fromBase64(encryptedDekParts[0]);
+      final encrypted = Encrypted.fromBase64(encryptedDekParts[1]);
+
+      final encrypter = Encrypter(AES(sessionKey, mode: AESMode.gcm));
+      final dekBase64 = encrypter.decrypt(encrypted, iv: iv);
+
+      _unlockedDEK = Key.fromBase64(dekBase64);
+      state = EncryptionState.unlocked;
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[EncryptionService] Error during quick unlock, disabling: $e');
+      }
+      await disableQuickUnlock();
+      return false;
+    }
+  }
+
+  /// Enables Quick Unlock after verifying master password.
+  Future<bool> enableQuickUnlock(String masterPassword) async {
+    if (_unlockedDEK == null) {
+      try {
+        await unlockSession(masterPassword);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    if (_unlockedDEK == null) return false;
+
+    final sessionKey = Key.fromSecureRandom(32);
+    final iv = IV.fromSecureRandom(12);
+    final encrypter = Encrypter(AES(sessionKey, mode: AESMode.gcm));
+    final encryptedDEK = encrypter.encrypt(_unlockedDEK!.base64, iv: iv);
+    final encryptedDEKB64 = '${iv.base64}:${encryptedDEK.base64}';
+
+    const aOptions = AndroidOptions(encryptedSharedPreferences: true);
+    await _secureStorage.write(
+        key: _kSessionKey, value: sessionKey.base64, aOptions: aOptions);
+    await _secureStorage.write(
+        key: _kEncryptedDekKey, value: encryptedDEKB64, aOptions: aOptions);
+
+    final userProfile = _ref.read(userProfileProvider).value;
+    if (userProfile != null) {
+      await _ref
+          .read(userServiceProvider)
+          .updateUserProfile(userProfile.copyWith(isQuickUnlockEnabled: true));
+    }
+    return true;
+  }
+
+  /// Disables Quick Unlock.
+  Future<void> disableQuickUnlock() async {
+    const aOptions = AndroidOptions(encryptedSharedPreferences: true);
+    await _secureStorage.delete(key: _kSessionKey, aOptions: aOptions);
+    await _secureStorage.delete(key: _kEncryptedDekKey, aOptions: aOptions);
+    final userProfile = _ref.read(userProfileProvider).value;
+    if (userProfile != null && userProfile.isQuickUnlockEnabled) {
+      await _ref
+          .read(userServiceProvider)
+          .updateUserProfile(userProfile.copyWith(
+            isQuickUnlockEnabled: false,
+            requireBiometricForMemory: false, // Also disable per-memory unlock
+          ));
+    }
+  }
+
   void _handleFailedAttempt() {
     _failedAttempts++;
     if (_failedAttempts >= _maxFailedAttempts) {
       _lockoutEndTime =
           DateTime.now().add(const Duration(seconds: _lockoutDurationSeconds));
-      _failedAttempts = 0; // Сбрасываем счетчик после установки блокировки
+      _failedAttempts = 0;
     }
   }
 
@@ -198,7 +336,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     try {
       decryptedDEKString = gcmEncrypter.decrypt(encryptedDEK, iv: iv);
     } catch (error) {
-      // Обратная совместимость с CBC
       final legacyEncrypter = Encrypter(AES(kek));
       decryptedDEKString = legacyEncrypter.decrypt(encryptedDEK, iv: iv);
     }
@@ -207,7 +344,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   Future<void> _migrateEncryption(String password, Key dek) async {
     final userProfile = _ref.read(userProfileProvider).value;
-    if (userProfile == null) return; // Should not happen here
+    if (userProfile == null) return;
 
     final newSalt = _generateRandomBytes(16);
     final newKek = await _deriveKey(password, newSalt, useIsolate: true);
@@ -231,50 +368,45 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       String oldPassword, String newPassword) async {
     final userProfile = _ref.read(userProfileProvider).value;
     if (userProfile == null || !userProfile.isEncryptionEnabled) {
-      return false; // Encryption not enabled
+      return false;
     }
-
-    // 1. Verify the old password by trying to unlock the session
     try {
       await unlockSession(oldPassword);
       if (_unlockedDEK == null) return false;
     } catch (e) {
-      return false; // Старый пароль неверный
+      return false;
     }
 
-    // At this point, _unlockedDEK contains the decrypted Data Encryption Key.
-
-    // 2. Generate a NEW salt for the NEW password.
     final newSalt = _generateRandomBytes(16);
-
-    // 3. Derive the new Key Encryption Key (KEK) from the new password and new salt.
     final newKek = await _deriveKey(newPassword, newSalt, useIsolate: true);
-
-    // 4. Re-wrap (encrypt) the existing DEK with the NEW KEK using AES-GCM.
     final iv = IV.fromSecureRandom(12);
-    // **ИЗМЕНЕНО:** Используем AESMode.gcm
     final encrypter = Encrypter(AES(newKek, mode: AESMode.gcm));
     final encryptedDEK = encrypter.encrypt(_unlockedDEK!.base64, iv: iv);
     final newWrappedDEK = '${iv.base64}:${encryptedDEK.base64}';
 
-    // 5. Update the user's profile with the new salt and new wrapped DEK.
     final updatedProfile = userProfile.copyWith(
       salt: base64.encode(newSalt),
       wrappedDEK: newWrappedDEK,
+      isQuickUnlockEnabled:
+          false, // Force disable quick unlock on password change
     );
     await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+    await disableQuickUnlock(); // Clear secure storage
 
-    // The session remains unlocked with the same DEK.
     return true;
   }
 
   /// Locks the session by clearing the cached DEK.
   Future<void> lockSession() async {
-    // ИСПРАВЛЕНО: Состояние должно переходить в 'locked', если оно было 'unlocked',
-    // независимо от текущего профиля пользователя. Это предотвращает
-    // неправильный переход в 'notConfigured' во время выхода из системы.
+    if (_isAttemptingUnlock) {
+      if (kDebugMode) {
+        print('[EncryptionService] Ignoring auto-lock during unlock attempt.');
+      }
+      return;
+    }
     if (state == EncryptionState.unlocked) {
       _unlockedDEK = null;
+      _unlockedMemoryIdsInSession.clear(); // NEW: Clear the set on lock
       state = EncryptionState.locked;
       if (kDebugMode) {
         print('[EncryptionService] Session locked.');
@@ -282,20 +414,25 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     }
   }
 
-  String? encrypt(String? plainText) {
+  String? encrypt(String? plainText, {int? memoryId}) {
     if (plainText == null || plainText.isEmpty) {
       return plainText;
     }
-    // **ИЗМЕНЕНО:** Выбрасываем исключение, если сервис заблокирован.
     if (state != EncryptionState.unlocked || _unlockedDEK == null) {
       throw EncryptionLockedException();
     }
-    final iv = IV.fromSecureRandom(12); // GCM standard
-    // **ИЗМЕНЕНО:** Используем AESMode.gcm
+
+    // NEW: Check for per-memory authentication requirement
+    final profile = _ref.read(userProfileProvider).value;
+    if (memoryId != null && (profile?.requireBiometricForMemory ?? false)) {
+      if (!isMemoryUnlocked(memoryId)) {
+        throw PerMemoryAuthenticationRequiredException(memoryId);
+      }
+    }
+
+    final iv = IV.fromSecureRandom(12);
     final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
     final encrypted = encrypter.encrypt(plainText, iv: iv);
-
-    // **ИЗМЕНЕНО:** Добавляем префикс для версионирования.
     return 'gcm_v1:${iv.base64}:${encrypted.base64}';
   }
 
@@ -311,19 +448,16 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     try {
       final parts = encryptedText.split(':');
       if (parts.length == 3 && parts.first == 'gcm_v1') {
-        // Новый формат GCM
         final iv = IV.fromBase64(parts[1]);
         final encrypted = Encrypted.fromBase64(parts[2]);
         final encrypter = Encrypter(AES(_unlockedDEK!, mode: AESMode.gcm));
         return encrypter.decrypt(encrypted, iv: iv);
       } else if (parts.length == 2) {
-        // Старый формат CBC для обратной совместимости
         final iv = IV.fromBase64(parts[0]);
         final encrypted = Encrypted.fromBase64(parts[1]);
         final legacyEncrypter = Encrypter(AES(_unlockedDEK!));
         return legacyEncrypter.decrypt(encrypted, iv: iv);
       }
-      // Если формат неизвестен, выбрасываем исключение
       throw Exception('Unsupported encrypted payload format');
     } catch (e) {
       if (kDebugMode) print('Decryption failed: $e');
@@ -331,59 +465,52 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     }
   }
 
-  /// РЕАЛИЗАЦИЯ ПРИНЦИПА 1: Возвращает новую, расшифрованную копию, не изменяя оригинал
   Memory decryptMemory(Memory m) {
     if (!m.isEncrypted) return m;
 
-    return m.copyWith(
-        content: decrypt(m.content),
-        reflectionImpact: decrypt(m.reflectionImpact),
-        reflectionLesson: decrypt(m.reflectionLesson),
-        reflectionAutoThought: decrypt(m.reflectionAutoThought),
-        reflectionEvidenceFor: decrypt(m.reflectionEvidenceFor),
-        reflectionEvidenceAgainst: decrypt(m.reflectionEvidenceAgainst),
-        reflectionReframe: decrypt(m.reflectionReframe),
-        reflectionAction: decrypt(m.reflectionAction));
+    final memoryCopy = m.copyWith();
+
+    return memoryCopy.copyWith(
+      content: decrypt(m.content),
+      reflectionImpact: decrypt(m.reflectionImpact),
+      reflectionLesson: decrypt(m.reflectionLesson),
+      reflectionAutoThought: decrypt(m.reflectionAutoThought),
+      reflectionEvidenceFor: decrypt(m.reflectionEvidenceFor),
+      reflectionEvidenceAgainst: decrypt(m.reflectionEvidenceAgainst),
+      reflectionReframe: decrypt(m.reflectionReframe),
+      reflectionAction: decrypt(m.reflectionAction),
+    );
   }
 
   bool isValueEncrypted(String? value) {
     if (value == null || value.isEmpty) return false;
-
-    // Проверка нового формата GCM
     if (value.startsWith('gcm_v1:')) {
       final parts = value.split(':');
       if (parts.length != 3) return false;
       try {
-        base64.decode(parts[1]); // iv
-        base64.decode(parts[2]); // encrypted data + tag
+        base64.decode(parts[1]);
+        base64.decode(parts[2]);
         return true;
       } catch (_) {
         return false;
       }
     }
-
-    // Проверка старого формата CBC
     final legacyParts = value.split(':');
     if (legacyParts.length == 2) {
       try {
         final ivBytes = base64.decode(legacyParts[0]);
         final cipherBytes = base64.decode(legacyParts[1]);
-        // IV for CBC is typically 16 bytes. Check this.
         if (ivBytes.length == 16 && cipherBytes.isNotEmpty) {
           return true;
         }
-      } catch (_) {
-        // fall through to return false
-      }
+      } catch (_) {}
     }
-
     return false;
   }
 
   Future<Key> _deriveKey(String password, Uint8List salt,
       {required bool useIsolate}) async {
     if (useIsolate && !kIsWeb) {
-      // --- ВЫПОЛНЕНИЕ В ИЗОЛЯТЕ ---
       final port = ReceivePort();
       final isolateData = IsolateDeriveKeyRequest(
         password: password,
@@ -394,9 +521,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       final keyBytes = await port.first as Uint8List;
       return Key(keyBytes);
     } else {
-      // --- ВЫПОЛНЕНИЕ В ОСНОВНОМ ПОТОКЕ (для Web и старого метода) ---
-      final iterations =
-          useIsolate ? 310000 : 100000; // Используем разное кол-во итераций
+      final iterations = useIsolate ? 310000 : 100000;
       final derivator = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
         ..init(Pbkdf2Parameters(salt, iterations, 32));
       return Key(derivator.process(Uint8List.fromList(utf8.encode(password))));

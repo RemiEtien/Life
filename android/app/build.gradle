@@ -57,7 +57,7 @@ android {
 
     defaultConfig {
         applicationId "com.momentic.lifeline"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion flutter.minSdkVersion // local_auth requires min 23
         // Финальный targetSdk, чтобы Play Console не считала сборку предпросмотром
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()

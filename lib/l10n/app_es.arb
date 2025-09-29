@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "Activar desbloqueo rápido",
+"profileQuickUnlockSubtitle": "Usa tu huella, rostro o PIN del dispositivo para desbloquear.",
+"profileRequireBiometricsForMemoryTitle": "Requerir biometría para cada recuerdo",
+"profileRequireBiometricsForMemorySubtitle": "Si se activa, se requerirá autenticación para abrir o editar recuerdos cifrados individuales, incluso cuando la app esté desbloqueada.",
+"quickUnlockPrompt": "Autentícate para desbloquear Lifeline",
+"quickUnlockEnablePrompt": "Autentícate para activar el desbloqueo rápido",
+"masterPasswordRequiredTitle": "Se requiere la contraseña maestra",
+"masterPasswordRequiredContent": "Ingresa tu contraseña maestra para habilitar esta función.",
+"unlockScreenTitle": "Desbloquear Lifeline",
+"unlockWithBiometrics": "Desbloquear con biometría",
+"unlockEnterMasterPassword": "Introduce la contraseña maestra"
 }

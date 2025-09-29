@@ -15,7 +15,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'providers/application_providers.dart';
 import 'screens/splash_screen.dart';
-import 'services/encryption_service.dart';
 import 'services/notification_service.dart';
 import 'widgets/device_performance_detector.dart';
 import 'l10n/app_localizations.dart';
@@ -27,14 +26,9 @@ void main() async {
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // ИСПРАВЛЕНИЕ: Современная настройка Edge-to-Edge без устаревших API
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    
-    // ИСПРАВЛЕНИЕ: Убираем statusBarColor и systemNavigationBarColor 
-    // для избежания вызова устаревших API в Android 15+
+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      // Не устанавливаем statusBarColor и systemNavigationBarColor
-      // чтобы избежать вызова Window.setStatusBarColor()
       systemNavigationBarIconBrightness: Brightness.light,
       statusBarIconBrightness: Brightness.light,
       systemNavigationBarDividerColor: Colors.transparent,
@@ -47,14 +41,16 @@ void main() async {
 
     await Firebase.initializeApp();
     FirebaseAnalytics.instance;
-    
+
     await FirebaseAppCheck.instance.activate(
-      androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-      appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.appAttest,
+      androidProvider:
+          kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      appleProvider:
+          kDebugMode ? AppleProvider.debug : AppleProvider.appAttest,
     );
-    
+
     if (kDebugMode) {
-       debugPrint('⚠️ App Check is using DEBUG providers.');
+      debugPrint('⚠️ App Check is using DEBUG providers.');
     } else {
       debugPrint('App Check activated with Play Integrity / App Attest.');
     }
@@ -73,9 +69,9 @@ void main() async {
     await DevicePerformanceDetector.initialize();
 
     if (kIsWeb) {
-       FlutterError.onError = (details) {
-         FlutterError.dumpErrorToConsole(details);
-       };
+      FlutterError.onError = (details) {
+        FlutterError.dumpErrorToConsole(details);
+      };
     } else if (kDebugMode) {
       FlutterError.onError = (details) {
         debugPrint('Flutter error: $details');
@@ -121,8 +117,8 @@ class LifelineApp extends ConsumerStatefulWidget {
   ConsumerState<LifelineApp> createState() => _LifelineAppState();
 }
 
-class _LifelineAppState extends ConsumerState<LifelineApp> with WidgetsBindingObserver {
-
+class _LifelineAppState extends ConsumerState<LifelineApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -139,12 +135,17 @@ class _LifelineAppState extends ConsumerState<LifelineApp> with WidgetsBindingOb
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (!mounted) return;
-    
-    // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Блокируем сессию шифрования при сворачивании или закрытии приложения ***
+
+    final isUnlockScreenVisible = ref.read(isUnlockScreenVisibleProvider);
+
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
-      ref.read(encryptionServiceProvider.notifier).lockSession();
+      // FIX: Only lock the session if the unlock screen is NOT visible.
+      // This prevents the race condition when the biometric prompt appears.
+      if (!isUnlockScreenVisible) {
+        ref.read(encryptionServiceProvider.notifier).lockSession();
+      }
       ref.read(audioPlayerProvider.notifier).pauseAllAudio();
     }
   }

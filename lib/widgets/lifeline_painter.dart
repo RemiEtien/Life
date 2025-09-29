@@ -729,7 +729,7 @@ class LifelinePainter extends CustomPainter {
   // --- НОВЫЙ МЕТОД: Рисует иконку замка ---
   void _drawLockIcon(Canvas canvas, Offset center, double nodeRadius, double opacity) {
     final iconSize = nodeRadius * 0.7;
-    final icon = Icons.lock_outline;
+    const icon = Icons.lock_outline;
     final textStyle = TextStyle(
         color: Colors.white.withOpacity(0.9 * opacity),
         fontSize: iconSize,

@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../memory.dart';
 import '../providers/application_providers.dart';
 import 'encryption_service.dart';
-import 'firestore_service.dart';
-import 'memory_repository.dart';
 import 'package:collection/collection.dart';
 
 @immutable

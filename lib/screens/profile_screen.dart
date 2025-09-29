@@ -15,22 +15,23 @@ import '../services/onboarding_service.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import 'package:collection/collection.dart';
 
+// Dialog to create the master password for the first time.
 Future<bool> showCreateMasterPasswordDialog(
     BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context)!;
   final formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
   final confirmController = TextEditingController();
-
   final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
 
   final confirmed = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
     builder: (context) {
+      bool obscurePassword = true;
+      bool obscureConfirmPassword = true;
+
       return StatefulBuilder(builder: (context, setState) {
-        bool obscurePassword = true;
-        bool obscureConfirmPassword = true;
         return AlertDialog(
           title: Text(l10n.profileCreateMasterPassword),
           content: SingleChildScrollView(
@@ -111,6 +112,7 @@ Future<bool> showCreateMasterPasswordDialog(
   return confirmed ?? false;
 }
 
+// Dialog to change the master password.
 class _ChangeMasterPasswordDialog extends ConsumerStatefulWidget {
   final AppLocalizations l10n;
   const _ChangeMasterPasswordDialog({required this.l10n});
@@ -305,7 +307,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     final userService = ref.read(userServiceProvider);
-
     final picker = ImagePicker();
     final XFile? image = await picker.pickImage(
       source: ImageSource.gallery,
@@ -315,12 +316,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (image != null) {
       if (!mounted) return;
-
       final String? photoUrl =
           await userService.uploadAvatar(currentUser.uid, File(image.path));
-
       if (!mounted) return;
-
       if (photoUrl != null) {
         final updatedProfile = profile.copyWith(photoUrl: photoUrl);
         await userService.updateUserProfile(updatedProfile);
@@ -338,9 +336,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _showEditDisplayNameDialog(
       UserProfile profile, AppLocalizations l10n) async {
     _displayNameController.text = profile.displayName;
-
     final userService = ref.read(userServiceProvider);
-
     return showDialog<void>(
       context: context,
       builder: (context) {
@@ -376,7 +372,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _showCountryPicker(UserProfile profile) {
     final userService = ref.read(userServiceProvider);
-
     showCountryPicker(
       context: context,
       onSelect: (country) async {
@@ -391,7 +386,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       UserProfile profile, AppLocalizations l10n) async {
     final userService = ref.read(userServiceProvider);
     final localeNotifier = ref.read(localeProvider.notifier);
-
     return showDialog<void>(
       context: context,
       builder: (context) {
@@ -422,20 +416,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     FirebaseCrashlytics.instance
         .log('ProfileScreen: Starting account deletion process.');
-
     if (!mounted) return;
     final audioNotifier = ref.read(audioPlayerProvider.notifier);
     final authService = ref.read(authServiceProvider);
 
     await audioNotifier.stopAndReset();
     final result = await authService.deleteAccount();
-
     if (!mounted) {
       FirebaseCrashlytics.instance
           .log('ProfileScreen: Unmounted during deleteAccount.');
       return;
     }
-
     if (result == 'success') {
       FirebaseCrashlytics.instance.log(
           'ProfileScreen: Account deletion successful. Popping until first route.');
@@ -522,7 +513,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final formKey = GlobalKey<FormState>();
     String? errorMessage;
     bool isLoading = false;
-
     final authService = ref.read(authServiceProvider);
 
     return showDialog<bool>(
@@ -700,9 +690,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  // NEW: Handle Quick Unlock toggle
+  Future<void> _toggleQuickUnlock(
+      bool enabled, UserProfile profile, AppLocalizations l10n) async {
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    if (enabled) {
+      // Show master password dialog to authorize enabling this feature
+      final password = await _showMasterPasswordEntryDialog(l10n);
+      if (password != null && password.isNotEmpty) {
+        final success = await encryptionNotifier.enableQuickUnlock(password);
+        if (!success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(l10n.profileChangePasswordErrorIncorrect)),
+          );
+        }
+      }
+    } else {
+      await encryptionNotifier.disableQuickUnlock();
+    }
+  }
+
+// NEW: Handle per-memory biometric toggle
+  Future<void> _toggleRequireBiometricsForMemory(
+      bool enabled, UserProfile profile, AppLocalizations l10n) async {
+    final userService = ref.read(userServiceProvider);
+
+    if (enabled) {
+      // To enable this higher-security feature, we must verify the user's identity first.
+      final biometricService = ref.read(biometricServiceProvider);
+      final didAuthenticate =
+          await biometricService.authenticate(l10n.quickUnlockEnablePrompt);
+      if (!didAuthenticate) return; // User cancelled or failed auth
+    }
+
+    final updatedProfile = profile.copyWith(requireBiometricForMemory: enabled);
+    await userService.updateUserProfile(updatedProfile);
+  }
+
+// NEW: Dialog to enter master password
+  Future<String?> _showMasterPasswordEntryDialog(
+      AppLocalizations l10n) async {
+    final passwordController = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.masterPasswordRequiredTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.masterPasswordRequiredContent),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration:
+                    InputDecoration(labelText: l10n.profileMasterPasswordHint),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.profileCancel),
+            ),
+            ElevatedButton(
+              onPressed: () =>
+                  Navigator.of(context).pop(passwordController.text),
+              child: Text(l10n.profileEnable),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ... (rest of the build method is unchanged)
     final userProfileAsyncValue = ref.watch(userProfileProvider);
     final currentUser = ref.watch(authStateChangesProvider).asData?.value;
     final isPremium = ref.watch(isPremiumProvider);
@@ -852,11 +916,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildEncryptionSetting(UserProfile profile, AppLocalizations l10n) {
     if (profile.isEncryptionEnabled) {
-      return ListTile(
-        leading: const Icon(Icons.password),
-        title: Text(l10n.profileChangePassword),
-        subtitle: Text(l10n.profileEncryptionActive),
-        onTap: () => _showChangeMasterPasswordDialog(l10n),
+      return Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.password),
+            title: Text(l10n.profileChangePassword),
+            subtitle: Text(l10n.profileEncryptionActive),
+            onTap: () => _showChangeMasterPasswordDialog(l10n),
+          ),
+          SwitchListTile(
+            title: Text(l10n.profileEnableQuickUnlock),
+            subtitle: Text(l10n.profileQuickUnlockSubtitle),
+            value: profile.isQuickUnlockEnabled,
+            onChanged: (value) => _toggleQuickUnlock(value, profile, l10n),
+            secondary: const Icon(Icons.fingerprint),
+          ),
+          // NEW: Switch for per-memory biometrics
+          SwitchListTile(
+            title: Text(l10n.profileRequireBiometricsForMemoryTitle),
+            subtitle: Text(l10n.profileRequireBiometricsForMemorySubtitle),
+            value: profile.requireBiometricForMemory,
+            // This switch is only enabled if Quick Unlock is also on.
+            onChanged: profile.isQuickUnlockEnabled
+                ? (value) =>
+                    _toggleRequireBiometricsForMemory(value, profile, l10n)
+                : null,
+            secondary: const Icon(Icons.lock_person_outlined),
+          ),
+        ],
       );
     } else {
       return ListTile(

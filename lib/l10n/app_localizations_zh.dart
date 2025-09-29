@@ -994,4 +994,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String exportFailed(String error) {
     return '导出失败：$error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => '启用快速解锁';
+
+  @override
+  String get profileQuickUnlockSubtitle => '使用指纹、面容或设备 PIN 码进行解锁。';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle => '为每条记忆要求生物识别';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      '启用后，即使应用已解锁，打开或编辑单条加密记忆时仍需进行身份验证。';
+
+  @override
+  String get quickUnlockPrompt => '验证身份以解锁 Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt => '验证身份以启用快速解锁';
+
+  @override
+  String get masterPasswordRequiredTitle => '需要主密码';
+
+  @override
+  String get masterPasswordRequiredContent => '请输入主密码以启用此功能。';
+
+  @override
+  String get unlockScreenTitle => '解锁 Lifeline';
+
+  @override
+  String get unlockWithBiometrics => '通过生物识别解锁';
+
+  @override
+  String get unlockEnterMasterPassword => '输入主密码';
 }

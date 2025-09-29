@@ -459,5 +459,16 @@
             "type": "int"
         }
     }
-}
+},
+"profileEnableQuickUnlock": "Ativar desbloqueio rápido",
+"profileQuickUnlockSubtitle": "Use sua impressão digital, rosto ou PIN do dispositivo para desbloquear.",
+"profileRequireBiometricsForMemoryTitle": "Exigir biometria para cada memória",
+"profileRequireBiometricsForMemorySubtitle": "Se ativado, exija autenticação para abrir ou editar memórias criptografadas individualmente, mesmo quando o app estiver desbloqueado.",
+"quickUnlockPrompt": "Autentique-se para desbloquear o Lifeline",
+"quickUnlockEnablePrompt": "Autentique-se para ativar o desbloqueio rápido",
+"masterPasswordRequiredTitle": "Senha mestra obrigatória",
+"masterPasswordRequiredContent": "Insira sua senha mestra para ativar este recurso.",
+"unlockScreenTitle": "Desbloquear Lifeline",
+"unlockWithBiometrics": "Desbloquear com biometria",
+"unlockEnterMasterPassword": "Digite a senha mestra"
 }

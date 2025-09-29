@@ -1036,4 +1036,43 @@ class AppLocalizationsRu extends AppLocalizations {
   String exportFailed(String error) {
     return 'Не удалось экспортировать: $error';
   }
+
+  @override
+  String get profileEnableQuickUnlock => 'Включить быстрый доступ';
+
+  @override
+  String get profileQuickUnlockSubtitle =>
+      'Используйте отпечаток пальца, лицо или PIN-код устройства, чтобы разблокировать.';
+
+  @override
+  String get profileRequireBiometricsForMemoryTitle =>
+      'Требовать биометрию для каждой записи';
+
+  @override
+  String get profileRequireBiometricsForMemorySubtitle =>
+      'Если включено, потребуется аутентификация для открытия или редактирования отдельных зашифрованных воспоминаний даже при разблокированном приложении.';
+
+  @override
+  String get quickUnlockPrompt =>
+      'Пройдите проверку, чтобы разблокировать Lifeline';
+
+  @override
+  String get quickUnlockEnablePrompt =>
+      'Пройдите проверку, чтобы включить быстрый доступ';
+
+  @override
+  String get masterPasswordRequiredTitle => 'Требуется мастер-пароль';
+
+  @override
+  String get masterPasswordRequiredContent =>
+      'Введите мастер-пароль, чтобы включить эту функцию.';
+
+  @override
+  String get unlockScreenTitle => 'Разблокировать Lifeline';
+
+  @override
+  String get unlockWithBiometrics => 'Разблокировать с помощью биометрии';
+
+  @override
+  String get unlockEnterMasterPassword => 'Введите мастер-пароль';
 }

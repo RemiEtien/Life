@@ -16,16 +16,19 @@ class MemoryRepository {
   Memory _encryptMemoryIfNeeded(Memory m) {
     if (!m.isEncrypted) return m;
 
+    // Pass the memory's local ID to the encryption service
+    final memoryId = m.id;
+
     return m.copyWith(
-      content: encryptionService.encrypt(m.content),
-      reflectionImpact: encryptionService.encrypt(m.reflectionImpact),
-      reflectionLesson: encryptionService.encrypt(m.reflectionLesson),
-      reflectionAutoThought: encryptionService.encrypt(m.reflectionAutoThought),
-      reflectionEvidenceFor: encryptionService.encrypt(m.reflectionEvidenceFor),
+      content: encryptionService.encrypt(m.content, memoryId: memoryId),
+      reflectionImpact: encryptionService.encrypt(m.reflectionImpact, memoryId: memoryId),
+      reflectionLesson: encryptionService.encrypt(m.reflectionLesson, memoryId: memoryId),
+      reflectionAutoThought: encryptionService.encrypt(m.reflectionAutoThought, memoryId: memoryId),
+      reflectionEvidenceFor: encryptionService.encrypt(m.reflectionEvidenceFor, memoryId: memoryId),
       reflectionEvidenceAgainst:
-          encryptionService.encrypt(m.reflectionEvidenceAgainst),
-      reflectionReframe: encryptionService.encrypt(m.reflectionReframe),
-      reflectionAction: encryptionService.encrypt(m.reflectionAction),
+          encryptionService.encrypt(m.reflectionEvidenceAgainst, memoryId: memoryId),
+      reflectionReframe: encryptionService.encrypt(m.reflectionReframe, memoryId: memoryId),
+      reflectionAction: encryptionService.encrypt(m.reflectionAction, memoryId: memoryId),
     );
   }
 
@@ -222,9 +225,9 @@ class MemoryRepository {
     final isar = await _db;
 
     final memoryToSave = m.copyWith(
-        userId: userId,
-        syncStatus: m.syncStatus == 'synced' ? 'pending' : m.syncStatus,
-        lastModified: DateTime.now().toUtc());
+      userId: userId,
+      lastModified: DateTime.now().toUtc(),
+    );
 
     final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
 
@@ -246,3 +249,4 @@ class MemoryRepository {
     return isar.writeTxn(() => isar.memorys.delete(id));
   }
 }
+

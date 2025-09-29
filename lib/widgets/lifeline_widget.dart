@@ -1859,7 +1859,7 @@ class _MemoriesListPopupState extends State<MemoriesListPopup> {
                             style: const TextStyle(color: Colors.white60)),
                         // --- ИЗМЕНЕНИЕ: Добавлен замок для зашифрованных воспоминаний ---
                         trailing: memory.isEncrypted
-                            ? Icon(Icons.lock_outline,
+                            ? const Icon(Icons.lock_outline,
                                 color: Colors.white54, size: 20)
                             : null,
                         onTap: () => widget.onMemorySelected(memory));
