@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
@@ -33,7 +34,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     super.dispose();
   }
 
-  // FIX: This function now handles the full biometric authentication flow.
+  // ✅ FIXED: This function now properly handles biometric authentication with result checking
   Future<void> _attemptQuickUnlockWithBiometrics() async {
     final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
     final profile = ref.read(userProfileProvider).value;
@@ -43,24 +44,74 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
       final l10n = AppLocalizations.of(context)!;
       final biometricService = ref.read(biometricServiceProvider);
 
+      // First check if biometrics are still available
       final isAvailable = await biometricService.isBiometricsAvailable();
       if (!isAvailable) {
-        // If biometrics were enabled but no longer are, disable the feature for safety.
+        // If biometrics were enabled but no longer are, disable the feature for safety
         await encryptionNotifier.disableQuickUnlock();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Biometric authentication is no longer available on this device.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
         return;
       }
 
-      // BUG FIX: Prevent auto-locking during biometric prompt
+      // Prevent auto-locking during biometric prompt
       encryptionNotifier.prepareForUnlockAttempt();
       try {
+        // Attempt biometric authentication
         final didAuthenticate =
             await biometricService.authenticate(l10n.quickUnlockPrompt);
 
         if (didAuthenticate && mounted) {
-          await encryptionNotifier.attemptQuickUnlock();
+          // ✅ CRITICAL FIX: Check the result of attemptQuickUnlock
+          final unlockSuccess = await encryptionNotifier.attemptQuickUnlock();
+
+          if (unlockSuccess) {
+            // Success! The AuthGate will automatically navigate away from UnlockScreen
+            if (kDebugMode) {
+              debugPrint('[UnlockScreen] Quick unlock successful');
+            }
+          } else {
+            // Quick unlock failed despite successful biometric authentication
+            if (kDebugMode) {
+              debugPrint('[UnlockScreen] Quick unlock failed despite successful biometric authentication');
+            }
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Biometric unlock failed. Please use your master password.'),
+                  backgroundColor: Colors.orange,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            }
+          }
+        } else if (!didAuthenticate && mounted) {
+          // User cancelled or biometric failed
+          if (kDebugMode) {
+            debugPrint('[UnlockScreen] Biometric authentication was cancelled or failed');
+          }
+        }
+      } catch (e) {
+        // Handle any errors during the biometric authentication process
+        if (kDebugMode) {
+          debugPrint('[UnlockScreen] Error during biometric unlock: $e');
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('An error occurred during biometric authentication.'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } finally {
-        // Always reset the flag
+        // Always reset the unlock attempt flag
         encryptionNotifier.finishUnlockAttempt();
       }
     }

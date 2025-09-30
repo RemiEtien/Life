@@ -4,7 +4,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
+import 'package:flutter/foundation.dart' hide Key;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pointycastle/digests/sha256.dart';
@@ -86,7 +86,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     _failedAttempts = 0;
     _lockoutEndTime = null;
     if (kDebugMode) {
-      print('[EncryptionService] Service state has been completely reset for sign-out.');
+      debugPrint('[EncryptionService] Service state has been completely reset for sign-out.');
     }
   }
 
@@ -94,7 +94,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   void prepareForUnlockAttempt() {
     _isAttemptingUnlock = true;
     if (kDebugMode) {
-      print(
+      debugPrint(
           '[EncryptionService] Preparing for unlock attempt. Auto-lock disabled.');
     }
   }
@@ -103,7 +103,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   void finishUnlockAttempt() {
     _isAttemptingUnlock = false;
     if (kDebugMode) {
-      print(
+      debugPrint(
           '[EncryptionService] Finished unlock attempt. Auto-lock re-enabled.');
     }
   }
@@ -238,7 +238,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       if (sessionKeyB64 == null || encryptedDekB64 == null) {
         // FIX as per friend's analysis
         if (kDebugMode) {
-          print(
+          debugPrint(
               '[EncryptionService] Quick Unlock keys not found. Disabling feature.');
         }
         await disableQuickUnlock();
@@ -258,7 +258,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       return true;
     } catch (e) {
       if (kDebugMode) {
-        print('[EncryptionService] Error during quick unlock, disabling: $e');
+        debugPrint('[EncryptionService] Error during quick unlock, disabling: $e');
       }
       await disableQuickUnlock();
       return false;
@@ -359,7 +359,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     );
     await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
     if (kDebugMode) {
-      print('[EncryptionService] User key migrated to stronger parameters.');
+      debugPrint('[EncryptionService] User key migrated to stronger parameters.');
     }
   }
 
@@ -400,7 +400,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   Future<void> lockSession() async {
     if (_isAttemptingUnlock) {
       if (kDebugMode) {
-        print('[EncryptionService] Ignoring auto-lock during unlock attempt.');
+        debugPrint('[EncryptionService] Ignoring auto-lock during unlock attempt.');
       }
       return;
     }
@@ -409,7 +409,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       _unlockedMemoryIdsInSession.clear(); // NEW: Clear the set on lock
       state = EncryptionState.locked;
       if (kDebugMode) {
-        print('[EncryptionService] Session locked.');
+        debugPrint('[EncryptionService] Session locked.');
       }
     }
   }
@@ -460,7 +460,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       }
       throw Exception('Unsupported encrypted payload format');
     } catch (e) {
-      if (kDebugMode) print('Decryption failed: $e');
+      if (kDebugMode) debugPrint('Decryption failed: $e');
       return '[Decryption Error]';
     }
   }
