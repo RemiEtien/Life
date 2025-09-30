@@ -59,7 +59,7 @@ class AuthService {
         // Обрабатываем ошибки отдельно
         _authEventSubscription!.onError((error) {
           if (kDebugMode) {
-            print('Google Sign-In error: $error');
+            debugPrint('Google Sign-In error: $error');
           }
           // Завершаем Completer с ошибкой
           if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
@@ -70,7 +70,7 @@ class AuthService {
         _isInitialized = true;
       } catch (e) {
         if (kDebugMode) {
-          print('Failed to initialize Google Sign-In: $e');
+          debugPrint('Failed to initialize Google Sign-In: $e');
         }
         throw Exception('Failed to initialize Google Sign-In: $e');
       }
@@ -130,20 +130,20 @@ class AuthService {
 
     if (_isInitialized) {
       futures.add(GoogleSignIn.instance.signOut().catchError((e) {
-        if (kDebugMode) print('Google signOut error (ignored): $e');
+        if (kDebugMode) debugPrint('Google signOut error (ignored): $e');
       }));
     }
 
     futures.add(_firebaseAuth.signOut());
 
     unawaited(IsarService.close().catchError((e) {
-      if (kDebugMode) print('IsarService close error (ignored): $e');
+      if (kDebugMode) debugPrint('IsarService close error (ignored): $e');
     }));
 
     try {
       await Future.wait(futures, eagerError: false);
     } catch (e) {
-      if (kDebugMode) print('SignOut cleanup error (continuing): $e');
+      if (kDebugMode) debugPrint('SignOut cleanup error (continuing): $e');
     }
   }
 
@@ -168,7 +168,7 @@ class AuthService {
         const Duration(seconds: 30),
         onTimeout: () {
           if (kDebugMode) {
-            print('Google Sign-In timeout');
+            debugPrint('Google Sign-In timeout');
           }
           return null;
         },
@@ -208,7 +208,7 @@ class AuthService {
     } catch (e, stackTrace) {
       _signInCompleter = null;
       if (kDebugMode) {
-        print('Error during Google sign-in: $e');
+        debugPrint('Error during Google sign-in: $e');
       }
       FirebaseCrashlytics.instance
           .recordError(e, stackTrace, reason: 'Google Sign-In Failed');
@@ -247,7 +247,7 @@ class AuthService {
       return userCredential;
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Apple sign-in failed: $e');
+        debugPrint('Apple sign-in failed: $e');
       }
       FirebaseCrashlytics.instance
           .recordError(e, stackTrace, reason: 'Apple Sign-In Failed');
@@ -289,7 +289,7 @@ class AuthService {
       if (await dbFile.exists()) {
         await dbFile.delete();
         if (kDebugMode) {
-          print('[AuthService] Deleted local database file for user $uid.');
+          debugPrint('[AuthService] Deleted local database file for user $uid.');
         }
       }
 

@@ -436,7 +436,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     return 'gcm_v1:${iv.base64}:${encrypted.base64}';
   }
 
-  String? decrypt(String? encryptedText) {
+  String? decrypt(String? encryptedText, {int? memoryId}) {
     if (encryptedText == null ||
         encryptedText.isEmpty ||
         !isValueEncrypted(encryptedText)) {
@@ -445,6 +445,15 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     if (state != EncryptionState.unlocked || _unlockedDEK == null) {
       throw EncryptionLockedException();
     }
+
+    // Check for per-memory authentication requirement
+    final profile = _ref.read(userProfileProvider).value;
+    if (memoryId != null && (profile?.requireBiometricForMemory ?? false)) {
+      if (!isMemoryUnlocked(memoryId)) {
+        throw PerMemoryAuthenticationRequiredException(memoryId);
+      }
+    }
+
     try {
       final parts = encryptedText.split(':');
       if (parts.length == 3 && parts.first == 'gcm_v1') {

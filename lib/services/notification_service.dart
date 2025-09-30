@@ -78,7 +78,7 @@ class NotificationService {
 
     if (!permissionsGranted) {
       if (kDebugMode) {
-        print('Notification permissions not granted. Aborting schedule.');
+        debugPrint('Notification permissions not granted. Aborting schedule.');
       }
       return false;
     }
@@ -106,7 +106,7 @@ class NotificationService {
       return true;
     } catch (e) {
       if (kDebugMode) {
-        print('Error scheduling notification: $e');
+        debugPrint('Error scheduling notification: $e');
       }
       return false;
     }

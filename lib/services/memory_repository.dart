@@ -38,15 +38,15 @@ class MemoryRepository {
     final memoryCopy = m.copyWith();
 
     return memoryCopy.copyWith(
-      content: encryptionService.decrypt(m.content),
-      reflectionImpact: encryptionService.decrypt(m.reflectionImpact),
-      reflectionLesson: encryptionService.decrypt(m.reflectionLesson),
-      reflectionAutoThought: encryptionService.decrypt(m.reflectionAutoThought),
-      reflectionEvidenceFor: encryptionService.decrypt(m.reflectionEvidenceFor),
+      content: encryptionService.decrypt(m.content, memoryId: m.id),
+      reflectionImpact: encryptionService.decrypt(m.reflectionImpact, memoryId: m.id),
+      reflectionLesson: encryptionService.decrypt(m.reflectionLesson, memoryId: m.id),
+      reflectionAutoThought: encryptionService.decrypt(m.reflectionAutoThought, memoryId: m.id),
+      reflectionEvidenceFor: encryptionService.decrypt(m.reflectionEvidenceFor, memoryId: m.id),
       reflectionEvidenceAgainst:
-          encryptionService.decrypt(m.reflectionEvidenceAgainst),
-      reflectionReframe: encryptionService.decrypt(m.reflectionReframe),
-      reflectionAction: encryptionService.decrypt(m.reflectionAction),
+          encryptionService.decrypt(m.reflectionEvidenceAgainst, memoryId: m.id),
+      reflectionReframe: encryptionService.decrypt(m.reflectionReframe, memoryId: m.id),
+      reflectionAction: encryptionService.decrypt(m.reflectionAction, memoryId: m.id),
     );
   }
 

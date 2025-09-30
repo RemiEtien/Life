@@ -51,13 +51,13 @@ class SpotifyService {
       return tracks;
     } on FirebaseFunctionsException catch (e, stackTrace) {
       if (kDebugMode) {
-        print('FirebaseFunctionsException searching tracks: ${e.code} - ${e.message}');
+        debugPrint('FirebaseFunctionsException searching tracks: ${e.code} - ${e.message}');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Cloud Function)');
       return [];
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Unexpected error during track search: $e');
+        debugPrint('Unexpected error during track search: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Client-side)');
       return [];
@@ -81,13 +81,13 @@ class SpotifyService {
 
     } on FirebaseFunctionsException catch (e, stackTrace) {
       if (kDebugMode) {
-        print('FirebaseFunctionsException getting track details: ${e.code} - ${e.message}');
+        debugPrint('FirebaseFunctionsException getting track details: ${e.code} - ${e.message}');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Cloud Function)');
       return null;
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Unexpected error getting track details: $e');
+        debugPrint('Unexpected error getting track details: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Client-side)');
       return null;
@@ -106,7 +106,7 @@ class SpotifyService {
       return null;
     } catch (e) {
       if (kDebugMode) {
-        print('Error finding best match on Spotify: $e');
+        debugPrint('Error finding best match on Spotify: $e');
       }
       return null;
     }

@@ -136,17 +136,21 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
     super.didChangeAppLifecycleState(state);
     if (!mounted) return;
 
-    final isUnlockScreenVisible = ref.read(isUnlockScreenVisibleProvider);
-
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
-      // FIX: Only lock the session if the unlock screen is NOT visible.
-      // This prevents the race condition when the biometric prompt appears.
-      if (!isUnlockScreenVisible) {
-        ref.read(encryptionServiceProvider.notifier).lockSession();
+      // IMPROVED: Race condition fix - EncryptionService now handles concurrent operations
+      // The lockSession() method already checks _isAttemptingUnlock to prevent conflicts
+      final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+
+      try {
+        encryptionNotifier.lockSession();
+      } catch (e) {
+        // Silently handle any errors during lock to prevent crashes
+        if (kDebugMode) {
+          debugPrint('[AppLifecycle] Error locking session: $e');
+        }
       }
-      ref.read(audioPlayerProvider.notifier).pauseAllAudio();
     }
   }
 

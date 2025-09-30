@@ -44,7 +44,7 @@ class UserService {
       final currentLocale = Localizations.localeOf(context);
 
       if (kDebugMode) {
-        print('[UserService] Creating profile with locale from context: ${currentLocale.languageCode}');
+        debugPrint('[UserService] Creating profile with locale from context: ${currentLocale.languageCode}');
       }
       FirebaseCrashlytics.instance.setCustomKey('user_language_on_creation', currentLocale.languageCode);
 
@@ -124,7 +124,7 @@ class UserService {
       return downloadUrl;
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Error uploading avatar: $e');
+        debugPrint('Error uploading avatar: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: uploadAvatar failed');
       return null;

@@ -63,7 +63,13 @@ final purchaseServiceProvider =
 
 // 1.5. User Service and Auth Service that depend on Ref
 final userServiceProvider = Provider((ref) => UserService(ref));
-final authServiceProvider = Provider((ref) => AuthService(ref));
+final authServiceProvider = Provider((ref) {
+  final authService = AuthService(ref);
+  ref.onDispose(() {
+    authService.dispose();
+  });
+  return authService;
+});
 
 // 1.6. Sync Service Provider (depends on other providers)
 final syncServiceProvider = Provider<SyncService>((ref) {

@@ -869,7 +869,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.language_outlined,
                       title: l10n.profileLanguage,
                       subtitle: _supportedLanguages[profile.languageCode] ??
-                          l10n.profileLanguageDefault,
+                          _supportedLanguages[Localizations.localeOf(context).languageCode] ??
+                          'English',
                       onTap: () => _showLanguagePickerDialog(profile, l10n),
                     ),
                     const Divider(height: 40),

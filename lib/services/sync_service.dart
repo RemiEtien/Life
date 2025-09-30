@@ -43,8 +43,23 @@ class SyncService {
   bool _isPausedForUnlock = false;
   bool _isReconciling = false;
 
+  // CONCURRENCY PROTECTION: Mutex to protect queue operations
+  bool _queueLocked = false;
+
   SyncService(this._ref) {
     _checkForUnsyncedMemories();
+  }
+
+  // CONCURRENCY PROTECTION: Safe queue operations
+  Future<void> _lockQueue() async {
+    while (_queueLocked) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+    _queueLocked = true;
+  }
+
+  void _unlockQueue() {
+    _queueLocked = false;
   }
 
   Future<void> syncFromCloudToLocal({bool isInitialSync = false}) async {
@@ -70,7 +85,7 @@ class SyncService {
         throw Exception('Could not fetch memories from cloud.');
       }
       final cloudIds =
-          cloudMemories.map((m) => m.firestoreId).whereNotNull().toSet();
+          cloudMemories.map((m) => m.firestoreId).nonNulls.toSet();
 
       final allLocalMemories = await repo.getAllMemories();
       
@@ -89,7 +104,7 @@ class SyncService {
       if (idsToDelete.isNotEmpty) {
         final deletedCount = await repo.deleteAllByIds(idsToDelete);
         if (kDebugMode) {
-          print(
+          debugPrint(
               '[SyncService] Deleted $deletedCount ghost memories from local DB.');
         }
       }
@@ -116,7 +131,7 @@ class SyncService {
 
       if (memoriesToUpsert.isNotEmpty) {
         if (kDebugMode) {
-          print(
+          debugPrint(
               '[SyncService] Upserting ${memoriesToUpsert.length} memories from cloud.');
         }
         await repo.upsertMemories(memoriesToUpsert);
@@ -128,8 +143,8 @@ class SyncService {
         notifier.updateState(isSyncing: false, currentStatus: 'Sync complete!');
       }
     } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace,
-          reason: 'SyncService: syncFromCloudToLocal reconciliation failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
+          reason: 'SyncService: syncFromCloudToLocal reconciliation failed'));
       if (!isInitialSync) {
         notifier.updateState(
             isSyncing: false, currentStatus: 'Sync from cloud failed.');
@@ -139,29 +154,39 @@ class SyncService {
     } finally {
       _isReconciling = false;
       if (!isInitialSync) {
-        _checkForUnsyncedMemories();
+        unawaited(_checkForUnsyncedMemories());
       }
     }
   }
 
-  void resumeSync() {
-    if (_isPausedForUnlock && !_isProcessing && _syncQueue.isNotEmpty) {
+  Future<void> resumeSync() async {
+    await _lockQueue();
+    final hasWork = _syncQueue.isNotEmpty;
+    _unlockQueue();
+
+    if (_isPausedForUnlock && !_isProcessing && hasWork) {
       if (kDebugMode) {
-        print('[SyncService] Resuming sync queue processing after unlock.');
+        debugPrint('[SyncService] Resuming sync queue processing after unlock.');
       }
       _isPausedForUnlock = false;
-      _processQueue();
+      unawaited(_processQueue());
     }
   }
 
-  void queueSync(int memoryId) {
-    if (!_syncQueue.contains(memoryId)) {
-      _syncQueue.add(memoryId);
-      _ref.read(syncNotifierProvider.notifier).updateState(
-            pendingJobs: _syncQueue.length,
-            currentStatus: 'Queued...',
-          );
-      Future(_processQueue);
+  Future<void> queueSync(int memoryId) async {
+    await _lockQueue();
+    try {
+      if (!_syncQueue.contains(memoryId)) {
+        _syncQueue.add(memoryId);
+        _ref.read(syncNotifierProvider.notifier).updateState(
+              pendingJobs: _syncQueue.length,
+              currentStatus: 'Queued...',
+            );
+        // Don't await _processQueue to avoid deadlock
+        unawaited(_processQueue());
+      }
+    } finally {
+      _unlockQueue();
     }
   }
 
@@ -172,64 +197,88 @@ class SyncService {
     final toSync = await repo.getMemoriesToSync();
     if (toSync.isNotEmpty) {
       if (kDebugMode) {
-        print('[SyncService] Found ${toSync.length} memories to sync.');
+        debugPrint('[SyncService] Found ${toSync.length} memories to sync.');
       }
       for (final memory in toSync) {
-        queueSync(memory.id);
+        unawaited(queueSync(memory.id));
       }
     }
   }
 
   Future<void> _processQueue() async {
-    if (_isProcessing ||
-        _syncQueue.isEmpty ||
-        _isPausedForUnlock ||
-        _isReconciling) {
-      if (_syncQueue.isEmpty) {
-        _ref.read(syncNotifierProvider.notifier).updateState(
-            pendingJobs: 0,
-            isSyncing: false,
-            currentStatus: 'Idle',
-            progress: null);
-      }
+    // CONCURRENCY: Double-check locking pattern
+    if (_isProcessing || _isPausedForUnlock || _isReconciling) {
       return;
     }
 
-    _isProcessing = true;
-    final memoryId = _syncQueue.first;
+    int? memoryId;
+    await _lockQueue();
+    try {
+      // Check again after acquiring lock
+      if (_isProcessing || _syncQueue.isEmpty || _isPausedForUnlock || _isReconciling) {
+        if (_syncQueue.isEmpty) {
+          _ref.read(syncNotifierProvider.notifier).updateState(
+              pendingJobs: 0,
+              isSyncing: false,
+              currentStatus: 'Idle',
+              progress: null);
+        }
+        return;
+      }
 
-    _ref.read(syncNotifierProvider.notifier).updateState(
-          isSyncing: true,
-          pendingJobs: _syncQueue.length,
-          currentStatus: 'Syncing memory...',
-          progress: 0.0,
-        );
+      _isProcessing = true;
+      memoryId = _syncQueue.first;
+
+      _ref.read(syncNotifierProvider.notifier).updateState(
+            isSyncing: true,
+            pendingJobs: _syncQueue.length,
+            currentStatus: 'Syncing memory...',
+            progress: 0.0,
+          );
+    } finally {
+      _unlockQueue();
+    }
+
+    if (memoryId == null) return;
 
     await _updateLocalStatus(memoryId, 'syncing');
 
     try {
       final success = await _syncMemoryWithRetries(memoryId);
 
-      _syncQueue.removeAt(0);
+      // CONCURRENCY: Safe removal from queue
+      await _lockQueue();
+      try {
+        if (_syncQueue.isNotEmpty && _syncQueue.first == memoryId) {
+          _syncQueue.removeAt(0);
+        }
+      } finally {
+        _unlockQueue();
+      }
       _isProcessing = false;
+
+      // CONCURRENCY: Safe access to queue length
+      await _lockQueue();
+      final queueLength = _syncQueue.length;
+      _unlockQueue();
 
       if (success) {
         _ref.read(syncNotifierProvider.notifier).updateState(
-            pendingJobs: _syncQueue.length,
+            pendingJobs: queueLength,
             currentStatus: 'Sync complete!',
             progress: 1.0);
       } else {
         _ref.read(syncNotifierProvider.notifier).updateState(
-            pendingJobs: _syncQueue.length,
+            pendingJobs: queueLength,
             currentStatus: 'Sync failed. Will retry later.',
             progress: null);
       }
 
       await Future.delayed(const Duration(seconds: 1));
-      _processQueue();
+      unawaited(_processQueue());
     } on EncryptionLockedException {
       if (kDebugMode) {
-        print('[SyncService] Queue processing paused. Waiting for unlock.');
+        debugPrint('[SyncService] Queue processing paused. Waiting for unlock.');
       }
       _isProcessing = false;
       _isPausedForUnlock = true;
@@ -319,12 +368,12 @@ class SyncService {
         }
 
         if (kDebugMode) {
-          print(
+          debugPrint(
               '[SyncService] Attempt $attempt failed for memory $memoryId: $e');
         }
-        FirebaseCrashlytics.instance.recordError(e, stackTrace,
+        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
             reason:
-                'SyncService: _syncMemoryWithRetries failed on attempt $attempt');
+                'SyncService: _syncMemoryWithRetries failed on attempt $attempt'));
 
         if (attempt < maxRetries) {
           final delay = Duration(seconds: 5 * attempt);
