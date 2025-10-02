@@ -166,6 +166,25 @@ final memoriesStreamProvider = StreamProvider.autoDispose<List<Memory>>((ref) {
   return Stream.value([]);
 });
 
+// 4.1. Drafts stream provider - watches all draft memories
+final draftsStreamProvider = StreamProvider.autoDispose<List<Memory>>((ref) {
+  final memoryRepo = ref.watch(memoryRepositoryProvider);
+  if (memoryRepo != null) {
+    final link = ref.keepAlive();
+    Timer? timer;
+    ref.onDispose(() {
+      timer?.cancel();
+    });
+    ref.onCancel(() {
+      timer = Timer(const Duration(seconds: 10), () {
+        link.close();
+      });
+    });
+    return memoryRepo.watchAllDrafts();
+  }
+  return Stream.value([]);
+});
+
 // 5. Provider for synchronization management
 class SyncNotifier extends StateNotifier<SyncState> {
   SyncNotifier() : super(const SyncState());

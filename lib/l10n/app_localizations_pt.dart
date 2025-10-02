@@ -1078,4 +1078,87 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'Digite a senha mestra';
+
+  @override
+  String get draftBannerSingleTitle => 'Você tem uma memória inacabada';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'Última edição: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'Você tem $count memórias inacabadas';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'Toque para ver todas';
+
+  @override
+  String get draftBannerResume => 'Retomar';
+
+  @override
+  String get draftBannerDelete => 'Excluir';
+
+  @override
+  String get draftResumedSuccess => 'Rascunho retomado com sucesso';
+
+  @override
+  String get draftDeleteDialogTitle => 'Excluir rascunho?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'Este rascunho será excluído permanentemente. Esta ação não pode ser desfeita.';
+
+  @override
+  String get draftDeleteCancel => 'Cancelar';
+
+  @override
+  String get draftDeleteConfirm => 'Excluir';
+
+  @override
+  String get draftDeletedSuccess => 'Rascunho excluído com sucesso';
+
+  @override
+  String get draftDeletedError => 'Falha ao excluir rascunho';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'Você tem $count rascunhos';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'Memória sem título';
+
+  @override
+  String get draftListItemNoContent => 'Sem conteúdo';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'Última modificação: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'agora mesmo';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'há $count minutos';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'há $count horas';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'há $count dias';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return 'há $count semanas';
+  }
 }

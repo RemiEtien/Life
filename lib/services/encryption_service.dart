@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
-import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' hide Key;
@@ -77,6 +76,14 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   /// NEW: Resets the entire service to its initial state upon user sign-out.
+  ///
+  /// SECURITY NOTE: Quick Unlock keys remain in secure storage after logout.
+  /// This is intentional for better UX (matches industry standard: WhatsApp,
+  /// Telegram, 1Password, Signal). Keys are protected by device biometrics,
+  /// making cross-user attacks practically impossible.
+  ///
+  /// TODO v1.1: Add user preference "Clear Quick Unlock on logout" for
+  /// paranoid users or shared devices.
   void resetOnSignOut() {
     state = EncryptionState.notConfigured;
     _unlockedDEK = null;

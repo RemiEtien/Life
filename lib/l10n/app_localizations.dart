@@ -2049,6 +2049,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter Master Password'**
   String get unlockEnterMasterPassword;
+
+  /// No description provided for @draftBannerSingleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have an unfinished memory'**
+  String get draftBannerSingleTitle;
+
+  /// No description provided for @draftBannerSingleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Last edited: {timeAgo}'**
+  String draftBannerSingleSubtitle(String timeAgo);
+
+  /// No description provided for @draftBannerMultipleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count} unfinished memories'**
+  String draftBannerMultipleTitle(int count);
+
+  /// No description provided for @draftBannerMultipleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view all'**
+  String get draftBannerMultipleSubtitle;
+
+  /// No description provided for @draftBannerResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get draftBannerResume;
+
+  /// No description provided for @draftBannerDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get draftBannerDelete;
+
+  /// No description provided for @draftResumedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft resumed successfully'**
+  String get draftResumedSuccess;
+
+  /// No description provided for @draftDeleteDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Draft?'**
+  String get draftDeleteDialogTitle;
+
+  /// No description provided for @draftDeleteDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This draft will be permanently deleted. This action cannot be undone.'**
+  String get draftDeleteDialogMessage;
+
+  /// No description provided for @draftDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get draftDeleteCancel;
+
+  /// No description provided for @draftDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get draftDeleteConfirm;
+
+  /// No description provided for @draftDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft deleted successfully'**
+  String get draftDeletedSuccess;
+
+  /// No description provided for @draftDeletedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete draft'**
+  String get draftDeletedError;
+
+  /// No description provided for @draftListDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count} drafts'**
+  String draftListDialogTitle(int count);
+
+  /// No description provided for @draftListItemNoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled memory'**
+  String get draftListItemNoTitle;
+
+  /// No description provided for @draftListItemNoContent.
+  ///
+  /// In en, this message translates to:
+  /// **'No content'**
+  String get draftListItemNoContent;
+
+  /// No description provided for @draftListItemLastModified.
+  ///
+  /// In en, this message translates to:
+  /// **'Last modified: {timeAgo}'**
+  String draftListItemLastModified(String timeAgo);
+
+  /// No description provided for @timeAgoJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get timeAgoJustNow;
+
+  /// No description provided for @timeAgoMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes ago'**
+  String timeAgoMinutes(int count);
+
+  /// No description provided for @timeAgoHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hours ago'**
+  String timeAgoHours(int count);
+
+  /// No description provided for @timeAgoDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String timeAgoDays(int count);
+
+  /// No description provided for @timeAgoWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} weeks ago'**
+  String timeAgoWeeks(int count);
 }
 
 class _AppLocalizationsDelegate

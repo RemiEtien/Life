@@ -76,7 +76,7 @@ class HistoricalDataService {
       }
     } catch (e, stackTrace) {
        if (kDebugMode) {
-         print('Error in _fetchArticleForSpecificDate: $e');
+         debugPrint('Error in _fetchArticleForSpecificDate: $e');
        }
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia article fetch failed');
     }
@@ -98,7 +98,7 @@ class HistoricalDataService {
       }
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Error in _fetchOnThisDayEvents: $e');
+        debugPrint('Error in _fetchOnThisDayEvents: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia OnThisDay fetch failed');
     }
@@ -125,7 +125,7 @@ class HistoricalDataService {
       final formattedDate = DateFormat('yyyy-MM-dd').format(tryDate);
       
       if (kDebugMode) {
-        print('Attempting to fetch Billboard chart for week of $formattedDate...');
+        debugPrint('Attempting to fetch Billboard chart for week of $formattedDate...');
       }
       
       try {
@@ -133,18 +133,18 @@ class HistoricalDataService {
         
         if (entries.isNotEmpty) {
            if (kDebugMode) {
-             print('Successfully parsed ${entries.length} entries from Billboard for $formattedDate.');
+             debugPrint('Successfully parsed ${entries.length} entries from Billboard for $formattedDate.');
            }
           final spotifyMatches = await _mapEntriesToSpotify(entries);
           
           if (spotifyMatches.isNotEmpty) {
              if (kDebugMode) {
-               print('Successfully matched ${spotifyMatches.length} tracks on Spotify.');
+               debugPrint('Successfully matched ${spotifyMatches.length} tracks on Spotify.');
              }
              return spotifyMatches;
           } else {
              if (kDebugMode) {
-               print('Parsed Billboard entries, but found no matches on Spotify. Trying previous week...');
+               debugPrint('Parsed Billboard entries, but found no matches on Spotify. Trying previous week...');
              }
           }
         }
@@ -155,14 +155,14 @@ class HistoricalDataService {
           reason: 'Billboard week fetch failed for $formattedDate'
         );
         if (kDebugMode) {
-          print('Error fetching week $formattedDate, trying previous week. Error: $e');
+          debugPrint('Error fetching week $formattedDate, trying previous week. Error: $e');
         }
         // Не пробрасываем ошибку, а просто переходим к следующей неделе
       }
     }
     
     if (kDebugMode) {
-      print('Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.');
+      debugPrint('Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.');
     }
     return []; // Возвращаем пустой список вместо исключения
   }
@@ -181,7 +181,7 @@ class HistoricalDataService {
 
       if (resp.statusCode != 200) {
         if (kDebugMode) {
-          print('Billboard HTTP Info: Status ${resp.statusCode} for date $ymd (chart may not exist)');
+          debugPrint('Billboard HTTP Info: Status ${resp.statusCode} for date $ymd (chart may not exist)');
         }
         return [];
       }
@@ -191,7 +191,7 @@ class HistoricalDataService {
       
       if (items.isEmpty) {
         if (kDebugMode) {
-          print('Could not find chart items on Billboard page for $ymd. The page structure might have changed.');
+          debugPrint('Could not find chart items on Billboard page for $ymd. The page structure might have changed.');
         }
         FirebaseCrashlytics.instance.recordError(
           Exception('Billboard parsing failed: No chart items found'),
@@ -219,13 +219,13 @@ class HistoricalDataService {
 
     } on TimeoutException catch(e, stackTrace) {
       if (kDebugMode) {
-        print('Timeout during Billboard fetch for $ymd: $e');
+        debugPrint('Timeout during Billboard fetch for $ymd: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Timeout for $ymd');
       rethrow;
     } catch(e, stackTrace) {
       if (kDebugMode) {
-        print('Exception during Billboard fetch/parse for $ymd: $e');
+        debugPrint('Exception during Billboard fetch/parse for $ymd: $e');
       }
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Fetch/Parse Exception for $ymd');
       rethrow;

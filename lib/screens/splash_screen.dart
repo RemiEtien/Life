@@ -125,7 +125,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       await ref.read(syncServiceProvider).syncFromCloudToLocal(isInitialSync: true);
     } catch (e, stack) {
       if (kDebugMode) {
-        print('[SplashScreen] Initial sync failed, proceeding with local data. Error: $e');
+        debugPrint('[SplashScreen] Initial sync failed, proceeding with local data. Error: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stack, reason: 'Initial sync failed on SplashScreen');
     }

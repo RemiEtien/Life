@@ -1,7 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import '../memory.dart';
@@ -106,7 +105,7 @@ Future<Uint8List> _generatePdf(
         }
       } catch (e) {
         // ignore: avoid_print
-        print('Could not download spotify artwork: ${details.albumArtUrl}');
+        debugPrint('Could not download spotify artwork: ${details.albumArtUrl}');
       }
     }
   }

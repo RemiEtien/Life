@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../providers/application_providers.dart';
+import '../utils/error_handler.dart';
 import 'isar_service.dart';
 import 'user_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -68,11 +69,9 @@ class AuthService {
         });
 
         _isInitialized = true;
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint('Failed to initialize Google Sign-In: $e');
-        }
-        throw Exception('Failed to initialize Google Sign-In: $e');
+      } catch (e, stackTrace) {
+        ErrorHandler.logError(e, stackTrace, reason: 'Failed to initialize Google Sign-In');
+        throw const SecurityException('Authentication service initialization failed. Please restart the app.');
       }
     }
   }
@@ -117,7 +116,10 @@ class AuthService {
     // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Вызываем полный сброс состояния шифрования ***
     // Это гарантирует, что при следующем запуске приложение не будет считать
     // себя заблокированным, а перейдет в состояние "notConfigured".
-    _ref.read(encryptionServiceProvider.notifier).resetOnSignOut();
+    // CRITICAL: Clear secure storage to prevent key leakage between users
+    final encryptionService = _ref.read(encryptionServiceProvider.notifier);
+    // Note: resetOnSignOut() is synchronous on StateNotifier but should trigger async cleanup
+    encryptionService.resetOnSignOut();
 
     _currentUser = null;
     if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
@@ -210,8 +212,8 @@ class AuthService {
       if (kDebugMode) {
         debugPrint('Error during Google sign-in: $e');
       }
-      FirebaseCrashlytics.instance
-          .recordError(e, stackTrace, reason: 'Google Sign-In Failed');
+      unawaited(FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: 'Google Sign-In Failed'));
       throw Exception(
           'An error occurred during Google Sign-In. Please try again.');
     }
@@ -249,8 +251,8 @@ class AuthService {
       if (kDebugMode) {
         debugPrint('Apple sign-in failed: $e');
       }
-      FirebaseCrashlytics.instance
-          .recordError(e, stackTrace, reason: 'Apple Sign-In Failed');
+      unawaited(FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: 'Apple Sign-In Failed'));
       throw Exception(
           'An error occurred during Apple Sign-In. Please try again.');
     }
@@ -275,8 +277,8 @@ class AuthService {
         try {
           await GoogleSignIn.instance.signOut();
         } catch (e, stackTrace) {
-          FirebaseCrashlytics.instance.recordError(e, stackTrace,
-              reason: 'Google Sign-Out failed after account deletion');
+          unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
+              reason: 'Google Sign-Out failed after account deletion'));
         }
       }
 
@@ -300,8 +302,8 @@ class AuthService {
       }
       return e.message ?? 'An unknown error occurred.';
     } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance
-          .recordError(e, stackTrace, reason: 'Account Deletion Failed');
+      unawaited(FirebaseCrashlytics.instance
+          .recordError(e, stackTrace, reason: 'Account Deletion Failed'));
       return 'Failed to delete account: $e';
     }
   }

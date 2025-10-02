@@ -127,7 +127,13 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   void initState() {
     super.initState();
 
+    // CRITICAL FIX: If editing existing memory, reload from database
+    // widget.initial may contain stale data from previous screen
     _draftMemory = widget.initial;
+    if (widget.initial != null && widget.initial!.id != 0) {
+      // Existing memory - reload from database asynchronously
+      _reloadMemoryFromDatabase();
+    }
 
     _titleCtrl = TextEditingController(text: _draftMemory?.title ?? '');
     _contentCtrl = TextEditingController(text: _draftMemory?.content ?? '');
@@ -148,7 +154,13 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     _date = _draftMemory?.date ?? DateTime.now();
     _spotifyTrackIds = List<String>.from(_draftMemory?.spotifyTrackIds ?? []);
-    _ambientSound = _draftMemory?.ambientSound ?? 'None';
+    // CRITICAL FIX: Treat empty string as 'None' (empty string is used instead of null in copyWith)
+    _ambientSound = (_draftMemory?.ambientSound == null || _draftMemory?.ambientSound == '')
+        ? 'None'
+        : _draftMemory!.ambientSound!;
+    if (kDebugMode) {
+      debugPrint('[AmbientSound] Loaded: memory.ambientSound=${_draftMemory?.ambientSound} -> _ambientSound=$_ambientSound');
+    }
     _isEncrypted = _draftMemory?.isEncrypted ?? false;
     _followUpDate = _draftMemory?.reflectionFollowUpAt;
 
@@ -209,6 +221,36 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     }
   }
 
+  Future<void> _reloadMemoryFromDatabase() async {
+    if (!mounted || _draftMemory == null) return;
+    final repo = ref.read(memoryRepositoryProvider);
+    if (repo == null) return;
+
+    try {
+      final freshMemory = await repo.getById(_draftMemory!.id);
+      if (freshMemory != null && mounted) {
+        if (kDebugMode) {
+          debugPrint('[MemoryEdit] Reloaded memory ${freshMemory.id} from database');
+          debugPrint('[AmbientSound] Reloaded: ambientSound=${freshMemory.ambientSound}');
+        }
+        setState(() {
+          _draftMemory = freshMemory;
+          // Update ambient sound from fresh data (treat empty string as 'None')
+          _ambientSound = (freshMemory.ambientSound == null || freshMemory.ambientSound == '')
+              ? 'None'
+              : freshMemory.ambientSound!;
+          if (kDebugMode) {
+            debugPrint('[AmbientSound] Updated state: _ambientSound=$_ambientSound');
+          }
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[MemoryEdit] Failed to reload memory: $e');
+      }
+    }
+  }
+
   Future<void> _initializeAutosave() async {
     if (_draftMemory == null) {
       if (!mounted) return;
@@ -256,7 +298,15 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       audioUrls:
           _audioNoteItems.where((i) => !i.isLocal).map((i) => i.path).toList(),
       spotifyTrackIds: _spotifyTrackIds,
-      ambientSound: _ambientSound == 'None' ? null : _ambientSound,
+      // CRITICAL FIX: Pass empty string '' instead of null to bypass copyWith ?? operator
+      // copyWith uses ?? operator which returns old value when new value is null
+      ambientSound: () {
+        final result = _ambientSound == 'None' ? '' : _ambientSound;
+        if (kDebugMode) {
+          debugPrint('[AmbientSound] Saving: _ambientSound=$_ambientSound -> result=$result (empty string = null)');
+        }
+        return result;
+      }(),
       reflectionImpact: _impactCtrl.text.trim().isEmpty
           ? null
           : _impactCtrl.text.trim(),
@@ -571,7 +621,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final memoryId = _draftMemory?.id;
     if (memoryId == null) return false;
 
-    bool needsPerMemoryUnlock = _isEncrypted &&
+    final bool needsPerMemoryUnlock = _isEncrypted &&
         (profile?.requireBiometricForMemory ?? false) &&
         !encryptionNotifier.isMemoryUnlocked(memoryId);
 
@@ -1417,8 +1467,16 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
             border: const OutlineInputBorder()),
         initialValue: _ambientSound,
         onChanged: (newValue) {
+          // FIX: Allow setting to 'None' to remove ambient sound
+          // Previous code: if (newValue != null) - blocked 'None' selection
+          if (kDebugMode) {
+            debugPrint('[AmbientSound] Dropdown changed: $_ambientSound -> $newValue');
+          }
           if (newValue != null) {
             setState(() => _ambientSound = newValue);
+            if (kDebugMode) {
+              debugPrint('[AmbientSound] State updated to: $_ambientSound');
+            }
             _autoSaveDraft();
           }
         },

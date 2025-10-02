@@ -1028,4 +1028,86 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => '输入主密码';
+
+  @override
+  String get draftBannerSingleTitle => '您有一个未完成的记忆';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return '最后编辑：$timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return '您有 $count 个未完成的记忆';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => '点击查看全部';
+
+  @override
+  String get draftBannerResume => '继续';
+
+  @override
+  String get draftBannerDelete => '删除';
+
+  @override
+  String get draftResumedSuccess => '草稿已成功恢复';
+
+  @override
+  String get draftDeleteDialogTitle => '删除草稿？';
+
+  @override
+  String get draftDeleteDialogMessage => '此草稿将被永久删除。此操作无法撤消。';
+
+  @override
+  String get draftDeleteCancel => '取消';
+
+  @override
+  String get draftDeleteConfirm => '删除';
+
+  @override
+  String get draftDeletedSuccess => '草稿已成功删除';
+
+  @override
+  String get draftDeletedError => '删除草稿失败';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return '您有 $count 个草稿';
+  }
+
+  @override
+  String get draftListItemNoTitle => '无标题记忆';
+
+  @override
+  String get draftListItemNoContent => '无内容';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return '最后修改：$timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => '刚刚';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return '$count 分钟前';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return '$count 小时前';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return '$count 天前';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return '$count 周前';
+  }
 }

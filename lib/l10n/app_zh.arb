@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "请输入主密码以启用此功能。",
 "unlockScreenTitle": "解锁 Lifeline",
 "unlockWithBiometrics": "通过生物识别解锁",
-"unlockEnterMasterPassword": "输入主密码"
+"unlockEnterMasterPassword": "输入主密码",
+"draftBannerSingleTitle": "您有一个未完成的记忆",
+"draftBannerSingleSubtitle": "最后编辑：{timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "您有 {count} 个未完成的记忆",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "点击查看全部",
+"draftBannerResume": "继续",
+"draftBannerDelete": "删除",
+"draftResumedSuccess": "草稿已成功恢复",
+"draftDeleteDialogTitle": "删除草稿？",
+"draftDeleteDialogMessage": "此草稿将被永久删除。此操作无法撤消。",
+"draftDeleteCancel": "取消",
+"draftDeleteConfirm": "删除",
+"draftDeletedSuccess": "草稿已成功删除",
+"draftDeletedError": "删除草稿失败",
+"draftListDialogTitle": "您有 {count} 个草稿",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "无标题记忆",
+"draftListItemNoContent": "无内容",
+"draftListItemLastModified": "最后修改：{timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "刚刚",
+"timeAgoMinutes": "{count} 分钟前",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "{count} 小时前",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "{count} 天前",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "{count} 周前",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

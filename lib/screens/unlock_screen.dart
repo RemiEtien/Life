@@ -51,8 +51,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
         await encryptionNotifier.disableQuickUnlock();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Biometric authentication is no longer available on this device.'),
+            const SnackBar(
+              content: Text('Biometric authentication is no longer available on this device.'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -83,10 +83,10 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
             }
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Biometric unlock failed. Please use your master password.'),
+                const SnackBar(
+                  content: Text('Biometric unlock failed. Please use your master password.'),
                   backgroundColor: Colors.orange,
-                  duration: const Duration(seconds: 4),
+                  duration: Duration(seconds: 4),
                 ),
               );
             }
@@ -104,8 +104,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
         }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('An error occurred during biometric authentication.'),
+            const SnackBar(
+              content: Text('An error occurred during biometric authentication.'),
               backgroundColor: Colors.red,
             ),
           );

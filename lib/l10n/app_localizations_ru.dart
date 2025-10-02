@@ -1075,4 +1075,87 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'Введите мастер-пароль';
+
+  @override
+  String get draftBannerSingleTitle => 'У вас есть незаконченное воспоминание';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'Последнее изменение: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'У вас есть $count незаконченных воспоминаний';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'Нажмите, чтобы посмотреть все';
+
+  @override
+  String get draftBannerResume => 'Продолжить';
+
+  @override
+  String get draftBannerDelete => 'Удалить';
+
+  @override
+  String get draftResumedSuccess => 'Черновик возобновлён';
+
+  @override
+  String get draftDeleteDialogTitle => 'Удалить черновик?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'Этот черновик будет удалён навсегда. Это действие нельзя отменить.';
+
+  @override
+  String get draftDeleteCancel => 'Отмена';
+
+  @override
+  String get draftDeleteConfirm => 'Удалить';
+
+  @override
+  String get draftDeletedSuccess => 'Черновик удалён';
+
+  @override
+  String get draftDeletedError => 'Не удалось удалить черновик';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'У вас $count черновиков';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'Без названия';
+
+  @override
+  String get draftListItemNoContent => 'Нет содержания';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'Последнее изменение: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'только что';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return '$count минут назад';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return '$count часов назад';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return '$count дней назад';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return '$count недель назад';
+  }
 }

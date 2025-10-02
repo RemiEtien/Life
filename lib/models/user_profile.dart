@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../utils/input_validator.dart';
 
 @immutable
 class UserProfile {
@@ -86,10 +87,18 @@ class UserProfile {
     double? visualBranchIntensity,
     bool? visualAnimationEnabled,
   }) {
+    // Validate displayName if provided
+    if (displayName != null) {
+      final validation = InputValidator.validateUserName(displayName);
+      if (!validation.isValid) {
+        throw ArgumentError('Invalid display name: ${validation.error}');
+      }
+    }
+
     return UserProfile(
       uid: uid,
       email: email,
-      displayName: displayName ?? this.displayName,
+      displayName: displayName != null ? InputValidator.validateUserName(displayName).value! : this.displayName,
       photoUrl: photoUrl ?? this.photoUrl,
       countryCode: countryCode ?? this.countryCode,
       languageCode: languageCode ?? this.languageCode,

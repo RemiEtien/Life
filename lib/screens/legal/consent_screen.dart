@@ -45,37 +45,37 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
   }
 
   Future<void> _openDocument(String title, String path, String languageCode) async {
-    print('=== DOCUMENT DEBUG START ===');
-    print('Title: $title');
-    print('Original path: $path');
-    print('Language code: $languageCode');
+    debugPrint('=== DOCUMENT DEBUG START ===');
+    debugPrint('Title: $title');
+    debugPrint('Original path: $path');
+    debugPrint('Language code: $languageCode');
 
     String finalPath = path;
     bool fileExists = false;
 
     try {
-      print('Trying to load: $path');
+      debugPrint('Trying to load: $path');
       await rootBundle.load(path);
       fileExists = true;
-      print('SUCCESS: File found at $path');
+      debugPrint('SUCCESS: File found at $path');
     } catch (e) {
-      print('FAILED: File not found at $path, error: $e');
+      debugPrint('FAILED: File not found at $path, error: $e');
     }
 
     if (!fileExists) {
       finalPath = path.replaceAll(RegExp(r'_[a-z]{2}\.md$'), '_en.md');
-      print('Trying fallback: $finalPath');
+      debugPrint('Trying fallback: $finalPath');
       try {
         await rootBundle.load(finalPath);
         fileExists = true;
-        print('SUCCESS: Fallback file found at $finalPath');
+        debugPrint('SUCCESS: Fallback file found at $finalPath');
       } catch (e) {
-        print('FAILED: Fallback also failed at $finalPath, error: $e');
+        debugPrint('FAILED: Fallback also failed at $finalPath, error: $e');
       }
     }
 
-    print('Final result - fileExists: $fileExists, finalPath: $finalPath');
-    print('=== DOCUMENT DEBUG END ===');
+    debugPrint('Final result - fileExists: $fileExists, finalPath: $finalPath');
+    debugPrint('=== DOCUMENT DEBUG END ===');
 
     if (!fileExists) {
       if (mounted) {
@@ -102,8 +102,8 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
     final locale = ref.watch(localeProvider) ?? Localizations.localeOf(context);
     final languageCode = locale.languageCode;
 
-    print('Current locale: $locale');
-    print('Language code: $languageCode');
+    debugPrint('Current locale: $locale');
+    debugPrint('Language code: $languageCode');
 
     return Scaffold(
       body: SafeArea(

@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "Bitte gib dein Master-Passwort ein, um diese Funktion zu aktivieren.",
 "unlockScreenTitle": "Lifeline entsperren",
 "unlockWithBiometrics": "Mit Biometrie entsperren",
-"unlockEnterMasterPassword": "Master-Passwort eingeben"
+"unlockEnterMasterPassword": "Master-Passwort eingeben",
+"draftBannerSingleTitle": "Du hast eine unfertige Erinnerung",
+"draftBannerSingleSubtitle": "Zuletzt bearbeitet: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "Du hast {count} unfertige Erinnerungen",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "Tippen, um alle anzuzeigen",
+"draftBannerResume": "Fortsetzen",
+"draftBannerDelete": "Löschen",
+"draftResumedSuccess": "Entwurf erfolgreich fortgesetzt",
+"draftDeleteDialogTitle": "Entwurf löschen?",
+"draftDeleteDialogMessage": "Dieser Entwurf wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+"draftDeleteCancel": "Abbrechen",
+"draftDeleteConfirm": "Löschen",
+"draftDeletedSuccess": "Entwurf erfolgreich gelöscht",
+"draftDeletedError": "Fehler beim Löschen des Entwurfs",
+"draftListDialogTitle": "Du hast {count} Entwürfe",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "Unbenannte Erinnerung",
+"draftListItemNoContent": "Kein Inhalt",
+"draftListItemLastModified": "Zuletzt geändert: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "gerade eben",
+"timeAgoMinutes": "vor {count} Minuten",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "vor {count} Stunden",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "vor {count} Tagen",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "vor {count} Wochen",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

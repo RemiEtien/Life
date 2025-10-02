@@ -26,13 +26,9 @@ void main() async {
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    // Enable edge-to-edge display mode (Android 15+ compatible)
+    // System bar styling is handled by Android themes (values/styles.xml, values-v35/styles.xml)
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarIconBrightness: Brightness.light,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarDividerColor: Colors.transparent,
-    ));
 
     final prefs = await SharedPreferences.getInstance();
     final savedLocaleCode = prefs.getString('appLocale');
@@ -136,21 +132,16 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
     super.didChangeAppLifecycleState(state);
     if (!mounted) return;
 
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.detached) {
-      // IMPROVED: Race condition fix - EncryptionService now handles concurrent operations
-      // The lockSession() method already checks _isAttemptingUnlock to prevent conflicts
-      final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    // FIX: Removed auto-lock on app lifecycle events (paused/inactive/detached)
+    // Reason: Users reported excessive unlock screens when switching apps or sharing from gallery
+    // Encryption service now remains unlocked during app session
+    // Lock only occurs on:
+    // 1. Cold start (initial app launch)
+    // 2. Profile entry (navigating to profile screen)
+    // 3. Per-memory unlock (if requireBiometricForMemory is enabled)
 
-      try {
-        encryptionNotifier.lockSession();
-      } catch (e) {
-        // Silently handle any errors during lock to prevent crashes
-        if (kDebugMode) {
-          debugPrint('[AppLifecycle] Error locking session: $e');
-        }
-      }
+    if (kDebugMode) {
+      debugPrint('[AppLifecycle] State changed to: $state (auto-lock disabled)');
     }
   }
 

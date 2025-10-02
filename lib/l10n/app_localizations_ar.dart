@@ -1071,4 +1071,87 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'أدخل كلمة المرور الرئيسية';
+
+  @override
+  String get draftBannerSingleTitle => 'لديك ذاكرة غير مكتملة';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'آخر تعديل: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'لديك $count ذاكرة غير مكتملة';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'اضغط لعرض الكل';
+
+  @override
+  String get draftBannerResume => 'استئناف';
+
+  @override
+  String get draftBannerDelete => 'حذف';
+
+  @override
+  String get draftResumedSuccess => 'تم استئناف المسودة بنجاح';
+
+  @override
+  String get draftDeleteDialogTitle => 'حذف المسودة؟';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'سيتم حذف هذه المسودة بشكل دائم. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get draftDeleteCancel => 'إلغاء';
+
+  @override
+  String get draftDeleteConfirm => 'حذف';
+
+  @override
+  String get draftDeletedSuccess => 'تم حذف المسودة بنجاح';
+
+  @override
+  String get draftDeletedError => 'فشل حذف المسودة';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'لديك $count مسودة';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'ذاكرة بدون عنوان';
+
+  @override
+  String get draftListItemNoContent => 'لا يوجد محتوى';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'آخر تعديل: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'للتو';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'منذ $count دقيقة';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'منذ $count ساعة';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'منذ $count يوم';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return 'منذ $count أسبوع';
+  }
 }

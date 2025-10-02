@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../memory.dart';
 import 'device_performance_detector.dart';
-import 'package:collection/collection.dart';
 import 'lifeline_widget.dart'; // Import for YearPosition
 
 // --- NEW: A dedicated class to hold performance timings ---

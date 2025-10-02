@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "Veuillez saisir votre mot de passe maître pour activer cette fonctionnalité.",
 "unlockScreenTitle": "Déverrouiller Lifeline",
 "unlockWithBiometrics": "Déverrouiller avec la biométrie",
-"unlockEnterMasterPassword": "Saisir le mot de passe maître"
+"unlockEnterMasterPassword": "Saisir le mot de passe maître",
+"draftBannerSingleTitle": "Vous avez un souvenir inachevé",
+"draftBannerSingleSubtitle": "Dernière modification : {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "Vous avez {count} souvenirs inachevés",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "Appuyez pour tout afficher",
+"draftBannerResume": "Reprendre",
+"draftBannerDelete": "Supprimer",
+"draftResumedSuccess": "Brouillon repris avec succès",
+"draftDeleteDialogTitle": "Supprimer le brouillon ?",
+"draftDeleteDialogMessage": "Ce brouillon sera supprimé définitivement. Cette action est irréversible.",
+"draftDeleteCancel": "Annuler",
+"draftDeleteConfirm": "Supprimer",
+"draftDeletedSuccess": "Brouillon supprimé avec succès",
+"draftDeletedError": "Échec de la suppression du brouillon",
+"draftListDialogTitle": "Vous avez {count} brouillons",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "Souvenir sans titre",
+"draftListItemNoContent": "Aucun contenu",
+"draftListItemLastModified": "Dernière modification : {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "à l'instant",
+"timeAgoMinutes": "il y a {count} minutes",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "il y a {count} heures",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "il y a {count} jours",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "il y a {count} semaines",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

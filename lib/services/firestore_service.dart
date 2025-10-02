@@ -43,7 +43,7 @@ class FirestoreService {
         if (repo != null) {
           await repo.upsertMemories(memoriesToUpdateLocally);
           if (kDebugMode) {
-            print(
+            debugPrint(
                 '[FirestoreService] Persisted ${memoriesToUpdateLocally.length} migrated memories back to local Isar DB.');
           }
         }
@@ -52,7 +52,7 @@ class FirestoreService {
       return memoriesFromCloud;
     } catch (e, stackTrace) {
       if (kDebugMode) {
-        print('Error fetching from Firestore: $e');
+        debugPrint('Error fetching from Firestore: $e');
       }
       FirebaseCrashlytics.instance.recordError(e, stackTrace,
           reason: 'Firestore: fetchAllMemoriesOnce failed');
@@ -81,7 +81,7 @@ class FirestoreService {
           // Document doesn't exist, so we can safely create it.
           transaction.set(docRef, memory.toFirestore());
           if (kDebugMode) {
-            print('[Sync Conflict] Remote doc ${memory.firestoreId} does not exist. Creating.');
+            debugPrint('[Sync Conflict] Remote doc ${memory.firestoreId} does not exist. Creating.');
           }
         } else {
           // Document exists, we must check timestamps to resolve conflict.
@@ -99,13 +99,13 @@ class FirestoreService {
             // Local version is newer, so we overwrite the remote document.
             transaction.set(docRef, memory.toFirestore());
             if (kDebugMode) {
-              print('[Sync Conflict] Local is newer for ${memory.firestoreId}. Overwriting remote.');
+              debugPrint('[Sync Conflict] Local is newer for ${memory.firestoreId}. Overwriting remote.');
             }
           } else {
             // Remote version is newer or the same. Do nothing.
             // The outdated local version will be corrected on the next sync from cloud.
             if (kDebugMode) {
-              print('[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping upload.');
+              debugPrint('[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping upload.');
             }
           }
         }
@@ -136,7 +136,7 @@ class FirestoreService {
           // If we are trying to update a doc that doesn't exist, create it.
           transaction.set(docRef, memory.toFirestore());
            if (kDebugMode) {
-            print('[Sync Conflict] Trying to update non-existent doc ${memory.firestoreId}. Creating instead.');
+            debugPrint('[Sync Conflict] Trying to update non-existent doc ${memory.firestoreId}. Creating instead.');
           }
         } else {
           final remoteData = snapshot.data();
@@ -151,12 +151,12 @@ class FirestoreService {
             // Local changes are newer, so apply the update.
             transaction.update(docRef, memory.toFirestore());
              if (kDebugMode) {
-              print('[Sync Conflict] Local is newer for ${memory.firestoreId}. Updating remote.');
+              debugPrint('[Sync Conflict] Local is newer for ${memory.firestoreId}. Updating remote.');
             }
           } else {
             // Remote is newer, discard local changes by doing nothing.
              if (kDebugMode) {
-              print('[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping update.');
+              debugPrint('[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping update.');
             }
           }
         }
@@ -201,7 +201,7 @@ class FirestoreService {
           await ref.delete();
         } catch (e, stackTrace) {
           if (kDebugMode) {
-            print('Could not delete file from Storage: $e');
+            debugPrint('Could not delete file from Storage: $e');
           }
           // Log non-fatal error to Crashlytics, as the main memory doc might be deleted already
           FirebaseCrashlytics.instance.recordError(e, stackTrace,

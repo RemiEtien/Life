@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "Insira sua senha mestra para ativar este recurso.",
 "unlockScreenTitle": "Desbloquear Lifeline",
 "unlockWithBiometrics": "Desbloquear com biometria",
-"unlockEnterMasterPassword": "Digite a senha mestra"
+"unlockEnterMasterPassword": "Digite a senha mestra",
+"draftBannerSingleTitle": "Você tem uma memória inacabada",
+"draftBannerSingleSubtitle": "Última edição: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "Você tem {count} memórias inacabadas",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "Toque para ver todas",
+"draftBannerResume": "Retomar",
+"draftBannerDelete": "Excluir",
+"draftResumedSuccess": "Rascunho retomado com sucesso",
+"draftDeleteDialogTitle": "Excluir rascunho?",
+"draftDeleteDialogMessage": "Este rascunho será excluído permanentemente. Esta ação não pode ser desfeita.",
+"draftDeleteCancel": "Cancelar",
+"draftDeleteConfirm": "Excluir",
+"draftDeletedSuccess": "Rascunho excluído com sucesso",
+"draftDeletedError": "Falha ao excluir rascunho",
+"draftListDialogTitle": "Você tem {count} rascunhos",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "Memória sem título",
+"draftListItemNoContent": "Sem conteúdo",
+"draftListItemLastModified": "Última modificação: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "agora mesmo",
+"timeAgoMinutes": "há {count} minutos",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "há {count} horas",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "há {count} dias",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "há {count} semanas",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

@@ -1086,4 +1086,87 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'Introduce la contraseña maestra';
+
+  @override
+  String get draftBannerSingleTitle => 'Tienes una memoria sin terminar';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'Última edición: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'Tienes $count memorias sin terminar';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'Toca para ver todas';
+
+  @override
+  String get draftBannerResume => 'Reanudar';
+
+  @override
+  String get draftBannerDelete => 'Eliminar';
+
+  @override
+  String get draftResumedSuccess => 'Borrador reanudado con éxito';
+
+  @override
+  String get draftDeleteDialogTitle => '¿Eliminar borrador?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'Este borrador será eliminado permanentemente. Esta acción no se puede deshacer.';
+
+  @override
+  String get draftDeleteCancel => 'Cancelar';
+
+  @override
+  String get draftDeleteConfirm => 'Eliminar';
+
+  @override
+  String get draftDeletedSuccess => 'Borrador eliminado con éxito';
+
+  @override
+  String get draftDeletedError => 'Error al eliminar el borrador';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'Tienes $count borradores';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'Memoria sin título';
+
+  @override
+  String get draftListItemNoContent => 'Sin contenido';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'Última modificación: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'justo ahora';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'hace $count minutos';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'hace $count horas';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'hace $count días';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return 'hace $count semanas';
+  }
 }

@@ -1,7 +1,7 @@
 name: lifeline
 description: Lifeline MVP
 publish_to: "none"
-version: 1.0.110+110
+version: 1.0.114+114
 
 
 environment:
@@ -37,6 +37,7 @@ dependencies:
   video_player: ^2.8.3
   flutter_local_notifications: ^19.4.2
   timezone: ^0.10.1
+  flutter_timezone: ^3.0.0
   
   # --- API & NETWORKING ---
   spotify: ^0.13.7

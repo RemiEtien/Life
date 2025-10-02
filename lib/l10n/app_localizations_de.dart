@@ -1085,4 +1085,87 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'Master-Passwort eingeben';
+
+  @override
+  String get draftBannerSingleTitle => 'Du hast eine unfertige Erinnerung';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'Zuletzt bearbeitet: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'Du hast $count unfertige Erinnerungen';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'Tippen, um alle anzuzeigen';
+
+  @override
+  String get draftBannerResume => 'Fortsetzen';
+
+  @override
+  String get draftBannerDelete => 'Löschen';
+
+  @override
+  String get draftResumedSuccess => 'Entwurf erfolgreich fortgesetzt';
+
+  @override
+  String get draftDeleteDialogTitle => 'Entwurf löschen?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'Dieser Entwurf wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get draftDeleteCancel => 'Abbrechen';
+
+  @override
+  String get draftDeleteConfirm => 'Löschen';
+
+  @override
+  String get draftDeletedSuccess => 'Entwurf erfolgreich gelöscht';
+
+  @override
+  String get draftDeletedError => 'Fehler beim Löschen des Entwurfs';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'Du hast $count Entwürfe';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'Unbenannte Erinnerung';
+
+  @override
+  String get draftListItemNoContent => 'Kein Inhalt';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'Zuletzt geändert: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'gerade eben';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'vor $count Minuten';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'vor $count Stunden';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'vor $count Tagen';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return 'vor $count Wochen';
+  }
 }

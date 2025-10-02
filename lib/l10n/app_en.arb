@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "Please enter your Master Password to enable this feature.",
 "unlockScreenTitle": "Unlock Lifeline",
 "unlockWithBiometrics": "Unlock with Biometrics",
-"unlockEnterMasterPassword": "Enter Master Password"
+"unlockEnterMasterPassword": "Enter Master Password",
+"draftBannerSingleTitle": "You have an unfinished memory",
+"draftBannerSingleSubtitle": "Last edited: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "You have {count} unfinished memories",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "Tap to view all",
+"draftBannerResume": "Resume",
+"draftBannerDelete": "Delete",
+"draftResumedSuccess": "Draft resumed successfully",
+"draftDeleteDialogTitle": "Delete Draft?",
+"draftDeleteDialogMessage": "This draft will be permanently deleted. This action cannot be undone.",
+"draftDeleteCancel": "Cancel",
+"draftDeleteConfirm": "Delete",
+"draftDeletedSuccess": "Draft deleted successfully",
+"draftDeletedError": "Failed to delete draft",
+"draftListDialogTitle": "You have {count} drafts",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "Untitled memory",
+"draftListItemNoContent": "No content",
+"draftListItemLastModified": "Last modified: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "just now",
+"timeAgoMinutes": "{count} minutes ago",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "{count} hours ago",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "{count} days ago",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "{count} weeks ago",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

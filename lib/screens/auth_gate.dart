@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/user_profile.dart';
 import '../services/encryption_service.dart';
 import 'unlock_screen.dart';
 import '../l10n/app_localizations.dart';

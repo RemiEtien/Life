@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "הזן את סיסמת-העל שלך כדי להפעיל את התכונה.",
 "unlockScreenTitle": "פתח את Lifeline",
 "unlockWithBiometrics": "פתח באמצעות אימות ביומטרי",
-"unlockEnterMasterPassword": "הזן סיסמת-על"
+"unlockEnterMasterPassword": "הזן סיסמת-על",
+"draftBannerSingleTitle": "יש לך זיכרון לא גמור",
+"draftBannerSingleSubtitle": "עריכה אחרונה: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "יש לך {count} זיכרונות לא גמורים",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "הקש לצפייה בהכל",
+"draftBannerResume": "המשך",
+"draftBannerDelete": "מחק",
+"draftResumedSuccess": "הטיוטה חודשה בהצלחה",
+"draftDeleteDialogTitle": "למחוק טיוטה?",
+"draftDeleteDialogMessage": "טיוטה זו תימחק לצמיתות. לא ניתן לבטל פעולה זו.",
+"draftDeleteCancel": "ביטול",
+"draftDeleteConfirm": "מחק",
+"draftDeletedSuccess": "הטיוטה נמחקה בהצלחה",
+"draftDeletedError": "מחיקת הטיוטה נכשלה",
+"draftListDialogTitle": "יש לך {count} טיוטות",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "זיכרון ללא כותרת",
+"draftListItemNoContent": "אין תוכן",
+"draftListItemLastModified": "שינוי אחרון: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "ממש עכשיו",
+"timeAgoMinutes": "לפני {count} דקות",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "לפני {count} שעות",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "לפני {count} ימים",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "לפני {count} שבועות",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

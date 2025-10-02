@@ -51,7 +51,7 @@ class ImageProcessingService {
 
       if (compressedFile == null || thumbnailFile == null) {
         if (kDebugMode) {
-          print('[ImageProcessingService] Failed to compress one or both images.');
+          debugPrint('[ImageProcessingService] Failed to compress one or both images.');
         }
         return null;
       }
@@ -62,7 +62,7 @@ class ImageProcessingService {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('[ImageProcessingService] Error processing image: $e');
+        debugPrint('[ImageProcessingService] Error processing image: $e');
       }
       return null;
     }

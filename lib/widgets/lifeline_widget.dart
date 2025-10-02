@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
+import '../utils/error_handler.dart';
 import '../providers/application_providers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -313,10 +314,12 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       );
       try {
         await userService.updateUserProfile(updatedProfile);
-      } catch (e) {
+      } catch (e, stackTrace) {
+        ErrorHandler.logError(e, stackTrace, reason: 'Failed to save visual settings');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to save visual settings: $e')),
+            SnackBar(content: Text(ErrorHandler.getUserFriendlyMessage(e,
+              fallback: 'Failed to save visual settings. Please try again.'))),
           );
         }
       }
@@ -397,7 +400,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       onError: (exception, stackTrace) {
         if (!completer.isCompleted) {
           if (kDebugMode) {
-            print('Error loading ui.Image: $exception');
+            debugPrint('Error loading ui.Image: $exception');
           }
           completer.complete(null);
         }
@@ -1122,7 +1125,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           // Флаг _centerOnNextLayout остается true и центрирование произойдет
           // после готовности данных в _requestGeometryUpdate
           if (kDebugMode) {
-            print('[LifelineWidget] Data not ready for centering, requesting recalculation');
+            debugPrint('[LifelineWidget] Data not ready for centering, requesting recalculation');
           }
           _requestFullRecalculation(_currentMemories);
         }
@@ -1446,6 +1449,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
             _buildControlsOverlay(l10n),
             _buildStatsOverlay(
                 syncState, memoriesAsyncValue.asData?.value ?? [], l10n),
+            _buildDraftsBanner(l10n),
             const FloatingMessageOverlay(),
             Positioned(
               right: 16,
@@ -1766,6 +1770,274 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                       ]
                     ]))));
   }
+
+  Widget _buildDraftsBanner(AppLocalizations l10n) {
+    final draftsAsyncValue = ref.watch(draftsStreamProvider);
+    final drafts = draftsAsyncValue.asData?.value ?? [];
+
+    if (drafts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final userId = ref.watch(authStateChangesProvider).asData?.value?.uid;
+    if (userId == null) {
+      return const SizedBox.shrink();
+    }
+
+    // Single draft: show inline banner with Resume/Delete
+    if (drafts.length == 1) {
+      final draft = drafts.first;
+      final lastModified = draft.lastModified;
+      final timeAgo = _formatTimeAgo(lastModified, l10n);
+
+      return Positioned(
+        right: 16,
+        top: 80,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.amber.withAlpha((255 * 0.15).round()),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.amber.withAlpha((255 * 0.6).round()), width: 1.5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.drafts, color: Colors.amber, size: 16),
+                  SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'Draft',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                timeAgo,
+                style: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 9,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  InkWell(
+                    onTap: () => _resumeDraft(draft, userId),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withAlpha((255 * 0.3).round()),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        l10n.draftBannerResume,
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () => _deleteDraft(draft),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: const Icon(Icons.close, color: Colors.white60, size: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Multiple drafts: show banner with "View all" button
+    return Positioned(
+      right: 16,
+      top: 80,
+      child: GestureDetector(
+        onTap: () => _showDraftsListPopup(drafts, userId, l10n),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.amber.withAlpha((255 * 0.15).round()),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.amber.withAlpha((255 * 0.6).round()), width: 1.5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.drafts, color: Colors.amber, size: 16),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      '${drafts.length} Drafts',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l10n.draftBannerMultipleSubtitle,
+                style: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 9,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withAlpha((255 * 0.3).round()),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        color: Colors.amber,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_ios, color: Colors.amber, size: 10),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatTimeAgo(DateTime dateTime, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 1) {
+      return l10n.timeAgoJustNow;
+    } else if (difference.inMinutes < 60) {
+      return l10n.timeAgoMinutes(difference.inMinutes);
+    } else if (difference.inHours < 24) {
+      return l10n.timeAgoHours(difference.inHours);
+    } else if (difference.inDays < 7) {
+      return l10n.timeAgoDays(difference.inDays);
+    } else {
+      return l10n.timeAgoWeeks((difference.inDays / 7).floor());
+    }
+  }
+
+  Future<void> _resumeDraft(Memory draft, String userId) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MemoryEditScreen(
+          initial: draft,
+          userId: userId,
+        ),
+      ),
+    );
+
+    if (result == true && mounted) {
+      ref.read(messageProvider.notifier).addMessage(
+        AppLocalizations.of(context)!.draftResumedSuccess,
+        type: MessageType.success,
+      );
+    }
+  }
+
+  Future<void> _deleteDraft(Memory draft) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.draftDeleteDialogTitle),
+        content: Text(l10n.draftDeleteDialogMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.draftDeleteCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(l10n.draftDeleteConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        final repo = ref.read(memoryRepositoryProvider);
+        await repo?.delete(draft.id);
+        if (mounted) {
+          ref.read(messageProvider.notifier).addMessage(
+            l10n.draftDeletedSuccess,
+            type: MessageType.success,
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ref.read(messageProvider.notifier).addMessage(
+            l10n.draftDeletedError,
+            type: MessageType.error,
+          );
+        }
+      }
+    }
+  }
+
+  void _showDraftsListPopup(List<Memory> drafts, String userId, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => DraftsListDialog(
+        userId: userId,
+        l10n: l10n,
+        onDraftSelected: (draft) async {
+          Navigator.of(context).pop();
+          await _resumeDraft(draft, userId);
+        },
+        onDraftDeleted: (draft) async {
+          await _deleteDraft(draft);
+        },
+      ),
+    );
+  }
 }
 
 class MemoriesListPopup extends StatefulWidget {
@@ -2038,6 +2310,163 @@ class PerformanceMonitor {
 
   void dispose() {
     fpsNotifier.dispose();
+  }
+}
+
+/// Dialog showing list of all draft memories
+class DraftsListDialog extends ConsumerWidget {
+  final String userId;
+  final AppLocalizations l10n;
+  final Function(Memory) onDraftSelected;
+  final Function(Memory) onDraftDeleted;
+
+  const DraftsListDialog({
+    super.key,
+    required this.userId,
+    required this.l10n,
+    required this.onDraftSelected,
+    required this.onDraftDeleted,
+  });
+
+  String _formatTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 1) {
+      return l10n.timeAgoJustNow;
+    } else if (difference.inMinutes < 60) {
+      return l10n.timeAgoMinutes(difference.inMinutes);
+    } else if (difference.inHours < 24) {
+      return l10n.timeAgoHours(difference.inHours);
+    } else if (difference.inDays < 7) {
+      return l10n.timeAgoDays(difference.inDays);
+    } else {
+      return l10n.timeAgoWeeks((difference.inDays / 7).floor());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch drafts stream to auto-update when drafts are deleted
+    final draftsAsyncValue = ref.watch(draftsStreamProvider);
+    final drafts = draftsAsyncValue.asData?.value ?? [];
+
+    // Auto-close dialog if no drafts left
+    if (drafts.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+      });
+    }
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const Icon(Icons.drafts, color: Colors.amber, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.draftListDialogTitle(drafts.length),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            // Drafts list
+            Flexible(
+              child: drafts.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(40),
+                      child: Text(
+                        l10n.draftListItemNoContent,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: drafts.length,
+                      itemBuilder: (context, index) {
+                        final draft = drafts[index];
+                        final timeAgo = _formatTimeAgo(draft.lastModified);
+                        final hasTitle = draft.title.isNotEmpty;
+                        final hasContent = draft.content != null && draft.content!.isNotEmpty;
+                        final previewText = hasContent
+                            ? draft.content!.length > 80
+                                ? '${draft.content!.substring(0, 80)}...'
+                                : draft.content!
+                            : l10n.draftListItemNoContent;
+
+                        return ListTile(
+                          leading: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withAlpha((255 * 0.2).round()),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.drafts, color: Colors.amber),
+                          ),
+                          title: Text(
+                            hasTitle ? draft.title : l10n.draftListItemNoTitle,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: hasTitle ? null : Colors.grey,
+                              fontStyle: hasTitle ? null : FontStyle.italic,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              Text(
+                                previewText,
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                l10n.draftListItemLastModified(timeAgo),
+                                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                          isThreeLine: true,
+                          trailing: IconButton(
+                            onPressed: () => onDraftDeleted(draft),
+                            icon: const Icon(Icons.delete_outline, color: Colors.red),
+                            tooltip: l10n.draftBannerDelete,
+                          ),
+                          onTap: () => onDraftSelected(draft),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

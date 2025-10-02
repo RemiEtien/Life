@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "Ingresa tu contraseña maestra para habilitar esta función.",
 "unlockScreenTitle": "Desbloquear Lifeline",
 "unlockWithBiometrics": "Desbloquear con biometría",
-"unlockEnterMasterPassword": "Introduce la contraseña maestra"
+"unlockEnterMasterPassword": "Introduce la contraseña maestra",
+"draftBannerSingleTitle": "Tienes una memoria sin terminar",
+"draftBannerSingleSubtitle": "Última edición: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "Tienes {count} memorias sin terminar",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "Toca para ver todas",
+"draftBannerResume": "Reanudar",
+"draftBannerDelete": "Eliminar",
+"draftResumedSuccess": "Borrador reanudado con éxito",
+"draftDeleteDialogTitle": "¿Eliminar borrador?",
+"draftDeleteDialogMessage": "Este borrador será eliminado permanentemente. Esta acción no se puede deshacer.",
+"draftDeleteCancel": "Cancelar",
+"draftDeleteConfirm": "Eliminar",
+"draftDeletedSuccess": "Borrador eliminado con éxito",
+"draftDeletedError": "Error al eliminar el borrador",
+"draftListDialogTitle": "Tienes {count} borradores",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "Memoria sin título",
+"draftListItemNoContent": "Sin contenido",
+"draftListItemLastModified": "Última modificación: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "justo ahora",
+"timeAgoMinutes": "hace {count} minutos",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "hace {count} horas",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "hace {count} días",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "hace {count} semanas",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

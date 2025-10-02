@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Index;
 import 'package:flutter/foundation.dart';
+import 'utils/input_validator.dart';
 
 part 'memory.g.dart';
 
@@ -256,12 +257,64 @@ class Memory {
     List<String>? audioKeysOrder,
     Map<String, int>? emotions,
   }) {
+    // Validate title if provided
+    if (title != null) {
+      final titleValidation = InputValidator.validateMemoryTitle(title);
+      if (!titleValidation.isValid) {
+        throw ArgumentError('Invalid memory title: ${titleValidation.error}');
+      }
+    }
+
+    // Validate content if provided
+    if (content != null) {
+      final contentValidation = InputValidator.validateMemoryContent(content);
+      if (!contentValidation.isValid) {
+        throw ArgumentError('Invalid memory content: ${contentValidation.error}');
+      }
+    }
+
+    // Validate reflection fields if provided
+    if (reflectionImpact != null) {
+      final validation = InputValidator.validateReflection(reflectionImpact);
+      if (!validation.isValid) {
+        throw ArgumentError('Invalid reflection impact: ${validation.error}');
+      }
+    }
+
+    // Validate media file paths if provided
+    if (mediaPaths != null) {
+      for (final path in mediaPaths) {
+        final validation = InputValidator.validateMediaFile(path, MediaType.image);
+        if (!validation.isValid) {
+          throw ArgumentError('Invalid media path "$path": ${validation.error}');
+        }
+      }
+    }
+
+    if (videoPaths != null) {
+      for (final path in videoPaths) {
+        final validation = InputValidator.validateMediaFile(path, MediaType.video);
+        if (!validation.isValid) {
+          throw ArgumentError('Invalid video path "$path": ${validation.error}');
+        }
+      }
+    }
+
+    if (audioNotePaths != null) {
+      for (final path in audioNotePaths) {
+        final validation = InputValidator.validateMediaFile(path, MediaType.audio);
+        if (!validation.isValid) {
+          throw ArgumentError('Invalid audio path "$path": ${validation.error}');
+        }
+      }
+    }
+
     final newMemory = Memory()
       ..id = id ?? this.id
       ..firestoreId = firestoreId ?? this.firestoreId
       ..userId = userId ?? this.userId
-      ..title = title ?? this.title
-      ..content = content ?? this.content
+      ..title = title != null ? InputValidator.validateMemoryTitle(title).value! : this.title
+      ..content = content != null ? InputValidator.validateMemoryContent(content).value! : this.content
       ..date = date ?? this.date
       ..lastModified = lastModified ?? this.lastModified
       ..mediaPaths = mediaPaths ?? List.from(this.mediaPaths)
@@ -395,7 +448,7 @@ class Memory {
     final rawMediaKeysOrder = List<String>.from(data['mediaKeysOrder'] ?? []);
     if (rawMediaKeysOrder.isEmpty && memory.mediaUrls.isNotEmpty) {
       if (kDebugMode) {
-        print(
+        debugPrint(
             '[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.mediaUrls.length} media keys from mediaUrls.');
       }
       memory.mediaKeysOrder =
@@ -410,7 +463,7 @@ class Memory {
     // Если миниатюр нет, но есть основные фото, используем основные фото в качестве миниатюр.
     if (memory.mediaThumbUrls.isEmpty && memory.mediaUrls.isNotEmpty) {
       if (kDebugMode) {
-        print(
+        debugPrint(
             '[MIGRATION] Memory ${snapshot.id}: Using full images as thumbnails fallback.');
       }
       memory.mediaThumbUrls = List.from(memory.mediaUrls);
@@ -421,7 +474,7 @@ class Memory {
     final rawVideoKeysOrder = List<String>.from(data['videoKeysOrder'] ?? []);
     if (rawVideoKeysOrder.isEmpty && memory.videoUrls.isNotEmpty) {
       if (kDebugMode) {
-        print(
+        debugPrint(
             '[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.videoUrls.length} video keys from videoUrls.');
       }
       memory.videoKeysOrder =
@@ -436,7 +489,7 @@ class Memory {
     final rawAudioKeysOrder = List<String>.from(data['audioKeysOrder'] ?? []);
     if (rawAudioKeysOrder.isEmpty && memory.audioUrls.isNotEmpty) {
       if (kDebugMode) {
-        print(
+        debugPrint(
             '[MIGRATION] Memory ${snapshot.id}: GENERATING ${memory.audioUrls.length} audio keys from audioUrls.');
       }
       memory.audioKeysOrder =

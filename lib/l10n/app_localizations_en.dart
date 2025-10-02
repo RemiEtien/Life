@@ -1068,4 +1068,87 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'Enter Master Password';
+
+  @override
+  String get draftBannerSingleTitle => 'You have an unfinished memory';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'Last edited: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'You have $count unfinished memories';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'Tap to view all';
+
+  @override
+  String get draftBannerResume => 'Resume';
+
+  @override
+  String get draftBannerDelete => 'Delete';
+
+  @override
+  String get draftResumedSuccess => 'Draft resumed successfully';
+
+  @override
+  String get draftDeleteDialogTitle => 'Delete Draft?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'This draft will be permanently deleted. This action cannot be undone.';
+
+  @override
+  String get draftDeleteCancel => 'Cancel';
+
+  @override
+  String get draftDeleteConfirm => 'Delete';
+
+  @override
+  String get draftDeletedSuccess => 'Draft deleted successfully';
+
+  @override
+  String get draftDeletedError => 'Failed to delete draft';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'You have $count drafts';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'Untitled memory';
+
+  @override
+  String get draftListItemNoContent => 'No content';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'Last modified: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'just now';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return '$count minutes ago';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return '$count hours ago';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return '$count weeks ago';
+  }
 }

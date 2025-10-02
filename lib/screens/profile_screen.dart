@@ -10,8 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
-import '../services/encryption_service.dart';
-import '../services/onboarding_service.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import 'package:collection/collection.dart';
 
@@ -572,8 +570,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             if (!mounted) return;
                             await authService.reauthenticateWithPassword(
                                 passwordController.text);
-                            if (context.mounted)
+                            if (context.mounted) {
                               Navigator.of(context).pop(true);
+                            }
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'wrong-password' ||
                                 e.code == 'invalid-credential') {

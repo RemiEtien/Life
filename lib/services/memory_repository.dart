@@ -14,11 +14,23 @@ class MemoryRepository {
   Future<Isar> get _db async => IsarService.instance(userId);
 
   Memory _encryptMemoryIfNeeded(Memory m) {
+    // CRITICAL FIX: If memory is NOT encrypted, return as is (no encryption needed)
+    // If memory IS encrypted, check if fields are already encrypted to avoid double encryption
     if (!m.isEncrypted) return m;
+
+    // Check if content is already encrypted (starts with gcm_v1: prefix)
+    final isAlreadyEncrypted = m.content != null &&
+        encryptionService.isValueEncrypted(m.content!);
+
+    if (isAlreadyEncrypted) {
+      // Fields are already encrypted, return as is to avoid double encryption
+      return m;
+    }
 
     // Pass the memory's local ID to the encryption service
     final memoryId = m.id;
 
+    // Encrypt plaintext fields
     return m.copyWith(
       content: encryptionService.encrypt(m.content, memoryId: memoryId),
       reflectionImpact: encryptionService.encrypt(m.reflectionImpact, memoryId: memoryId),
@@ -100,6 +112,19 @@ class MemoryRepository {
         .findFirst();
   }
 
+  /// Watch all drafts sorted by last modified date (most recent first)
+  /// Returns a stream of all draft memories for the current user
+  Stream<List<Memory>> watchAllDrafts() async* {
+    final isar = await _db;
+    yield* isar.memorys
+        .where()
+        .filter()
+        .userIdEqualTo(userId)
+        .syncStatusEqualTo('draft')
+        .sortByLastModifiedDesc()
+        .watch(fireImmediately: true);
+  }
+
   Future<void> upsertMemories(List<Memory> memories) async {
     if (memories.isEmpty) return;
 
@@ -171,7 +196,7 @@ class MemoryRepository {
 
   Stream<List<Memory>> watchAllSortedByDate() async* {
     if (kDebugMode) {
-      print('[DIAGNOSTIC] Subscribing to memories for userId: $userId');
+      debugPrint('[DIAGNOSTIC] Subscribing to memories for userId: $userId');
     }
     final isar = await _db;
 
@@ -185,13 +210,13 @@ class MemoryRepository {
 
     if (kDebugMode) {
       final initialResults = await query.findAll();
-      print(
+      debugPrint(
           '[DIAGNOSTIC] Initial fetch for userId: $userId found ${initialResults.length} memories.');
     }
 
     yield* query.watch(fireImmediately: true).map((results) {
       if (kDebugMode) {
-        print(
+        debugPrint(
             '[DIAGNOSTIC] Stream update for userId: $userId delivered ${results.length} memories.');
       }
       return results;

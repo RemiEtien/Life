@@ -197,10 +197,68 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   void _startAmbientSound() {
-    if (_currentMemory.ambientSound != null &&
-        _currentMemory.ambientSound!.isNotEmpty) {
-      _audioNotifier.playAmbientSound(_currentMemory.ambientSound!);
-      _isSoundPlaying = true;
+    // CRITICAL FIX: Stop ambient sound if it was removed (None/empty string)
+    if (_currentMemory.ambientSound == null ||
+        _currentMemory.ambientSound!.isEmpty) {
+      _audioNotifier.stopAmbientSound();
+      _isSoundPlaying = false;
+      return;
+    }
+
+    // Play ambient sound if available
+    _audioNotifier.playAmbientSound(_currentMemory.ambientSound!);
+    _isSoundPlaying = true;
+  }
+
+  @override
+  void didUpdateWidget(MemoryViewScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // CRITICAL FIX: Restart ambient sound when memory is updated (e.g., after editing)
+    if (oldWidget.memory != widget.memory) {
+      _currentMemory = widget.memory;
+      _startAmbientSound(); // This will stop sound if ambientSound is empty
+      _initializeMedia();
+      _decryptContent();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // CRITICAL FIX: Reload memory when returning from Edit screen
+    // This ensures ambient sound changes are reflected immediately
+    _reloadMemoryFromDatabase();
+  }
+
+  Future<void> _reloadMemoryFromDatabase() async {
+    if (!mounted) return;
+    final repo = ref.read(memoryRepositoryProvider);
+    if (repo == null) return;
+
+    try {
+      final freshMemory = await repo.getById(_currentMemory.id);
+      if (freshMemory != null && mounted) {
+        if (kDebugMode) {
+          debugPrint('[MemoryView] Reloaded memory from database');
+          debugPrint('[MemoryView] Old ambientSound: ${_currentMemory.ambientSound}');
+          debugPrint('[MemoryView] New ambientSound: ${freshMemory.ambientSound}');
+        }
+
+        // Only update if memory actually changed
+        if (_currentMemory != freshMemory) {
+          _currentMemory = freshMemory;
+          _startAmbientSound(); // Will stop sound if ambientSound is empty/null
+          _initializeMedia();
+          _decryptContent();
+          setState(() {});
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[MemoryView] Failed to reload memory: $e');
+      }
     }
   }
 
@@ -224,7 +282,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         _audioNotifier.stopAmbientSound();
         _isSoundPlaying = false;
       } else {
-        if (_currentMemory.ambientSound != null) {
+        // CRITICAL FIX: Check for empty string as well as null
+        if (_currentMemory.ambientSound != null &&
+            _currentMemory.ambientSound!.isNotEmpty) {
           _audioNotifier.playAmbientSound(_currentMemory.ambientSound!);
           _isSoundPlaying = true;
         }
@@ -514,7 +574,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final biometricService = ref.read(biometricServiceProvider);
     final profile = ref.read(userProfileProvider).value;
 
-    bool needsBiometrics = _currentMemory.isEncrypted &&
+    final bool needsBiometrics = _currentMemory.isEncrypted &&
         (profile?.requireBiometricForMemory ?? false) &&
         !encryptionNotifier.isMemoryUnlocked(_currentMemory.id);
 

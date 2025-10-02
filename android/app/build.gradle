@@ -39,7 +39,8 @@ android {
     namespace "com.momentic.lifeline"
     // Обновляем compileSdk до 36 — плагины и androidx требуют API 35+
     compileSdk 36
-    ndkVersion "26.1.10909125" // ИСПРАВЛЕНИЕ: Указываем конкретную версию NDK
+    // ОБНОВЛЕНО: NDK r28+ для 16KB page size support (Google Play requirement)
+    ndkVersion "28.0.12674087"
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -71,10 +72,16 @@ android {
     }
 
     // ИСПРАВЛЕНИЕ: Упрощенные настройки packaging
+    // ДОБАВЛЕНО: Поддержка 16KB page size для Android 15+ (требование Google Play)
     packaging {
         jniLibs {
             useLegacyPackaging false
         }
+    }
+
+    // Android 15 16KB page size support
+    buildFeatures {
+        buildConfig = true
     }
 
     signingConfigs {

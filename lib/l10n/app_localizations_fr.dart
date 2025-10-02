@@ -1090,4 +1090,87 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'Saisir le mot de passe maître';
+
+  @override
+  String get draftBannerSingleTitle => 'Vous avez un souvenir inachevé';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'Dernière modification : $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'Vous avez $count souvenirs inachevés';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'Appuyez pour tout afficher';
+
+  @override
+  String get draftBannerResume => 'Reprendre';
+
+  @override
+  String get draftBannerDelete => 'Supprimer';
+
+  @override
+  String get draftResumedSuccess => 'Brouillon repris avec succès';
+
+  @override
+  String get draftDeleteDialogTitle => 'Supprimer le brouillon ?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'Ce brouillon sera supprimé définitivement. Cette action est irréversible.';
+
+  @override
+  String get draftDeleteCancel => 'Annuler';
+
+  @override
+  String get draftDeleteConfirm => 'Supprimer';
+
+  @override
+  String get draftDeletedSuccess => 'Brouillon supprimé avec succès';
+
+  @override
+  String get draftDeletedError => 'Échec de la suppression du brouillon';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'Vous avez $count brouillons';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'Souvenir sans titre';
+
+  @override
+  String get draftListItemNoContent => 'Aucun contenu';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'Dernière modification : $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'à l\'instant';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'il y a $count minutes';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'il y a $count heures';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'il y a $count jours';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return 'il y a $count semaines';
+  }
 }

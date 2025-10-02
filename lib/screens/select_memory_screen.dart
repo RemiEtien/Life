@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../l10n/app_localizations.dart';
 import '../memory.dart';
+import '../utils/error_handler.dart';
 import '../providers/application_providers.dart';
+import '../services/encryption_service.dart';
 import 'memory_edit_screen.dart'; // For MediaItem
 import '../services/message_service.dart';
 
@@ -55,36 +57,53 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
         throw Exception('Memory repository is not available.');
       }
 
-      // ИЗМЕНЕНО: Обработка и фото, и видео
+      // CRITICAL FIX: Use copyWith to avoid double encryption
+      // The memory object from provider contains already encrypted fields
+      // We must only update media fields, not modify the original object
+
+      final newMediaPaths = List<String>.from(memory.mediaPaths);
+      final newMediaUrls = List<String>.from(memory.mediaUrls);
+      final newMediaThumbPaths = List<String>.from(memory.mediaThumbPaths);
+      final newMediaThumbUrls = List<String>.from(memory.mediaThumbUrls);
+      final newMediaKeysOrder = List<String>.from(memory.mediaKeysOrder);
+
       if (widget.mediaToAdd != null && widget.mediaToAdd!.isNotEmpty) {
-        memory.mediaPaths = List.from(memory.mediaPaths)
-          ..addAll(widget.mediaToAdd!.where((i) => i.isLocal).map((i) => i.path));
-        memory.mediaUrls = List.from(memory.mediaUrls)
-          ..addAll(widget.mediaToAdd!.where((i) => !i.isLocal).map((i) => i.path));
-        memory.mediaThumbPaths = List.from(memory.mediaThumbPaths)
-          ..addAll(widget.mediaToAdd!
-              .where((i) => i.isLocal)
-              .map((i) => i.thumbPath));
-        memory.mediaThumbUrls = List.from(memory.mediaThumbUrls)
-          ..addAll(widget.mediaToAdd!
-              .where((i) => !i.isLocal)
-              .map((i) => i.thumbPath));
-        memory.mediaKeysOrder = List.from(memory.mediaKeysOrder)
-          ..addAll(widget.mediaToAdd!.map((item) => _getFileKey(item.path)));
+        newMediaPaths.addAll(widget.mediaToAdd!.where((i) => i.isLocal).map((i) => i.path));
+        newMediaUrls.addAll(widget.mediaToAdd!.where((i) => !i.isLocal).map((i) => i.path));
+        newMediaThumbPaths.addAll(widget.mediaToAdd!
+            .where((i) => i.isLocal)
+            .map((i) => i.thumbPath));
+        newMediaThumbUrls.addAll(widget.mediaToAdd!
+            .where((i) => !i.isLocal)
+            .map((i) => i.thumbPath));
+        newMediaKeysOrder.addAll(widget.mediaToAdd!.map((item) => _getFileKey(item.path)));
       }
+
+      final newVideoPaths = List<String>.from(memory.videoPaths);
+      final newVideoUrls = List<String>.from(memory.videoUrls);
+      final newVideoKeysOrder = List<String>.from(memory.videoKeysOrder);
 
       if (widget.videosToAdd != null && widget.videosToAdd!.isNotEmpty) {
-        memory.videoPaths = List.from(memory.videoPaths)
-          ..addAll(
-              widget.videosToAdd!.where((i) => i.isLocal).map((i) => i.path));
-        memory.videoUrls = List.from(memory.videoUrls)
-          ..addAll(
-              widget.videosToAdd!.where((i) => !i.isLocal).map((i) => i.path));
-        memory.videoKeysOrder = List.from(memory.videoKeysOrder)
-          ..addAll(widget.videosToAdd!.map((item) => _getFileKey(item.path)));
+        newVideoPaths.addAll(
+            widget.videosToAdd!.where((i) => i.isLocal).map((i) => i.path));
+        newVideoUrls.addAll(
+            widget.videosToAdd!.where((i) => !i.isLocal).map((i) => i.path));
+        newVideoKeysOrder.addAll(widget.videosToAdd!.map((item) => _getFileKey(item.path)));
       }
 
-      await repo.update(memory);
+      // Create a new memory object with updated media fields only
+      final updatedMemory = memory.copyWith(
+        mediaPaths: newMediaPaths,
+        mediaUrls: newMediaUrls,
+        mediaThumbPaths: newMediaThumbPaths,
+        mediaThumbUrls: newMediaThumbUrls,
+        mediaKeysOrder: newMediaKeysOrder,
+        videoPaths: newVideoPaths,
+        videoUrls: newVideoUrls,
+        videoKeysOrder: newVideoKeysOrder,
+      );
+
+      await repo.update(updatedMemory);
       ref.read(syncServiceProvider).queueSync(memory.id);
 
       if (mounted) {
@@ -95,14 +114,61 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
             .read(messageProvider.notifier)
             .addMessage(l10n.memoryUpdatedSuccess, type: MessageType.success);
       }
+    } on PerMemoryAuthenticationRequiredException catch (e) {
+      // FIX: Handle per-memory authentication requirement
+      if (mounted) {
+        Navigator.of(context).pop(); // Pop loading dialog
+        await _handlePerMemoryAuth(e.memoryId, memory);
+      }
     } catch (e, stack) {
       if (kDebugMode) {
-        print('Error adding media to memory: $e\n$stack');
+        ErrorHandler.logError(e, stack, reason: 'Error adding media to memory');
       }
       if (mounted) {
         Navigator.of(context).pop(); // Pop loading dialog on error
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to add media: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(ErrorHandler.getUserFriendlyMessage(e,
+            fallback: 'Failed to add media. Please try again.'))));
+      }
+    }
+  }
+
+  Future<void> _handlePerMemoryAuth(int memoryId, Memory memory) async {
+    final l10n = AppLocalizations.of(context)!;
+    final biometricService = ref.read(biometricServiceProvider);
+    final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+
+    try {
+      // Attempt biometric authentication for this specific memory
+      final didAuthenticate = await biometricService.authenticate(
+        l10n.memoryViewUnlockDialogTitle,
+      );
+
+      if (didAuthenticate) {
+        // Mark this memory as unlocked for the session
+        encryptionNotifier.markMemoryAsUnlocked(memoryId);
+
+        // Retry adding media
+        await _addMediaToMemory(memory);
+      } else {
+        // User cancelled authentication
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.profileCancel)),
+          );
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[SelectMemoryScreen] Per-memory auth failed: $e');
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Authentication failed. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }

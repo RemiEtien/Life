@@ -1062,4 +1062,87 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get unlockEnterMasterPassword => 'הזן סיסמת-על';
+
+  @override
+  String get draftBannerSingleTitle => 'יש לך זיכרון לא גמור';
+
+  @override
+  String draftBannerSingleSubtitle(String timeAgo) {
+    return 'עריכה אחרונה: $timeAgo';
+  }
+
+  @override
+  String draftBannerMultipleTitle(int count) {
+    return 'יש לך $count זיכרונות לא גמורים';
+  }
+
+  @override
+  String get draftBannerMultipleSubtitle => 'הקש לצפייה בהכל';
+
+  @override
+  String get draftBannerResume => 'המשך';
+
+  @override
+  String get draftBannerDelete => 'מחק';
+
+  @override
+  String get draftResumedSuccess => 'הטיוטה חודשה בהצלחה';
+
+  @override
+  String get draftDeleteDialogTitle => 'למחוק טיוטה?';
+
+  @override
+  String get draftDeleteDialogMessage =>
+      'טיוטה זו תימחק לצמיתות. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get draftDeleteCancel => 'ביטול';
+
+  @override
+  String get draftDeleteConfirm => 'מחק';
+
+  @override
+  String get draftDeletedSuccess => 'הטיוטה נמחקה בהצלחה';
+
+  @override
+  String get draftDeletedError => 'מחיקת הטיוטה נכשלה';
+
+  @override
+  String draftListDialogTitle(int count) {
+    return 'יש לך $count טיוטות';
+  }
+
+  @override
+  String get draftListItemNoTitle => 'זיכרון ללא כותרת';
+
+  @override
+  String get draftListItemNoContent => 'אין תוכן';
+
+  @override
+  String draftListItemLastModified(String timeAgo) {
+    return 'שינוי אחרון: $timeAgo';
+  }
+
+  @override
+  String get timeAgoJustNow => 'ממש עכשיו';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'לפני $count דקות';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'לפני $count שעות';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'לפני $count ימים';
+  }
+
+  @override
+  String timeAgoWeeks(int count) {
+    return 'לפני $count שבועות';
+  }
 }

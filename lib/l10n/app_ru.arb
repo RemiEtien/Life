@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "Введите мастер-пароль, чтобы включить эту функцию.",
 "unlockScreenTitle": "Разблокировать Lifeline",
 "unlockWithBiometrics": "Разблокировать с помощью биометрии",
-"unlockEnterMasterPassword": "Введите мастер-пароль"
+"unlockEnterMasterPassword": "Введите мастер-пароль",
+"draftBannerSingleTitle": "У вас есть незаконченное воспоминание",
+"draftBannerSingleSubtitle": "Последнее изменение: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "У вас есть {count} незаконченных воспоминаний",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "Нажмите, чтобы посмотреть все",
+"draftBannerResume": "Продолжить",
+"draftBannerDelete": "Удалить",
+"draftResumedSuccess": "Черновик возобновлён",
+"draftDeleteDialogTitle": "Удалить черновик?",
+"draftDeleteDialogMessage": "Этот черновик будет удалён навсегда. Это действие нельзя отменить.",
+"draftDeleteCancel": "Отмена",
+"draftDeleteConfirm": "Удалить",
+"draftDeletedSuccess": "Черновик удалён",
+"draftDeletedError": "Не удалось удалить черновик",
+"draftListDialogTitle": "У вас {count} черновиков",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "Без названия",
+"draftListItemNoContent": "Нет содержания",
+"draftListItemLastModified": "Последнее изменение: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "только что",
+"timeAgoMinutes": "{count} минут назад",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "{count} часов назад",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "{count} дней назад",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "{count} недель назад",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

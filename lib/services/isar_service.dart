@@ -20,7 +20,7 @@ class IsarService {
       } else {
         // Если открыта БД другого пользователя, сначала закрываем ее.
         if (kDebugMode) {
-          print(
+          debugPrint(
               "[IsarService] Closing DB for user '${_isar?.name}' to open for '$dbName'.");
         }
         await close();
@@ -28,7 +28,7 @@ class IsarService {
     }
 
     if (kDebugMode) {
-      print("[IsarService] Opening DB for user '$dbName'.");
+      debugPrint("[IsarService] Opening DB for user '$dbName'.");
     }
     final dir = await getApplicationDocumentsDirectory();
     _isar = await Isar.open(
@@ -45,7 +45,7 @@ class IsarService {
   static Future<void> close() async {
     if (_isar != null && _isar!.isOpen) {
       if (kDebugMode) {
-        print("[IsarService] Closing DB instance for user '${_isar?.name}'.");
+        debugPrint("[IsarService] Closing DB instance for user '${_isar?.name}'.");
       }
       await _isar!.close();
       _isar = null;

@@ -470,5 +470,83 @@
 "masterPasswordRequiredContent": "يرجى إدخال كلمة المرور الرئيسية لتفعيل هذه الميزة.",
 "unlockScreenTitle": "فتح Lifeline",
 "unlockWithBiometrics": "افتح باستخدام القياسات الحيوية",
-"unlockEnterMasterPassword": "أدخل كلمة المرور الرئيسية"
+"unlockEnterMasterPassword": "أدخل كلمة المرور الرئيسية",
+"draftBannerSingleTitle": "لديك ذاكرة غير مكتملة",
+"draftBannerSingleSubtitle": "آخر تعديل: {timeAgo}",
+"@draftBannerSingleSubtitle": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"draftBannerMultipleTitle": "لديك {count} ذاكرة غير مكتملة",
+"@draftBannerMultipleTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftBannerMultipleSubtitle": "اضغط لعرض الكل",
+"draftBannerResume": "استئناف",
+"draftBannerDelete": "حذف",
+"draftResumedSuccess": "تم استئناف المسودة بنجاح",
+"draftDeleteDialogTitle": "حذف المسودة؟",
+"draftDeleteDialogMessage": "سيتم حذف هذه المسودة بشكل دائم. لا يمكن التراجع عن هذا الإجراء.",
+"draftDeleteCancel": "إلغاء",
+"draftDeleteConfirm": "حذف",
+"draftDeletedSuccess": "تم حذف المسودة بنجاح",
+"draftDeletedError": "فشل حذف المسودة",
+"draftListDialogTitle": "لديك {count} مسودة",
+"@draftListDialogTitle": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"draftListItemNoTitle": "ذاكرة بدون عنوان",
+"draftListItemNoContent": "لا يوجد محتوى",
+"draftListItemLastModified": "آخر تعديل: {timeAgo}",
+"@draftListItemLastModified": {
+"placeholders": {
+"timeAgo": {
+"type": "String"
+}
+}
+},
+"timeAgoJustNow": "للتو",
+"timeAgoMinutes": "منذ {count} دقيقة",
+"@timeAgoMinutes": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoHours": "منذ {count} ساعة",
+"@timeAgoHours": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoDays": "منذ {count} يوم",
+"@timeAgoDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"timeAgoWeeks": "منذ {count} أسبوع",
+"@timeAgoWeeks": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+}
 }

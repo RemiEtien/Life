@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../memory.dart';
 import '../providers/application_providers.dart';
 import 'encryption_service.dart';
-import 'package:collection/collection.dart';
 
 @immutable
 class SyncState {
@@ -238,8 +237,6 @@ class SyncService {
     } finally {
       _unlockQueue();
     }
-
-    if (memoryId == null) return;
 
     await _updateLocalStatus(memoryId, 'syncing');
 
