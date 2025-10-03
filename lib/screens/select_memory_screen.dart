@@ -252,6 +252,9 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
                     return ListTile(
                       title: Text(memory.title),
                       subtitle: Text(DateFormat.yMMMMd().format(memory.date)),
+                      trailing: memory.isEncrypted
+                          ? const Icon(Icons.lock_outline, size: 20)
+                          : null,
                       onTap: () => _addMediaToMemory(memory),
                     );
                   },
