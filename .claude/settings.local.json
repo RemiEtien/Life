@@ -23,7 +23,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(flutter test:*)",
+      "Bash(dart:*)",
+      "Bash(del test_emotion_parsing.dart)",
+      "Bash(npm install)",
+      "Bash(npm test)"
     ],
     "deny": [],
     "ask": []
