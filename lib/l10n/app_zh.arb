@@ -347,7 +347,8 @@
 "onboardingGesturesTitle": "导航您的时间线",
 "onboardingGestureSwipe": "滑动",
 "onboardingGesturePinch": "捏合缩放",
-"onboardingGesturesSubtitle": "您的 Lifeline 将与您一同成长。捏合以缩小，查看全局。左右滑动以在时间中导航。",
+"onboardingGestureDoubleTap": "双击",
+"onboardingGesturesSubtitle": "您的 Lifeline 将与您一同成长。捏合缩放，双击快速放大。左右滑动以在时间中导航。",
 "onboardingContinueButton": "继续",
 "onboardingFinalTitle": "一切就绪！",
 "onboardingFinalSubtitle": "您的旅程现在开始。开始记录那些重要的瞬间。",
@@ -548,5 +549,9 @@
 "type": "int"
 }
 }
-}
+},
+"fileSizeTooLargeImage": "图片文件太大。最大大小为 10 MB。",
+"fileSizeTooLargeVideo": "视频文件太大。最大大小为 100 MB。",
+"fileSizeTooLargeAudio": "音频文件太大。最大大小为 25 MB。",
+"biometricUnlockFailedMessage": "重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。"
 }

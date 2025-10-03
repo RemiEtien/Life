@@ -805,8 +805,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingGesturePinch => 'اضغط للتكبير';
 
   @override
+  String get onboardingGestureDoubleTap => 'انقر مرتين';
+
+  @override
   String get onboardingGesturesSubtitle =>
-      'سينمو خط Lifeline الخاص بك معك. اضغط للتصغير ورؤية الصورة الأكبر. اسحب لليسار واليمين للتنقل عبر الزمن.';
+      'سينمو خط Lifeline الخاص بك معك. اضغط للتكبير، انقر مرتين للتكبير السريع. اسحب لليسار واليمين للتنقل عبر الزمن.';
 
   @override
   String get onboardingContinueButton => 'متابعة';
@@ -1154,4 +1157,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String timeAgoWeeks(int count) {
     return 'منذ $count أسبوع';
   }
+
+  @override
+  String get fileSizeTooLargeImage =>
+      'ملف الصورة كبير جدًا. الحد الأقصى للحجم هو 10 ميجابايت.';
+
+  @override
+  String get fileSizeTooLargeVideo =>
+      'ملف الفيديو كبير جدًا. الحد الأقصى للحجم هو 100 ميجابايت.';
+
+  @override
+  String get fileSizeTooLargeAudio =>
+      'ملف الصوت كبير جدًا. الحد الأقصى للحجم هو 25 ميجابايت.';
+
+  @override
+  String get biometricUnlockFailedMessage =>
+      'يجب إعادة إنشاء مفاتيح الأمان بعد إعادة تثبيت التطبيق. الرجاء إدخال كلمة المرور الرئيسية للمتابعة.';
 }

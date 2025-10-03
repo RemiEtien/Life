@@ -347,7 +347,8 @@
 "onboardingGesturesTitle": "Naviguez dans votre timeline",
 "onboardingGestureSwipe": "Balayer",
 "onboardingGesturePinch": "Pincer pour zoomer",
-"onboardingGesturesSubtitle": "Votre Lifeline grandira avec vous. Pincez pour dézoomer et voir la vue d'ensemble. Balayez vers la gauche et la droite pour naviguer dans le temps.",
+"onboardingGestureDoubleTap": "Double tape",
+"onboardingGesturesSubtitle": "Votre Lifeline grandira avec vous. Pincez pour zoomer, double tapez pour zoomer rapidement. Balayez vers la gauche et la droite pour naviguer dans le temps.",
 "onboardingContinueButton": "Continuer",
 "onboardingFinalTitle": "Vous êtes prêt !",
 "onboardingFinalSubtitle": "Votre voyage commence maintenant. Commencez à capturer les moments qui comptent.",
@@ -548,5 +549,9 @@
 "type": "int"
 }
 }
-}
+},
+"fileSizeTooLargeImage": "Le fichier image est trop volumineux. La taille maximale est de 10 Mo.",
+"fileSizeTooLargeVideo": "Le fichier vidéo est trop volumineux. La taille maximale est de 100 Mo.",
+"fileSizeTooLargeAudio": "Le fichier audio est trop volumineux. La taille maximale est de 25 Mo.",
+"biometricUnlockFailedMessage": "Les clés de sécurité doivent être recréées après la réinstallation de l'application. Veuillez saisir votre mot de passe principal pour continuer."
 }

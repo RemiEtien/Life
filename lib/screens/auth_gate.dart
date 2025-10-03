@@ -16,7 +16,7 @@ import 'select_memory_screen.dart';
 import 'verify_email_screen.dart';
 import '../services/notification_service.dart';
 import '../widgets/lifeline_widget.dart';
-import 'package:image_picker/image_picker.dart';
+import '../widgets/premium_upsell_widgets.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -85,41 +85,20 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       return;
     }
 
-    final imageProcessor = ref.read(imageProcessingServiceProvider);
-    final List<dynamic> processedMedia = [];
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    for (var file in files) {
-      if (file.type == SharedMediaType.image) {
-        final result =
-            await imageProcessor.processPickedImage(XFile(file.path));
-        if (result != null) {
-          processedMedia.add(MediaItem(
-            path: result.compressedImagePath,
-            thumbPath: result.thumbnailPath,
-            isLocal: true,
-          ));
-        }
-      } else if (file.type == SharedMediaType.video) {
-        processedMedia.add(VideoMediaItem(path: file.path, isLocal: true));
-      }
-    }
-
-    if (mounted) Navigator.of(context).pop();
-
-    if (processedMedia.isNotEmpty && mounted) {
-      ReceiveSharingIntent.instance.reset();
-      _showShareActionSheet(processedMedia, user.uid);
-    }
+    // NEW: Show dialog instantly without processing
+    // Processing will happen in background after user chooses action
+    ReceiveSharingIntent.instance.reset();
+    _showShareActionSheet(files, user.uid);
   }
 
-  void _showShareActionSheet(List<dynamic> media, String userId) {
+  void _showShareActionSheet(List<SharedMediaFile> files, String userId) {
     final l10n = AppLocalizations.of(context)!;
+    final isPremium = ref.read(isPremiumProvider);
+
+    // Count photos and videos
+    final photoCount = files.where((f) => f.type == SharedMediaType.image).length;
+    final videoCount = files.where((f) => f.type == SharedMediaType.video).length;
+
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -141,13 +120,14 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 20),
+              // Show instant preview with original file paths (no processing yet)
               SizedBox(
                 height: 100,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: media.length,
+                  itemCount: files.length,
                   itemBuilder: (context, index) {
-                    final item = media[index];
+                    final file = files[index];
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: ClipRRect(
@@ -155,9 +135,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                         child: SizedBox(
                           width: 100,
                           height: 100,
-                          child: item is MediaItem
-                              ? Image.file(File(item.thumbPath),
-                                  fit: BoxFit.cover)
+                          child: file.type == SharedMediaType.image
+                              ? Image.file(File(file.path), fit: BoxFit.cover)
                               : Container(
                                   color: Colors.black54,
                                   child: const Icon(Icons.videocam,
@@ -178,15 +157,26 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  // Check premium limits BEFORE processing
+                  if (!isPremium && photoCount > 3) {
+                    Navigator.of(context).pop();
+                    await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+                    return;
+                  }
+                  if (!isPremium && videoCount > 1) {
+                    Navigator.of(context).pop();
+                    await showPremiumDialog(context, l10n.premiumFeatureVideos);
+                    return;
+                  }
+
                   Navigator.of(context).pop(); // Close bottom sheet
+                  // Pass raw files - processing will happen in MemoryEditScreen
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => MemoryEditScreen(
                         userId: userId,
-                        initialMedia: media.whereType<MediaItem>().toList(),
-                        initialVideos:
-                            media.whereType<VideoMediaItem>().toList(),
+                        sharedFiles: files,
                       ),
                     ),
                   );
@@ -202,13 +192,25 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                   side: BorderSide(
                       color: Colors.white.withAlpha((255 * 0.5).round())),
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  // Check premium limits BEFORE processing
+                  if (!isPremium && photoCount > 3) {
+                    Navigator.of(context).pop();
+                    await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+                    return;
+                  }
+                  if (!isPremium && videoCount > 1) {
+                    Navigator.of(context).pop();
+                    await showPremiumDialog(context, l10n.premiumFeatureVideos);
+                    return;
+                  }
+
                   Navigator.of(context).pop(); // Close bottom sheet
+                  // Pass raw files - processing will happen in SelectMemoryScreen
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => SelectMemoryScreen(
-                        mediaToAdd: media.whereType<MediaItem>().toList(),
-                        videosToAdd: media.whereType<VideoMediaItem>().toList(),
+                        sharedFiles: files,
                       ),
                     ),
                   );

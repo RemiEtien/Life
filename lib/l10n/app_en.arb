@@ -347,7 +347,8 @@
 "onboardingGesturesTitle": "Navigate Your Timeline",
 "onboardingGestureSwipe": "Swipe",
 "onboardingGesturePinch": "Pinch to Zoom",
-"onboardingGesturesSubtitle": "Your Lifeline will grow with you. Pinch to zoom out and see the bigger picture. Swipe left and right to navigate through time.",
+"onboardingGestureDoubleTap": "Double Tap",
+"onboardingGesturesSubtitle": "Your Lifeline will grow with you. Pinch to zoom, double tap to quickly zoom in. Swipe left and right to navigate through time.",
 "onboardingContinueButton": "Continue",
 "onboardingFinalTitle": "You're All Set!",
 "onboardingFinalSubtitle": "Your journey begins now. Start capturing the moments that matter.",
@@ -548,5 +549,9 @@
 "type": "int"
 }
 }
-}
+},
+"fileSizeTooLargeImage": "Image file is too large. Maximum size is 10 MB.",
+"fileSizeTooLargeVideo": "Video file is too large. Maximum size is 100 MB.",
+"fileSizeTooLargeAudio": "Audio file is too large. Maximum size is 25 MB.",
+"biometricUnlockFailedMessage": "Security keys need to be recreated after reinstalling the app. Please enter your master password to continue."
 }

@@ -6,7 +6,20 @@
       "Bash(dart analyze:*)",
       "Bash(flutter build:*)",
       "Bash(where:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(for file in lib/l10n/app_*.arb)",
+      "Bash(do if [ \"$file\" != \"lib/l10n/app_en.arb\" ])",
+      "Bash([ \"$file\" != \"lib/l10n/app_ru.arb\" ])",
+      "Bash([ \"$file\" != \"lib/l10n/app_de.arb\" ])",
+      "Bash(then sed -i '/\"\"onboardingGesturePinch\"\":/a\\  \"\"onboardingGestureDoubleTap\"\": \"\"Double Tap\"\",' \"$file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(dir:*)",
+      "Bash(./gradlew:*)",
+      "Bash(flutter run:*)",
+      "Bash(for:*)",
+      "Bash(do sed -i 's/\"\"fileSizeTooLargeAudio\"\": \"\".*\"\"$/\"\"fileSizeTooLargeAudio\"\": \"\"Audio file is too large. Maximum size is 25 MB.\"\",\\n\"\"biometricUnlockFailedMessage\"\": \"\"Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.\"\"/g' \"$file\")",
+      "Bash(flutter gen-l10n:*)"
     ],
     "deny": [],
     "ask": []

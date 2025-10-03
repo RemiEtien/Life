@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import '../l10n/app_localizations.dart';
 import '../memory.dart';
 import '../models/anchors/anchor_models.dart';
@@ -57,6 +58,7 @@ class MemoryEditScreen extends ConsumerStatefulWidget {
   final String userId;
   final List<MediaItem>? initialMedia;
   final List<VideoMediaItem>? initialVideos;
+  final List<SharedMediaFile>? sharedFiles; // NEW: Raw files from Share intent
 
   const MemoryEditScreen({
     super.key,
@@ -64,6 +66,7 @@ class MemoryEditScreen extends ConsumerStatefulWidget {
     required this.userId,
     this.initialMedia,
     this.initialVideos,
+    this.sharedFiles, // NEW: Will be processed in background
   });
 
   @override
@@ -114,6 +117,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   bool _isRecording = false;
   bool _isSaving = false;
   bool _isProcessingImages = false;
+  bool _sharedFilesProcessed = false; // Track if shared files have been processed
 
   Timer? _autosaveTimer;
   Memory? _draftMemory;
@@ -195,6 +199,17 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     if (_spotifyTrackIds.isNotEmpty) {
       _loadAllTrackDetails();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Process shared files AFTER dependencies are ready (localization available)
+    if (widget.sharedFiles != null && widget.sharedFiles!.isNotEmpty && !_sharedFilesProcessed) {
+      _sharedFilesProcessed = true;
+      _processSharedFilesInBackground();
     }
   }
 
@@ -405,6 +420,20 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final pickedFiles = await picker.pickMultiImage();
     if (!mounted || pickedFiles.isEmpty) return;
 
+    // Check file sizes before processing (10MB limit per Firebase Storage rules)
+    const maxImageSize = 10 * 1024 * 1024; // 10MB
+    for (var file in pickedFiles) {
+      final fileSize = await File(file.path).length();
+      if (fileSize > maxImageSize) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.fileSizeTooLargeImage)),
+          );
+        }
+        return;
+      }
+    }
+
     if (!isPremium &&
         (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
       await showPremiumDialog(context, l10n.premiumFeaturePhotos);
@@ -446,6 +475,75 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     }
   }
 
+  /// NEW: Process shared files from Share intent in background
+  /// Premium limits already checked in AuthGate before navigation
+  Future<void> _processSharedFilesInBackground() async {
+    if (widget.sharedFiles == null || widget.sharedFiles!.isEmpty) return;
+
+    setState(() => _isProcessingImages = true);
+
+    try {
+      final imageProcessor = ref.read(imageProcessingServiceProvider);
+      final l10n = AppLocalizations.of(context)!;
+
+      for (var file in widget.sharedFiles!) {
+        if (!mounted) break;
+
+        if (file.type == SharedMediaType.image) {
+          // Check file size before processing (10MB limit)
+          const maxImageSize = 10 * 1024 * 1024; // 10MB
+          final fileSize = await File(file.path).length();
+          if (fileSize > maxImageSize) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.fileSizeTooLargeImage)),
+              );
+            }
+            continue; // Skip this file and process others
+          }
+
+          final result = await imageProcessor.processPickedImage(XFile(file.path));
+          if (result != null && mounted) {
+            setState(() {
+              _mediaItems.add(MediaItem(
+                path: result.compressedImagePath,
+                thumbPath: result.thumbnailPath,
+                isLocal: true,
+              ));
+            });
+          }
+        } else if (file.type == SharedMediaType.video) {
+          // Check file size before adding (100MB limit)
+          const maxVideoSize = 100 * 1024 * 1024; // 100MB
+          final fileSize = await File(file.path).length();
+          if (fileSize > maxVideoSize) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.fileSizeTooLargeVideo)),
+              );
+            }
+            continue; // Skip this file and process others
+          }
+
+          if (mounted) {
+            setState(() {
+              _videoItems.add(VideoMediaItem(path: file.path, isLocal: true));
+            });
+          }
+        }
+      }
+
+      // Don't auto-save here - let user enter title first
+      // Files are already added to state, will be saved when user saves manually
+    } catch (e) {
+      debugPrint('[Share] Error processing shared files: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessingImages = false);
+      }
+    }
+  }
+
   Future<void> _pickVideo() async {
     final isPremium = ref.read(isPremiumProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -461,6 +559,18 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       final picker = ImagePicker();
       final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
       if (pickedFile != null) {
+        // Check file size before adding (100MB limit per Firebase Storage rules)
+        const maxVideoSize = 100 * 1024 * 1024; // 100MB
+        final fileSize = await File(pickedFile.path).length();
+        if (fileSize > maxVideoSize) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.fileSizeTooLargeVideo)),
+            );
+          }
+          return;
+        }
+
         setState(() =>
             _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
         _autoSaveDraft();
@@ -487,6 +597,21 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       if (_isRecording) {
         final path = await _audioRecorder.stop();
         if (path != null) {
+          // Check file size after recording (25MB limit per Firebase Storage rules)
+          const maxAudioSize = 25 * 1024 * 1024; // 25MB
+          final fileSize = await File(path).length();
+          if (fileSize > maxAudioSize) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.fileSizeTooLargeAudio)),
+              );
+            }
+            // Delete the oversized file
+            await File(path).delete();
+            setState(() => _isRecording = false);
+            return;
+          }
+
           setState(() {
             _isRecording = false;
             _audioNoteItems.add(AudioMediaItem(path: path, isLocal: true));
@@ -599,9 +724,13 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Future<void> _handleReflectionReminder(Memory memory) async {
     final notificationService = ref.read(notificationServiceProvider);
     await notificationService.cancelNotification(memory.id);
+
+    // FIX: Only schedule notification if action is not completed
+    // This prevents re-triggering after memory date change when marked as done
     if (memory.reflectionFollowUpAt != null &&
         memory.reflectionAction != null &&
-        memory.reflectionAction!.isNotEmpty) {
+        memory.reflectionAction!.isNotEmpty &&
+        !memory.reflectionActionCompleted) {
       await notificationService.scheduleNotification(
           id: memory.id,
           title: memory.title,

@@ -347,7 +347,8 @@
 "onboardingGesturesTitle": "Navigieren Sie durch Ihre Zeitachse",
 "onboardingGestureSwipe": "Wischen",
 "onboardingGesturePinch": "Zum Zoomen zusammenziehen",
-"onboardingGesturesSubtitle": "Ihre Lifeline wird mit Ihnen wachsen. Ziehen Sie zusammen, um herauszuzoomen und das große Ganze zu sehen. Wischen Sie nach links und rechts, um durch die Zeit zu navigieren.",
+"onboardingGestureDoubleTap": "Doppeltippen",
+"onboardingGesturesSubtitle": "Ihre Lifeline wird mit Ihnen wachsen. Ziehen Sie zusammen zum Zoomen, doppeltippen Sie zum schnellen Hineinzoomen. Wischen Sie nach links und rechts, um durch die Zeit zu navigieren.",
 "onboardingContinueButton": "Weiter",
 "onboardingFinalTitle": "Sie sind bereit!",
 "onboardingFinalSubtitle": "Ihre Reise beginnt jetzt. Fangen Sie an, die wichtigen Momente festzuhalten.",
@@ -548,5 +549,9 @@
 "type": "int"
 }
 }
-}
+},
+"fileSizeTooLargeImage": "Die Bilddatei ist zu groß. Maximale Größe beträgt 10 MB.",
+"fileSizeTooLargeVideo": "Die Videodatei ist zu groß. Maximale Größe beträgt 100 MB.",
+"fileSizeTooLargeAudio": "Die Audiodatei ist zu groß. Maximale Größe beträgt 25 MB.",
+"biometricUnlockFailedMessage": "Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren."
 }

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/application_providers.dart';
 
@@ -235,6 +236,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ]
                         ],
                       ),
+                      const SizedBox(height: 32),
+                      _buildVersionInfo(),
                     ]
                   ],
                 ),
@@ -331,6 +334,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         child: Image.asset(assetPath, width: 28, height: 28),
       ),
+    );
+  }
+
+  Widget _buildVersionInfo() {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final version = snapshot.data!.version;
+          final buildNumber = snapshot.data!.buildNumber;
+          return Text(
+            'v$version ($buildNumber)',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.3),
+              fontSize: 12,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

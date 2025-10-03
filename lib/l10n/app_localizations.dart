@@ -1570,10 +1570,16 @@ abstract class AppLocalizations {
   /// **'Pinch to Zoom'**
   String get onboardingGesturePinch;
 
+  /// No description provided for @onboardingGestureDoubleTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Double Tap'**
+  String get onboardingGestureDoubleTap;
+
   /// No description provided for @onboardingGesturesSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Lifeline will grow with you. Pinch to zoom out and see the bigger picture. Swipe left and right to navigate through time.'**
+  /// **'Your Lifeline will grow with you. Pinch to zoom, double tap to quickly zoom in. Swipe left and right to navigate through time.'**
   String get onboardingGesturesSubtitle;
 
   /// No description provided for @onboardingContinueButton.
@@ -2181,6 +2187,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} weeks ago'**
   String timeAgoWeeks(int count);
+
+  /// No description provided for @fileSizeTooLargeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image file is too large. Maximum size is 10 MB.'**
+  String get fileSizeTooLargeImage;
+
+  /// No description provided for @fileSizeTooLargeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video file is too large. Maximum size is 100 MB.'**
+  String get fileSizeTooLargeVideo;
+
+  /// No description provided for @fileSizeTooLargeAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio file is too large. Maximum size is 25 MB.'**
+  String get fileSizeTooLargeAudio;
+
+  /// No description provided for @biometricUnlockFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.'**
+  String get biometricUnlockFailedMessage;
 }
 
 class _AppLocalizationsDelegate

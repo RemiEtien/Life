@@ -29,13 +29,13 @@ class DocumentScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              // ИЗМЕНЕНИЕ: Заменен Markdown на MarkdownWidget из нового пакета.
-              // Виджет обернут в SingleChildScrollView для поддержки прокрутки.
-              return SingleChildScrollView(
+              // FIX: MarkdownWidget has internal scrolling, don't wrap in SingleChildScrollView
+              // Use shrinkWrap: true to avoid unbounded height error
+              return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: MarkdownWidget(
                   data: snapshot.data!,
-                  // Базовая конфигурация для улучшения внешнего вида
+                  shrinkWrap: true, // FIX: Prevents unbounded height error
                   config: MarkdownConfig(
                     configs: [
                       PConfig(

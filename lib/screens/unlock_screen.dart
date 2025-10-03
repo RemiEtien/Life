@@ -82,11 +82,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
               debugPrint('[UnlockScreen] Quick unlock failed despite successful biometric authentication');
             }
             if (mounted) {
+              final l10n = AppLocalizations.of(context)!;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Biometric unlock failed. Please use your master password.'),
+                SnackBar(
+                  content: Text(l10n.biometricUnlockFailedMessage),
                   backgroundColor: Colors.orange,
-                  duration: Duration(seconds: 4),
+                  duration: const Duration(seconds: 5),
                 ),
               );
             }

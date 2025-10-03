@@ -12,7 +12,7 @@ import 'legal/document_screen.dart';
 class PremiumScreen extends ConsumerWidget {
   const PremiumScreen({super.key});
 
-  // ИСПРАВЛЕНИЕ: Добавляем вспомогательный метод для открытия локальных документов
+  // FIX: Helper method to open legal documents with proper error handling
   Future<void> _openDocument(BuildContext context, WidgetRef ref, String title, String docName) async {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.read(localeProvider) ?? Localizations.localeOf(context);
@@ -23,19 +23,24 @@ class PremiumScreen extends ConsumerWidget {
     String finalPath = fallbackPath;
     bool fileExists = false;
 
+    debugPrint('[PremiumScreen] Trying to load document: $specificPath');
     try {
       await rootBundle.loadString(specificPath);
       finalPath = specificPath;
       fileExists = true;
-    } catch (_) {
+      debugPrint('[PremiumScreen] SUCCESS: Loaded $specificPath');
+    } catch (e) {
+      debugPrint('[PremiumScreen] FAILED: $specificPath not found, trying fallback: $e');
       try {
         await rootBundle.loadString(fallbackPath);
         fileExists = true;
-      } catch (e) {
-          fileExists = false;
+        debugPrint('[PremiumScreen] SUCCESS: Loaded fallback $fallbackPath');
+      } catch (e2) {
+        fileExists = false;
+        debugPrint('[PremiumScreen] ERROR: Both files failed to load: $e2');
       }
     }
-    
+
     if (!context.mounted) return;
 
     if (fileExists) {
@@ -45,7 +50,7 @@ class PremiumScreen extends ConsumerWidget {
         ),
       );
     } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.documentErrorLoading)),
       );
     }

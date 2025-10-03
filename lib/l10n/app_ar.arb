@@ -347,7 +347,8 @@
 "onboardingGesturesTitle": "تنقل في خطك الزمني",
 "onboardingGestureSwipe": "اسحب",
 "onboardingGesturePinch": "اضغط للتكبير",
-"onboardingGesturesSubtitle": "سينمو خط Lifeline الخاص بك معك. اضغط للتصغير ورؤية الصورة الأكبر. اسحب لليسار واليمين للتنقل عبر الزمن.",
+"onboardingGestureDoubleTap": "انقر مرتين",
+"onboardingGesturesSubtitle": "سينمو خط Lifeline الخاص بك معك. اضغط للتكبير، انقر مرتين للتكبير السريع. اسحب لليسار واليمين للتنقل عبر الزمن.",
 "onboardingContinueButton": "متابعة",
 "onboardingFinalTitle": "أنت جاهز تماماً!",
 "onboardingFinalSubtitle": "رحلتك تبدأ الآن. ابدأ في التقاط اللحظات المهمة.",
@@ -548,5 +549,9 @@
 "type": "int"
 }
 }
-}
+},
+"fileSizeTooLargeImage": "ملف الصورة كبير جدًا. الحد الأقصى للحجم هو 10 ميجابايت.",
+"fileSizeTooLargeVideo": "ملف الفيديو كبير جدًا. الحد الأقصى للحجم هو 100 ميجابايت.",
+"fileSizeTooLargeAudio": "ملف الصوت كبير جدًا. الحد الأقصى للحجم هو 25 ميجابايت.",
+"biometricUnlockFailedMessage": "يجب إعادة إنشاء مفاتيح الأمان بعد إعادة تثبيت التطبيق. الرجاء إدخال كلمة المرور الرئيسية للمتابعة."
 }

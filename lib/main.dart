@@ -46,9 +46,9 @@ void main() async {
     );
 
     if (kDebugMode) {
-      debugPrint('⚠️ App Check is using DEBUG providers.');
+      debugPrint('✅ App Check is using DEBUG provider');
     } else {
-      debugPrint('App Check activated with Play Integrity / App Attest.');
+      debugPrint('✅ App Check activated with Play Integrity / App Attest');
     }
 
     await NotificationService().init();

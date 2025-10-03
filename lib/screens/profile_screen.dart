@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
@@ -314,6 +315,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (image != null) {
       if (!mounted) return;
+
+      // Check file size before upload (10MB limit per Firebase Storage rules)
+      const maxImageSize = 10 * 1024 * 1024; // 10MB
+      final fileSize = await File(image.path).length();
+      if (fileSize > maxImageSize) {
+        if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.fileSizeTooLargeImage)),
+          );
+        }
+        return;
+      }
+
       final String? photoUrl =
           await userService.uploadAvatar(currentUser.uid, File(image.path));
       if (!mounted) return;
@@ -735,11 +750,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          icon: const Icon(Icons.lock_outline, size: 48),
           title: Text(l10n.masterPasswordRequiredTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(l10n.masterPasswordRequiredContent),
+              const SizedBox(height: 16),
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -907,6 +924,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           style: TextStyle(color: Colors.red.shade400)),
                       onTap: () => _showDeleteAccountDialog(l10n),
                     ),
+                    const SizedBox(height: 32),
+                    _buildVersionInfo(),
                   ],
                 );
               },
@@ -991,6 +1010,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       onChanged: (value) {
         final updatedProfile = profile.copyWith(notificationsEnabled: value);
         ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+      },
+    );
+  }
+
+  Widget _buildVersionInfo() {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final version = snapshot.data!.version;
+          final buildNumber = snapshot.data!.buildNumber;
+          return Center(
+            child: Text(
+              'v$version ($buildNumber)',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 12,
+              ),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
       },
     );
   }

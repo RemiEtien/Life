@@ -814,8 +814,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get onboardingGesturePinch => 'Zum Zoomen zusammenziehen';
 
   @override
+  String get onboardingGestureDoubleTap => 'Doppeltippen';
+
+  @override
   String get onboardingGesturesSubtitle =>
-      'Ihre Lifeline wird mit Ihnen wachsen. Ziehen Sie zusammen, um herauszuzoomen und das große Ganze zu sehen. Wischen Sie nach links und rechts, um durch die Zeit zu navigieren.';
+      'Ihre Lifeline wird mit Ihnen wachsen. Ziehen Sie zusammen zum Zoomen, doppeltippen Sie zum schnellen Hineinzoomen. Wischen Sie nach links und rechts, um durch die Zeit zu navigieren.';
 
   @override
   String get onboardingContinueButton => 'Weiter';
@@ -1168,4 +1171,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String timeAgoWeeks(int count) {
     return 'vor $count Wochen';
   }
+
+  @override
+  String get fileSizeTooLargeImage =>
+      'Die Bilddatei ist zu groß. Maximale Größe beträgt 10 MB.';
+
+  @override
+  String get fileSizeTooLargeVideo =>
+      'Die Videodatei ist zu groß. Maximale Größe beträgt 100 MB.';
+
+  @override
+  String get fileSizeTooLargeAudio =>
+      'Die Audiodatei ist zu groß. Maximale Größe beträgt 25 MB.';
+
+  @override
+  String get biometricUnlockFailedMessage =>
+      'Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren.';
 }

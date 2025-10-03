@@ -347,7 +347,8 @@
 "onboardingGesturesTitle": "נווט בציר הזמן שלך",
 "onboardingGestureSwipe": "החלקה",
 "onboardingGesturePinch": "צביטה לזום",
-"onboardingGesturesSubtitle": "ציר הזמן שלך יגדל איתך. צבוט כדי להתרחק ולראות את התמונה הגדולה. החלק שמאלה וימינה כדי לנווט בזמן.",
+"onboardingGestureDoubleTap": "הקשה כפולה",
+"onboardingGesturesSubtitle": "ציר הזמן שלך יגדל איתך. צבוט לזום, הקש פעמיים לזום מהיר. החלק שמאלה וימינה כדי לנווט בזמן.",
 "onboardingContinueButton": "המשך",
 "onboardingFinalTitle": "אתה מוכן!",
 "onboardingFinalSubtitle": "המסע שלך מתחיל עכשיו. התחל לתעד את הרגעים החשובים.",
@@ -548,5 +549,9 @@
 "type": "int"
 }
 }
-}
+},
+"fileSizeTooLargeImage": "קובץ התמונה גדול מדי. הגודל המרבי הוא 10 מגה-בייט.",
+"fileSizeTooLargeVideo": "קובץ הווידאו גדול מדי. הגודל המרבי הוא 100 מגה-בייט.",
+"fileSizeTooLargeAudio": "קובץ האודיו גדול מדי. הגודל המרבי הוא 25 מגה-בייט.",
+"biometricUnlockFailedMessage": "יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך."
 }

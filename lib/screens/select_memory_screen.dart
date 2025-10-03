@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import '../l10n/app_localizations.dart';
 import '../memory.dart';
 import '../utils/error_handler.dart';
@@ -15,8 +17,9 @@ class SelectMemoryScreen extends ConsumerStatefulWidget {
   // ИЗМЕНЕНО: Списки теперь могут быть null
   final List<MediaItem>? mediaToAdd;
   final List<VideoMediaItem>? videosToAdd;
+  final List<SharedMediaFile>? sharedFiles; // NEW: Raw files from Share intent
 
-  const SelectMemoryScreen({super.key, this.mediaToAdd, this.videosToAdd});
+  const SelectMemoryScreen({super.key, this.mediaToAdd, this.videosToAdd, this.sharedFiles});
 
   @override
   ConsumerState<SelectMemoryScreen> createState() => _SelectMemoryScreenState();
@@ -61,34 +64,57 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
       // The memory object from provider contains already encrypted fields
       // We must only update media fields, not modify the original object
 
+      // NEW: Process shared files if present (from Share intent)
+      final List<MediaItem> processedMedia = widget.mediaToAdd != null ? List.from(widget.mediaToAdd!) : [];
+      final List<VideoMediaItem> processedVideos = widget.videosToAdd != null ? List.from(widget.videosToAdd!) : [];
+
+      if (widget.sharedFiles != null && widget.sharedFiles!.isNotEmpty) {
+        final imageProcessor = ref.read(imageProcessingServiceProvider);
+
+        for (var file in widget.sharedFiles!) {
+          if (file.type == SharedMediaType.image) {
+            final result = await imageProcessor.processPickedImage(XFile(file.path));
+            if (result != null) {
+              processedMedia.add(MediaItem(
+                path: result.compressedImagePath,
+                thumbPath: result.thumbnailPath,
+                isLocal: true,
+              ));
+            }
+          } else if (file.type == SharedMediaType.video) {
+            processedVideos.add(VideoMediaItem(path: file.path, isLocal: true));
+          }
+        }
+      }
+
       final newMediaPaths = List<String>.from(memory.mediaPaths);
       final newMediaUrls = List<String>.from(memory.mediaUrls);
       final newMediaThumbPaths = List<String>.from(memory.mediaThumbPaths);
       final newMediaThumbUrls = List<String>.from(memory.mediaThumbUrls);
       final newMediaKeysOrder = List<String>.from(memory.mediaKeysOrder);
 
-      if (widget.mediaToAdd != null && widget.mediaToAdd!.isNotEmpty) {
-        newMediaPaths.addAll(widget.mediaToAdd!.where((i) => i.isLocal).map((i) => i.path));
-        newMediaUrls.addAll(widget.mediaToAdd!.where((i) => !i.isLocal).map((i) => i.path));
-        newMediaThumbPaths.addAll(widget.mediaToAdd!
+      if (processedMedia.isNotEmpty) {
+        newMediaPaths.addAll(processedMedia.where((i) => i.isLocal).map((i) => i.path));
+        newMediaUrls.addAll(processedMedia.where((i) => !i.isLocal).map((i) => i.path));
+        newMediaThumbPaths.addAll(processedMedia
             .where((i) => i.isLocal)
             .map((i) => i.thumbPath));
-        newMediaThumbUrls.addAll(widget.mediaToAdd!
+        newMediaThumbUrls.addAll(processedMedia
             .where((i) => !i.isLocal)
             .map((i) => i.thumbPath));
-        newMediaKeysOrder.addAll(widget.mediaToAdd!.map((item) => _getFileKey(item.path)));
+        newMediaKeysOrder.addAll(processedMedia.map((item) => _getFileKey(item.path)));
       }
 
       final newVideoPaths = List<String>.from(memory.videoPaths);
       final newVideoUrls = List<String>.from(memory.videoUrls);
       final newVideoKeysOrder = List<String>.from(memory.videoKeysOrder);
 
-      if (widget.videosToAdd != null && widget.videosToAdd!.isNotEmpty) {
+      if (processedVideos.isNotEmpty) {
         newVideoPaths.addAll(
-            widget.videosToAdd!.where((i) => i.isLocal).map((i) => i.path));
+            processedVideos.where((i) => i.isLocal).map((i) => i.path));
         newVideoUrls.addAll(
-            widget.videosToAdd!.where((i) => !i.isLocal).map((i) => i.path));
-        newVideoKeysOrder.addAll(widget.videosToAdd!.map((item) => _getFileKey(item.path)));
+            processedVideos.where((i) => !i.isLocal).map((i) => i.path));
+        newVideoKeysOrder.addAll(processedVideos.map((item) => _getFileKey(item.path)));
       }
 
       // Create a new memory object with updated media fields only

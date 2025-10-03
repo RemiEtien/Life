@@ -232,6 +232,29 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     _reloadMemoryFromDatabase();
   }
 
+  String _getTranslatedEmotion(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'joy':
+        return l10n.emotionJoy;
+      case 'nostalgia':
+        return l10n.emotionNostalgia;
+      case 'pride':
+        return l10n.emotionPride;
+      case 'sadness':
+        return l10n.emotionSadness;
+      case 'gratitude':
+        return l10n.emotionGratitude;
+      case 'love':
+        return l10n.emotionLove;
+      case 'fear':
+        return l10n.emotionFear;
+      case 'anger':
+        return l10n.emotionAnger;
+      default:
+        return key;
+    }
+  }
+
   Future<void> _reloadMemoryFromDatabase() async {
     if (!mounted) return;
     final repo = ref.read(memoryRepositoryProvider);
@@ -962,7 +985,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   _buildLockedContentPlaceholder()
                 else if (content != null && content.isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  Text(
+                  SelectableText(
                     content,
                     style: TextStyle(
                       fontSize: 15,
@@ -1084,7 +1107,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                     runSpacing: 4.0,
                     children: _currentMemory.emotions.entries
                         .map((entry) => Chip(
-                              label: Text('${entry.key} (${entry.value}%)'),
+                              label: Text(
+                                  '${_getTranslatedEmotion(entry.key, l10n)} (${entry.value}%)'),
                               backgroundColor:
                                   Colors.white.withAlpha((255 * 0.1).round()),
                               labelStyle: const TextStyle(color: Colors.white),
@@ -1202,7 +1226,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   color: Colors.white.withAlpha((255 * 0.9).round()),
                   fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(content,
+          SelectableText(content,
               style: TextStyle(
                   color: Colors.white.withAlpha((255 * 0.8).round()),
                   height: 1.5)),
@@ -1237,7 +1261,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             ),
           ])),
           const SizedBox(height: 4),
-          Text(content,
+          SelectableText(content,
               style: TextStyle(
                   color: Colors.white.withAlpha((255 * 0.8).round()),
                   height: 1.5,
@@ -1619,23 +1643,116 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   Widget _buildPageIndicator(int count) {
     if (count <= 1) return const SizedBox.shrink();
+
+    // FIX: Limit indicators to single line on narrow screens
+    // Show current page indicator and surrounding ones only
+    const int maxVisibleDots = 15; // Maximum dots that fit on narrow screens
+
     final List<Widget> dots = [];
-    for (int i = 0; i < count; i++) {
-      dots.add(
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: 8,
-          height: 8,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _currentPage == i
-                ? Colors.white
-                : Colors.white.withAlpha((255 * 0.5).round()),
+
+    if (count <= maxVisibleDots) {
+      // Show all indicators if they fit
+      for (int i = 0; i < count; i++) {
+        dots.add(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _currentPage == i
+                  ? Colors.white
+                  : Colors.white.withAlpha((255 * 0.5).round()),
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } else {
+      // Show ellipsis pattern: first, current range, last
+      const int sideDotsCount = 2;
+      const int centerDotsCount = 5;
+
+      // Show first dots
+      for (int i = 0; i < sideDotsCount && i < count; i++) {
+        dots.add(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _currentPage == i
+                  ? Colors.white
+                  : Colors.white.withAlpha((255 * 0.5).round()),
+            ),
+          ),
+        );
+      }
+
+      // Add ellipsis if needed
+      if (_currentPage > sideDotsCount + 1) {
+        dots.add(
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text('...', style: TextStyle(color: Colors.white.withAlpha((255 * 0.5).round()))),
+          ),
+        );
+      }
+
+      // Show center dots around current page
+      final int startCenter = (_currentPage - centerDotsCount ~/ 2).clamp(sideDotsCount, count - sideDotsCount - centerDotsCount);
+      final int endCenter = (startCenter + centerDotsCount).clamp(sideDotsCount, count - sideDotsCount);
+
+      for (int i = startCenter; i < endCenter; i++) {
+        if (i >= sideDotsCount && i < count - sideDotsCount) {
+          dots.add(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentPage == i
+                    ? Colors.white
+                    : Colors.white.withAlpha((255 * 0.5).round()),
+              ),
+            ),
+          );
+        }
+      }
+
+      // Add ellipsis if needed
+      if (_currentPage < count - sideDotsCount - 2) {
+        dots.add(
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text('...', style: TextStyle(color: Colors.white.withAlpha((255 * 0.5).round()))),
+          ),
+        );
+      }
+
+      // Show last dots
+      for (int i = count - sideDotsCount; i < count; i++) {
+        dots.add(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _currentPage == i
+                  ? Colors.white
+                  : Colors.white.withAlpha((255 * 0.5).round()),
+            ),
+          ),
+        );
+      }
     }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: dots,

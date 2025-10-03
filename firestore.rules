@@ -1,0 +1,94 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // HELPER FUNCTIONS
+    // ========================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ========================================
+    // USER PROFILES
+    // ========================================
+
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isOwner(userId);
+
+      // Users can create and update their own profile
+      // Simplified validation - just check ownership
+      allow create, update: if isOwner(userId);
+
+      // Deletion only through Cloud Functions (soft delete recommended)
+      allow delete: if false;
+    }
+
+    // ========================================
+    // USER MEMORIES
+    // ========================================
+
+    match /users/{userId}/memories/{memoryId} {
+      // Users can read their own memories
+      allow read: if isOwner(userId);
+
+      // Users can create, update and delete their own memories
+      // Simplified validation - just check ownership
+      allow create, update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // ========================================
+    // PREMIUM SUBSCRIPTIONS (if stored in Firestore)
+    // ========================================
+
+    match /users/{userId}/subscriptions/{subscriptionId} {
+      // Users can only read their subscription status
+      allow read: if isOwner(userId);
+
+      // Subscriptions can only be created/updated by Cloud Functions
+      // (after IAP verification)
+      allow write: if false;
+    }
+
+    // ========================================
+    // SHARED MEMORIES (Future Feature - currently disabled)
+    // ========================================
+
+    match /shared_memories/{memoryId} {
+      // Currently disabled - implement when sharing feature is ready
+      allow read, write: if false;
+    }
+
+    // ========================================
+    // PUBLIC DATA (Read-only for all users)
+    // ========================================
+
+    match /public/{document=**} {
+      // Anyone authenticated can read public data
+      // (e.g., app configuration, announcements)
+      allow read: if isAuthenticated();
+
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // ========================================
+    // FALLBACK RULE - DENY ALL
+    // ========================================
+
+    // Explicitly deny access to any other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

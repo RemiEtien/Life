@@ -346,9 +346,14 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     if (next is AsyncData<List<Memory>>) {
       final memories = next.value;
-      if (mounted && !_isDisposed && !_lastKnownSize.isEmpty) {
+      if (mounted && !_isDisposed) {
+        // FIX: Load images and paragraphs immediately, even if size not known yet
+        // This prevents "empty lifeline on fresh install" issue
         _loadMemoryImages(memories);
         _updateParagraphs(memories);
+
+        // Recalculation will be skipped if size is not known (handled inside _requestFullRecalculation)
+        // but will trigger automatically when size becomes available in build()
         _requestFullRecalculation(memories);
       }
     }

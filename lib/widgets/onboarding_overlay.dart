@@ -385,16 +385,27 @@ class _GesturesDialog extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Column(children: [
-                const Icon(Icons.swipe, size: 40),
-                const SizedBox(height: 8),
-                Text(l10n.onboardingGestureSwipe)
-              ]),
-              Column(children: [
-                const Icon(Icons.zoom_in_map, size: 40),
-                const SizedBox(height: 8),
-                Text(l10n.onboardingGesturePinch)
-              ]),
+              Expanded(
+                child: Column(children: [
+                  const Icon(Icons.swipe, size: 40),
+                  const SizedBox(height: 8),
+                  Text(l10n.onboardingGestureSwipe, textAlign: TextAlign.center)
+                ]),
+              ),
+              Expanded(
+                child: Column(children: [
+                  const Icon(Icons.zoom_in_map, size: 40),
+                  const SizedBox(height: 8),
+                  Text(l10n.onboardingGesturePinch, textAlign: TextAlign.center)
+                ]),
+              ),
+              Expanded(
+                child: Column(children: [
+                  const Icon(Icons.touch_app, size: 40),
+                  const SizedBox(height: 8),
+                  Text(l10n.onboardingGestureDoubleTap, textAlign: TextAlign.center)
+                ]),
+              ),
             ],
           ),
           const SizedBox(height: 16),

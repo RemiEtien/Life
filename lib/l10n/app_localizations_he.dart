@@ -796,8 +796,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get onboardingGesturePinch => 'צביטה לזום';
 
   @override
+  String get onboardingGestureDoubleTap => 'הקשה כפולה';
+
+  @override
   String get onboardingGesturesSubtitle =>
-      'ציר הזמן שלך יגדל איתך. צבוט כדי להתרחק ולראות את התמונה הגדולה. החלק שמאלה וימינה כדי לנווט בזמן.';
+      'ציר הזמן שלך יגדל איתך. צבוט לזום, הקש פעמיים לזום מהיר. החלק שמאלה וימינה כדי לנווט בזמן.';
 
   @override
   String get onboardingContinueButton => 'המשך';
@@ -1145,4 +1148,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String timeAgoWeeks(int count) {
     return 'לפני $count שבועות';
   }
+
+  @override
+  String get fileSizeTooLargeImage =>
+      'קובץ התמונה גדול מדי. הגודל המרבי הוא 10 מגה-בייט.';
+
+  @override
+  String get fileSizeTooLargeVideo =>
+      'קובץ הווידאו גדול מדי. הגודל המרבי הוא 100 מגה-בייט.';
+
+  @override
+  String get fileSizeTooLargeAudio =>
+      'קובץ האודיו גדול מדי. הגודל המרבי הוא 25 מגה-בייט.';
+
+  @override
+  String get biometricUnlockFailedMessage =>
+      'יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך.';
 }

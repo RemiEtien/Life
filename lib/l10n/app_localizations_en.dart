@@ -800,8 +800,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGesturePinch => 'Pinch to Zoom';
 
   @override
+  String get onboardingGestureDoubleTap => 'Double Tap';
+
+  @override
   String get onboardingGesturesSubtitle =>
-      'Your Lifeline will grow with you. Pinch to zoom out and see the bigger picture. Swipe left and right to navigate through time.';
+      'Your Lifeline will grow with you. Pinch to zoom, double tap to quickly zoom in. Swipe left and right to navigate through time.';
 
   @override
   String get onboardingContinueButton => 'Continue';
@@ -1151,4 +1154,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String timeAgoWeeks(int count) {
     return '$count weeks ago';
   }
+
+  @override
+  String get fileSizeTooLargeImage =>
+      'Image file is too large. Maximum size is 10 MB.';
+
+  @override
+  String get fileSizeTooLargeVideo =>
+      'Video file is too large. Maximum size is 100 MB.';
+
+  @override
+  String get fileSizeTooLargeAudio =>
+      'Audio file is too large. Maximum size is 25 MB.';
+
+  @override
+  String get biometricUnlockFailedMessage =>
+      'Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.';
 }

@@ -1,0 +1,40 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ========================================
+    // HELPER FUNCTIONS
+    // ========================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ========================================
+    // USER FILES
+    // ========================================
+
+    // All files under users/{userId}/**
+    // Includes: avatars, memory media (images, videos, audio), thumbnails, exports, temp files
+    match /users/{userId}/{allPaths=**} {
+      // Owner can read, write and delete their own files
+      allow read, write, delete: if isOwner(userId);
+    }
+
+    // ========================================
+    // FALLBACK RULE - DENY ALL
+    // ========================================
+
+    // Explicitly deny access to any other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

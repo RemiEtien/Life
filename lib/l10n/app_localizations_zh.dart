@@ -769,8 +769,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingGesturePinch => '捏合缩放';
 
   @override
+  String get onboardingGestureDoubleTap => '双击';
+
+  @override
   String get onboardingGesturesSubtitle =>
-      '您的 Lifeline 将与您一同成长。捏合以缩小，查看全局。左右滑动以在时间中导航。';
+      '您的 Lifeline 将与您一同成长。捏合缩放，双击快速放大。左右滑动以在时间中导航。';
 
   @override
   String get onboardingContinueButton => '继续';
@@ -1110,4 +1113,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String timeAgoWeeks(int count) {
     return '$count 周前';
   }
+
+  @override
+  String get fileSizeTooLargeImage => '图片文件太大。最大大小为 10 MB。';
+
+  @override
+  String get fileSizeTooLargeVideo => '视频文件太大。最大大小为 100 MB。';
+
+  @override
+  String get fileSizeTooLargeAudio => '音频文件太大。最大大小为 25 MB。';
+
+  @override
+  String get biometricUnlockFailedMessage => '重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。';
 }

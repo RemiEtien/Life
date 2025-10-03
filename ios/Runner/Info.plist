@@ -45,11 +45,37 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- CAMERA PERMISSION -->
 	<key>NSCameraUsageDescription</key>
-	<string>Это приложение использует камеру для добавления фотографий и видео в ваши воспоминания.</string>
+	<string>This app uses the camera to add photos and videos to your memories.</string>
+
+	<!-- PHOTO LIBRARY PERMISSION -->
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Это приложение использует галерею для выбора фотографий и видео для ваших воспоминаний.</string>
+	<string>This app uses your photo library to select photos and videos for your memories.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app can save exported memories to your photo library.</string>
+
+	<!-- MICROPHONE PERMISSION -->
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Это приложение использует микрофон для записи аудиозаметок к вашим воспоминаниям.</string>
+	<string>This app uses the microphone to record audio notes for your memories.</string>
+
+	<!-- FACE ID / BIOMETRIC PERMISSION -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app uses Face ID to securely unlock encrypted memories and provide quick access to the app.</string>
+
+	<!-- LOCALIZATION -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ru</string>
+		<string>de</string>
+		<string>es</string>
+		<string>fr</string>
+		<string>he</string>
+		<string>pt</string>
+		<string>ar</string>
+		<string>zh</string>
+	</array>
 </dict>
 </plist>

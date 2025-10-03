@@ -806,8 +806,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingGesturePinch => 'Масштабирование';
 
   @override
+  String get onboardingGestureDoubleTap => 'Двойной тап';
+
+  @override
   String get onboardingGesturesSubtitle =>
-      'Ваша линия жизни будет расти вместе с вами. Масштабируйте, чтобы увидеть общую картину. Проводите пальцем влево и вправо для навигации по времени.';
+      'Ваша линия жизни будет расти вместе с вами. Масштабируйте щипком, дважды нажмите для быстрого приближения. Проводите пальцем влево и вправо для навигации по времени.';
 
   @override
   String get onboardingContinueButton => 'Продолжить';
@@ -1158,4 +1161,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String timeAgoWeeks(int count) {
     return '$count недель назад';
   }
+
+  @override
+  String get fileSizeTooLargeImage =>
+      'Файл изображения слишком большой. Максимальный размер — 10 МБ.';
+
+  @override
+  String get fileSizeTooLargeVideo =>
+      'Видеофайл слишком большой. Максимальный размер — 100 МБ.';
+
+  @override
+  String get fileSizeTooLargeAudio =>
+      'Аудиофайл слишком большой. Максимальный размер — 25 МБ.';
+
+  @override
+  String get biometricUnlockFailedMessage =>
+      'Необходимо пересоздать ключи безопасности после переустановки приложения. Пожалуйста, введите мастер-пароль для продолжения.';
 }
