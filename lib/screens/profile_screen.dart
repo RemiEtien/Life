@@ -745,39 +745,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 // NEW: Dialog to enter master password
   Future<String?> _showMasterPasswordEntryDialog(
       AppLocalizations l10n) async {
-    final passwordController = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: const Icon(Icons.lock_outline, size: 48),
-          title: Text(l10n.masterPasswordRequiredTitle),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.masterPasswordRequiredContent),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration:
-                    InputDecoration(labelText: l10n.profileMasterPasswordHint),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.profileCancel),
-            ),
-            ElevatedButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(passwordController.text),
-              child: Text(l10n.profileEnable),
-            ),
-          ],
-        );
-      },
+      builder: (context) => _MasterPasswordDialog(l10n: l10n),
     );
   }
 
@@ -1199,6 +1169,65 @@ class __HoldToDeleteAccountDialogState extends State<_HoldToDeleteAccountDialog>
               );
             },
           ),
+        ),
+      ],
+    );
+  }
+}
+
+// Stateful dialog widget for master password entry with show/hide toggle
+class _MasterPasswordDialog extends StatefulWidget {
+  final AppLocalizations l10n;
+
+  const _MasterPasswordDialog({required this.l10n});
+
+  @override
+  State<_MasterPasswordDialog> createState() => _MasterPasswordDialogState();
+}
+
+class _MasterPasswordDialogState extends State<_MasterPasswordDialog> {
+  final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      icon: const Icon(Icons.lock_outline, size: 48),
+      title: Text(widget.l10n.masterPasswordRequiredTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(widget.l10n.masterPasswordRequiredContent),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            decoration: InputDecoration(
+              labelText: widget.l10n.profileMasterPasswordHint,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(widget.l10n.profileCancel),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(_passwordController.text),
+          child: Text(widget.l10n.profileEnable),
         ),
       ],
     );
