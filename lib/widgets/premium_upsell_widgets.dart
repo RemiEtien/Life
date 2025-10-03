@@ -21,7 +21,7 @@ class PremiumBannerCard extends ConsumerWidget {
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen()));
@@ -125,7 +125,7 @@ class PremiumStatusCard extends StatelessWidget {
         side: BorderSide(color: Colors.amber.shade700, width: 2),
         borderRadius: BorderRadius.circular(12),
       ),
-      color: Colors.amber.withOpacity(0.1),
+      color: Colors.amber.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(

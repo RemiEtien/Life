@@ -25,9 +25,15 @@ service cloud.firestore {
       // Users can read their own profile
       allow read: if isOwner(userId);
 
-      // Users can create and update their own profile
-      // Simplified validation - just check ownership
-      allow create, update: if isOwner(userId);
+      // Users can create their own profile (only on first signup)
+      allow create: if isOwner(userId) &&
+                       !request.resource.data.keys().hasAny(['isPremium', 'premiumUntil']);
+
+      // Users can update ONLY whitelisted fields
+      // Premium fields can ONLY be set by Cloud Functions
+      allow update: if isOwner(userId) &&
+                       !request.resource.data.diff(resource.data).affectedKeys()
+                         .hasAny(['isPremium', 'premiumUntil', 'uid', 'email']);
 
       // Deletion only through Cloud Functions (soft delete recommended)
       allow delete: if false;
@@ -80,6 +86,26 @@ service cloud.firestore {
 
       // Only Cloud Functions can write
       allow write: if false;
+    }
+
+    // ========================================
+    // USED RECEIPTS (Receipt Deduplication)
+    // ========================================
+
+    match /used_receipts/{receiptHash} {
+      // Users cannot read or write directly
+      // Only Cloud Functions can access this collection
+      allow read, write: if false;
+    }
+
+    // ========================================
+    // RATE LIMITS (API Abuse Prevention)
+    // ========================================
+
+    match /rate_limits/{rateLimitId} {
+      // Users cannot read or write directly
+      // Only Cloud Functions can access this collection
+      allow read, write: if false;
     }
 
     // ========================================

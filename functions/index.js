@@ -8,6 +8,7 @@ const axios = require("axios");
 const admin = require("firebase-admin");
 const {GoogleAuth} = require("google-auth-library");
 const {getStorage} = require("firebase-admin/storage");
+const crypto = require("crypto");
 
 admin.initializeApp();
 
@@ -16,6 +17,57 @@ const SPOTIFY_ID = defineSecret("SPOTIFY_ID");
 const SPOTIFY_SECRET = defineSecret("SPOTIFY_SECRET");
 // **НОВОЕ:** Секрет для проверки покупок в App Store
 const APPLE_SHARED_SECRET = defineSecret("APPLE_SHARED_SECRET");
+
+/**
+ * Rate limiting helper function
+ * @param {string} userId - User ID to check
+ * @param {string} functionName - Name of the function being rate limited
+ * @param {number} maxCalls - Maximum calls allowed in the time window
+ * @param {number} windowMs - Time window in milliseconds
+ * @return {Promise<void>} Throws HttpsError if rate limit exceeded
+ */
+async function checkRateLimit(userId, functionName, maxCalls, windowMs) {
+  const now = Date.now();
+  const rateLimitRef = admin.firestore()
+      .collection("rate_limits")
+      .doc(`${userId}_${functionName}`);
+
+  const doc = await rateLimitRef.get();
+
+  if (doc.exists) {
+    const data = doc.data();
+    const windowStart = data.windowStart.toMillis();
+
+    // Check if we're still in the same time window
+    if (now - windowStart < windowMs) {
+      if (data.callCount >= maxCalls) {
+        const resetTime = new Date(windowStart + windowMs);
+        console.warn(`Rate limit exceeded for user ${userId} on ${functionName}. Resets at ${resetTime.toISOString()}`);
+        throw new HttpsError(
+            "resource-exhausted",
+            "Too many requests. Please try again later.",
+        );
+      }
+
+      // Increment call count
+      await rateLimitRef.update({
+        callCount: admin.firestore.FieldValue.increment(1),
+      });
+    } else {
+      // New time window
+      await rateLimitRef.set({
+        windowStart: admin.firestore.Timestamp.fromMillis(now),
+        callCount: 1,
+      });
+    }
+  } else {
+    // First call
+    await rateLimitRef.set({
+      windowStart: admin.firestore.Timestamp.fromMillis(now),
+      callCount: 1,
+    });
+  }
+}
 
 
 // Кеш для Spotify токена
@@ -90,9 +142,20 @@ exports.searchTracks = onCall(
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
       }
 
+      const uid = request.auth.uid;
+
+      // --- RATE LIMITING: Максимум 30 поисковых запросов в час ---
+      await checkRateLimit(uid, "searchTracks", 30, 60 * 60 * 1000); // 30 calls per hour
+      // --- КОНЕЦ RATE LIMITING ---
+
       const query = request.data.query;
       if (!query) {
         throw new HttpsError("invalid-argument", "The function must be called with a 'query' parameter.");
+      }
+
+      // Validate query string to prevent injection
+      if (typeof query !== "string" || query.length > 200) {
+        throw new HttpsError("invalid-argument", "Invalid query parameter.");
       }
 
       try {
@@ -137,9 +200,20 @@ exports.getTrackDetails = onCall(
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
       }
 
+      const uid = request.auth.uid;
+
+      // --- RATE LIMITING: Максимум 50 запросов деталей в час ---
+      await checkRateLimit(uid, "getTrackDetails", 50, 60 * 60 * 1000); // 50 calls per hour
+      // --- КОНЕЦ RATE LIMITING ---
+
       const trackId = request.data.trackId;
       if (!trackId) {
         throw new HttpsError("invalid-argument", "The function must be called with a 'trackId' parameter.");
+      }
+
+      // Validate trackId format (Spotify IDs are alphanumeric, max 22 chars)
+      if (typeof trackId !== "string" || !/^[a-zA-Z0-9]{1,22}$/.test(trackId)) {
+        throw new HttpsError("invalid-argument", "Invalid trackId format.");
       }
 
       try {
@@ -186,6 +260,10 @@ exports.verifyPurchase = onCall(
       const {platform, receipt, productId} = request.data;
       const uid = request.auth.uid;
 
+      // --- RATE LIMITING: Максимум 5 попыток в час ---
+      await checkRateLimit(uid, "verifyPurchase", 5, 60 * 60 * 1000); // 5 calls per hour
+      // --- КОНЕЦ RATE LIMITING ---
+
       if (!platform || !receipt || !productId) {
         throw new HttpsError("invalid-argument", "Missing required parameters for purchase verification.");
       }
@@ -196,8 +274,22 @@ exports.verifyPurchase = onCall(
         throw new HttpsError("invalid-argument", "The provided product ID is not valid.");
       }
 
+      // --- ЗАЩИТА ОТ REPLAY АТАК: Проверяем, использовался ли receipt ранее ---
+      // Используем SHA-256 для предотвращения коллизий
+      const receiptHash = crypto.createHash("sha256").update(receipt).digest("hex");
+      const receiptRef = admin.firestore().collection("used_receipts").doc(receiptHash);
+
+      const receiptDoc = await receiptRef.get();
+      if (receiptDoc.exists) {
+        const existingData = receiptDoc.data();
+        console.warn(`Receipt replay attempt detected. Receipt already used by user ${existingData.userId} at ${existingData.usedAt.toDate().toISOString()}`);
+        throw new HttpsError("already-exists", "This receipt has already been used.");
+      }
+      // --- КОНЕЦ ЗАЩИТЫ ---
+
       let isValid = false;
       let expiryDate = new Date();
+      let transactionId = null; // Для более точной идентификации
       const expectedPackageName = "com.momentic.lifeline";
       const expectedBundleId = "com.momentic.lifeline";
 
@@ -221,6 +313,7 @@ exports.verifyPurchase = onCall(
             if (!isExpired && isPurchaseStateValid && isAcknowledged) {
               isValid = true;
               expiryDate = new Date(parseInt(purchase.expiryTimeMillis));
+              transactionId = purchase.orderId; // Сохраняем orderId для логирования
             } else {
               // Логируем, почему покупка недействительна, даже если ответ получен
               console.warn(`[Android] Purchase for user ${uid} is invalid. Details:`, {
@@ -265,6 +358,7 @@ exports.verifyPurchase = onCall(
                      if (expiryTimestamp > Date.now()) {
                         isValid = true;
                         expiryDate = new Date(expiryTimestamp);
+                        transactionId = latestTransaction.transaction_id; // Сохраняем transaction_id для логирования
                      } else {
                        console.warn(`[iOS] Latest transaction for user ${uid} and product ${productId} is expired.`);
                      }
@@ -293,6 +387,17 @@ exports.verifyPurchase = onCall(
       }
 
       if (isValid) {
+        // --- СОХРАНЕНИЕ ИСПОЛЬЗОВАННОГО RECEIPT ДЛЯ ПРЕДОТВРАЩЕНИЯ REPLAY АТАК ---
+        await receiptRef.set({
+          userId: uid,
+          productId: productId,
+          platform: platform,
+          transactionId: transactionId,
+          usedAt: admin.firestore.FieldValue.serverTimestamp(),
+          expiryDate: admin.firestore.Timestamp.fromDate(expiryDate),
+        });
+        // --- КОНЕЦ СОХРАНЕНИЯ ---
+
         await admin.firestore().collection("users").doc(uid).set({
           isPremium: true,
           premiumUntil: admin.firestore.Timestamp.fromDate(expiryDate),
@@ -300,7 +405,7 @@ exports.verifyPurchase = onCall(
 
         console.log(
             `Successfully verified purchase for user ${uid}. ` +
-            `Premium expires on ${expiryDate.toISOString()}`,
+            `Premium expires on ${expiryDate.toISOString()}. TransactionId: ${transactionId}`,
         );
         return {success: true, premiumUntil: expiryDate.toISOString()};
       } else {

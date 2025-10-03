@@ -283,13 +283,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseCrashlytics.instance.log('ProfileScreen: initState');
+    unawaited(FirebaseCrashlytics.instance.log('ProfileScreen: initState'));
     _displayNameController = TextEditingController();
   }
 
   @override
   void dispose() {
-    FirebaseCrashlytics.instance.log('ProfileScreen: dispose');
+    unawaited(FirebaseCrashlytics.instance.log('ProfileScreen: dispose'));
     _displayNameController.dispose();
     super.dispose();
   }
@@ -441,8 +441,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       return;
     }
     if (result == 'success') {
-      FirebaseCrashlytics.instance.log(
-          'ProfileScreen: Account deletion successful. Popping until first route.');
+      unawaited(FirebaseCrashlytics.instance.log(
+          'ProfileScreen: Account deletion successful. Popping until first route.'));
       Navigator.of(context).popUntil((route) => route.isFirst);
       return;
     }
@@ -468,8 +468,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           reauthSuccess = didReauth ?? false;
         }
 
-        FirebaseCrashlytics.instance.log(
-            'ProfileScreen: Re-authentication success status: $reauthSuccess');
+        unawaited(FirebaseCrashlytics.instance.log(
+            'ProfileScreen: Re-authentication success status: $reauthSuccess'));
         if (reauthSuccess) {
           FirebaseCrashlytics.instance
               .log('ProfileScreen: Retrying delete after successful re-auth.');

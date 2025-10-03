@@ -34,7 +34,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   void initState() {
     super.initState();
-    FirebaseCrashlytics.instance.log('AuthGate: initState');
+    unawaited(FirebaseCrashlytics.instance.log('AuthGate: initState'));
     _notificationSubscription = onNotificationTap.stream.listen((payload) {
       if (mounted) {
         _handleNotificationTap(payload);
@@ -70,7 +70,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   @override
   void dispose() {
-    FirebaseCrashlytics.instance.log('AuthGate: dispose');
+    unawaited(FirebaseCrashlytics.instance.log('AuthGate: dispose'));
     _notificationSubscription?.cancel();
     _sharingSubscription?.cancel();
     super.dispose();
@@ -87,7 +87,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
     // NEW: Show dialog instantly without processing
     // Processing will happen in background after user chooses action
-    ReceiveSharingIntent.instance.reset();
+    unawaited(ReceiveSharingIntent.instance.reset());
     _showShareActionSheet(files, user.uid);
   }
 
@@ -172,14 +172,14 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
                   Navigator.of(context).pop(); // Close bottom sheet
                   // Pass raw files - processing will happen in MemoryEditScreen
-                  Navigator.of(context).push(
+                  unawaited(Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => MemoryEditScreen(
                         userId: userId,
                         sharedFiles: files,
                       ),
                     ),
-                  );
+                  ));
                 },
               ),
               const SizedBox(height: 12),
@@ -207,13 +207,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
                   Navigator.of(context).pop(); // Close bottom sheet
                   // Pass raw files - processing will happen in SelectMemoryScreen
-                  Navigator.of(context).push(
+                  unawaited(Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => SelectMemoryScreen(
                         sharedFiles: files,
                       ),
                     ),
-                  );
+                  ));
                 },
               ),
             ],
@@ -225,36 +225,36 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   Future<void> _checkForDrafts(AppLocalizations l10n) async {
     if (!mounted) return;
-    FirebaseCrashlytics.instance.log('AuthGate: Checking for drafts.');
+    unawaited(FirebaseCrashlytics.instance.log('AuthGate: Checking for drafts.'));
 
     final repo = ref.read(memoryRepositoryProvider);
     if (repo == null) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Draft check aborted, repo is null.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Draft check aborted, repo is null.'));
       return;
     }
 
     final draft = await repo.findDraft();
 
     if (!mounted) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Unmounted after finding draft.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Unmounted after finding draft.'));
       return;
     }
 
     final currentAuthValue = ref.read(authStateChangesProvider);
     if (currentAuthValue.asData?.value == null) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Draft check aborted, user logged out.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Draft check aborted, user logged out.'));
       return;
     }
 
     if (draft != null) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Found draft ${draft.id}. Showing dialog.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Found draft ${draft.id}. Showing dialog.'));
       _showDraftDialog(draft, l10n);
     } else {
-      FirebaseCrashlytics.instance.log('AuthGate: No drafts found.');
+      unawaited(FirebaseCrashlytics.instance.log('AuthGate: No drafts found.'));
     }
   }
 
@@ -274,7 +274,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             onPressed: () {
               FirebaseCrashlytics.instance
                   .log('AuthGate: Discarding draft ${draft.id}.');
-              repo?.delete(draft.id);
+              unawaited(repo?.delete(draft.id));
               Navigator.of(context).pop();
             },
           ),
@@ -285,12 +285,12 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                   .log('AuthGate: Continuing to edit draft ${draft.id}.');
               Navigator.of(context).pop();
               if (mounted) {
-                Navigator.of(context).push(
+                unawaited(Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => MemoryEditScreen(
                         initial: draft, userId: draft.userId!),
                   ),
-                );
+                ));
               }
             },
           ),
@@ -300,8 +300,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   Future<void> _handleNotificationTap(String? payload) async {
-    FirebaseCrashlytics.instance
-        .log('AuthGate: Handling notification tap with payload: $payload');
+    unawaited(FirebaseCrashlytics.instance
+        .log('AuthGate: Handling notification tap with payload: $payload'));
     if (!mounted || payload == null) return;
 
     final memoryId = int.tryParse(payload);
@@ -309,36 +309,36 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     final memoryRepo = ref.read(memoryRepositoryProvider);
 
     if (memoryId == null || memoryRepo == null) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Invalid payload or repo not ready for notification.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Invalid payload or repo not ready for notification.'));
       return;
     }
 
     final memory = await memoryRepo.getById(memoryId);
 
     if (!mounted) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Unmounted after getting memory by ID.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Unmounted after getting memory by ID.'));
       return;
     }
 
     if (ref.read(authStateChangesProvider).value == null) {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Notification tap aborted, user logged out.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Notification tap aborted, user logged out.'));
       return;
     }
 
     if (memory != null && navigatorKey.currentContext != null) {
-      FirebaseCrashlytics.instance.log(
-          'AuthGate: Navigating to MemoryViewScreen for memory ${memory.id}.');
-      Navigator.of(navigatorKey.currentContext!).push(
+      unawaited(FirebaseCrashlytics.instance.log(
+          'AuthGate: Navigating to MemoryViewScreen for memory ${memory.id}.'));
+      unawaited(Navigator.of(navigatorKey.currentContext!).push(
         MaterialPageRoute(
             builder: (_) =>
                 MemoryViewScreen(memory: memory, userId: memoryRepo.userId)),
-      );
+      ));
     } else {
-      FirebaseCrashlytics.instance
-          .log('AuthGate: Memory with id $memoryId not found for notification.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('AuthGate: Memory with id $memoryId not found for notification.'));
     }
   }
 
@@ -349,7 +349,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
     return authState.when(
       loading: () {
-        FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.loading');
+        unawaited(FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.loading'));
         return _LoadingScreen(message: l10n.authGateAuthenticating);
       },
       error: (error, stack) {
@@ -362,14 +362,14 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       },
       data: (user) {
         if (user == null) {
-          FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user is null). Navigating to LoginScreen.');
+          unawaited(FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user is null). Navigating to LoginScreen.'));
           return const LoginScreen();
         }
 
         final isEmailPasswordProvider = user.providerData
             .any((userInfo) => userInfo.providerId == 'password');
         if (isEmailPasswordProvider && !user.emailVerified) {
-          FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user not verified). Navigating to VerifyEmailScreen.');
+          unawaited(FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user not verified). Navigating to VerifyEmailScreen.'));
           return const VerifyEmailScreen();
         }
 
@@ -417,8 +417,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
               data: (memories) {
                 final onboardingState = ref.watch(onboardingServiceProvider);
                 if (memories.isEmpty && !onboardingState.isActive) {
-                  FirebaseCrashlytics.instance.log(
-                      'AuthGate: Build state is memoriesState.data (memories are empty).');
+                  unawaited(FirebaseCrashlytics.instance.log(
+                      'AuthGate: Build state is memoriesState.data (memories are empty).'));
                   return Scaffold(
                     body: Stack(
                       children: [
@@ -428,8 +428,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                     ),
                   );
                 }
-                FirebaseCrashlytics.instance.log(
-                    'AuthGate: Build state is memoriesState.data (showing ${memories.length} memories).');
+                unawaited(FirebaseCrashlytics.instance.log(
+                    'AuthGate: Build state is memoriesState.data (showing ${memories.length} memories).'));
                 return Scaffold(
                   body: SafeArea(
                     child: LifelineWidget(key: ValueKey(user.uid)),

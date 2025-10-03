@@ -1229,7 +1229,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
           SelectableText(content,
               style: TextStyle(
                   color: Colors.white.withAlpha((255 * 0.8).round()),
-                  height: 1.5)),
+                  height: 1.5),
+              textAlign: TextAlign.start),
         ],
       ),
     );

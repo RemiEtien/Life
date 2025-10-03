@@ -286,11 +286,14 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Memory _buildMemoryFromState() {
     final baseMemory = _draftMemory ?? Memory();
 
+    // Preserve newlines in content - only check if empty, don't trim the actual value
+    final contentText = _contentCtrl.text;
+    final trimmedContent = contentText.trim();
+
     return baseMemory.copyWith(
       userId: widget.userId,
       title: _titleCtrl.text.trim(),
-      content:
-          _contentCtrl.text.trim().isEmpty ? null : _contentCtrl.text.trim(),
+      content: trimmedContent.isEmpty ? null : contentText,
       date: _date,
       mediaPaths:
           _mediaItems.where((i) => i.isLocal).map((i) => i.path).toList(),
@@ -324,24 +327,24 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       }(),
       reflectionImpact: _impactCtrl.text.trim().isEmpty
           ? null
-          : _impactCtrl.text.trim(),
+          : _impactCtrl.text,
       reflectionLesson: _lessonCtrl.text.trim().isEmpty
           ? null
-          : _lessonCtrl.text.trim(),
+          : _lessonCtrl.text,
       reflectionAutoThought: _autoThoughtCtrl.text.trim().isEmpty
           ? null
-          : _autoThoughtCtrl.text.trim(),
+          : _autoThoughtCtrl.text,
       reflectionEvidenceFor: _evidenceForCtrl.text.trim().isEmpty
           ? null
-          : _evidenceForCtrl.text.trim(),
+          : _evidenceForCtrl.text,
       reflectionEvidenceAgainst: _evidenceAgainstCtrl.text.trim().isEmpty
           ? null
-          : _evidenceAgainstCtrl.text.trim(),
+          : _evidenceAgainstCtrl.text,
       reflectionReframe: _reframeCtrl.text.trim().isEmpty
           ? null
-          : _reframeCtrl.text.trim(),
+          : _reframeCtrl.text,
       reflectionAction:
-          _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text.trim(),
+          _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text,
       reflectionFollowUpAt: _followUpDate,
       isEncrypted: _isEncrypted,
       emotions: _selectedEmotionsWithIntensity,

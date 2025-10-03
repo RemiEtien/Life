@@ -48,7 +48,7 @@ linter:
     - prefer_is_not_empty
     - slash_for_doc_comments
     - valid_regexps
-    - package_api_docs # Требует документирования публичного API
+    # - package_api_docs # REMOVED: Deprecated lint rule
     - only_throw_errors # Запрещает throw "строк"
     - unawaited_futures # Предупреждает о Future, который не был дождан через await
 
@@ -65,7 +65,7 @@ linter:
 
     # --- ASYNC ---
     - avoid_void_async
-    - unawaited_futures
+    # REMOVED DUPLICATE: unawaited_futures (already on line 53)
 
 # Additional config for excluding generated files from analysis
 analyzer:

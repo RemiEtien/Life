@@ -19,7 +19,11 @@
       "Bash(flutter run:*)",
       "Bash(for:*)",
       "Bash(do sed -i 's/\"\"fileSizeTooLargeAudio\"\": \"\".*\"\"$/\"\"fileSizeTooLargeAudio\"\": \"\"Audio file is too large. Maximum size is 25 MB.\"\",\\n\"\"biometricUnlockFailedMessage\"\": \"\"Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.\"\"/g' \"$file\")",
-      "Bash(flutter gen-l10n:*)"
+      "Bash(flutter gen-l10n:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

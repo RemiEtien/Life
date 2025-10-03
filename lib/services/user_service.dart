@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,7 +21,7 @@ class UserService {
       _db.collection('users');
 
   Future<void> ensureUserProfileExists(User user, BuildContext context) async {
-    FirebaseCrashlytics.instance.log('UserService: Checking if profile exists for user ${user.uid}');
+    unawaited(FirebaseCrashlytics.instance.log('UserService: Checking if profile exists for user ${user.uid}'));
     try {
       final doc = _usersCollection.doc(user.uid);
       final snapshot = await doc.get();
@@ -28,10 +29,10 @@ class UserService {
       if (!context.mounted) return;
 
       if (!snapshot.exists) {
-        FirebaseCrashlytics.instance.log('UserService: Profile not found for ${user.uid}. Creating new one.');
+        unawaited(FirebaseCrashlytics.instance.log('UserService: Profile not found for ${user.uid}. Creating new one.'));
         await createUserProfile(user, context);
       } else {
-         FirebaseCrashlytics.instance.log('UserService: Profile already exists for ${user.uid}.');
+         unawaited(FirebaseCrashlytics.instance.log('UserService: Profile already exists for ${user.uid}.'));
       }
     } catch (e, stackTrace) {
       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: ensureUserProfileExists failed');
@@ -39,7 +40,7 @@ class UserService {
   }
 
   Future<void> createUserProfile(User user, BuildContext context) async {
-    FirebaseCrashlytics.instance.log('UserService: Attempting to create profile for user ${user.uid}');
+    unawaited(FirebaseCrashlytics.instance.log('UserService: Attempting to create profile for user ${user.uid}'));
     try {
       final currentLocale = Localizations.localeOf(context);
 
@@ -67,7 +68,7 @@ class UserService {
         languageCode: currentLocale.languageCode,
       );
       await _usersCollection.doc(user.uid).set(userProfile.toJson());
-      FirebaseCrashlytics.instance.log('UserService: Successfully created profile for user ${user.uid}');
+      unawaited(FirebaseCrashlytics.instance.log('UserService: Successfully created profile for user ${user.uid}'));
     } catch (e, stackTrace) {
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: createUserProfile failed');
        rethrow;
@@ -132,7 +133,7 @@ class UserService {
   }
 
   Future<void> deleteUserAccountData(String uid) async {
-    FirebaseCrashlytics.instance.log('UserService: Deleting all data for user $uid.');
+    unawaited(FirebaseCrashlytics.instance.log('UserService: Deleting all data for user $uid.'));
     try {
       final userFolderRef = _storage.ref('users/$uid');
       await _deleteFolderContents(userFolderRef);
@@ -162,7 +163,7 @@ class UserService {
       if (await dbFile.exists()) {
         await dbFile.delete();
       }
-      FirebaseCrashlytics.instance.log('UserService: Successfully deleted data for user $uid.');
+      unawaited(FirebaseCrashlytics.instance.log('UserService: Successfully deleted data for user $uid.'));
     } catch(e, stackTrace) {
        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: deleteUserAccountData failed');
        rethrow;

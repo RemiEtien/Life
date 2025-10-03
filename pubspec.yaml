@@ -1,7 +1,7 @@
 name: lifeline
 description: Lifeline MVP
 publish_to: "none"
-version: 1.0.117+117
+version: 1.0.120+120
 
 
 environment:
@@ -14,16 +14,16 @@ dependencies:
     sdk: flutter
 
   # --- FIREBASE & AUTH ---
-  firebase_core: ^4.1.0
-  firebase_auth: ^6.0.2
-  cloud_firestore: ^6.0.1
-  firebase_storage: ^13.0.1
-  firebase_crashlytics: ^5.0.1
-  firebase_analytics: ^12.0.1
-  firebase_app_check: ^0.4.0+1
+  firebase_core: ^4.1.1
+  firebase_auth: ^6.1.0
+  cloud_firestore: ^6.0.2
+  firebase_storage: ^13.0.2
+  firebase_crashlytics: ^5.0.2
+  firebase_analytics: ^12.0.2
+  firebase_app_check: ^0.4.1
   google_sign_in: ^7.2.0
   sign_in_with_apple: ^7.0.1
-  cloud_functions: ^6.0.1
+  cloud_functions: ^6.0.2
 
   # --- LOCAL DATABASE ---
   isar: 3.1.0+1
@@ -45,29 +45,29 @@ dependencies:
   
   # --- UI & HELPERS ---
   intl: ^0.20.2
-  google_fonts: ^6.2.1
+  google_fonts: ^6.3.2
   url_launcher: ^6.3.0
   device_info_plus: ^12.1.0
   collection: ^1.17.0
   country_picker: ^2.0.20
   path: ^1.8.3
-  provider: ^6.0.0  
+  provider: ^6.0.0
   html: ^0.15.4
   flutter_dotenv: ^6.0.0
-  flutter_riverpod: ^2.5.1
+  flutter_riverpod: ^2.6.1
   shared_preferences: ^2.2.2
   markdown_widget: ^2.3.2+8
   encrypt: ^5.0.3
   flutter_secure_storage: ^9.0.0
-  pointycastle: ^3.7.4
+  pointycastle: ^3.9.1
   uuid: ^4.3.3
   connectivity_plus: ^7.0.0
   in_app_purchase: ^3.1.13
-  flutter_image_compress: ^2.2.0
+  flutter_image_compress: ^2.4.0
 
   # --- НОВЫЕ ЗАВИСИМОСТИ ---
   permission_handler: ^12.0.1       # Для запроса разрешений
-  cached_network_image: ^3.3.1     # Для кэширования изображений
+  cached_network_image: ^3.4.1     # Для кэширования изображений
   flutter_cache_manager: ^3.3.1
   receive_sharing_intent: ^1.4.5   # ДОБАВЛЕНО: для приёма медиа
   local_auth: ^2.2.0               # ДОБАВЛЕНО: для биометрии

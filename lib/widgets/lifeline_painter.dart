@@ -253,23 +253,23 @@ class StructurePainter extends CustomPainter {
 
     if (maxLayers > 4) {
       paint.strokeWidth = (40.0 * pulse * width * intensity).clamp(1.0, 200.0);
-      paint.color = baseColor.withOpacity(0.1 * intensity);
+      paint.color = baseColor.withValues(alpha: 0.1 * intensity);
       canvas.drawPath(path, paint);
     }
     if (maxLayers > 2) {
       paint.strokeWidth = (15.0 * pulse * width * intensity).clamp(1.0, 100.0);
-      paint.color = baseColor.withOpacity(0.2 * intensity);
+      paint.color = baseColor.withValues(alpha: 0.2 * intensity);
       canvas.drawPath(path, paint);
     }
     if (maxLayers > 1) {
       paint.strokeWidth = (6.0 * pulse * width * intensity).clamp(1.0, 50.0);
-      paint.color = baseColor.withOpacity(0.7 * intensity);
+      paint.color = baseColor.withValues(alpha: 0.7 * intensity);
       canvas.drawPath(path, paint);
     }
     if (maxLayers > 0) {
       paint.strokeWidth = (2.0 * pulse * width).clamp(1.0, 10.0);
       paint.color =
-          Color.lerp(baseColor, Colors.white, 0.8)!.withOpacity(0.9 * intensity);
+          Color.lerp(baseColor, Colors.white, 0.8)!.withValues(alpha: 0.9 * intensity);
       canvas.drawPath(path, paint);
     }
   }
@@ -657,16 +657,16 @@ class LifelinePainter extends CustomPainter {
     final paint = Paint();
     const nodeColor = Color(0xFFFF6B6B);
 
-    paint.color = nodeColor.withOpacity((0.6 * combinedPulse) * opacity);
+    paint.color = nodeColor.withValues(alpha: (0.6 * combinedPulse) * opacity);
     canvas.drawCircle(adjustedPos, nodeRadius, paint);
 
     final coreColor = Color.lerp(nodeColor, Colors.white, 0.6)!;
-    paint.color = coreColor.withOpacity((0.9 * combinedPulse) * opacity);
+    paint.color = coreColor.withValues(alpha: (0.9 * combinedPulse) * opacity);
     canvas.drawCircle(adjustedPos, nodeRadius * 0.7, paint);
 
     final brightIntensity = 0.7 + sin(pulseValue * pi * 4 + index * 1.2) * 0.3;
     paint.color =
-        Colors.white.withOpacity(0.9 * brightIntensity * combinedPulse * opacity);
+        Colors.white.withValues(alpha: 0.9 * brightIntensity * combinedPulse * opacity);
     canvas.drawCircle(adjustedPos, nodeRadius * 0.3, paint);
   }
 
@@ -686,7 +686,7 @@ class LifelinePainter extends CustomPainter {
     final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
 
     final ringPaint = Paint()
-      ..color = ringColor.withOpacity(0.7 * combinedPulse * opacity)
+      ..color = ringColor.withValues(alpha: 0.7 * combinedPulse * opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0 * combinedPulse;
     canvas.drawCircle(adjustedPos, nodeRadius * 1.5, ringPaint);
@@ -695,7 +695,7 @@ class LifelinePainter extends CustomPainter {
         DevicePerformanceDetector.getAdaptiveBlurRadius(10 * combinedPulse);
     if (ringBlur > 0) {
       final ringGlow = Paint()
-        ..color = ringColor.withOpacity(0.3 * combinedPulse * opacity)
+        ..color = ringColor.withValues(alpha: 0.3 * combinedPulse * opacity)
         ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, ringBlur)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 4.0;
@@ -709,7 +709,7 @@ class LifelinePainter extends CustomPainter {
     }
 
     final textStyle = GoogleFonts.orbitron(
-        color: ringColor.withOpacity(opacity),
+        color: ringColor.withValues(alpha: opacity),
         fontSize: 10.0,
         fontWeight: FontWeight.bold,
         shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)]);
@@ -730,7 +730,7 @@ class LifelinePainter extends CustomPainter {
     final iconSize = nodeRadius * 0.7;
     const icon = Icons.lock_outline;
     final textStyle = TextStyle(
-        color: Colors.white.withOpacity(0.9 * opacity),
+        color: Colors.white.withValues(alpha: 0.9 * opacity),
         fontSize: iconSize,
         fontFamily: icon.fontFamily,
         package: icon.fontPackage,
@@ -757,7 +757,7 @@ class LifelinePainter extends CustomPainter {
         height: textPainter.height + 4
     );
     final backgroundPaint = Paint()
-        ..color = Colors.black.withOpacity(0.4 * opacity)
+        ..color = Colors.black.withValues(alpha: 0.4 * opacity)
         ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 2.0);
     canvas.drawRRect(RRect.fromRectAndRadius(backgroundRect, const Radius.circular(4)), backgroundPaint);
 

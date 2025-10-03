@@ -25,7 +25,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     // BREADCRUMB: Log when this widget is created.
-    FirebaseCrashlytics.instance.log('SplashScreen: initState');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: initState'));
     _audioPlayer = AudioPlayer();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -46,7 +46,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _startSequence(AppLocalizations l10n) async {
-    FirebaseCrashlytics.instance.log('SplashScreen: Starting sequence.');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Starting sequence.'));
     try {
       _audioPlayer.play(AssetSource('sounds/intro_phrase.mp3'));
     } catch (e) {
@@ -57,17 +57,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after 3s sound delay.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after 3s sound delay.'));
       return;
     }
 
-    FirebaseCrashlytics.instance.log('SplashScreen: Checking consent.');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Checking consent.'));
     if (mounted) {
       setState(() => _statusMessage = l10n.splashMessageCheckingSettings);
     }
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after getting SharedPreferences.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after getting SharedPreferences.'));
       return;
     }
 
@@ -75,19 +75,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final bool hasConsented = prefs.getBool('hasConsented') ?? false;
 
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after checking consent.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after checking consent.'));
       return;
     }
 
     if (!hasConsented) {
-      FirebaseCrashlytics.instance.log('SplashScreen: No consent. Navigating to ConsentScreen.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: No consent. Navigating to ConsentScreen.'));
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const ConsentScreen()),
       );
       return;
     }
 
-    FirebaseCrashlytics.instance.log('SplashScreen: Consent found. Awaiting first auth state.');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Consent found. Awaiting first auth state.'));
     if (mounted) {
       setState(() => _statusMessage = l10n.splashMessageAuthenticating);
     }
@@ -95,22 +95,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     // Using ref.read for one-time read
     final user = await ref.read(authStateChangesProvider.future);
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after awaiting auth state.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after awaiting auth state.'));
       return;
     }
 
     if (user == null) {
-      FirebaseCrashlytics.instance.log('SplashScreen: User is null. Navigating to AuthGate (Login).');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: User is null. Navigating to AuthGate (Login).'));
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const AuthGate()),
       );
       return;
     }
 
-    FirebaseCrashlytics.instance.log('SplashScreen: User found. Syncing locale with profile.');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: User found. Syncing locale with profile.'));
     await ref.read(localeProvider.notifier).syncLocaleWithUserProfile();
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after syncing locale.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Unmounted after syncing locale.'));
       return;
     }
 
@@ -120,7 +120,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     
     // ИЗМЕНЕНО: Мы дожидаемся завершения первой синхронизации ЗДЕСЬ,
     // чтобы гарантировать, что локальная база данных актуальна перед показом UI.
-    FirebaseCrashlytics.instance.log('SplashScreen: Starting initial sync from cloud.');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Starting initial sync from cloud.'));
     try {
       await ref.read(syncServiceProvider).syncFromCloudToLocal(isInitialSync: true);
     } catch (e, stack) {
@@ -131,11 +131,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
 
     if (!mounted) {
-      FirebaseCrashlytics.instance.log('SplashScreen: Unmounted before final navigation.');
+      unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Unmounted before final navigation.'));
       return;
     }
 
-    FirebaseCrashlytics.instance.log('SplashScreen: Sequence complete. Navigating to AuthGate (Main).');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Sequence complete. Navigating to AuthGate (Main).'));
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const AuthGate()),
     );
@@ -144,7 +144,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void dispose() {
     // BREADCRUMB: Log when this widget is destroyed.
-    FirebaseCrashlytics.instance.log('SplashScreen: dispose');
+    unawaited(FirebaseCrashlytics.instance.log('SplashScreen: dispose'));
     _audioPlayer.dispose();
     super.dispose();
   }
