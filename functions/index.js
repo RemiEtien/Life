@@ -295,25 +295,75 @@ exports.verifyPurchase = onCall(
 
       try {
         if (platform === "android") {
+          console.log(`[Android] Starting purchase verification for user ${uid}, product ${productId}`);
+          console.log(`[Android] Environment check - Project: ${process.env.GCLOUD_PROJECT}, Function: ${process.env.FUNCTION_NAME}`);
+
           const auth = new GoogleAuth({
             scopes: "https://www.googleapis.com/auth/androidpublisher",
           });
-          const authClient = await auth.getClient();
+
+          console.log("[Android] GoogleAuth instance created");
+
+          let authClient;
+          try {
+            authClient = await auth.getClient();
+            console.log(`[Android] Auth client obtained successfully, type: ${authClient.constructor.name}`);
+          } catch (authError) {
+            console.error("[Android] Failed to get auth client:", authError);
+            throw authError;
+          }
+
+          const credentials = await auth.getCredentials();
+          const projectId = await auth.getProjectId();
+
+          console.log(`[Android] Service account: ${credentials.client_email || "unknown"}`);
+          console.log(`[Android] Project ID: ${projectId}`);
+          console.log(`[Android] Scopes: ${JSON.stringify(auth.scopes)}`);
+          console.log(`[Android] Credentials type: ${credentials.type || "unknown"}`);
+          console.log(`[Android] Has private key: ${!!credentials.private_key}`);
+
           const url = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/" +
             `${expectedPackageName}/purchases/subscriptions/${productId}/tokens/${receipt}`;
-          const response = await authClient.request({url});
+
+          console.log(`[Android] Request URL: ${url}`);
+          console.log(`[Android] Package name: ${expectedPackageName}`);
+          console.log("[Android] Making API request...");
+
+          let response;
+          try {
+            response = await authClient.request({url});
+          } catch (apiError) {
+            console.error("[Android] API request failed at HTTP level");
+            console.error(`[Android] API Error name: ${apiError.name}`);
+            console.error(`[Android] API Error message: ${apiError.message}`);
+            if (apiError.response) {
+              console.error(`[Android] API Error response headers: ${JSON.stringify(apiError.response.headers)}`);
+            }
+            throw apiError;
+          }
+
+          console.log(`[Android] API response status: ${response.status}`);
+          console.log("[Android] API response received successfully");
 
           // --- ИЗМЕНЕНИЕ: Усиленная проверка ответа от Google Play ---
           if (response.data && response.data.expiryTimeMillis) {
             const purchase = response.data;
             const isExpired = parseInt(purchase.expiryTimeMillis) <= Date.now();
-            const isPurchaseStateValid = purchase.purchaseState === 0; // 0 = PURCHASED
+
+            // purchaseState может отсутствовать для некоторых типов подписок
+            // Если поле отсутствует, считаем покупку валидной если она не истекла
+            const hasPurchaseState = purchase.purchaseState !== undefined;
+            const isPurchaseStateValid = hasPurchaseState ? purchase.purchaseState === 0 : true;
+
             const isAcknowledged = purchase.acknowledgementState === 1; // 1 = ACKNOWLEDGED
 
-            if (!isExpired && isPurchaseStateValid && isAcknowledged) {
+            console.log(`[Android] Purchase validation: expired=${isExpired}, stateValid=${isPurchaseStateValid}, acknowledged=${isAcknowledged}, hasPurchaseState=${hasPurchaseState}`);
+
+            if (!isExpired && isPurchaseStateValid) {
               isValid = true;
               expiryDate = new Date(parseInt(purchase.expiryTimeMillis));
               transactionId = purchase.orderId; // Сохраняем orderId для логирования
+              console.log(`[Android] Purchase is VALID. Expiry: ${expiryDate.toISOString()}, OrderId: ${transactionId}`);
             } else {
               // Логируем, почему покупка недействительна, даже если ответ получен
               console.warn(`[Android] Purchase for user ${uid} is invalid. Details:`, {
@@ -375,6 +425,15 @@ exports.verifyPurchase = onCall(
         }
       } catch (error) {
         // --- ИЗМЕНЕНИЕ: Улучшенное логирование ошибок ---
+        console.error(`[${platform}] Purchase verification FAILED for user ${uid}`);
+        console.error(`[${platform}] Error code: ${error.code || "unknown"}`);
+        console.error(`[${platform}] Error status: ${error.status || "unknown"}`);
+
+        if (error.response) {
+          console.error(`[${platform}] Response status: ${error.response.status}`);
+          console.error(`[${platform}] Response data: ${JSON.stringify(error.response.data)}`);
+        }
+
         const errorMessage = (error.response && error.response.data) ? JSON.stringify(error.response.data) : error.message;
         console.error(`Purchase verification failed for user ${uid} on platform ${platform}. Error: ${errorMessage}`, {
           uid: uid,

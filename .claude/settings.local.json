@@ -28,7 +28,9 @@
       "Bash(dart:*)",
       "Bash(del test_emotion_parsing.dart)",
       "Bash(npm install)",
-      "Bash(npm test)"
+      "Bash(npm test)",
+      "Bash(firebase deploy:*)",
+      "Bash(gcloud firestore databases export:*)"
     ],
     "deny": [],
     "ask": []

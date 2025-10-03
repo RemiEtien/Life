@@ -17,5 +17,19 @@ module.exports = {
     "require-jsdoc": "off", // Отключаем требование JSDoc комментариев
     "indent": "off", // Отключаем проверку отступов
   },
+  "overrides": [
+    {
+      "files": ["test/**/*.js"],
+      "env": {
+        "jest": true,
+      },
+      "rules": {
+        "quotes": "off",
+        "object-curly-spacing": "off",
+        "comma-dangle": "off",
+        "valid-jsdoc": "off",
+      },
+    },
+  ],
 };
 
