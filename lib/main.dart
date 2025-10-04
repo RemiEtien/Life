@@ -51,18 +51,9 @@ void main() async {
       debugPrint('✅ App Check activated with Play Integrity / App Attest');
     }
 
-    await NotificationService().init();
-    await initializeDateFormatting('ru', null);
+    // Initialize critical date formatting for default locale only
+    // Other locales will be lazy-loaded when needed
     await initializeDateFormatting('en', null);
-    await initializeDateFormatting('de', null);
-    await initializeDateFormatting('es', null);
-    await initializeDateFormatting('fr', null);
-    await initializeDateFormatting('he', null);
-    await initializeDateFormatting('pt', null);
-    await initializeDateFormatting('zh', null);
-    await initializeDateFormatting('ar', null);
-
-    await DevicePerformanceDetector.initialize();
 
     if (kIsWeb) {
       FlutterError.onError = (details) {
@@ -119,6 +110,53 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Defer heavy initialization until after first frame to avoid ANR
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeHeavyServices();
+    });
+  }
+
+  Future<void> _initializeHeavyServices() async {
+    try {
+      // Initialize in parallel for faster startup
+      await Future.wait([
+        NotificationService().init(),
+        DevicePerformanceDetector.initialize(),
+        _initializeAllLocaleDateFormats(),
+      ]);
+
+      if (kDebugMode) {
+        debugPrint('✅ Heavy services initialized successfully');
+      }
+    } catch (e, stack) {
+      if (kDebugMode) {
+        debugPrint('❌ Error initializing heavy services: $e');
+        debugPrint('Stack: $stack');
+      }
+      // Log to Crashlytics in production
+      if (!kDebugMode) {
+        unawaited(FirebaseCrashlytics.instance.recordError(
+          e,
+          stack,
+          reason: 'Failed to initialize heavy services',
+        ));
+      }
+    }
+  }
+
+  Future<void> _initializeAllLocaleDateFormats() async {
+    // Initialize all supported locales in parallel
+    await Future.wait([
+      initializeDateFormatting('ru', null),
+      initializeDateFormatting('de', null),
+      initializeDateFormatting('es', null),
+      initializeDateFormatting('fr', null),
+      initializeDateFormatting('he', null),
+      initializeDateFormatting('pt', null),
+      initializeDateFormatting('zh', null),
+      initializeDateFormatting('ar', null),
+    ]);
   }
 
   @override

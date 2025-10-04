@@ -23,7 +23,7 @@ void main() {
 
     test('creates memory with encrypted content and preserves structure', () {
       // Arrange: Create memory with sensitive content
-      final sensitiveContent = 'This is my private memory\nWith multiple lines\nAnd emotions';
+      const sensitiveContent = 'This is my private memory\nWith multiple lines\nAnd emotions';
       final memory = Memory()
         ..title = 'Private Memory'
         ..date = DateTime(2025, 10, 3)
@@ -74,9 +74,9 @@ void main() {
 
     test('handles memory with encrypted reflections', () {
       // Arrange: Encrypt multiple reflection fields
-      final impactText = 'This event made me realize...';
-      final lessonText = 'I learned that...';
-      final reframeText = 'A better way to think about it...';
+      const impactText = 'This event made me realize...';
+      const lessonText = 'I learned that...';
+      const reframeText = 'A better way to think about it...';
 
       final memory = Memory()
         ..title = 'Deep Reflection'
@@ -99,7 +99,7 @@ void main() {
 
     test('copyWith preserves encryption state and re-encrypts if needed', () {
       // Original encrypted memory
-      final originalContent = 'Original secret';
+      const originalContent = 'Original secret';
       final encrypted = encrypter.encrypt(originalContent, iv: iv);
 
       final originalMemory = Memory()
@@ -109,7 +109,7 @@ void main() {
         ..date = DateTime.now();
 
       // Update with new encrypted content
-      final newContent = 'Updated secret';
+      const newContent = 'Updated secret';
       final newIV = IV.fromSecureRandom(12);
       final newEncrypted = encrypter.encrypt(newContent, iv: newIV);
       final newPayload = 'gcm_v1:${newIV.base64}:${newEncrypted.base64}';
@@ -140,7 +140,7 @@ void main() {
       expect(titleValidation.isValid, isFalse);
 
       // Valid content
-      final content = 'Valid content';
+      const content = 'Valid content';
       final contentValidation = InputValidator.validateMemoryContent(content);
       expect(contentValidation.isValid, isTrue);
 
@@ -173,7 +173,7 @@ void main() {
         ..isEncrypted = true;
 
       // Encrypt content
-      final content = 'A wonderful day with friends';
+      const content = 'A wonderful day with friends';
       final encrypted = encrypter.encrypt(content, iv: iv);
       memory.content = 'gcm_v1:${iv.base64}:${encrypted.base64}';
 
@@ -210,7 +210,7 @@ void main() {
 
     test('encryption workflow: validate → sanitize → encrypt → store', () {
       // Step 1: Raw user input (potentially dangerous)
-      final rawInput = '  My memory with    extra spaces\n\nAnd paragraphs  ';
+      const rawInput = '  My memory with    extra spaces\n\nAnd paragraphs  ';
 
       // Step 2: Validate (checks length, content)
       final validation = InputValidator.validateMemoryContent(rawInput);

@@ -33,7 +33,7 @@ service cloud.firestore {
       // Security-critical fields (encryption, premium, etc) can ONLY be set by Cloud Functions
       allow update: if isOwner(userId) &&
                        request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['displayName', 'bio', 'languageCode', 'avatarUrl', 'countryCode', 'updatedAt']) &&
+                         .hasOnly(['displayName', 'bio', 'languageCode', 'photoUrl', 'countryCode', 'updatedAt']) &&
                        // Validate types and constraints
                        ((!('displayName' in request.resource.data.diff(resource.data).affectedKeys())) ||
                          (request.resource.data.displayName is string && request.resource.data.displayName.size() <= 100)) &&
@@ -41,6 +41,10 @@ service cloud.firestore {
                          (request.resource.data.bio is string && request.resource.data.bio.size() <= 500)) &&
                        ((!('languageCode' in request.resource.data.diff(resource.data).affectedKeys())) ||
                          (request.resource.data.languageCode is string && request.resource.data.languageCode.size() == 2)) &&
+                       ((!('photoUrl' in request.resource.data.diff(resource.data).affectedKeys())) ||
+                         (request.resource.data.photoUrl is string && request.resource.data.photoUrl.size() <= 500)) &&
+                       ((!('countryCode' in request.resource.data.diff(resource.data).affectedKeys())) ||
+                         (request.resource.data.countryCode is string && request.resource.data.countryCode.size() <= 10)) &&
                        ((!('updatedAt' in request.resource.data.diff(resource.data).affectedKeys())) ||
                          (request.resource.data.updatedAt is timestamp));
 

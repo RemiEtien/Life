@@ -573,3 +573,4 @@ exports.cleanupOldReceipts = functions.pubsub.schedule("0 3 * * *")
         throw error;
       }
     });
+

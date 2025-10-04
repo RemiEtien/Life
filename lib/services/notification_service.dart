@@ -16,6 +16,10 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  // Cache permission status to avoid repeated permission requests
+  bool? _permissionsGranted;
+  DateTime? _lastPermissionCheck;
+
   Future<void> init() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -62,27 +66,60 @@ class NotificationService {
     }
   }
 
-  Future<bool> _requestPermissions() async {
+  Future<bool> _requestPermissions({bool forceCheck = false}) async {
+    // Return cached result if available and not forcing a new check
+    // Re-check permissions every 24 hours or if forced
+    if (!forceCheck &&
+        _permissionsGranted != null &&
+        _lastPermissionCheck != null) {
+      final timeSinceLastCheck = DateTime.now().difference(_lastPermissionCheck!);
+      if (timeSinceLastCheck.inHours < 24) {
+        if (kDebugMode) {
+          debugPrint(
+              '[NotificationService] Using cached permission status: $_permissionsGranted');
+        }
+        return _permissionsGranted!;
+      }
+    }
+
     if (defaultTargetPlatform == TargetPlatform.android) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-          _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
 
       final bool? notificationPermissionGranted =
           await androidImplementation?.requestNotificationsPermission();
       // Разрешение на уведомления является обязательным.
-      if (notificationPermissionGranted == false) return false;
+      if (notificationPermissionGranted == false) {
+        _permissionsGranted = false;
+        _lastPermissionCheck = DateTime.now();
+        return false;
+      }
 
-      // **ИСПРАВЛЕНО:** Обрабатываем запрос на точные будильники
+      // **FIX:** Only request exact alarms permission once
+      // On Android 13+ this opens system settings - avoid repeated requests
       final bool? exactAlarmPermissionGranted =
           await androidImplementation?.requestExactAlarmsPermission();
-      
+
       // На Android < 13 (API 33), `requestExactAlarmsPermission` вернет null,
       // но разрешение считается выданным, если оно есть в манифесте.
       // Поэтому мы считаем `null` или `true` как успех.
-      return exactAlarmPermissionGranted ?? true;
+      final result = exactAlarmPermissionGranted ?? true;
+
+      _permissionsGranted = result;
+      _lastPermissionCheck = DateTime.now();
+
+      if (kDebugMode) {
+        debugPrint(
+            '[NotificationService] Permission check result: $result (cached)');
+      }
+
+      return result;
     }
     // Для iOS разрешения запрашиваются при инициализации
+    _permissionsGranted = true;
+    _lastPermissionCheck = DateTime.now();
     return true;
   }
 

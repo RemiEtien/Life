@@ -392,7 +392,7 @@ void main() {
     });
 
     test('handles complex URL with all transformations', () {
-      final complexUrl = 'https://storage.googleapis.com/bucket/users%2F123%2F1234567890123_thumb_photo.webp?alt=media&token=abc';
+      const complexUrl = 'https://storage.googleapis.com/bucket/users%2F123%2F1234567890123_thumb_photo.webp?alt=media&token=abc';
       expect(
         getFileKey(complexUrl),
         equals('photo.webp'),

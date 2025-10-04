@@ -18,9 +18,16 @@ class MemoryRepository {
     // If memory IS encrypted, check if fields are already encrypted to avoid double encryption
     if (!m.isEncrypted) return m;
 
-    // Check if content is already encrypted (starts with gcm_v1: prefix)
-    final isAlreadyEncrypted = m.content != null &&
-        encryptionService.isValueEncrypted(m.content!);
+    // Check if ANY field is already encrypted (starts with gcm_v1: prefix)
+    // This prevents data loss when content is null but reflections are encrypted
+    final isAlreadyEncrypted = (m.content != null &&
+            encryptionService.isValueEncrypted(m.content!)) ||
+        (m.reflectionImpact != null &&
+            encryptionService.isValueEncrypted(m.reflectionImpact!)) ||
+        (m.reflectionLesson != null &&
+            encryptionService.isValueEncrypted(m.reflectionLesson!)) ||
+        (m.reflectionAutoThought != null &&
+            encryptionService.isValueEncrypted(m.reflectionAutoThought!));
 
     if (isAlreadyEncrypted) {
       // Fields are already encrypted, return as is to avoid double encryption
