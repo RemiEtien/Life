@@ -29,6 +29,7 @@ Future<bool> showCreateMasterPasswordDialog(
     builder: (context) {
       bool obscurePassword = true;
       bool obscureConfirmPassword = true;
+      bool isProcessing = false;
 
       return StatefulBuilder(builder: (context, setState) {
         return AlertDialog(
@@ -44,6 +45,7 @@ Future<bool> showCreateMasterPasswordDialog(
                   TextFormField(
                     controller: passwordController,
                     obscureText: obscurePassword,
+                    enabled: !isProcessing,
                     decoration: InputDecoration(
                       labelText: l10n.profileMasterPasswordHint,
                       suffixIcon: IconButton(
@@ -61,6 +63,7 @@ Future<bool> showCreateMasterPasswordDialog(
                   TextFormField(
                     controller: confirmController,
                     obscureText: obscureConfirmPassword,
+                    enabled: !isProcessing,
                     decoration: InputDecoration(
                       labelText: l10n.profileConfirmPasswordHint,
                       suffixIcon: IconButton(
@@ -75,27 +78,51 @@ Future<bool> showCreateMasterPasswordDialog(
                         ? l10n.profilePasswordsDoNotMatch
                         : null,
                   ),
+                  if (isProcessing) ...[
+                    const SizedBox(height: 20),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 10),
+                    const Text('Setting up encryption...'),
+                  ],
                 ],
               ),
             ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: isProcessing ? null : () => Navigator.of(context).pop(false),
               child: Text(l10n.profileCancel),
             ),
             ElevatedButton(
-              onPressed: () async {
+              onPressed: isProcessing ? null : () async {
                 if (formKey.currentState?.validate() ?? false) {
-                  if (!context.mounted) return;
-                  await encryptionNotifier
-                      .setupEncryption(passwordController.text);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Encryption enabled successfully!')),
-                    );
-                    Navigator.of(context).pop(true);
+                  final password = passwordController.text;
+
+                  debugPrint('[CreateMasterPassword] Validation passed, showing loading');
+                  setState(() => isProcessing = true);
+
+                  try {
+                    debugPrint('[CreateMasterPassword] Calling setupEncryption');
+                    await encryptionNotifier.setupEncryption(password);
+                    debugPrint('[CreateMasterPassword] setupEncryption completed successfully');
+
+                    if (context.mounted) {
+                      Navigator.of(context).pop(true);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Encryption enabled successfully!')),
+                      );
+                    }
+                  } catch (e, stack) {
+                    debugPrint('[CreateMasterPassword] ERROR: $e');
+                    debugPrint('[CreateMasterPassword] Stack: $stack');
+                    setState(() => isProcessing = false);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('Failed to enable encryption: $e')),
+                      );
+                    }
                   }
                 }
               },

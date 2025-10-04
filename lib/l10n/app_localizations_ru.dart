@@ -1080,6 +1080,45 @@ class AppLocalizationsRu extends AppLocalizations {
   String get unlockEnterMasterPassword => 'Введите мастер-пароль';
 
   @override
+  String get unlockForgotPassword => 'Забыли пароль?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'Сброс шифрования';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ ВНИМАНИЕ: Это действие необратимо!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'Если вы забыли мастер-пароль, вы можете сбросить шифрование. Однако это приведет к безвозвратному удалению всех зашифрованных воспоминаний.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'Что будет удалено:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'Все зашифрованные воспоминания (локальные и в облаке)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 => 'Шифрование будет отключено';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'Вы сможете продолжить использовать приложение без шифрования';
+
+  @override
+  String get unlockResetEncryptionConfirm =>
+      'Удалить зашифрованные воспоминания';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'Шифрование сброшено. Теперь вы можете использовать приложение без мастер-пароля.';
+
+  @override
+  String get unlockResetEncryptionError => 'Не удалось сбросить шифрование';
+
+  @override
   String get draftBannerSingleTitle => 'У вас есть незаконченное воспоминание';
 
   @override

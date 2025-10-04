@@ -31,7 +31,8 @@
       "Bash(npm test)",
       "Bash(firebase deploy:*)",
       "Bash(gcloud firestore databases export:*)",
-      "Bash(firebase login:*)"
+      "Bash(firebase login:*)",
+      "Bash(flutter:*)"
     ],
     "deny": [],
     "ask": []

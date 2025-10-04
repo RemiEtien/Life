@@ -26,27 +26,16 @@ service cloud.firestore {
       allow read: if isOwner(userId);
 
       // Users can create their own profile (only on first signup)
+      // Allow all fields except premium fields (those must come from Cloud Functions)
       allow create: if isOwner(userId) &&
-                       !request.resource.data.keys().hasAny(['isPremium', 'premiumUntil']);
+                       request.resource.data.isPremium == false &&
+                       !request.resource.data.keys().hasAny(['premiumUntil']);
 
-      // Users can update ONLY whitelisted fields (WHITELIST approach)
-      // Security-critical fields (encryption, premium, etc) can ONLY be set by Cloud Functions
+      // Users can update their profile fields
+      // SIMPLE APPROACH: Only block premium fields, allow everything else
       allow update: if isOwner(userId) &&
-                       request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['displayName', 'bio', 'languageCode', 'photoUrl', 'countryCode', 'updatedAt']) &&
-                       // Validate types and constraints
-                       ((!('displayName' in request.resource.data.diff(resource.data).affectedKeys())) ||
-                         (request.resource.data.displayName is string && request.resource.data.displayName.size() <= 100)) &&
-                       ((!('bio' in request.resource.data.diff(resource.data).affectedKeys())) ||
-                         (request.resource.data.bio is string && request.resource.data.bio.size() <= 500)) &&
-                       ((!('languageCode' in request.resource.data.diff(resource.data).affectedKeys())) ||
-                         (request.resource.data.languageCode is string && request.resource.data.languageCode.size() == 2)) &&
-                       ((!('photoUrl' in request.resource.data.diff(resource.data).affectedKeys())) ||
-                         (request.resource.data.photoUrl is string && request.resource.data.photoUrl.size() <= 500)) &&
-                       ((!('countryCode' in request.resource.data.diff(resource.data).affectedKeys())) ||
-                         (request.resource.data.countryCode is string && request.resource.data.countryCode.size() <= 10)) &&
-                       ((!('updatedAt' in request.resource.data.diff(resource.data).affectedKeys())) ||
-                         (request.resource.data.updatedAt is timestamp));
+                       // Block premium status changes by users (Cloud Functions only)
+                       !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'premiumUntil']);
 
       // Deletion only through Cloud Functions (soft delete recommended)
       allow delete: if false;

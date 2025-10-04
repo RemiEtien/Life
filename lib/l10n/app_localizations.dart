@@ -2056,6 +2056,72 @@ abstract class AppLocalizations {
   /// **'Enter Master Password'**
   String get unlockEnterMasterPassword;
 
+  /// No description provided for @unlockForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get unlockForgotPassword;
+
+  /// No description provided for @unlockResetEncryptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Encryption'**
+  String get unlockResetEncryptionTitle;
+
+  /// No description provided for @unlockResetEncryptionWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ WARNING: This action cannot be undone!'**
+  String get unlockResetEncryptionWarning;
+
+  /// No description provided for @unlockResetEncryptionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'ve forgotten your master password, you can reset encryption. However, this will permanently delete all encrypted memories.'**
+  String get unlockResetEncryptionDescription;
+
+  /// No description provided for @unlockResetEncryptionConsequences.
+  ///
+  /// In en, this message translates to:
+  /// **'What will be deleted:'**
+  String get unlockResetEncryptionConsequences;
+
+  /// No description provided for @unlockResetEncryptionConsequence1.
+  ///
+  /// In en, this message translates to:
+  /// **'All encrypted memories (local and cloud)'**
+  String get unlockResetEncryptionConsequence1;
+
+  /// No description provided for @unlockResetEncryptionConsequence2.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption will be disabled'**
+  String get unlockResetEncryptionConsequence2;
+
+  /// No description provided for @unlockResetEncryptionConsequence3.
+  ///
+  /// In en, this message translates to:
+  /// **'You can continue using the app with unencrypted memories'**
+  String get unlockResetEncryptionConsequence3;
+
+  /// No description provided for @unlockResetEncryptionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Encrypted Memories'**
+  String get unlockResetEncryptionConfirm;
+
+  /// No description provided for @unlockResetEncryptionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption has been reset. You can now use the app without a master password.'**
+  String get unlockResetEncryptionSuccess;
+
+  /// No description provided for @unlockResetEncryptionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reset encryption'**
+  String get unlockResetEncryptionError;
+
   /// No description provided for @draftBannerSingleTitle.
   ///
   /// In en, this message translates to:

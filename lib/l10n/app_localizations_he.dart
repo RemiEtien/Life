@@ -1067,6 +1067,43 @@ class AppLocalizationsHe extends AppLocalizations {
   String get unlockEnterMasterPassword => 'הזן סיסמת-על';
 
   @override
+  String get unlockForgotPassword => 'שכחת סיסמה?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'אפס הצפנה';
+
+  @override
+  String get unlockResetEncryptionWarning => '⚠️ אזהרה: לא ניתן לבטל פעולה זו!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'אם שכחת את סיסמת-העל, תוכל לאפס את ההצפנה. עם זאת, זה ימחק לצמיתות את כל הזיכרונות המוצפנים.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'מה יימחק:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'כל הזיכרונות המוצפנים (מקומיים ובענן)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 => 'ההצפנה תבוטל';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'תוכל להמשיך להשתמש באפליקציה ללא הצפנה';
+
+  @override
+  String get unlockResetEncryptionConfirm => 'מחק זיכרונות מוצפנים';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'ההצפנה אופסה. כעת תוכל להשתמש באפליקציה ללא סיסמת-על.';
+
+  @override
+  String get unlockResetEncryptionError => 'איפוס ההצפנה נכשל';
+
+  @override
   String get draftBannerSingleTitle => 'יש לך זיכרון לא גמור';
 
   @override

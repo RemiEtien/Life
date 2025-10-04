@@ -157,6 +157,121 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     }
   }
 
+  Future<void> _showResetEncryptionDialog(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 32),
+            const SizedBox(width: 12),
+            Expanded(child: Text(l10n.unlockResetEncryptionTitle)),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.unlockResetEncryptionWarning,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              Text(l10n.unlockResetEncryptionDescription),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.delete_forever, color: Colors.red.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.unlockResetEncryptionConsequences,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '• ${l10n.unlockResetEncryptionConsequence1}',
+                      style: TextStyle(color: Colors.red.shade900),
+                    ),
+                    Text(
+                      '• ${l10n.unlockResetEncryptionConsequence2}',
+                      style: TextStyle(color: Colors.red.shade900),
+                    ),
+                    Text(
+                      '• ${l10n.unlockResetEncryptionConsequence3}',
+                      style: TextStyle(color: Colors.red.shade900),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.profileCancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.unlockResetEncryptionConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      setState(() => _isLoading = true);
+
+      try {
+        final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+        await encryptionNotifier.resetEncryption();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.unlockResetEncryptionSuccess),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          // AuthGate will automatically navigate to main screen since encryption is now disabled
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${l10n.unlockResetEncryptionError}: $e'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -236,6 +351,15 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                         ),
                         child: Text(l10n.memoryEditUnlockButton),
                       ),
+                const SizedBox(height: 16),
+                // "Forgot Password?" button
+                TextButton(
+                  onPressed: _isLoading ? null : () => _showResetEncryptionDialog(l10n),
+                  child: Text(
+                    l10n.unlockForgotPassword,
+                    style: TextStyle(color: Colors.orange.shade700),
+                  ),
+                ),
                 // FIX: This button now correctly triggers the sign-out flow.
                 TextButton(
                   onPressed: () => ref.read(authServiceProvider).signOut(),

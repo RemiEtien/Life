@@ -167,9 +167,15 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   /// Sets up encryption for the first time.
   Future<void> setupEncryption(String masterPassword) async {
+    debugPrint('[EncryptionService] setupEncryption started');
     final userProfile = _ref.read(userProfileProvider).value;
-    if (userProfile == null) throw Exception('User profile not found.');
+    if (userProfile == null) {
+      debugPrint('[EncryptionService] ERROR: User profile not found');
+      throw Exception('User profile not found.');
+    }
+    debugPrint('[EncryptionService] User profile loaded: ${userProfile.uid}');
 
+    debugPrint('[EncryptionService] Generating encryption keys');
     final newDEK = Key.fromSecureRandom(32);
     final salt = _generateRandomBytes(16);
     final kek = await _deriveKey(masterPassword, salt, useIsolate: true);
@@ -177,16 +183,27 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final encrypter = Encrypter(AES(kek, mode: AESMode.gcm));
     final encryptedDEK = encrypter.encrypt(newDEK.base64, iv: iv);
     final wrappedDEK = '${iv.base64}:${encryptedDEK.base64}';
+    debugPrint('[EncryptionService] Keys generated successfully');
 
     final updatedProfile = userProfile.copyWith(
       isEncryptionEnabled: true,
       salt: base64.encode(salt),
       wrappedDEK: wrappedDEK,
     );
-    await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
 
+    // Update internal state first (no rebuild)
+    debugPrint('[EncryptionService] Updating internal DEK state');
     _unlockedDEK = newDEK;
+
+    // Update Firestore (may take time, no rebuild yet)
+    debugPrint('[EncryptionService] Updating Firestore profile');
+    await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+    debugPrint('[EncryptionService] Firestore profile updated');
+
+    // Finally update state (triggers rebuild after Firestore update completes)
+    debugPrint('[EncryptionService] Setting state to unlocked');
     state = EncryptionState.unlocked;
+    debugPrint('[EncryptionService] setupEncryption completed successfully');
   }
 
   /// Attempts to unlock the session with the master password.
@@ -318,6 +335,90 @@ class EncryptionService extends StateNotifier<EncryptionState> {
             isQuickUnlockEnabled: false,
             requireBiometricForMemory: false, // Also disable per-memory unlock
           ));
+    }
+  }
+
+  /// Resets encryption completely:
+  /// - Deletes all encrypted memories from local database and cloud
+  /// - Removes encryption keys from secure storage
+  /// - Disables encryption in user profile
+  /// - Unlocks the session (since encryption is now disabled)
+  ///
+  /// This is a destructive operation that cannot be undone.
+  /// Use this when the user forgets their master password.
+  Future<void> resetEncryption() async {
+    final userProfile = _ref.read(userProfileProvider).value;
+    if (userProfile == null) {
+      throw Exception('User profile not found.');
+    }
+
+    try {
+      // Step 1: Get all encrypted memories from local database
+      final repo = _ref.read(memoryRepositoryProvider);
+      if (repo != null) {
+        final allMemories = await repo.getAllMemories();
+        final encryptedMemories = allMemories.where((m) => m.isEncrypted).toList();
+
+        if (encryptedMemories.isNotEmpty) {
+          if (kDebugMode) {
+            debugPrint('[EncryptionService] Found ${encryptedMemories.length} encrypted memories to delete');
+          }
+
+          // Step 2: Delete from Firestore
+          final firestore = _ref.read(firestoreServiceProvider);
+          for (final memory in encryptedMemories) {
+            if (memory.firestoreId != null) {
+              try {
+                await firestore.deleteMemory(userProfile.uid, memory);
+              } catch (e) {
+                if (kDebugMode) {
+                  debugPrint('[EncryptionService] Failed to delete memory ${memory.firestoreId} from Firestore: $e');
+                }
+                // Continue deleting other memories even if one fails
+              }
+            }
+          }
+
+          // Step 3: Delete from local database
+          final encryptedIds = encryptedMemories.map((m) => m.id).toList();
+          await repo.deleteAllByIds(encryptedIds);
+
+          if (kDebugMode) {
+            debugPrint('[EncryptionService] Deleted ${encryptedIds.length} encrypted memories from local database');
+          }
+        }
+      }
+
+      // Step 4: Clear Quick Unlock keys
+      await disableQuickUnlock();
+
+      // Step 5: Update user profile to disable encryption
+      final updatedProfile = userProfile.copyWith(
+        isEncryptionEnabled: false,
+        isQuickUnlockEnabled: false,
+        requireBiometricForMemory: false,
+        salt: null,
+        wrappedDEK: null,
+      );
+      await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+
+      // Step 6: Clear in-memory state
+      _unlockedDEK = null;
+      _unlockedMemoryIdsInSession.clear();
+      _failedAttempts = 0;
+      _lockoutEndTime = null;
+
+      // Step 7: Set state to notConfigured (unlocked since encryption is disabled)
+      state = EncryptionState.notConfigured;
+
+      if (kDebugMode) {
+        debugPrint('[EncryptionService] Encryption reset completed successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[EncryptionService] Error during encryption reset: $e');
+      }
+      rethrow;
     }
   }
 

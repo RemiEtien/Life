@@ -1095,6 +1095,46 @@ class AppLocalizationsFr extends AppLocalizations {
   String get unlockEnterMasterPassword => 'Saisir le mot de passe maître';
 
   @override
+  String get unlockForgotPassword => 'Mot de passe oublié ?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'Réinitialiser le chiffrement';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ ATTENTION : Cette action est irréversible !';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'Si vous avez oublié votre mot de passe maître, vous pouvez réinitialiser le chiffrement. Cependant, cela supprimera définitivement tous les souvenirs chiffrés.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'Ce qui sera supprimé :';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'Tous les souvenirs chiffrés (locaux et dans le cloud)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 =>
+      'Le chiffrement sera désactivé';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'Vous pourrez continuer à utiliser l\'application sans chiffrement';
+
+  @override
+  String get unlockResetEncryptionConfirm => 'Supprimer les souvenirs chiffrés';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'Le chiffrement a été réinitialisé. Vous pouvez maintenant utiliser l\'application sans mot de passe maître.';
+
+  @override
+  String get unlockResetEncryptionError =>
+      'Échec de la réinitialisation du chiffrement';
+
+  @override
   String get draftBannerSingleTitle => 'Vous avez un souvenir inachevé';
 
   @override

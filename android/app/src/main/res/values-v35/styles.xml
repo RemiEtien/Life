@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Специальная тема для Android 15+ с полной поддержкой Edge-to-Edge -->
+    <!-- Android 15+ Edge-to-Edge theme (compliant with new requirements) -->
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <!-- Android 15+ Edge-to-Edge настройки -->
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
-        <item name="android:enforceStatusBarContrast">false</item>
-        <!-- Новые свойства для Android 15 -->
+        <!-- Enable Edge-to-Edge (mandatory for Android 15) -->
         <item name="android:windowOptOutEdgeToEdgeEnforcement">false</item>
     </style>
-    
+
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
-        <!-- Android 15+ Edge-to-Edge настройки -->
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
-        <item name="android:enforceStatusBarContrast">false</item>
-        <!-- Новые свойства для Android 15 -->
+        <!-- Enable Edge-to-Edge (mandatory for Android 15) -->
         <item name="android:windowOptOutEdgeToEdgeEnforcement">false</item>
     </style>
 </resources>

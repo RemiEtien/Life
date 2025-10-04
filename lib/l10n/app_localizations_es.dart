@@ -1091,6 +1091,44 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unlockEnterMasterPassword => 'Introduce la contraseña maestra';
 
   @override
+  String get unlockForgotPassword => '¿Olvidaste la contraseña?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'Restablecer cifrado';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ ADVERTENCIA: ¡Esta acción no se puede deshacer!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'Si has olvidado tu contraseña maestra, puedes restablecer el cifrado. Sin embargo, esto eliminará permanentemente todas las memorias cifradas.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'Lo que se eliminará:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'Todas las memorias cifradas (locales y en la nube)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 => 'El cifrado se desactivará';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'Podrás seguir usando la aplicación sin cifrado';
+
+  @override
+  String get unlockResetEncryptionConfirm => 'Eliminar memorias cifradas';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'El cifrado se ha restablecido. Ahora puedes usar la aplicación sin contraseña maestra.';
+
+  @override
+  String get unlockResetEncryptionError => 'Error al restablecer el cifrado';
+
+  @override
   String get draftBannerSingleTitle => 'Tienes una memoria sin terminar';
 
   @override

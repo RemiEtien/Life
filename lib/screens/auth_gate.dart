@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,9 +28,24 @@ class AuthGate extends ConsumerStatefulWidget {
   ConsumerState<AuthGate> createState() => _AuthGateState();
 }
 
+// Profile creation state tracking
+enum ProfileCreationState {
+  notStarted,
+  inProgress,
+  retrying,
+  failed,
+  success,
+}
+
 class _AuthGateState extends ConsumerState<AuthGate> {
   StreamSubscription? _notificationSubscription;
   StreamSubscription? _sharingSubscription;
+
+  // Track profile creation attempts
+  ProfileCreationState _profileCreationState = ProfileCreationState.notStarted;
+  int _profileCreationAttempts = 0;
+  String? _lastProfileCreationError;
+  static const int _maxProfileCreationAttempts = 3;
 
   @override
   void initState() {
@@ -344,6 +360,154 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
   }
 
+  /// Handles missing user profile with retry logic and comprehensive logging
+  Widget _handleMissingProfile(User user, AppLocalizations l10n) {
+    // If we've already failed after max attempts, show error screen
+    if (_profileCreationState == ProfileCreationState.failed) {
+      return _ProfileCreationErrorScreen(
+        l10n: l10n,
+        error: _lastProfileCreationError ?? 'Unknown error',
+        attempts: _profileCreationAttempts,
+        onRetry: () {
+          setState(() {
+            _profileCreationState = ProfileCreationState.notStarted;
+            _profileCreationAttempts = 0;
+            _lastProfileCreationError = null;
+          });
+          // Trigger provider refresh to restart the flow
+          // ignore: unused_result
+          ref.refresh(userProfileProvider);
+        },
+        onLogout: () {
+          ref.read(authServiceProvider).signOut();
+        },
+      );
+    }
+
+    // If we haven't started or are retrying, attempt profile creation
+    if (_profileCreationState == ProfileCreationState.notStarted ||
+        _profileCreationState == ProfileCreationState.retrying) {
+
+      // Don't exceed max attempts
+      if (_profileCreationAttempts >= _maxProfileCreationAttempts) {
+        setState(() {
+          _profileCreationState = ProfileCreationState.failed;
+        });
+
+        // Log final failure to Crashlytics
+        unawaited(FirebaseCrashlytics.instance.recordError(
+          Exception('Profile creation failed after $_maxProfileCreationAttempts attempts'),
+          null,
+          reason: 'AuthGate: Profile creation FAILED after all retries',
+          fatal: false,
+          information: [
+            'User ID: ${user.uid}',
+            'Email: ${user.email}',
+            'Provider: ${user.providerData.firstOrNull?.providerId ?? "unknown"}',
+            'Last error: $_lastProfileCreationError',
+          ],
+        ));
+
+        unawaited(FirebaseCrashlytics.instance.setCustomKey(
+          'profile_creation_status', 'failed_all_attempts'
+        ));
+
+        return _LoadingScreen(message: l10n.authGateLoadingMemories);
+      }
+
+      // Attempt profile creation
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+
+        _profileCreationAttempts++;
+        setState(() {
+          _profileCreationState = _profileCreationAttempts == 1
+              ? ProfileCreationState.inProgress
+              : ProfileCreationState.retrying;
+        });
+
+        // Log attempt to Crashlytics
+        unawaited(FirebaseCrashlytics.instance.log(
+          'AuthGate: Profile creation attempt $_profileCreationAttempts/$_maxProfileCreationAttempts for user ${user.uid}'
+        ));
+
+        unawaited(FirebaseCrashlytics.instance.setCustomKey(
+          'profile_creation_attempts', _profileCreationAttempts
+        ));
+
+        try {
+          await ref.read(userServiceProvider).ensureUserProfileExists(user, context);
+
+          // Success!
+          if (mounted) {
+            setState(() {
+              _profileCreationState = ProfileCreationState.success;
+            });
+
+            unawaited(FirebaseCrashlytics.instance.log(
+              'AuthGate: Profile creation SUCCESS after $_profileCreationAttempts attempts'
+            ));
+
+            unawaited(FirebaseCrashlytics.instance.setCustomKey(
+              'profile_creation_status', 'success'
+            ));
+
+            // Refresh provider to get the new profile
+            // ignore: unused_result
+            ref.refresh(userProfileProvider);
+          }
+        } catch (e, stackTrace) {
+          if (!mounted) return;
+
+          _lastProfileCreationError = e.toString();
+
+          // Log error to Crashlytics (non-fatal)
+          unawaited(FirebaseCrashlytics.instance.recordError(
+            e,
+            stackTrace,
+            reason: 'AuthGate: Profile creation attempt $_profileCreationAttempts failed',
+            fatal: false,
+            information: [
+              'User ID: ${user.uid}',
+              'Attempt: $_profileCreationAttempts/$_maxProfileCreationAttempts',
+            ],
+          ));
+
+          unawaited(FirebaseCrashlytics.instance.setCustomKey(
+            'profile_creation_last_error', e.toString()
+          ));
+
+          // If we haven't hit max attempts, trigger a rebuild to retry
+          if (_profileCreationAttempts < _maxProfileCreationAttempts) {
+            setState(() {
+              _profileCreationState = ProfileCreationState.retrying;
+            });
+
+            // Small delay before retry
+            await Future.delayed(const Duration(seconds: 2));
+
+            if (mounted) {
+              // Trigger rebuild which will retry
+              setState(() {});
+            }
+          } else {
+            // Max attempts reached
+            setState(() {
+              _profileCreationState = ProfileCreationState.failed;
+            });
+          }
+        }
+      });
+    }
+
+    // Show appropriate loading message based on state
+    final message = _profileCreationState == ProfileCreationState.retrying
+        ? '${l10n.authGateLoadingMemories}\n(Attempt $_profileCreationAttempts/$_maxProfileCreationAttempts)'
+        : l10n.authGateLoadingMemories;
+
+    return _LoadingScreen(message: message);
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateChangesProvider);
@@ -388,16 +552,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
           ),
           data: (profile) {
             if (profile == null) {
-              // This can happen briefly when a user is created but the profile isn't yet.
-              // Show a loading screen while `ensureUserProfileExists` runs.
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) {
-                  ref
-                      .read(userServiceProvider)
-                      .ensureUserProfileExists(user, context);
-                }
-              });
-              return _LoadingScreen(message: l10n.authGateLoadingMemories);
+              // Profile doesn't exist - attempt to create with retry logic
+              return _handleMissingProfile(user, l10n);
             }
 
             // **CRITICAL LOGIC**: Show UnlockScreen if encryption is enabled and state is locked.
@@ -522,6 +678,131 @@ class _ErrorScreen extends StatelessWidget {
                 onPressed: onRetry,
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileCreationErrorScreen extends StatelessWidget {
+  final String error;
+  final int attempts;
+  final VoidCallback onRetry;
+  final VoidCallback onLogout;
+  final AppLocalizations l10n;
+
+  const _ProfileCreationErrorScreen({
+    required this.error,
+    required this.attempts,
+    required this.onRetry,
+    required this.onLogout,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D0C11),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.account_circle_outlined,
+                    color: Colors.redAccent.shade100, size: 80),
+                const SizedBox(height: 24),
+                Text(
+                  'Failed to Create Profile',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'We tried $attempts times but couldn\'t create your profile.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white.withAlpha((255 * 0.8).round()),
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withAlpha((255 * 0.1).round()),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Error: $error',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.redAccent.shade100,
+                      fontSize: 12,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'This might be due to:',
+                  style: TextStyle(
+                    color: Colors.white.withAlpha((255 * 0.7).round()),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '• Network connectivity issues\n• Server problems\n• Permission errors',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white.withAlpha((255 * 0.6).round()),
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Try Again'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onPressed: onRetry,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Logout'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Colors.white24),
+                    ),
+                    onPressed: onLogout,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextButton.icon(
+                  icon: const Icon(Icons.email_outlined, size: 16),
+                  label: const Text(
+                    'Contact Support',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  onPressed: () {
+                    // TODO: Open email or support page
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

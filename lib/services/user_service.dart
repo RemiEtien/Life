@@ -22,20 +22,60 @@ class UserService {
 
   Future<void> ensureUserProfileExists(User user, BuildContext context) async {
     unawaited(FirebaseCrashlytics.instance.log('UserService: Checking if profile exists for user ${user.uid}'));
-    try {
-      final doc = _usersCollection.doc(user.uid);
-      final snapshot = await doc.get();
 
-      if (!context.mounted) return;
+    // Retry with exponential backoff for transient Firestore errors
+    int retryCount = 0;
+    const maxRetries = 3;
+    const initialDelay = Duration(milliseconds: 500);
 
-      if (!snapshot.exists) {
-        unawaited(FirebaseCrashlytics.instance.log('UserService: Profile not found for ${user.uid}. Creating new one.'));
-        await createUserProfile(user, context);
-      } else {
-         unawaited(FirebaseCrashlytics.instance.log('UserService: Profile already exists for ${user.uid}.'));
+    while (retryCount < maxRetries) {
+      try {
+        final doc = _usersCollection.doc(user.uid);
+        final snapshot = await doc.get();
+
+        if (!context.mounted) return;
+
+        if (!snapshot.exists) {
+          unawaited(FirebaseCrashlytics.instance.log('UserService: Profile not found for ${user.uid}. Creating new one.'));
+          await createUserProfile(user, context);
+        } else {
+          unawaited(FirebaseCrashlytics.instance.log('UserService: Profile already exists for ${user.uid}.'));
+        }
+
+        // Success - exit retry loop
+        return;
+      } on FirebaseException catch (e, stackTrace) {
+        retryCount++;
+
+        // Check if error is transient (unavailable, deadline-exceeded, etc)
+        final isTransient = e.code == 'unavailable' ||
+                           e.code == 'deadline-exceeded' ||
+                           e.code == 'resource-exhausted';
+
+        if (isTransient && retryCount < maxRetries) {
+          final delay = initialDelay * (1 << retryCount); // Exponential backoff
+          unawaited(FirebaseCrashlytics.instance.log(
+            'UserService: Transient error (${e.code}), retrying in ${delay.inMilliseconds}ms (attempt $retryCount/$maxRetries)'
+          ));
+          await Future.delayed(delay);
+        } else {
+          // Non-transient error or max retries reached
+          unawaited(FirebaseCrashlytics.instance.recordError(
+            e,
+            stackTrace,
+            reason: 'UserService: ensureUserProfileExists failed after $retryCount retries'
+          ));
+          return; // Give up
+        }
+      } catch (e, stackTrace) {
+        // Non-Firebase error
+        unawaited(FirebaseCrashlytics.instance.recordError(
+          e,
+          stackTrace,
+          reason: 'UserService: ensureUserProfileExists failed with non-Firebase error'
+        ));
+        return;
       }
-    } catch (e, stackTrace) {
-      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: ensureUserProfileExists failed'));
     }
   }
 
@@ -60,14 +100,27 @@ class UserService {
         throw Exception('Email is required for registration.');
       }
 
-      final userProfile = UserProfile(
-        uid: user.uid,
-        displayName: user.displayName ?? 'New User',
-        email: userEmail,
-        photoUrl: user.photoURL,
-        languageCode: currentLocale.languageCode,
-      );
-      await _usersCollection.doc(user.uid).set(userProfile.toJson());
+      // Create profile with only essential fields to avoid Firestore Rules conflicts
+      final profileData = {
+        'displayName': user.displayName ?? 'New User',
+        'email': userEmail,
+        'photoUrl': user.photoURL,
+        'languageCode': currentLocale.languageCode,
+        'themePreference': 'system',
+        'performanceMode': 'auto',
+        'notificationsEnabled': true,
+        'isEncryptionEnabled': false,
+        'isQuickUnlockEnabled': false,
+        'requireBiometricForMemory': false,
+        'isPremium': false,
+        'visualSpeed': 2.0,
+        'visualAmplitude': 10.0,
+        'visualYearLinePosition': 0.65,
+        'visualBranchDensity': 0.35,
+        'visualBranchIntensity': 0.6,
+        'visualAnimationEnabled': true,
+      };
+      await _usersCollection.doc(user.uid).set(profileData);
       unawaited(FirebaseCrashlytics.instance.log('UserService: Successfully created profile for user ${user.uid}'));
     } catch (e, stackTrace) {
        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: createUserProfile failed'));
@@ -99,8 +152,20 @@ class UserService {
 
   Future<void> updateUserProfile(UserProfile profile) async {
     try {
-      await _usersCollection.doc(profile.uid).update(profile.toJson());
+      debugPrint('[UserService] updateUserProfile started for uid: ${profile.uid}');
+      // Convert to JSON and remove premium fields that are blocked by Firestore Rules
+      final data = profile.toJson();
+      debugPrint('[UserService] Profile data keys: ${data.keys.toList()}');
+      data.remove('isPremium');
+      data.remove('premiumUntil');
+      debugPrint('[UserService] Removed premium fields, remaining keys: ${data.keys.toList()}');
+
+      debugPrint('[UserService] Calling Firestore update');
+      await _usersCollection.doc(profile.uid).update(data);
+      debugPrint('[UserService] Firestore update completed successfully');
     } catch (e, stackTrace) {
+       debugPrint('[UserService] ERROR in updateUserProfile: $e');
+       debugPrint('[UserService] Stack trace: $stackTrace');
        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: updateUserProfile failed'));
        rethrow;
     }

@@ -1033,6 +1033,40 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unlockEnterMasterPassword => '输入主密码';
 
   @override
+  String get unlockForgotPassword => '忘记密码？';
+
+  @override
+  String get unlockResetEncryptionTitle => '重置加密';
+
+  @override
+  String get unlockResetEncryptionWarning => '⚠️ 警告：此操作无法撤销！';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      '如果您忘记了主密码，可以重置加密。但是，这将永久删除所有加密的记忆。';
+
+  @override
+  String get unlockResetEncryptionConsequences => '将被删除的内容：';
+
+  @override
+  String get unlockResetEncryptionConsequence1 => '所有加密的记忆（本地和云端）';
+
+  @override
+  String get unlockResetEncryptionConsequence2 => '加密功能将被禁用';
+
+  @override
+  String get unlockResetEncryptionConsequence3 => '您可以继续使用应用程序而无需加密';
+
+  @override
+  String get unlockResetEncryptionConfirm => '删除加密的记忆';
+
+  @override
+  String get unlockResetEncryptionSuccess => '加密已重置。您现在可以在没有主密码的情况下使用应用程序。';
+
+  @override
+  String get unlockResetEncryptionError => '重置加密失败';
+
+  @override
   String get draftBannerSingleTitle => '您有一个未完成的记忆';
 
   @override

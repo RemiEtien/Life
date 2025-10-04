@@ -1073,6 +1073,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockEnterMasterPassword => 'Enter Master Password';
 
   @override
+  String get unlockForgotPassword => 'Forgot Password?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'Reset Encryption';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ WARNING: This action cannot be undone!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'If you\'ve forgotten your master password, you can reset encryption. However, this will permanently delete all encrypted memories.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'What will be deleted:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'All encrypted memories (local and cloud)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 => 'Encryption will be disabled';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'You can continue using the app with unencrypted memories';
+
+  @override
+  String get unlockResetEncryptionConfirm => 'Delete Encrypted Memories';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'Encryption has been reset. You can now use the app without a master password.';
+
+  @override
+  String get unlockResetEncryptionError => 'Failed to reset encryption';
+
+  @override
   String get draftBannerSingleTitle => 'You have an unfinished memory';
 
   @override

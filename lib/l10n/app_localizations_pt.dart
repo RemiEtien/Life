@@ -1083,6 +1083,45 @@ class AppLocalizationsPt extends AppLocalizations {
   String get unlockEnterMasterPassword => 'Digite a senha mestra';
 
   @override
+  String get unlockForgotPassword => 'Esqueceu a senha?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'Redefinir criptografia';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ AVISO: Esta ação não pode ser desfeita!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'Se você esqueceu sua senha mestra, pode redefinir a criptografia. No entanto, isso excluirá permanentemente todas as memórias criptografadas.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'O que será excluído:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'Todas as memórias criptografadas (locais e na nuvem)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 =>
+      'A criptografia será desativada';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'Você poderá continuar usando o aplicativo sem criptografia';
+
+  @override
+  String get unlockResetEncryptionConfirm => 'Excluir memórias criptografadas';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'A criptografia foi redefinida. Agora você pode usar o aplicativo sem senha mestra.';
+
+  @override
+  String get unlockResetEncryptionError => 'Falha ao redefinir a criptografia';
+
+  @override
   String get draftBannerSingleTitle => 'Você tem uma memória inacabada';
 
   @override

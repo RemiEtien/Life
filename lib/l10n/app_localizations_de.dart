@@ -1090,6 +1090,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get unlockEnterMasterPassword => 'Master-Passwort eingeben';
 
   @override
+  String get unlockForgotPassword => 'Passwort vergessen?';
+
+  @override
+  String get unlockResetEncryptionTitle => 'Verschlüsselung zurücksetzen';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ WARNUNG: Diese Aktion kann nicht rückgängig gemacht werden!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'Wenn du dein Master-Passwort vergessen hast, kannst du die Verschlüsselung zurücksetzen. Dies führt jedoch zum unwiderruflichen Löschen aller verschlüsselten Erinnerungen.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'Was wird gelöscht:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'Alle verschlüsselten Erinnerungen (lokal und in der Cloud)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 =>
+      'Die Verschlüsselung wird deaktiviert';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'Du kannst die App weiterhin ohne Verschlüsselung nutzen';
+
+  @override
+  String get unlockResetEncryptionConfirm =>
+      'Verschlüsselte Erinnerungen löschen';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'Verschlüsselung wurde zurückgesetzt. Du kannst die App jetzt ohne Master-Passwort verwenden.';
+
+  @override
+  String get unlockResetEncryptionError =>
+      'Verschlüsselung konnte nicht zurückgesetzt werden';
+
+  @override
   String get draftBannerSingleTitle => 'Du hast eine unfertige Erinnerung';
 
   @override

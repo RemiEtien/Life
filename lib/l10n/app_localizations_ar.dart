@@ -1076,6 +1076,44 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unlockEnterMasterPassword => 'أدخل كلمة المرور الرئيسية';
 
   @override
+  String get unlockForgotPassword => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get unlockResetEncryptionTitle => 'إعادة تعيين التشفير';
+
+  @override
+  String get unlockResetEncryptionWarning =>
+      '⚠️ تحذير: لا يمكن التراجع عن هذا الإجراء!';
+
+  @override
+  String get unlockResetEncryptionDescription =>
+      'إذا نسيت كلمة المرور الرئيسية، يمكنك إعادة تعيين التشفير. ومع ذلك، سيؤدي ذلك إلى حذف جميع الذكريات المشفرة نهائياً.';
+
+  @override
+  String get unlockResetEncryptionConsequences => 'ما سيتم حذفه:';
+
+  @override
+  String get unlockResetEncryptionConsequence1 =>
+      'جميع الذكريات المشفرة (محلية وسحابية)';
+
+  @override
+  String get unlockResetEncryptionConsequence2 => 'سيتم تعطيل التشفير';
+
+  @override
+  String get unlockResetEncryptionConsequence3 =>
+      'يمكنك الاستمرار في استخدام التطبيق بدون تشفير';
+
+  @override
+  String get unlockResetEncryptionConfirm => 'حذف الذكريات المشفرة';
+
+  @override
+  String get unlockResetEncryptionSuccess =>
+      'تم إعادة تعيين التشفير. يمكنك الآن استخدام التطبيق بدون كلمة مرور رئيسية.';
+
+  @override
+  String get unlockResetEncryptionError => 'فشل إعادة تعيين التشفير';
+
+  @override
   String get draftBannerSingleTitle => 'لديك ذاكرة غير مكتملة';
 
   @override
