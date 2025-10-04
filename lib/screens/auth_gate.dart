@@ -102,12 +102,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Text(
                 l10n.shareActionTitle,
                 textAlign: TextAlign.center,
@@ -217,6 +218,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                 },
               ),
             ],
+          ),
           ),
         );
       },

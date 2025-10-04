@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -30,8 +32,10 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
       await prefs.setBool('hasConsented', true);
 
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AuthGate()),
+        unawaited(
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const AuthGate()),
+          ),
         );
       }
     } catch (e) {
@@ -87,9 +91,11 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
     }
     
     if (mounted) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => DocumentScreen(title: title, documentPath: finalPath),
+      unawaited(
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DocumentScreen(title: title, documentPath: finalPath),
+          ),
         ),
       );
     }

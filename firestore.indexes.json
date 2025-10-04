@@ -1,0 +1,15 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "used_receipts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "usedAt",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

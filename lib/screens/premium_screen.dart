@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -44,9 +45,11 @@ class PremiumScreen extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (fileExists) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => DocumentScreen(title: title, documentPath: finalPath),
+      unawaited(
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DocumentScreen(title: title, documentPath: finalPath),
+          ),
         ),
       );
     } else {

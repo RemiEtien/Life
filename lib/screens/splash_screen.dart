@@ -48,7 +48,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Future<void> _startSequence(AppLocalizations l10n) async {
     unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Starting sequence.'));
     try {
-      _audioPlayer.play(AssetSource('sounds/intro_phrase.mp3'));
+      unawaited(_audioPlayer.play(AssetSource('sounds/intro_phrase.mp3')));
     } catch (e) {
       if (kDebugMode) {
         debugPrint('Could not play intro sound: $e');
@@ -81,9 +81,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (!hasConsented) {
       unawaited(FirebaseCrashlytics.instance.log('SplashScreen: No consent. Navigating to ConsentScreen.'));
-      Navigator.of(context).pushReplacement(
+      unawaited(Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const ConsentScreen()),
-      );
+      ));
       return;
     }
 
@@ -101,9 +101,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (user == null) {
       unawaited(FirebaseCrashlytics.instance.log('SplashScreen: User is null. Navigating to AuthGate (Login).'));
-      Navigator.of(context).pushReplacement(
+      unawaited(Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const AuthGate()),
-      );
+      ));
       return;
     }
 
@@ -127,7 +127,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (kDebugMode) {
         debugPrint('[SplashScreen] Initial sync failed, proceeding with local data. Error: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stack, reason: 'Initial sync failed on SplashScreen');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stack, reason: 'Initial sync failed on SplashScreen'));
     }
 
     if (!mounted) {
@@ -136,9 +136,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
 
     unawaited(FirebaseCrashlytics.instance.log('SplashScreen: Sequence complete. Navigating to AuthGate (Main).'));
-    Navigator.of(context).pushReplacement(
+    unawaited(Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const AuthGate()),
-    );
+    ));
   }
 
   @override

@@ -1,7 +1,7 @@
 name: lifeline
 description: Lifeline MVP
 publish_to: "none"
-version: 1.0.120+120
+version: 1.0.122+122
 
 
 environment:
@@ -78,6 +78,7 @@ dependencies:
   qr_flutter: ^4.1.0
   share_plus: ^12.0.0
   package_info_plus: ^9.0.0
+  image: ^4.1.7  # Для сжатия изображений в PDF
 
 dev_dependencies:
   flutter_test:

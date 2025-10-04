@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -53,13 +54,13 @@ class SpotifyService {
       if (kDebugMode) {
         debugPrint('FirebaseFunctionsException searching tracks: ${e.code} - ${e.message}');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Cloud Function)');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Cloud Function)'));
       return [];
     } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint('Unexpected error during track search: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Client-side)');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Client-side)'));
       return [];
     }
   }
@@ -83,13 +84,13 @@ class SpotifyService {
       if (kDebugMode) {
         debugPrint('FirebaseFunctionsException getting track details: ${e.code} - ${e.message}');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Cloud Function)');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Cloud Function)'));
       return null;
     } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint('Unexpected error getting track details: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Client-side)');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Client-side)'));
       return null;
     }
   }

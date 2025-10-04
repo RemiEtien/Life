@@ -35,7 +35,7 @@ class UserService {
          unawaited(FirebaseCrashlytics.instance.log('UserService: Profile already exists for ${user.uid}.'));
       }
     } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: ensureUserProfileExists failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: ensureUserProfileExists failed'));
     }
   }
 
@@ -47,16 +47,16 @@ class UserService {
       if (kDebugMode) {
         debugPrint('[UserService] Creating profile with locale from context: ${currentLocale.languageCode}');
       }
-      FirebaseCrashlytics.instance.setCustomKey('user_language_on_creation', currentLocale.languageCode);
+      unawaited(FirebaseCrashlytics.instance.setCustomKey('user_language_on_creation', currentLocale.languageCode));
 
       final userEmail = user.email;
       if (userEmail == null) {
-        FirebaseCrashlytics.instance.recordError(
+        unawaited(FirebaseCrashlytics.instance.recordError(
           Exception('User tried to register without an email.'),
           null,
           reason: 'UserService:createUserProfile user.email is null',
           fatal: true,
-        );
+        ));
         throw Exception('Email is required for registration.');
       }
 
@@ -70,7 +70,7 @@ class UserService {
       await _usersCollection.doc(user.uid).set(userProfile.toJson());
       unawaited(FirebaseCrashlytics.instance.log('UserService: Successfully created profile for user ${user.uid}'));
     } catch (e, stackTrace) {
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: createUserProfile failed');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: createUserProfile failed'));
        rethrow;
     }
   }
@@ -92,7 +92,7 @@ class UserService {
       }
       return null;
     } catch (e, stackTrace) {
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: getUserProfile failed');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: getUserProfile failed'));
        return null;
     }
   }
@@ -101,7 +101,7 @@ class UserService {
     try {
       await _usersCollection.doc(profile.uid).update(profile.toJson());
     } catch (e, stackTrace) {
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: updateUserProfile failed');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: updateUserProfile failed'));
        rethrow;
     }
   }
@@ -127,7 +127,7 @@ class UserService {
       if (kDebugMode) {
         debugPrint('Error uploading avatar: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: uploadAvatar failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: uploadAvatar failed'));
       return null;
     }
   }
@@ -165,7 +165,7 @@ class UserService {
       }
       unawaited(FirebaseCrashlytics.instance.log('UserService: Successfully deleted data for user $uid.'));
     } catch(e, stackTrace) {
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: deleteUserAccountData failed');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: deleteUserAccountData failed'));
        rethrow;
     }
   }
@@ -182,7 +182,7 @@ class UserService {
         await _deleteFolderContents(prefix);
       }
     } catch (e, stackTrace) {
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: _deleteFolderContents failed');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: _deleteFolderContents failed'));
     }
   }
 }

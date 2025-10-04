@@ -38,8 +38,8 @@ class HistoricalDataService {
         musicChart: musicChart,
       );
     } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace,
-          reason: 'HistoricalDataService: getEmotionalAnchor failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
+          reason: 'HistoricalDataService: getEmotionalAnchor failed'));
       // Возвращаем null вместо rethrow, чтобы UI не падал
       return null;
     }
@@ -78,7 +78,7 @@ class HistoricalDataService {
        if (kDebugMode) {
          debugPrint('Error in _fetchArticleForSpecificDate: $e');
        }
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia article fetch failed');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia article fetch failed'));
     }
     return [];
   }
@@ -100,7 +100,7 @@ class HistoricalDataService {
       if (kDebugMode) {
         debugPrint('Error in _fetchOnThisDayEvents: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia OnThisDay fetch failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia OnThisDay fetch failed'));
     }
     return [];
   }
@@ -149,11 +149,11 @@ class HistoricalDataService {
           }
         }
       } catch (e, stackTrace) {
-        FirebaseCrashlytics.instance.recordError(
-          e, 
-          stackTrace, 
+        unawaited(FirebaseCrashlytics.instance.recordError(
+          e,
+          stackTrace,
           reason: 'Billboard week fetch failed for $formattedDate'
-        );
+        ));
         if (kDebugMode) {
           debugPrint('Error fetching week $formattedDate, trying previous week. Error: $e');
         }
@@ -193,11 +193,11 @@ class HistoricalDataService {
         if (kDebugMode) {
           debugPrint('Could not find chart items on Billboard page for $ymd. The page structure might have changed.');
         }
-        FirebaseCrashlytics.instance.recordError(
+        unawaited(FirebaseCrashlytics.instance.recordError(
           Exception('Billboard parsing failed: No chart items found'),
           null,
           reason: 'HTML structure might have changed for URL: $url'
-        );
+        ));
         return [];
       }
       
@@ -221,13 +221,13 @@ class HistoricalDataService {
       if (kDebugMode) {
         debugPrint('Timeout during Billboard fetch for $ymd: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Timeout for $ymd');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Timeout for $ymd'));
       rethrow;
     } catch(e, stackTrace) {
       if (kDebugMode) {
         debugPrint('Exception during Billboard fetch/parse for $ymd: $e');
       }
-       FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Fetch/Parse Exception for $ymd');
+       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Fetch/Parse Exception for $ymd'));
       rethrow;
     }
   }

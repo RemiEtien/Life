@@ -54,8 +54,8 @@ class FirestoreService {
       if (kDebugMode) {
         debugPrint('Error fetching from Firestore: $e');
       }
-      FirebaseCrashlytics.instance.recordError(e, stackTrace,
-          reason: 'Firestore: fetchAllMemoriesOnce failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
+          reason: 'Firestore: fetchAllMemoriesOnce failed'));
       return null;
     }
   }
@@ -111,7 +111,7 @@ class FirestoreService {
         }
       });
     } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: setMemory transaction failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: setMemory transaction failed'));
       rethrow;
     }
   }
@@ -162,7 +162,7 @@ class FirestoreService {
         }
       });
     } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: updateMemory transaction failed');
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: updateMemory transaction failed'));
       rethrow;
     }
   }
@@ -180,7 +180,7 @@ class FirestoreService {
         await _deleteMemoryFilesFromStorage(userId, firestoreId, memory);
         }
     } catch(e, stackTrace) {
-        FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: deleteMemory failed');
+        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: deleteMemory failed'));
         rethrow;
     }
   }
@@ -204,8 +204,8 @@ class FirestoreService {
             debugPrint('Could not delete file from Storage: $e');
           }
           // Log non-fatal error to Crashlytics, as the main memory doc might be deleted already
-          FirebaseCrashlytics.instance.recordError(e, stackTrace,
-              reason: 'Storage: Failed to delete file at $url');
+          unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
+              reason: 'Storage: Failed to delete file at $url'));
         }
       }
     }
@@ -229,7 +229,7 @@ class FirestoreService {
             final url = await ref.getDownloadURL();
             uploadedUrls.add(url);
           } catch(e, stackTrace) {
-             FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles failed for type $type');
+             unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles failed for type $type'));
              rethrow;
           }
         }

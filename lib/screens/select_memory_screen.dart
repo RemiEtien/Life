@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,11 +49,11 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
   Future<void> _addMediaToMemory(Memory memory) async {
     final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    ));
 
     try {
       final repo = ref.read(memoryRepositoryProvider);
@@ -130,7 +131,7 @@ class _SelectMemoryScreenState extends ConsumerState<SelectMemoryScreen> {
       );
 
       await repo.update(updatedMemory);
-      ref.read(syncServiceProvider).queueSync(memory.id);
+      unawaited(ref.read(syncServiceProvider).queueSync(memory.id));
 
       if (mounted) {
         Navigator.of(context).pop(); // Pop loading dialog

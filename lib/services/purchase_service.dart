@@ -123,7 +123,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       final receipt = purchaseDetails.verificationData.serverVerificationData;
 
       debugPrint('[PurchaseService] Calling verifyPurchase function with receipt for product ${purchaseDetails.productID}...');
-      
+
       final result = await callable.call({
         'platform': platform,
         'receipt': receipt,
@@ -131,7 +131,12 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       });
 
       debugPrint('[PurchaseService] Cloud function call successful. Result: ${result.data}');
-      
+
+      // ИЗМЕНЕНИЕ: Принудительно обновляем профиль пользователя после успешной покупки
+      // Это заставит isPremiumProvider пересчитаться
+      _ref.invalidate(userProfileProvider);
+      debugPrint('[PurchaseService] User profile invalidated to refresh premium status');
+
     } catch (e) {
       // ИЗМЕНЕНИЕ: Более детальное логирование ошибок
       debugPrint('[PurchaseService] Error verifying purchase with cloud function: $e');

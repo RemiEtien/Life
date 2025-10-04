@@ -30,7 +30,8 @@
       "Bash(npm install)",
       "Bash(npm test)",
       "Bash(firebase deploy:*)",
-      "Bash(gcloud firestore databases export:*)"
+      "Bash(gcloud firestore databases export:*)",
+      "Bash(firebase login:*)"
     ],
     "deny": [],
     "ask": []

@@ -439,7 +439,9 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
     if (!isPremium &&
         (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
-      await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+      if (mounted) {
+        await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+      }
       return;
     }
 
@@ -576,7 +578,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
 
         setState(() =>
             _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
-        _autoSaveDraft();
+        unawaited(_autoSaveDraft());
       }
     } else if (status.isPermanentlyDenied) {
       if (!mounted) return;
@@ -619,7 +621,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
             _isRecording = false;
             _audioNoteItems.add(AudioMediaItem(path: path, isLocal: true));
           });
-          _autoSaveDraft();
+          unawaited(_autoSaveDraft());
         }
       } else {
         final dir = await getTemporaryDirectory();
@@ -655,7 +657,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         lastDate: DateTime(2100));
     if (newDate != null) {
       setState(() => _date = newDate);
-      _autoSaveDraft();
+      unawaited(_autoSaveDraft());
     }
   }
 
@@ -682,7 +684,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       if (newTime != null) {
         setState(() => _followUpDate =
             newDate.copyWith(hour: newTime.hour, minute: newTime.minute));
-        _autoSaveDraft();
+        unawaited(_autoSaveDraft());
       }
     }
   }
@@ -719,8 +721,8 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
           _spotifyTrackIds.add(selectedTrackId);
         }
       });
-      _loadAllTrackDetails();
-      _autoSaveDraft();
+      unawaited(_loadAllTrackDetails());
+      unawaited(_autoSaveDraft());
     }
   }
 
@@ -747,6 +749,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Future<bool> _triggerUnlockFlow() async {
     final l10n = AppLocalizations.of(context)!;
     final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final encryptionState = ref.read(encryptionServiceProvider);
     final biometricService = ref.read(biometricServiceProvider);
     final profile = ref.read(userProfileProvider).value;
 
@@ -758,7 +761,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         !encryptionNotifier.isMemoryUnlocked(memoryId);
 
     // 1. If session is locked, we must unlock it first.
-    if (encryptionNotifier.state == EncryptionState.locked) {
+    if (encryptionState == EncryptionState.locked) {
       // Set a flag to prevent auto-locking during the prompt
       encryptionNotifier.prepareForUnlockAttempt();
       final sessionUnlocked = await _triggerSessionUnlockFlow();
@@ -1168,7 +1171,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       final success = await showCreateMasterPasswordDialog(context, ref);
       if (success) {
         setState(() => _isEncrypted = true);
-        _autoSaveDraft();
+        unawaited(_autoSaveDraft());
       }
     }
   }

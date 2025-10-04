@@ -345,7 +345,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     await _audioNotePlayer.play(source);
     setState(() => _isAudioNotePlaying = true);
 
-    _audioNotePlayer.onPlayerComplete.first.then((_) {
+    unawaited(_audioNotePlayer.onPlayerComplete.first.then((_) {
       if (mounted) {
         setState(() {
           _isAudioNotePlaying = false;
@@ -353,7 +353,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
               (_currentAudioNoteIndex + 1) % audioPaths.length;
         });
       }
-    });
+    }));
   }
 
   Future<void> _editMemory() async {
@@ -403,11 +403,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     if (confirmed == true) {
       final memoryRepo = ref.read(memoryRepositoryProvider);
       final firestoreService = ref.read(firestoreServiceProvider);
-      final currentContext = context;
 
       if (memoryRepo == null) {
         if (mounted) {
-          ScaffoldMessenger.of(currentContext).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.memoryViewErrorLocalDb)));
         }
         return;
@@ -417,7 +416,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       await memoryRepo.delete(memoryToDelete.id);
 
       if (!mounted) return;
-      Navigator.of(currentContext).pop(true);
+      Navigator.of(context).pop(true);
 
       ref.read(messageProvider.notifier).addMessage(
             l10n.memoryViewMemoryDeleted,
@@ -447,7 +446,6 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   Future<void> _exportAndShare(String format) async {
     if (_isExporting) return;
     setState(() => _isExporting = true);
-    final currentContext = context;
     File? tempFile;
 
     try {
@@ -523,7 +521,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       // ignore: avoid_print
       print('Export failed: $e\n$stack');
       if (mounted) {
-        ScaffoldMessenger.of(currentContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Export failed: $e')),
         );
       }
@@ -594,6 +592,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   Future<bool> _handleUnlockRequest() async {
     final l10n = AppLocalizations.of(context)!;
     final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
+    final encryptionState = ref.read(encryptionServiceProvider);
     final biometricService = ref.read(biometricServiceProvider);
     final profile = ref.read(userProfileProvider).value;
 
@@ -602,7 +601,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         !encryptionNotifier.isMemoryUnlocked(_currentMemory.id);
 
     // 1. If session is locked, we need to unlock it first.
-    if (encryptionNotifier.state == EncryptionState.locked) {
+    if (encryptionState == EncryptionState.locked) {
       final unlocked = await _triggerSessionUnlockFlow();
       if (!unlocked) return false;
     }
@@ -736,7 +735,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     );
 
     if (unlocked == true && mounted) {
-      ref.read(syncServiceProvider).resumeSync();
+      unawaited(ref.read(syncServiceProvider).resumeSync());
     }
     return unlocked ?? false;
   }
@@ -804,7 +803,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
         await _audioNotifier.stopAmbientSound();
@@ -2525,16 +2524,18 @@ class _ShareMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Wrap(
-        children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.picture_as_pdf),
-            title: Text(l10n.memoryViewExportPdf),
-            onTap: onExport,
-          ),
-        ],
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.picture_as_pdf),
+              title: Text(l10n.memoryViewExportPdf),
+              onTap: onExport,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1565,11 +1565,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                         }
                         break;
                       case 'sign_out':
-                        ref.read(audioPlayerProvider.notifier).stopAndReset();
-                        ref
+                        unawaited(ref.read(audioPlayerProvider.notifier).stopAndReset());
+                        unawaited(ref
                             .read(encryptionServiceProvider.notifier)
-                            .lockSession();
-                        ref.read(authServiceProvider).signOut();
+                            .lockSession());
+                        unawaited(ref.read(authServiceProvider).signOut());
                         break;
                     }
                   },

@@ -410,7 +410,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 final updatedProfile =
                     profile.copyWith(languageCode: entry.key);
                 await userService.updateUserProfile(updatedProfile);
-                localeNotifier.setLocale(Locale(entry.key));
+                unawaited(localeNotifier.setLocale(Locale(entry.key)));
                 if (context.mounted) {
                   Navigator.pop(context);
                 }
@@ -427,8 +427,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!mounted) return;
     setState(() => _isDeleting = true);
 
-    FirebaseCrashlytics.instance
-        .log('ProfileScreen: Starting account deletion process.');
+    unawaited(FirebaseCrashlytics.instance
+        .log('ProfileScreen: Starting account deletion process.'));
     if (!mounted) return;
     final audioNotifier = ref.read(audioPlayerProvider.notifier);
     final authService = ref.read(authServiceProvider);
@@ -436,8 +436,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     await audioNotifier.stopAndReset();
     final result = await authService.deleteAccount();
     if (!mounted) {
-      FirebaseCrashlytics.instance
-          .log('ProfileScreen: Unmounted during deleteAccount.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('ProfileScreen: Unmounted during deleteAccount.'));
       return;
     }
     if (result == 'success') {
@@ -448,14 +448,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     if (result == 'requires-recent-login') {
-      FirebaseCrashlytics.instance
-          .log('ProfileScreen: Account deletion requires re-authentication.');
+      unawaited(FirebaseCrashlytics.instance
+          .log('ProfileScreen: Account deletion requires re-authentication.'));
       final user = FirebaseAuth.instance.currentUser;
       final providerId = user?.providerData.firstOrNull?.providerId;
       bool reauthSuccess = false;
 
-      FirebaseCrashlytics.instance
-          .log('ProfileScreen: Re-auth needed for provider: $providerId');
+      unawaited(FirebaseCrashlytics.instance
+          .log('ProfileScreen: Re-auth needed for provider: $providerId'));
 
       try {
         if (providerId == 'password') {
@@ -471,34 +471,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         unawaited(FirebaseCrashlytics.instance.log(
             'ProfileScreen: Re-authentication success status: $reauthSuccess'));
         if (reauthSuccess) {
-          FirebaseCrashlytics.instance
-              .log('ProfileScreen: Retrying delete after successful re-auth.');
+          unawaited(FirebaseCrashlytics.instance
+              .log('ProfileScreen: Retrying delete after successful re-auth.'));
           if (!mounted) return;
           final finalResult = await authService.deleteAccount();
           if (!mounted) return;
 
           if (finalResult == 'success') {
-            FirebaseCrashlytics.instance
-                .log('ProfileScreen: Second deletion attempt successful.');
+            unawaited(FirebaseCrashlytics.instance
+                .log('ProfileScreen: Second deletion attempt successful.'));
             Navigator.of(context).popUntil((route) => route.isFirst);
             return;
           } else {
-            FirebaseCrashlytics.instance.recordError(
+            unawaited(FirebaseCrashlytics.instance.recordError(
               Exception('Account deletion failed after re-auth'),
               null,
               reason: finalResult,
-            );
+            ));
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(finalResult)));
           }
         } else {
-          FirebaseCrashlytics.instance
-              .log('ProfileScreen: Re-authentication was cancelled or failed.');
+          unawaited(FirebaseCrashlytics.instance
+              .log('ProfileScreen: Re-authentication was cancelled or failed.'));
         }
       } catch (e, s) {
         if (!mounted) return;
-        FirebaseCrashlytics.instance.recordError(e, s,
-            reason: 'Error during re-authentication flow.');
+        unawaited(FirebaseCrashlytics.instance.recordError(e, s,
+            reason: 'Error during re-authentication flow.'));
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
@@ -507,11 +507,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         setState(() => _isDeleting = false);
       }
     } else {
-      FirebaseCrashlytics.instance.recordError(
+      unawaited(FirebaseCrashlytics.instance.recordError(
         Exception('Account deletion failed on first attempt'),
         null,
         reason: result,
-      );
+      ));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result)),
@@ -665,7 +665,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
     if (confirmed == true) {
       if (mounted) {
-        _handleDeleteAccount(l10n);
+        unawaited(_handleDeleteAccount(l10n));
       }
     }
   }
@@ -693,7 +693,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (!mounted) return;
       final notifier = ref.read(onboardingServiceProvider.notifier);
       await notifier.replayTour();
-      Navigator.of(context).pop('replay_onboarding');
+      if (mounted) {
+        Navigator.of(context).pop('replay_onboarding');
+      }
     }
   }
 

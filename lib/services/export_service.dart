@@ -10,6 +10,7 @@ import 'package:pdf/pdf.dart';
 // ignore: depend_on_referenced_packages
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:isolate';
+import 'package:image/image.dart' as img;
 
 /// Сервис, отвечающий за логику генерации PDF и JSON файлов.
 class ExportService {
@@ -91,7 +92,22 @@ Future<Uint8List> _generatePdf(
   for (final path in localImagePaths) {
     final file = File(path);
     if (await file.exists()) {
-      imageProviders.add(pw.MemoryImage(await file.readAsBytes()));
+      // Читаем и сжимаем изображение перед добавлением в PDF
+      final imageBytes = await file.readAsBytes();
+      final originalImage = img.decodeImage(imageBytes);
+
+      if (originalImage != null) {
+        // Уменьшаем до максимум 800px по большей стороне
+        final resized = img.copyResize(
+          originalImage,
+          width: originalImage.width > originalImage.height ? 800 : null,
+          height: originalImage.height > originalImage.width ? 800 : null,
+        );
+
+        // Сжимаем в JPEG с качеством 85
+        final compressedBytes = img.encodeJpg(resized, quality: 85);
+        imageProviders.add(pw.MemoryImage(Uint8List.fromList(compressedBytes)));
+      }
     }
   }
 
@@ -101,7 +117,13 @@ Future<Uint8List> _generatePdf(
       try {
         final response = await http.get(Uri.parse(details.albumArtUrl!));
         if (response.statusCode == 200) {
-          spotifyArtworks[details.id] = pw.MemoryImage(response.bodyBytes);
+          // Сжимаем обложку альбома
+          final originalImage = img.decodeImage(response.bodyBytes);
+          if (originalImage != null) {
+            final resized = img.copyResize(originalImage, width: 200);
+            final compressedBytes = img.encodeJpg(resized, quality: 85);
+            spotifyArtworks[details.id] = pw.MemoryImage(Uint8List.fromList(compressedBytes));
+          }
         }
       } catch (e) {
         // ignore: avoid_print

@@ -520,3 +520,56 @@ exports.deleteUserData = functions.auth.user().onDelete(async (user) => {
   console.log(`Finished cleanup for user: ${uid}`);
   return null;
 });
+
+/**
+ * Scheduled function для очистки старых использованных чеков (старше 90 дней)
+ * Запускается каждый день в 3:00 UTC
+ */
+exports.cleanupOldReceipts = functions.pubsub.schedule("0 3 * * *")
+    .timeZone("UTC")
+    .onRun(async (context) => {
+      const db = admin.firestore();
+      const now = admin.firestore.Timestamp.now();
+      const ninetyDaysAgo = admin.firestore.Timestamp.fromMillis(
+          now.toMillis() - (90 * 24 * 60 * 60 * 1000), // 90 дней в миллисекундах
+      );
+
+      console.log(`[cleanupOldReceipts] Starting cleanup of receipts older than ${ninetyDaysAgo.toDate().toISOString()}`);
+
+      try {
+        // Находим все старые чеки
+        const oldReceiptsQuery = db.collection("used_receipts")
+            .where("usedAt", "<", ninetyDaysAgo)
+            .limit(500); // Обрабатываем по 500 за раз для избежания таймаутов
+
+        const snapshot = await oldReceiptsQuery.get();
+
+        if (snapshot.empty) {
+          console.log("[cleanupOldReceipts] No old receipts found to delete.");
+          return null;
+        }
+
+        // Удаляем найденные документы батчами
+        const batch = db.batch();
+        let deleteCount = 0;
+
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+          deleteCount++;
+        });
+
+        await batch.commit();
+
+        console.log(`[cleanupOldReceipts] Successfully deleted ${deleteCount} old receipt(s).`);
+
+        // Если были найдены 500 документов, возможно есть еще - логируем предупреждение
+        if (deleteCount === 500) {
+          console.warn("[cleanupOldReceipts] Deleted 500 receipts (batch limit). There may be more old receipts to clean up in the next run.");
+        }
+
+        return null;
+      } catch (error) {
+        console.error("[cleanupOldReceipts] Error during cleanup:", error);
+        throw error;
+      }
+    });
