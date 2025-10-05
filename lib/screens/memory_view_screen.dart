@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../l10n/app_localizations.dart';
@@ -62,6 +63,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   final Map<String, String?> _decryptedContent = {};
   bool _needsUnlock = false;
+  bool _decryptionErrorShown = false; // Track if error dialog was shown
 
   List<String> _displayImagePaths = [];
   List<String> _displayVideoPaths = [];
@@ -157,6 +159,64 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       if (mounted && !_needsUnlock) {
         setState(() {
           _needsUnlock = true;
+        });
+      }
+    } on DecryptionFailedException catch (e, stackTrace) {
+      // Handle decryption-specific errors (corrupted data, wrong key, etc.)
+      if (kDebugMode) {
+        debugPrint('[MemoryView] Decryption failed: ${e.message}');
+      }
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'MemoryView: Decryption failed for memory ${_currentMemory.id} - ${e.message}',
+        fatal: false,
+      ));
+
+      // Set decrypted content to detailed error message and update UI
+      if (mounted) {
+        setState(() {
+          _decryptedContent['content'] = '[Decryption Error: ${e.message}]';
+          _decryptedContent['reflectionImpact'] = '';
+          _decryptedContent['reflectionLesson'] = '';
+          _decryptedContent['reflectionAutoThought'] = '';
+          _decryptedContent['reflectionEvidenceFor'] = '';
+          _decryptedContent['reflectionEvidenceAgainst'] = '';
+          _decryptedContent['reflectionReframe'] = '';
+          _decryptedContent['reflectionAction'] = '';
+          _needsUnlock = false; // Remove lock overlay to show error message
+        });
+
+        // Show recovery dialog once (avoid spam on rebuild)
+        if (!_decryptionErrorShown) {
+          _decryptionErrorShown = true;
+          _showDecryptionErrorDialog();
+        }
+      }
+    } catch (e, stackTrace) {
+      // Handle any other unexpected errors
+      if (kDebugMode) {
+        debugPrint('[MemoryView] Unexpected error during decryption: $e');
+      }
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'MemoryView: Unexpected decryption error for memory ${_currentMemory.id}',
+        fatal: false,
+      ));
+
+      // Set decrypted content to generic error message and update UI
+      if (mounted) {
+        setState(() {
+          _decryptedContent['content'] = '[Decryption Error: ${e.toString()}]';
+          _decryptedContent['reflectionImpact'] = '';
+          _decryptedContent['reflectionLesson'] = '';
+          _decryptedContent['reflectionAutoThought'] = '';
+          _decryptedContent['reflectionEvidenceFor'] = '';
+          _decryptedContent['reflectionEvidenceAgainst'] = '';
+          _decryptedContent['reflectionReframe'] = '';
+          _decryptedContent['reflectionAction'] = '';
+          _needsUnlock = false; // Remove lock overlay to show error message
         });
       }
     }
@@ -740,6 +800,146 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     return unlocked ?? false;
   }
 
+  Future<void> _showDecryptionErrorDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final action = await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red.shade700, size: 28),
+            const SizedBox(width: 12),
+            const Expanded(child: Text('Decryption Failed')),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'This memory cannot be decrypted with your current encryption key.',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 16),
+              const Text('Possible reasons:'),
+              const SizedBox(height: 8),
+              const Text('• Master password was changed'),
+              const Text('• Memory was encrypted on another device'),
+              const Text('• Encryption data is corrupted'),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.orange.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        const Text('Recovery Options:',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('1. Keep encrypted: Memory stays locked but visible in timeline'),
+                    const Text('2. Delete memory: Permanently remove this memory'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('keep'),
+            child: Text(l10n.profileCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('delete'),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete Memory'),
+          ),
+        ],
+      ),
+    );
+
+    if (action == 'delete' && mounted) {
+      await _confirmAndDeleteMemory();
+    }
+  }
+
+  Future<void> _confirmAndDeleteMemory() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Memory?'),
+        content: const Text(
+          'This will permanently delete this memory from all your devices. This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.profileCancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        final repo = ref.read(memoryRepositoryProvider);
+        final userProfile = ref.read(userProfileProvider).value;
+
+        if (repo != null && userProfile != null) {
+          await repo.delete(_currentMemory.id);
+
+          // Delete from cloud if it has firestoreId
+          if (_currentMemory.firestoreId != null) {
+            final firestoreService = ref.read(firestoreServiceProvider);
+            await firestoreService.deleteMemory(userProfile.uid, _currentMemory);
+          }
+
+          if (mounted) {
+            Navigator.of(context).pop(); // Close MemoryViewScreen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Memory deleted successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete memory: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
 
   void _showMediaPopup(int initialIndex) {
     // ... (rest of the method is unchanged)
@@ -837,9 +1037,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         color: Colors.black.withAlpha((255 * 0.2).round())),
                   ),
                 ),
-              NestedScrollView(
-                headerSliverBuilder:
-                    (context, innerBoxIsScrolled) {
+              SafeArea(
+                child: NestedScrollView(
+                  headerSliverBuilder:
+                      (context, innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
                       leading: IconButton(
@@ -912,6 +1113,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   ],
                 ),
               ),
+                ),
             ],
           ),
         ),

@@ -32,7 +32,10 @@
       "Bash(firebase deploy:*)",
       "Bash(gcloud firestore databases export:*)",
       "Bash(firebase login:*)",
-      "Bash(flutter:*)"
+      "Bash(flutter:*)",
+      "Bash(grep:*)",
+      "Read(//c//**)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []

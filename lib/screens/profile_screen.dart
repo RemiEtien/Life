@@ -817,9 +817,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   );
                 }
 
-                return ListView(
-                  padding: const EdgeInsets.all(16.0),
-                  children: [
+                return SafeArea(
+                  child: ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: [
                     _buildSectionTitle(l10n.profileSectionProfile, context),
                     const SizedBox(height: 16),
                     Center(
@@ -925,7 +926,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 32),
                     _buildVersionInfo(),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
@@ -1025,8 +1027,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               'v$version ($buildNumber)',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 12,
+                color: Colors.grey.shade400,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
               ),
             ),
           );

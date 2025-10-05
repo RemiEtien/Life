@@ -44,6 +44,15 @@ class EncryptionUnlockException implements Exception {
   String toString() => message;
 }
 
+/// Exception thrown when decryption fails (wrong key, corrupted data, etc.)
+class DecryptionFailedException implements Exception {
+  final String message;
+  final dynamic originalError;
+  const DecryptionFailedException(this.message, {this.originalError});
+  @override
+  String toString() => 'DecryptionFailedException: $message${originalError != null ? ' (${originalError.toString()})' : ''}';
+}
+
 // Represents the state of encryption for the current user session.
 enum EncryptionState {
   notConfigured,
@@ -575,10 +584,14 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         final legacyEncrypter = Encrypter(AES(_unlockedDEK!));
         return legacyEncrypter.decrypt(encrypted, iv: iv);
       }
-      throw Exception('Unsupported encrypted payload format');
+      throw DecryptionFailedException('Unsupported encrypted payload format');
     } catch (e) {
       if (kDebugMode) debugPrint('Decryption failed: $e');
-      return '[Decryption Error]';
+      // Re-throw as DecryptionFailedException if it's not already
+      if (e is DecryptionFailedException) {
+        rethrow;
+      }
+      throw DecryptionFailedException('Failed to decrypt content', originalError: e);
     }
   }
 

@@ -843,16 +843,18 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       }
       _autosaveTimer?.cancel(); // Stop autosave after a successful final save.
 
+      // Give the stream a moment to propagate changes to UI before closing screen
+      // This ensures the memory appears on the timeline immediately
+      await Future.delayed(const Duration(milliseconds: 100));
+
       if (mounted) {
         Navigator.of(context).pop(true);
       }
 
-      // Start async tasks after the screen is closed
+      // Start async sync in background (don't await - let it run)
       unawaited(Future.microtask(() {
-        if (mounted) {
-          ref.read(syncServiceProvider).queueSync(savedMemory.id);
-          _handleReflectionReminder(savedMemory);
-        }
+        ref.read(syncServiceProvider).queueSync(savedMemory.id);
+        _handleReflectionReminder(savedMemory);
       }));
     } catch (e) {
       if (mounted) {
@@ -1015,10 +1017,11 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                     tooltip: l10n.memoryEditSave)
           ],
         ),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
+        body: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.all(16),
             children: [
               _AutosavingTextField(
                 controller: _titleCtrl,
@@ -1114,6 +1117,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 
