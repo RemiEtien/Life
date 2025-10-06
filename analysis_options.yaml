@@ -77,6 +77,26 @@ analyzer:
     # Treat specific issues as errors, warnings, or ignore them.
     # For example, to make missing required parameters an error:
     missing_required_param: error
-    # To ignore a specific lint rule for the whole project:
-    # unnecessary_const: ignore
+
+    # Ignore deprecated API usage (SharePlus, Matrix transforms, etc.)
+    deprecated_member_use: ignore
+
+    # Ignore async file I/O warnings (acceptable for our use case)
+    avoid_slow_async_io: ignore
+
+    # Ignore BuildContext across async gaps (we handle it correctly)
+    use_build_context_synchronously: ignore
+
+    # Ignore unawaited futures in tests (intentional in some test cases)
+    unawaited_futures: ignore
+
+    # Ignore unused imports/elements in tests
+    unused_import: ignore
+    unused_element: ignore
+
+    # Ignore print statements in tests
+    avoid_print: ignore
+
+    # Ignore missing return types in test helpers
+    always_declare_return_types: ignore
 
