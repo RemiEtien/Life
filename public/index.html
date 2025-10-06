@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lifeline - The Artery of Your Life</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Lifeline - The Artery of Your Life v2</title>
     <style>
         * {
             margin: 0;
@@ -48,6 +51,7 @@
             transform: translateX(-50%);
             text-align: center;
             transition: opacity 0.5s;
+            z-index: 5;
         }
 
         .hero h1 {
@@ -117,6 +121,7 @@
             top: 50px;
             left: 40px;
             display: flex;
+            flex-direction: row;
             gap: 15px;
             pointer-events: all;
         }
@@ -276,6 +281,7 @@
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             box-shadow: 0 20px 100px rgba(100, 30, 30, 0.5);
             backdrop-filter: blur(20px);
+            z-index: 2000;
         }
 
         .content-section.active {
@@ -392,6 +398,7 @@
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             box-shadow: 0 20px 100px rgba(255, 100, 100, 0.4);
             backdrop-filter: blur(20px);
+            z-index: 2000;
         }
 
         .node-detail-panel.active {
@@ -453,47 +460,78 @@
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 48px; letter-spacing: 4px; }
-            .hero p { font-size: 18px; padding: 0 20px; }
+            .hero {
+                top: 15px;
+            }
+            .hero h1 {
+                font-size: 32px;
+                letter-spacing: 3px;
+                margin-bottom: 5px;
+            }
+            .hero p {
+                font-size: 14px;
+                padding: 0 20px;
+            }
             .node-detail-panel { padding: 30px; }
             .node-detail-panel h2 { font-size: 32px; }
-            .zoom-controls { bottom: 20px; right: 20px; }
+            .zoom-controls {
+                bottom: 20px;
+                right: 20px;
+                gap: 8px;
+            }
+            .zoom-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
             .info { display: none; }
             .download-links {
-                top: 20px;
-                left: 20px;
+                top: 15px;
+                left: 15px;
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+                z-index: 100;
+            }
+            @media (orientation: landscape) and (max-width: 768px) {
+                .download-links {
+                    flex-direction: row;
+                    gap: 8px;
+                }
             }
             .hamburger {
-                top: 20px;
-                right: 20px;
-                width: 45px;
-                height: 45px;
+                top: 15px;
+                right: 15px;
+                width: 44px;
+                height: 44px;
             }
             .menu {
-                top: 75px;
-                right: 20px;
+                top: 70px;
+                right: 15px;
+                min-width: 160px;
             }
             .store-btn span {
                 display: none;
             }
             .store-btn {
                 padding: 10px;
+                width: 44px;
+                height: 44px;
+                justify-content: center;
             }
             .menu-btn {
                 padding: 10px 16px;
-                font-size: 12px;
+                font-size: 13px;
             }
             .content-section {
                 padding: 30px 20px;
                 max-height: 85vh;
+                width: 95%;
             }
             .content-section h2 {
-                font-size: 28px;
+                font-size: 24px;
             }
             .content-section h3 {
-                font-size: 20px;
+                font-size: 18px;
             }
             .feature-grid {
                 grid-template-columns: 1fr;
@@ -569,7 +607,6 @@
                         <p style="margin: 10px 0;"><span style="color: #88bb88;">✓</span> Tags & search</p>
                         <p style="margin: 10px 0; color: #666;">✗ Audio recordings</p>
                         <p style="margin: 10px 0; color: #666;">✗ Video recordings</p>
-                        <p style="margin: 10px 0; color: #666;">✗ AI analysis</p>
                         <p style="margin: 10px 0; color: #666;">✗ End-to-end encryption</p>
                         <p style="margin: 10px 0; color: #666;">✗ Audio anchors</p>
                     </div>
@@ -726,7 +763,6 @@
                     <li>All memories and entries</li>
                     <li>Photos, videos, and audio recordings</li>
                     <li>Tags, emotions, and metadata</li>
-                    <li>AI analysis data</li>
                     <li>Account settings and preferences</li>
                 </ul>
             </div>
@@ -825,7 +861,8 @@
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
 
-        // Camera system
+        // Camera system - adaptive for mobile
+        const isMobile = window.innerWidth < 768;
         let camera = {
             x: 0,
             y: 0,
@@ -833,8 +870,8 @@
             targetY: 0,
             zoom: 1,
             targetZoom: 1,
-            minZoom: 0.5,
-            maxZoom: 3,
+            minZoom: isMobile ? 0.15 : 0.5,
+            maxZoom: isMobile ? 2.0 : 3,
             initialized: false
         };
 
@@ -843,9 +880,33 @@
         let dragStart = { x: 0, y: 0 };
         let cameraStart = { x: 0, y: 0 };
 
+        // Touch/pinch system
+        let lastTouchDistance = 0;
+        let touchStartZoom = 1;
+
         window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
+
+            // Regenerate path with new dimensions
+            path = getLifelinePath();
+
+            // Re-center camera on resized path (account for zoom)
+            const centerPoint = path[Math.floor(path.length / 2)];
+            camera.x = camera.targetX = centerPoint.x * camera.zoom - width / 2;
+            camera.y = camera.targetY = centerPoint.y * camera.zoom - height / 2;
+
+            // Update camera zoom limits on resize
+            const mobile = window.innerWidth < 768;
+            if (mobile) {
+                camera.minZoom = 0.15;
+                camera.maxZoom = 2.0;
+                if (camera.targetZoom > 2.0) camera.targetZoom = 2.0;
+                if (camera.targetZoom < 0.15) camera.targetZoom = 0.2;
+            } else {
+                camera.minZoom = 0.5;
+                camera.maxZoom = 3.0;
+            }
         });
 
         // Nodes data with muted colors and interesting symbols
@@ -880,8 +941,8 @@
             {
                 icon: '◯',  // Open circle for reflection/insight
                 title: 'Reflection',
-                description: 'AI analysis of your entries helps find patterns, track mood and gain insights about yourself.',
-                detailedDesc: 'Artificial intelligence analyzes your entries and helps find patterns in your life. Track mood changes, discover connections between events, get personal insights. AI - your personal life analyst.',
+                description: 'Review your past entries to find patterns, track your emotional journey and gain insights.',
+                detailedDesc: 'Look back at your memories and emotions to understand patterns in your life. Track mood changes, discover connections between events, and gain personal insights through reflection on your journey.',
                 age: '30 YEARS',
                 position: 0.70,
                 color: '#5577AA'
@@ -983,32 +1044,45 @@
 
         const orbs = Array.from({ length: 12 }, () => new EnergyOrb());
 
-        // Lifeline path - main artery
+        // Lifeline path - main artery (adaptive for mobile/desktop)
         function getLifelinePath() {
             const points = [];
             const startX = width * 0.15;
             const endX = width * 1.75;
-            const centerY = height;
+            const mobile = window.innerWidth < 768;
+
+            // Different positioning for mobile vs desktop
+            const centerY = mobile ? height * 0.5 : height;
             const segments = 200;
 
             for (let i = 0; i <= segments; i++) {
                 const t = i / segments;
                 const x = startX + (endX - startX) * t;
 
-                const wave1 = Math.sin(t * Math.PI * 4) * 120;
-                const wave2 = Math.sin(t * Math.PI * 7) * 60;
-                const wave3 = Math.cos(t * Math.PI * 3) * 90;
-                const wave4 = Math.sin(t * Math.PI * 12) * 30;
-
-                const y = centerY + wave1 + wave2 + wave3 + wave4;
-
-                points.push({ x, y, t });
+                // Different wave amplitudes for mobile (flatter) vs desktop (original)
+                if (mobile) {
+                    // Flatter line for mobile
+                    const wave1 = Math.sin(t * Math.PI * 4) * 40;
+                    const wave2 = Math.sin(t * Math.PI * 7) * 20;
+                    const wave3 = Math.cos(t * Math.PI * 3) * 30;
+                    const wave4 = Math.sin(t * Math.PI * 12) * 10;
+                    const y = centerY + wave1 + wave2 + wave3 + wave4;
+                    points.push({ x, y, t });
+                } else {
+                    // Original curved line for desktop
+                    const wave1 = Math.sin(t * Math.PI * 4) * 120;
+                    const wave2 = Math.sin(t * Math.PI * 7) * 60;
+                    const wave3 = Math.cos(t * Math.PI * 3) * 90;
+                    const wave4 = Math.sin(t * Math.PI * 12) * 30;
+                    const y = centerY + wave1 + wave2 + wave3 + wave4;
+                    points.push({ x, y, t });
+                }
             }
 
             return points;
         }
 
-        const path = getLifelinePath();
+        let path = getLifelinePath();
 
         // Create nodes
         class Node {
@@ -1124,13 +1198,14 @@
                     ctx.fillText(this.data.age, this.x, this.y - size - 20);
                 }
 
-                // Hover info (show on normal stage)
+                // Hover panel
                 if (stage === 'normal' && this.hoverTime > 0.3) {
                     const panelWidth = 300;
                     const panelHeight = 150;
                     const panelX = this.x - panelWidth / 2;
                     const panelY = this.y + size + 30;
 
+                    ctx.save();
                     ctx.globalAlpha = this.hoverTime;
 
                     // Panel background
@@ -1167,7 +1242,7 @@
                     });
                     ctx.fillText(line, panelX + 20, y);
 
-                    ctx.globalAlpha = 1;
+                    ctx.restore();
                 }
 
                 ctx.restore();
@@ -1199,8 +1274,8 @@
             // Initialize camera position on first frame
             if (!camera.initialized && path.length > 0) {
                 const centerPoint = path[Math.floor(path.length / 2)];
-                camera.x = camera.targetX = centerPoint.x - width / 2;
-                camera.y = camera.targetY = centerPoint.y - height / 2;
+                camera.x = camera.targetX = centerPoint.x * camera.zoom - width / 2;
+                camera.y = camera.targetY = centerPoint.y * camera.zoom - height / 2;
                 camera.initialized = true;
             }
 
@@ -1272,7 +1347,14 @@
             ctx.restore();
 
             // Update and draw nodes
-            nodes.forEach(node => {
+            // Sort nodes so hovering nodes are drawn last (on top)
+            const sortedNodes = [...nodes].sort((a, b) => {
+                if (a.hoverTime > 0.3 && b.hoverTime <= 0.3) return 1;
+                if (b.hoverTime > 0.3 && a.hoverTime <= 0.3) return -1;
+                return 0;
+            });
+
+            sortedNodes.forEach(node => {
                 node.update(time, mousePos.x, mousePos.y);
                 node.draw(time);
             });
@@ -1312,10 +1394,118 @@
 
             nodes.forEach(node => {
                 if (node.isClicked(e.clientX, e.clientY)) {
+                    // Center camera on clicked node in world coordinates
+                    camera.targetX = (node.x - width / 2 / camera.zoom) * camera.zoom;
+                    camera.targetY = (node.y - height / 2 / camera.zoom) * camera.zoom;
+
                     showNodeDetail(node.data);
                 }
             });
         });
+
+        // Touch events for mobile
+        let touchStartTime = 0;
+        let touchMoved = false;
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+
+            if (e.touches.length === 1) {
+                // Single touch - drag
+                isDragging = true;
+                touchStartTime = Date.now();
+                touchMoved = false;
+                const touch = e.touches[0];
+                dragStart = { x: touch.clientX, y: touch.clientY };
+                cameraStart = { x: camera.targetX, y: camera.targetY };
+            } else if (e.touches.length === 2) {
+                // Two fingers - pinch to zoom
+                isDragging = false;
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const dx = touch2.clientX - touch1.clientX;
+                const dy = touch2.clientY - touch1.clientY;
+                lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+                touchStartZoom = camera.targetZoom;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+
+            if (e.touches.length === 1 && isDragging) {
+                // Single touch drag
+                const touch = e.touches[0];
+                const dx = touch.clientX - dragStart.x;
+                const dy = touch.clientY - dragStart.y;
+
+                // Check if moved significantly
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    touchMoved = true;
+                }
+
+                mousePos = { x: touch.clientX, y: touch.clientY };
+                camera.targetX = cameraStart.x - dx;
+                camera.targetY = cameraStart.y - dy;
+                camera.x = camera.targetX;
+                camera.y = camera.targetY;
+            } else if (e.touches.length === 2) {
+                // Pinch to zoom
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const dx = touch2.clientX - touch1.clientX;
+                const dy = touch2.clientY - touch1.clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (lastTouchDistance > 0) {
+                    const scale = distance / lastTouchDistance;
+                    const newZoom = Math.max(camera.minZoom, Math.min(camera.maxZoom, touchStartZoom * scale));
+
+                    // Zoom towards center of two touches
+                    const centerX = (touch1.clientX + touch2.clientX) / 2;
+                    const centerY = (touch1.clientY + touch2.clientY) / 2;
+
+                    const worldX = (centerX + camera.targetX) / camera.targetZoom;
+                    const worldY = (centerY + camera.targetY) / camera.targetZoom;
+
+                    camera.targetX = worldX * newZoom - centerX;
+                    camera.targetY = worldY * newZoom - centerY;
+                    camera.targetZoom = newZoom;
+                }
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+
+            if (e.touches.length === 0) {
+                // Check if this was a tap (not a drag)
+                const touchDuration = Date.now() - touchStartTime;
+                if (!touchMoved && touchDuration < 300) {
+                    // This was a tap - check for node click
+                    const touch = e.changedTouches[0];
+                    nodes.forEach(node => {
+                        if (node.isClicked(touch.clientX, touch.clientY)) {
+                            // Center camera on clicked node
+                            camera.targetX = (node.x - width / 2 / camera.zoom) * camera.zoom;
+                            camera.targetY = (node.y - height / 2 / camera.zoom) * camera.zoom;
+
+                            showNodeDetail(node.data);
+                        }
+                    });
+                }
+
+                isDragging = false;
+                lastTouchDistance = 0;
+            } else if (e.touches.length === 1) {
+                // One finger released, restart drag with remaining finger
+                const touch = e.touches[0];
+                dragStart = { x: touch.clientX, y: touch.clientY };
+                cameraStart = { x: camera.targetX, y: camera.targetY };
+                isDragging = true;
+                lastTouchDistance = 0;
+            }
+        }, { passive: false });
 
         // Zoom controls
         canvas.addEventListener('wheel', (e) => {
@@ -1347,8 +1537,8 @@
             camera.targetZoom = 1;
             // Center the lifeline path in the viewport
             const centerPoint = path[Math.floor(path.length / 2)];
-            camera.targetX = centerPoint.x - width / 2;
-            camera.targetY = centerPoint.y - height / 2;
+            camera.targetX = centerPoint.x * camera.targetZoom - width / 2;
+            camera.targetY = centerPoint.y * camera.targetZoom - height / 2;
         });
 
         // Detail panel
