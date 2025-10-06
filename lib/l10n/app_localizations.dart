@@ -2277,6 +2277,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.'**
   String get biometricUnlockFailedMessage;
+
+  /// No description provided for @lifelineInsightStreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'🔥 {count} day streak'**
+  String lifelineInsightStreakDays(int count);
+
+  /// No description provided for @lifelineInsightMemoriesThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'📝 {count} memories this month'**
+  String lifelineInsightMemoriesThisMonth(int count);
+
+  /// No description provided for @lifelineInsightMemoriesThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'✨ {count} new this week'**
+  String lifelineInsightMemoriesThisWeek(int count);
+
+  /// No description provided for @lifelineInsightReflectionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'⭐ {count} reflections'**
+  String lifelineInsightReflectionsCount(int count);
+
+  /// No description provided for @lifelineInsightPhotosCount.
+  ///
+  /// In en, this message translates to:
+  /// **'📸 {count} photos'**
+  String lifelineInsightPhotosCount(int count);
+
+  /// No description provided for @lifelineInsightAudioCount.
+  ///
+  /// In en, this message translates to:
+  /// **'🎵 {count} audio notes'**
+  String lifelineInsightAudioCount(int count);
+
+  /// No description provided for @lifelineInsightSpanningYears.
+  ///
+  /// In en, this message translates to:
+  /// **'📅 Spanning {years} years'**
+  String lifelineInsightSpanningYears(int years);
+
+  /// No description provided for @lifelineInsightTotalMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'📖 {count} moments captured'**
+  String lifelineInsightTotalMemories(int count);
+
+  /// No description provided for @lifelineInsightPositiveVibes.
+  ///
+  /// In en, this message translates to:
+  /// **'😊 Mostly positive vibes'**
+  String get lifelineInsightPositiveVibes;
+
+  /// No description provided for @lifelineInsightGrowthJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'🌱 Growth journey'**
+  String get lifelineInsightGrowthJourney;
+
+  /// No description provided for @lifelineInsightBalancedEmotions.
+  ///
+  /// In en, this message translates to:
+  /// **'⚖️ Balanced emotions'**
+  String get lifelineInsightBalancedEmotions;
+
+  /// No description provided for @lifelineInsightStartJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'✍️ Start your journey'**
+  String get lifelineInsightStartJourney;
+
+  /// No description provided for @lifelineInsightBuildStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'💪 Build your streak'**
+  String get lifelineInsightBuildStreak;
 }
 
 class _AppLocalizationsDelegate

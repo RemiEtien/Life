@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "El archivo de imagen es demasiado grande. El tamaño máximo es de 10 MB.",
 "fileSizeTooLargeVideo": "El archivo de vídeo es demasiado grande. El tamaño máximo es de 100 MB.",
 "fileSizeTooLargeAudio": "El archivo de audio es demasiado grande. El tamaño máximo es de 25 MB.",
-"biometricUnlockFailedMessage": "Las claves de seguridad deben recrearse después de reinstalar la aplicación. Por favor, introduce tu contraseña maestra para continuar."
+"biometricUnlockFailedMessage": "Las claves de seguridad deben recrearse después de reinstalar la aplicación. Por favor, introduce tu contraseña maestra para continuar.",
+"lifelineInsightStreakDays": "🔥 Racha de {count} días",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 {count} recuerdos este mes",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ {count} nuevos esta semana",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} reflexiones",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} fotos",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} notas de audio",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 Abarca {years} años",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} momentos capturados",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 Vibraciones mayormente positivas",
+"lifelineInsightGrowthJourney": "🌱 Viaje de crecimiento",
+"lifelineInsightBalancedEmotions": "⚖️ Emociones equilibradas",
+"lifelineInsightStartJourney": "✍️ Comienza tu viaje",
+"lifelineInsightBuildStreak": "💪 Construye tu racha"
 }

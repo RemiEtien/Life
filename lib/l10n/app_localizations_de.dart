@@ -1228,4 +1228,59 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get biometricUnlockFailedMessage =>
       'Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren.';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 $count Tage Streak';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 $count Erinnerungen in diesem Monat';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ $count neue diese Woche';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count Reflexionen';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count Fotos';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count Audionotizen';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 Umfasst $years Jahre';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count erfasste Momente';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes => '😊 Überwiegend positive Stimmung';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 Reise des Wachstums';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ Ausgeglichene Emotionen';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ Beginne deine Reise';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 Baue deinen Streak auf';
 }

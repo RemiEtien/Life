@@ -1201,4 +1201,59 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get biometricUnlockFailedMessage =>
       'יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך.';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 רצף של $count ימים';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 $count זיכרונות החודש';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ $count חדשים השבוע';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count הרהורים';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count תמונות';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count הערות אודיו';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 משתרע על פני $years שנים';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count רגעים שנשמרו';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes => '😊 רגשות חיוביים בעיקר';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 מסע צמיחה';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ רגשות מאוזנים';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ התחל את המסע שלך';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 בנה את הרצף שלך';
 }

@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "קובץ התמונה גדול מדי. הגודל המרבי הוא 10 מגה-בייט.",
 "fileSizeTooLargeVideo": "קובץ הווידאו גדול מדי. הגודל המרבי הוא 100 מגה-בייט.",
 "fileSizeTooLargeAudio": "קובץ האודיו גדול מדי. הגודל המרבי הוא 25 מגה-בייט.",
-"biometricUnlockFailedMessage": "יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך."
+"biometricUnlockFailedMessage": "יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך.",
+"lifelineInsightStreakDays": "🔥 רצף של {count} ימים",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 {count} זיכרונות החודש",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ {count} חדשים השבוע",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} הרהורים",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} תמונות",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} הערות אודיו",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 משתרע על פני {years} שנים",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} רגעים שנשמרו",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 רגשות חיוביים בעיקר",
+"lifelineInsightGrowthJourney": "🌱 מסע צמיחה",
+"lifelineInsightBalancedEmotions": "⚖️ רגשות מאוזנים",
+"lifelineInsightStartJourney": "✍️ התחל את המסע שלך",
+"lifelineInsightBuildStreak": "💪 בנה את הרצף שלך"
 }

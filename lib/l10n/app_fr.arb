@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "Le fichier image est trop volumineux. La taille maximale est de 10 Mo.",
 "fileSizeTooLargeVideo": "Le fichier vidéo est trop volumineux. La taille maximale est de 100 Mo.",
 "fileSizeTooLargeAudio": "Le fichier audio est trop volumineux. La taille maximale est de 25 Mo.",
-"biometricUnlockFailedMessage": "Les clés de sécurité doivent être recréées après la réinstallation de l'application. Veuillez saisir votre mot de passe principal pour continuer."
+"biometricUnlockFailedMessage": "Les clés de sécurité doivent être recréées après la réinstallation de l'application. Veuillez saisir votre mot de passe principal pour continuer.",
+"lifelineInsightStreakDays": "🔥 Série de {count} jours",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 {count} souvenirs ce mois-ci",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ {count} nouveaux cette semaine",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} réflexions",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} photos",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} notes audio",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 S'étend sur {years} années",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} moments capturés",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 Ambiance principalement positive",
+"lifelineInsightGrowthJourney": "🌱 Parcours de croissance",
+"lifelineInsightBalancedEmotions": "⚖️ Émotions équilibrées",
+"lifelineInsightStartJourney": "✍️ Commencez votre voyage",
+"lifelineInsightBuildStreak": "💪 Construisez votre série"
 }

@@ -1671,10 +1671,25 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                           )
                         ]
                       ],
-                      if (_isCalculating)
-                        Text(l10n.lifelineCalculating,
-                            style: const TextStyle(
-                                color: Colors.amber, fontSize: 10)),
+                      // Show insights when NOT syncing
+                      if (!syncState.isSyncing && memoriesCount > 0) ...[
+                        const SizedBox(height: 4),
+                        Builder(
+                          builder: (context) {
+                            final insight = _getCurrentInsight(memories, l10n);
+                            if (insight == null) return const SizedBox.shrink();
+
+                            return Text(
+                              insight,
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                       if (_isAdmin && _debugMode) ...[
                         const SizedBox(height: 4),
                         ValueListenableBuilder<Matrix4>(
@@ -2043,6 +2058,189 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       ),
     );
   }
+
+  // === STREAK & PROGRESS INSIGHTS ===
+
+  /// Calculate current streak (consecutive days with memories)
+  int _calculateStreak(List<Memory> memories) {
+    if (memories.isEmpty) return 0;
+
+    // Get unique dates sorted descending
+    final uniqueDates = memories.map((m) {
+      final date = m.date;
+      return DateTime(date.year, date.month, date.day);
+    }).toSet().toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    int streak = 0;
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+
+    // Check if there's a memory today or yesterday to start counting
+    final latestMemory = uniqueDates.first;
+    final daysSinceLatest = todayDate.difference(latestMemory).inDays;
+
+    if (daysSinceLatest > 1) {
+      return 0; // Streak broken
+    }
+
+    // Count consecutive days
+    DateTime expectedDate = latestMemory;
+    for (final memoryDate in uniqueDates) {
+      final diff = expectedDate.difference(memoryDate).inDays;
+
+      if (diff == 0) {
+        streak++;
+        expectedDate = memoryDate.subtract(const Duration(days: 1));
+      } else if (diff > 0) {
+        break; // Gap found, streak ends
+      }
+    }
+
+    return streak;
+  }
+
+  /// Calculate timeline span in years
+  int _calculateTimelineSpan(List<Memory> memories) {
+    if (memories.length < 2) return 0;
+
+    final dates = memories.map((m) => m.date).toList();
+    final earliest = dates.reduce((a, b) => a.isBefore(b) ? a : b);
+    final latest = dates.reduce((a, b) => a.isAfter(b) ? a : b);
+
+    final years = latest.year - earliest.year;
+    return years > 0 ? years : 0;
+  }
+
+  /// Get current insight to display
+  String? _getCurrentInsight(List<Memory> memories, AppLocalizations l10n) {
+    if (memories.isEmpty) {
+      return l10n.lifelineInsightStartJourney;
+    }
+
+    final now = DateTime.now();
+    final insights = <_InsightData>[];
+
+    // 1. Streak (highest priority)
+    final streak = _calculateStreak(memories);
+    if (streak > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightStreakDays(streak),
+        priority: 100,
+      ));
+    }
+
+    // 2. This month
+    final thisMonthCount = memories
+        .where((m) => m.date.year == now.year && m.date.month == now.month)
+        .length;
+    if (thisMonthCount > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightMemoriesThisMonth(thisMonthCount),
+        priority: 50,
+      ));
+    }
+
+    // 3. This week
+    final weekAgo = now.subtract(const Duration(days: 7));
+    final thisWeekCount = memories.where((m) => m.date.isAfter(weekAgo)).length;
+    if (thisWeekCount > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightMemoriesThisWeek(thisWeekCount),
+        priority: 45,
+      ));
+    }
+
+    // 4. Reflections
+    final reflectionCount =
+        memories.where((m) => m.insightScore > 0).length;
+    if (reflectionCount > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightReflectionsCount(reflectionCount),
+        priority: 40,
+      ));
+    }
+
+    // 5. Photos
+    final photoCount =
+        memories.fold<int>(0, (sum, m) => sum + m.mediaPaths.length);
+    if (photoCount > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightPhotosCount(photoCount),
+        priority: 35,
+      ));
+    }
+
+    // 6. Audio notes
+    final audioCount = memories
+        .fold<int>(0, (sum, m) => sum + m.displayableAudioPaths.length);
+    if (audioCount > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightAudioCount(audioCount),
+        priority: 33,
+      ));
+    }
+
+    // 7. Timeline span
+    final years = _calculateTimelineSpan(memories);
+    if (years > 0) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightSpanningYears(years),
+        priority: 30,
+      ));
+    }
+
+    // 8. Total memories
+    if (memories.length >= 10) {
+      insights.add(_InsightData(
+        text: l10n.lifelineInsightTotalMemories(memories.length),
+        priority: 25,
+      ));
+    }
+
+    // 9. Emotional balance (if we have emotions)
+    final memoriesWithEmotions =
+        memories.where((m) => m.emotions.isNotEmpty).length;
+    if (memoriesWithEmotions > 5) {
+      final avgValence = memories
+              .where((m) => m.emotions.isNotEmpty)
+              .map((m) => m.valence)
+              .reduce((a, b) => a + b) /
+          memoriesWithEmotions;
+
+      if (avgValence > 0.3) {
+        insights.add(_InsightData(
+          text: l10n.lifelineInsightPositiveVibes,
+          priority: 20,
+        ));
+      } else if (avgValence < -0.3) {
+        insights.add(_InsightData(
+          text: l10n.lifelineInsightGrowthJourney,
+          priority: 20,
+        ));
+      } else {
+        insights.add(_InsightData(
+          text: l10n.lifelineInsightBalancedEmotions,
+          priority: 20,
+        ));
+      }
+    }
+
+    // Rotate insights based on hour (changes every hour)
+    if (insights.isNotEmpty) {
+      // Sort by priority
+      insights.sort((a, b) => b.priority.compareTo(a.priority));
+
+      // Use hour for rotation, but prioritize high-priority insights
+      final hourOfDay = DateTime.now().hour;
+      final rotationIndex = hourOfDay % insights.length;
+
+      return insights[rotationIndex].text;
+    }
+
+    // Fallback for new users
+    return l10n.lifelineInsightBuildStreak;
+  }
 }
 
 class MemoriesListPopup extends StatefulWidget {
@@ -2293,6 +2491,13 @@ class _SelectionItem extends StatelessWidget {
       ],
     );
   }
+}
+
+class _InsightData {
+  final String text;
+  final int priority;
+
+  _InsightData({required this.text, required this.priority});
 }
 
 class PerformanceMonitor {

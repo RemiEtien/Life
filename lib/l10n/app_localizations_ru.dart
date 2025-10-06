@@ -1216,4 +1216,59 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get biometricUnlockFailedMessage =>
       'Необходимо пересоздать ключи безопасности после переустановки приложения. Пожалуйста, введите мастер-пароль для продолжения.';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 Серия $count дней';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 $count воспоминаний в этом месяце';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ $count новых на этой неделе';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count рефлексий';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count фотографий';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count аудиозаметок';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 Охватывает $years лет';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count запечатленных моментов';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes => '😊 В основном позитивные эмоции';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 Путь роста';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ Сбалансированные эмоции';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ Начните свое путешествие';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 Создайте серию';
 }

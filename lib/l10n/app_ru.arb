@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "Файл изображения слишком большой. Максимальный размер — 10 МБ.",
 "fileSizeTooLargeVideo": "Видеофайл слишком большой. Максимальный размер — 100 МБ.",
 "fileSizeTooLargeAudio": "Аудиофайл слишком большой. Максимальный размер — 25 МБ.",
-"biometricUnlockFailedMessage": "Необходимо пересоздать ключи безопасности после переустановки приложения. Пожалуйста, введите мастер-пароль для продолжения."
+"biometricUnlockFailedMessage": "Необходимо пересоздать ключи безопасности после переустановки приложения. Пожалуйста, введите мастер-пароль для продолжения.",
+"lifelineInsightStreakDays": "🔥 Серия {count} дней",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 {count} воспоминаний в этом месяце",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ {count} новых на этой неделе",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} рефлексий",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} фотографий",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} аудиозаметок",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 Охватывает {years} лет",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} запечатленных моментов",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 В основном позитивные эмоции",
+"lifelineInsightGrowthJourney": "🌱 Путь роста",
+"lifelineInsightBalancedEmotions": "⚖️ Сбалансированные эмоции",
+"lifelineInsightStartJourney": "✍️ Начните свое путешествие",
+"lifelineInsightBuildStreak": "💪 Создайте серию"
 }

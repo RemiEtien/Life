@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "Image file is too large. Maximum size is 10 MB.",
 "fileSizeTooLargeVideo": "Video file is too large. Maximum size is 100 MB.",
 "fileSizeTooLargeAudio": "Audio file is too large. Maximum size is 25 MB.",
-"biometricUnlockFailedMessage": "Security keys need to be recreated after reinstalling the app. Please enter your master password to continue."
+"biometricUnlockFailedMessage": "Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.",
+"lifelineInsightStreakDays": "🔥 {count} day streak",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 {count} memories this month",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ {count} new this week",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} reflections",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} photos",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} audio notes",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 Spanning {years} years",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} moments captured",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 Mostly positive vibes",
+"lifelineInsightGrowthJourney": "🌱 Growth journey",
+"lifelineInsightBalancedEmotions": "⚖️ Balanced emotions",
+"lifelineInsightStartJourney": "✍️ Start your journey",
+"lifelineInsightBuildStreak": "💪 Build your streak"
 }

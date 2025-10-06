@@ -1159,4 +1159,59 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get biometricUnlockFailedMessage => '重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 连续 $count 天';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 本月 $count 个记忆';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ 本周 $count 个新记忆';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count 个反思';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count 张照片';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count 个音频笔记';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 跨越 $years 年';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count 个珍贵时刻';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes => '😊 大多是积极的情绪';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 成长之旅';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ 情绪平衡';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ 开始你的旅程';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 建立连续记录';
 }

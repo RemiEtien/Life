@@ -1211,4 +1211,59 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get biometricUnlockFailedMessage =>
       'يجب إعادة إنشاء مفاتيح الأمان بعد إعادة تثبيت التطبيق. الرجاء إدخال كلمة المرور الرئيسية للمتابعة.';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 سلسلة $count أيام';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 $count ذكريات هذا الشهر';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ $count جديدة هذا الأسبوع';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count تأملات';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count صور';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count ملاحظات صوتية';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 تمتد عبر $years سنوات';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count لحظات محفوظة';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes => '😊 مشاعر إيجابية في الغالب';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 رحلة النمو';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ مشاعر متوازنة';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ ابدأ رحلتك';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 ابنِ سلسلتك';
 }

@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "Die Bilddatei ist zu groß. Maximale Größe beträgt 10 MB.",
 "fileSizeTooLargeVideo": "Die Videodatei ist zu groß. Maximale Größe beträgt 100 MB.",
 "fileSizeTooLargeAudio": "Die Audiodatei ist zu groß. Maximale Größe beträgt 25 MB.",
-"biometricUnlockFailedMessage": "Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren."
+"biometricUnlockFailedMessage": "Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren.",
+"lifelineInsightStreakDays": "🔥 {count} Tage Streak",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 {count} Erinnerungen in diesem Monat",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ {count} neue diese Woche",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} Reflexionen",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} Fotos",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} Audionotizen",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 Umfasst {years} Jahre",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} erfasste Momente",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 Überwiegend positive Stimmung",
+"lifelineInsightGrowthJourney": "🌱 Reise des Wachstums",
+"lifelineInsightBalancedEmotions": "⚖️ Ausgeglichene Emotionen",
+"lifelineInsightStartJourney": "✍️ Beginne deine Reise",
+"lifelineInsightBuildStreak": "💪 Baue deinen Streak auf"
 }

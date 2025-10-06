@@ -564,5 +564,74 @@
 "fileSizeTooLargeImage": "图片文件太大。最大大小为 10 MB。",
 "fileSizeTooLargeVideo": "视频文件太大。最大大小为 100 MB。",
 "fileSizeTooLargeAudio": "音频文件太大。最大大小为 25 MB。",
-"biometricUnlockFailedMessage": "重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。"
+"biometricUnlockFailedMessage": "重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。",
+"lifelineInsightStreakDays": "🔥 连续 {count} 天",
+"@lifelineInsightStreakDays": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisMonth": "📝 本月 {count} 个记忆",
+"@lifelineInsightMemoriesThisMonth": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightMemoriesThisWeek": "✨ 本周 {count} 个新记忆",
+"@lifelineInsightMemoriesThisWeek": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightReflectionsCount": "⭐ {count} 个反思",
+"@lifelineInsightReflectionsCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPhotosCount": "📸 {count} 张照片",
+"@lifelineInsightPhotosCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightAudioCount": "🎵 {count} 个音频笔记",
+"@lifelineInsightAudioCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightSpanningYears": "📅 跨越 {years} 年",
+"@lifelineInsightSpanningYears": {
+"placeholders": {
+"years": {
+"type": "int"
+}
+}
+},
+"lifelineInsightTotalMemories": "📖 {count} 个珍贵时刻",
+"@lifelineInsightTotalMemories": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"lifelineInsightPositiveVibes": "😊 大多是积极的情绪",
+"lifelineInsightGrowthJourney": "🌱 成长之旅",
+"lifelineInsightBalancedEmotions": "⚖️ 情绪平衡",
+"lifelineInsightStartJourney": "✍️ 开始你的旅程",
+"lifelineInsightBuildStreak": "💪 建立连续记录"
 }

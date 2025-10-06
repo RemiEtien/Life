@@ -1219,4 +1219,60 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get biometricUnlockFailedMessage =>
       'As chaves de segurança precisam ser recriadas após reinstalar o aplicativo. Por favor, insira sua senha mestra para continuar.';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 Sequência de $count dias';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 $count memórias este mês';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ $count novos esta semana';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count reflexões';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count fotos';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count notas de áudio';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 Abrange $years anos';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count momentos capturados';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes =>
+      '😊 Vibrações principalmente positivas';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 Jornada de crescimento';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ Emoções equilibradas';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ Comece sua jornada';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 Construa sua sequência';
 }

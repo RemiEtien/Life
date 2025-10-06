@@ -1208,4 +1208,59 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get biometricUnlockFailedMessage =>
       'Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.';
+
+  @override
+  String lifelineInsightStreakDays(int count) {
+    return '🔥 $count day streak';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisMonth(int count) {
+    return '📝 $count memories this month';
+  }
+
+  @override
+  String lifelineInsightMemoriesThisWeek(int count) {
+    return '✨ $count new this week';
+  }
+
+  @override
+  String lifelineInsightReflectionsCount(int count) {
+    return '⭐ $count reflections';
+  }
+
+  @override
+  String lifelineInsightPhotosCount(int count) {
+    return '📸 $count photos';
+  }
+
+  @override
+  String lifelineInsightAudioCount(int count) {
+    return '🎵 $count audio notes';
+  }
+
+  @override
+  String lifelineInsightSpanningYears(int years) {
+    return '📅 Spanning $years years';
+  }
+
+  @override
+  String lifelineInsightTotalMemories(int count) {
+    return '📖 $count moments captured';
+  }
+
+  @override
+  String get lifelineInsightPositiveVibes => '😊 Mostly positive vibes';
+
+  @override
+  String get lifelineInsightGrowthJourney => '🌱 Growth journey';
+
+  @override
+  String get lifelineInsightBalancedEmotions => '⚖️ Balanced emotions';
+
+  @override
+  String get lifelineInsightStartJourney => '✍️ Start your journey';
+
+  @override
+  String get lifelineInsightBuildStreak => '💪 Build your streak';
 }
