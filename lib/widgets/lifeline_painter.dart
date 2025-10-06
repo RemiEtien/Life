@@ -495,19 +495,6 @@ class LifelinePainter extends CustomPainter {
     });
   }
 
-  Offset? _getPositionAtT(
-      double t, List<ui.PathMetric> metrics, double totalLen) {
-    final dist = t * totalLen;
-    double acc = 0;
-    for (final m in metrics) {
-      if (dist <= acc + m.length) {
-        return m.getTangentForOffset(dist - acc)?.position;
-      }
-      acc += m.length;
-    }
-    return null;
-  }
-
   void _drawMemoryLabels(Canvas canvas, Size size,
       List<PlacementInfo> placementInfos, Rect visibleRect, double opacity) {
     if (opacity <= 0) return;
@@ -786,25 +773,6 @@ class LifelinePainter extends CustomPainter {
     textPainter.layout();
     final textPos = Offset(pos.dx - textPainter.width / 2, pos.dy);
     textPainter.paint(canvas, textPos);
-  }
-
-  void _drawNodeSparks(
-      Canvas canvas, Offset center, double radius, int nodeIndex, double intensity) {
-    final random = Random(nodeIndex * 42);
-    for (int i = 0; i < 6; i++) {
-      final angle = (i * pi * 2 / 6) + progress * pi * 0.2;
-      final sparkDistance = radius * (1.8 + random.nextDouble() * 0.6);
-      final sparkSize = (1.0 + random.nextDouble() * 1.5) * intensity;
-      final sparkPos = Offset(center.dx + cos(angle) * sparkDistance,
-          center.dy + sin(angle) * sparkDistance);
-      final sparkBlur =
-          DevicePerformanceDetector.getAdaptiveBlurRadius(sparkSize);
-      final sparkPaint = Paint()
-        ..color = Colors.white.withAlpha((255 * 0.6 * intensity).round())
-        ..maskFilter =
-            sparkBlur > 0 ? ui.MaskFilter.blur(ui.BlurStyle.normal, sparkBlur) : null;
-      canvas.drawCircle(sparkPos, sparkSize, sparkPaint);
-    }
   }
 
   @override

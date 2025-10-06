@@ -25,7 +25,6 @@ class ImageProcessingService {
     try {
       final tempDir = await getTemporaryDirectory();
       final uuid = const Uuid().v4();
-      final originalExtension = p.extension(pickedFile.path);
 
       // --- 1. Обработка основного изображения ---
       final compressedImagePath = p.join(tempDir.path, '$uuid.webp');

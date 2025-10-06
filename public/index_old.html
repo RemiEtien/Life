@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifeline - Legal Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0D0C11 0%, #1a1a2a 100%);
+            color: #E5E7EB;
+        }
+        .hero {
+            background: linear-gradient(135deg, #FF3B3B 0%, #FF6B6B 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: #1a1a2a;
+            border: 1px solid #2a2a3a;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #FF3B3B;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+        .btn:hover {
+            background: #FF6B6B;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,59,59,0.3);
+        }
+        .btn-secondary {
+            background: #2a2a3a;
+        }
+        .btn-secondary:hover {
+            background: #3a3a4a;
+        }
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<div class="hero">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Lifeline</h1>
+    <p class="text-xl opacity-90">Legal Information & Privacy</p>
+</div>
+
+<!-- Main Container -->
+<div class="container mx-auto max-w-4xl px-4 pb-12">
+
+    <!-- Language Selector -->
+    <div class="card text-center">
+        <h2 class="text-2xl font-semibold mb-4">Select Language / Выберите язык / Sprache wählen</h2>
+        <div class="flex flex-wrap justify-center">
+            <a href="privacy_en.html" class="btn lang-btn">🇬🇧 English</a>
+            <a href="privacy_ru.html" class="btn lang-btn">🇷🇺 Русский</a>
+            <a href="privacy_de.html" class="btn lang-btn">🇩🇪 Deutsch</a>
+            <a href="privacy_es.html" class="btn lang-btn">🇪🇸 Español</a>
+            <a href="privacy_fr.html" class="btn lang-btn">🇫🇷 Français</a>
+            <a href="privacy_pt.html" class="btn lang-btn">🇵🇹 Português</a>
+            <a href="privacy_zh.html" class="btn lang-btn">🇨🇳 中文</a>
+            <a href="privacy_ar.html" class="btn lang-btn">🇸🇦 العربية</a>
+            <a href="privacy_he.html" class="btn lang-btn">🇮🇱 עברית</a>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold mb-4">📄 Legal Documents</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h3 class="text-xl font-semibold text-[#FF3B3B] mb-2">Privacy Policy</h3>
+                <p class="text-gray-300 mb-4">Learn how we collect, use, and protect your personal data.</p>
+                <a href="privacy_en.html" class="btn">Read Privacy Policy</a>
+            </div>
+            <div>
+                <h3 class="text-xl font-semibold text-[#FF3B3B] mb-2">Terms of Service</h3>
+                <p class="text-gray-300 mb-4">Understand the terms and conditions of using Lifeline.</p>
+                <a href="terms_en.html" class="btn">Read Terms of Service</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Features -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold mb-4">🔒 Your Privacy Matters</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div>
+                <div class="text-4xl mb-2">🔐</div>
+                <h3 class="font-semibold mb-2">End-to-End Encryption</h3>
+                <p class="text-sm text-gray-400">Optional AES-256 encryption for your sensitive memories</p>
+            </div>
+            <div>
+                <div class="text-4xl mb-2">🚫</div>
+                <h3 class="font-semibold mb-2">No Data Selling</h3>
+                <p class="text-sm text-gray-400">We never sell your personal information to third parties</p>
+            </div>
+            <div>
+                <div class="text-4xl mb-2">✅</div>
+                <h3 class="font-semibold mb-2">GDPR & CCPA Compliant</h3>
+                <p class="text-sm text-gray-400">Full compliance with EU and California privacy laws</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Deletion -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold mb-4">🗑️ Delete Your Account</h2>
+        <p class="text-gray-300 mb-4">You have the right to delete all your data at any time. Account deletion is permanent and cannot be undone.</p>
+        <a href="delete_account_en.html" class="btn btn-secondary">Request Account Deletion</a>
+    </div>
+
+    <!-- Contact -->
+    <div class="card">
+        <h2 class="text-2xl font-semibold mb-4">📧 Contact Us</h2>
+        <p class="text-gray-300 mb-2">For questions about privacy or legal matters:</p>
+        <a href="mailto:founder@theplacewelive.org" class="text-[#FF3B3B] hover:text-[#FF6B6B] font-semibold">founder@theplacewelive.org</a>
+        <p class="text-sm text-gray-400 mt-4">Response time: Within 7 business days</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-gray-400 text-sm mt-8">
+        <p>© 2025 Lifeline. All rights reserved.</p>
+        <p class="mt-2">Last updated: October 2, 2025</p>
+    </div>
+
+</div>
+
+</body>
+</html>

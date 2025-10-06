@@ -114,7 +114,6 @@ class Memory {
     return map;
   }
 
-  @ignore
   set emotions(Map<String, int> newEmotions) {
     emotionsData =
         newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();

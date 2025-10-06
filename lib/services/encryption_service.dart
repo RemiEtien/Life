@@ -584,7 +584,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         final legacyEncrypter = Encrypter(AES(_unlockedDEK!));
         return legacyEncrypter.decrypt(encrypted, iv: iv);
       }
-      throw DecryptionFailedException('Unsupported encrypted payload format');
+      throw const DecryptionFailedException('Unsupported encrypted payload format');
     } catch (e) {
       if (kDebugMode) debugPrint('Decryption failed: $e');
       // Re-throw as DecryptionFailedException if it's not already

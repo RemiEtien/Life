@@ -553,6 +553,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final formKey = GlobalKey<FormState>();
     String? errorMessage;
     bool isLoading = false;
+    bool obscurePassword = true;
     final authService = ref.read(authServiceProvider);
 
     return showDialog<bool>(
@@ -560,7 +561,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(builder: (context, setState) {
-          bool obscurePassword = true;
           return AlertDialog(
             title: Text(l10n.profileReauthPasswordDialogTitle),
             content: Form(
@@ -581,11 +581,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         labelText: l10n.password,
                         errorText: errorMessage,
                         suffixIcon: IconButton(
-                          icon: Icon(obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                          onPressed: () =>
-                              setState(() => obscurePassword = !obscurePassword),
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
                         ),
                       ),
                       validator: (val) => (val?.isEmpty ?? true)

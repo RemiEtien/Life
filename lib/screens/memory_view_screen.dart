@@ -25,6 +25,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import '../widgets/premium_upsell_widgets.dart';
 
 class MemoryViewScreen extends ConsumerStatefulWidget {
   final Memory memory;
@@ -1577,6 +1578,21 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Consumer(
       builder: (context, ref, child) {
+        final isPremium = ref.watch(isPremiumProvider);
+
+        // Premium feature check
+        if (!isPremium) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: PremiumFeatureLockTile(
+                icon: Icons.public_outlined,
+                text: l10n.premiumFeatureHistoricalContext,
+              ),
+            ),
+          );
+        }
+
         final userProfileAsyncValue = ref.watch(userProfileProvider);
 
         return userProfileAsyncValue.when(
