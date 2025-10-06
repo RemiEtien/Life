@@ -1,3 +1,17 @@
 {
-    "cmake.sourceDirectory": "C:/Users/gambi/Desktop/Lifeline/linux"
+    "cmake.sourceDirectory": "C:/Users/gambi/Desktop/Lifeline/linux",
+
+    // Hide TODO comments from Problems panel
+    "todo-tree.general.tags": [],
+    "todohighlight.isEnable": false,
+
+    // Dart/Flutter analysis - exclude TODOs from problems
+    "dart.analysisExcludedFolders": [
+        "lib/l10n",
+        ".dart_tool"
+    ],
+
+    // Don't show info severity issues in problems panel
+    "problems.showCurrentInStatus": false,
+    "problems.defaultSeverityFilter": "warning"
 }

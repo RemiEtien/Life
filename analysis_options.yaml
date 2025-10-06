@@ -100,3 +100,6 @@ analyzer:
     # Ignore missing return types in test helpers
     always_declare_return_types: ignore
 
+    # Ignore TODO comments (they are intentional reminders, not issues)
+    todo: ignore
+
