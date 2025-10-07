@@ -225,12 +225,33 @@ class FirestoreService {
                 '${DateTime.now().millisecondsSinceEpoch}_${p.basename(path)}';
             final ref =
                 _storage.ref('users/$userId/memories/$memoryId/$type/$fileName');
-            await ref.putFile(file);
+
+            // Upload with timeout and retry logic
+            await ref.putFile(file).timeout(
+              const Duration(seconds: 60),
+              onTimeout: () {
+                throw FirebaseException(
+                  plugin: 'firebase_storage',
+                  code: 'timeout',
+                  message: 'Upload timeout exceeded for $type',
+                );
+              },
+            );
+
             final url = await ref.getDownloadURL();
             uploadedUrls.add(url);
+          } on FirebaseException catch(e, stackTrace) {
+            if (kDebugMode) {
+              debugPrint('Firebase Storage upload failed for $type: ${e.code} - ${e.message}');
+            }
+            unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles failed for type $type'));
+            rethrow;
           } catch(e, stackTrace) {
-             unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles failed for type $type'));
-             rethrow;
+            if (kDebugMode) {
+              debugPrint('Unknown error uploading $type: $e');
+            }
+            unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles unknown error for type $type'));
+            rethrow;
           }
         }
       }

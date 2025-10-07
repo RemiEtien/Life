@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -15,22 +16,30 @@ class PurchaseState {
   final List<ProductDetails> products;
   final bool isAvailable;
   final bool isLoading;
+  final bool purchaseSuccess;
+  final String? errorMessage;
 
   const PurchaseState({
     this.products = const [],
     this.isAvailable = false,
     this.isLoading = true,
+    this.purchaseSuccess = false,
+    this.errorMessage,
   });
 
   PurchaseState copyWith({
     List<ProductDetails>? products,
     bool? isAvailable,
     bool? isLoading,
+    bool? purchaseSuccess,
+    String? errorMessage,
   }) {
     return PurchaseState(
       products: products ?? this.products,
       isAvailable: isAvailable ?? this.isAvailable,
       isLoading: isLoading ?? this.isLoading,
+      purchaseSuccess: purchaseSuccess ?? this.purchaseSuccess,
+      errorMessage: errorMessage,
     );
   }
 }
@@ -77,24 +86,59 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     state = state.copyWith(products: products);
   }
 
-  Future<void> buyProduct(ProductDetails productDetails) async {
-    final PurchaseParam purchaseParam =
-        PurchaseParam(productDetails: productDetails);
-    await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+  Future<bool> buyProduct(ProductDetails productDetails) async {
+    try {
+      final PurchaseParam purchaseParam =
+          PurchaseParam(productDetails: productDetails);
+
+      final bool success = await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+
+      if (!success) {
+        debugPrint('[PurchaseService] Failed to initiate purchase for ${productDetails.id}');
+      }
+
+      return success;
+    } catch (e, stackTrace) {
+      debugPrint('[PurchaseService] Exception during buyProduct: $e');
+      debugPrint('[PurchaseService] Stack trace: $stackTrace');
+
+      // Log to Crashlytics as non-fatal
+      if (!kDebugMode) {
+        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Purchase initiation failed'));
+      }
+
+      return false;
+    }
   }
 
   Future<void> restorePurchases() async {
-    await _inAppPurchase.restorePurchases();
+    try {
+      await _inAppPurchase.restorePurchases();
+      debugPrint('[PurchaseService] Purchases restored successfully');
+    } catch (e, stackTrace) {
+      debugPrint('[PurchaseService] Error restoring purchases: $e');
+      debugPrint('[PurchaseService] Stack trace: $stackTrace');
+
+      // Log to Crashlytics as non-fatal
+      if (!kDebugMode) {
+        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Restore purchases failed'));
+      }
+    }
   }
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchaseDetailsList) {
     for (var purchaseDetails in purchaseDetailsList) {
       if (purchaseDetails.status == PurchaseStatus.pending) {
         // Покупка в процессе...
+        state = state.copyWith(isLoading: true, purchaseSuccess: false, errorMessage: null);
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
-          debugPrint(
-              '[PurchaseService] Purchase error: ${purchaseDetails.error}');
+          debugPrint('[PurchaseService] Purchase error: ${purchaseDetails.error}');
+          state = state.copyWith(
+            isLoading: false,
+            purchaseSuccess: false,
+            errorMessage: purchaseDetails.error?.message ?? 'Purchase failed',
+          );
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
           _verifyAndGrantPremium(purchaseDetails);
@@ -136,6 +180,13 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       // Это заставит isPremiumProvider пересчитаться
       _ref.invalidate(userProfileProvider);
       debugPrint('[PurchaseService] User profile invalidated to refresh premium status');
+
+      // Notify UI of successful purchase
+      state = state.copyWith(
+        isLoading: false,
+        purchaseSuccess: true,
+        errorMessage: null,
+      );
 
     } catch (e) {
       // ИЗМЕНЕНИЕ: Более детальное логирование ошибок

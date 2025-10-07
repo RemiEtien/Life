@@ -221,8 +221,11 @@ class InputValidator {
     // Remove null bytes
     sanitized = sanitized.replaceAll(_nullBytePattern, '');
 
-    // Normalize whitespace
-    sanitized = sanitized.replaceAll(RegExp(r'\s+'), ' ');
+    // Normalize whitespace BUT preserve newlines
+    // Replace multiple spaces/tabs with single space, but keep newlines
+    sanitized = sanitized.replaceAll(RegExp(r'[ \t]+'), ' ');
+    // Remove excessive blank lines (more than 2 consecutive newlines)
+    sanitized = sanitized.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
     return sanitized;
   }

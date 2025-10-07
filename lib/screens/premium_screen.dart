@@ -66,6 +66,58 @@ class PremiumScreen extends ConsumerWidget {
     final purchaseState = ref.watch(purchaseServiceProvider);
     final purchaseNotifier = ref.read(purchaseServiceProvider.notifier);
 
+    // Listen for purchase success and show feedback
+    ref.listen<PurchaseState>(purchaseServiceProvider, (previous, next) {
+      if (next.purchaseSuccess && !next.isLoading) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.purchaseSuccessMessage,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Close the premium screen after a short delay
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        });
+      } else if (next.errorMessage != null && !next.isLoading) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    next.errorMessage!,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.premiumScreenTitle),
@@ -184,7 +236,17 @@ class PremiumScreen extends ConsumerWidget {
               width: 2),
           borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => service.buyProduct(product),
+        onTap: () async {
+          final success = await service.buyProduct(product);
+          if (!success && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to initiate purchase. Please try again.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

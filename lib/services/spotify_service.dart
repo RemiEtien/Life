@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import '../models/anchors/anchor_models.dart';
 
 class SpotifyService {
   final FirebaseFunctions _functions;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // ИЗМЕНЕНО: FirebaseFunctions теперь передается через конструктор
   SpotifyService(this._functions);
@@ -32,6 +34,14 @@ class SpotifyService {
 
   /// ИЗМЕНЕНО: Добавлена надежная обработка и преобразование ответа от Firebase Functions.
   Future<List<SpotifyTrackDetails>> searchTracks(String query) async {
+    // Check authentication before calling Cloud Function
+    if (_auth.currentUser == null) {
+      if (kDebugMode) {
+        debugPrint('SpotifyService: User not authenticated, cannot search tracks');
+      }
+      return [];
+    }
+
     try {
       final result = await _searchTracksCallable.call<dynamic>({
         'query': query,
@@ -67,6 +77,14 @@ class SpotifyService {
 
   /// ИЗМЕНЕНО: Добавлена надежная обработка и преобразование ответа от Firebase Functions.
   Future<SpotifyTrackDetails?> getTrackDetails(String trackId) async {
+    // Check authentication before calling Cloud Function
+    if (_auth.currentUser == null) {
+      if (kDebugMode) {
+        debugPrint('SpotifyService: User not authenticated, cannot get track details');
+      }
+      return null;
+    }
+
     try {
       final result = await _getTrackDetailsCallable.call<dynamic>({
         'trackId': trackId,

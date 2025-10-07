@@ -212,8 +212,16 @@ class AuthService {
       if (kDebugMode) {
         debugPrint('Error during Google sign-in: $e');
       }
-      unawaited(FirebaseCrashlytics.instance
-          .recordError(e, stackTrace, reason: 'Google Sign-In Failed'));
+
+      // Don't log user cancellation as an error
+      final errorString = e.toString();
+      if (!errorString.contains('canceled') &&
+          !errorString.contains('Cancelled by user') &&
+          !errorString.contains('SIGN_IN_CANCELLED')) {
+        unawaited(FirebaseCrashlytics.instance
+            .recordError(e, stackTrace, reason: 'Google Sign-In Failed'));
+      }
+
       throw Exception(
           'An error occurred during Google Sign-In. Please try again.');
     }
@@ -251,8 +259,16 @@ class AuthService {
       if (kDebugMode) {
         debugPrint('Apple sign-in failed: $e');
       }
-      unawaited(FirebaseCrashlytics.instance
-          .recordError(e, stackTrace, reason: 'Apple Sign-In Failed'));
+
+      // Don't log user cancellation as an error
+      final errorString = e.toString();
+      if (!errorString.contains('canceled') &&
+          !errorString.contains('operation') &&
+          !errorString.contains('1001')) {  // Apple Sign-In cancellation code
+        unawaited(FirebaseCrashlytics.instance
+            .recordError(e, stackTrace, reason: 'Apple Sign-In Failed'));
+      }
+
       throw Exception(
           'An error occurred during Apple Sign-In. Please try again.');
     }
