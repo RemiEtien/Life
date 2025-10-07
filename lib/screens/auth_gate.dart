@@ -109,7 +109,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   void _showShareActionSheet(List<SharedMediaFile> files, String userId) {
     final l10n = AppLocalizations.of(context)!;
-    final isPremium = ref.read(isPremiumProvider);
 
     // Count photos and videos
     final photoCount = files.where((f) => f.type == SharedMediaType.image).length;
@@ -118,124 +117,157 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return SafeArea(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-              Text(
-                l10n.shareActionTitle,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall,
+        return Consumer(
+          builder: (context, ref, child) {
+            // Wait for user profile to load before checking premium status
+            final userProfileAsync = ref.watch(userProfileProvider);
+
+            return userProfileAsync.when(
+              loading: () => SafeArea(
+                child: Container(
+                  padding: const EdgeInsets.all(40),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.shareActionSubtitle,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
+              error: (error, stack) => const SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Center(
+                    child: Text(
+                      'Error loading profile',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
-              // Show instant preview with original file paths (no processing yet)
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: files.length,
-                  itemBuilder: (context, index) {
-                    final file = files[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: file.type == SharedMediaType.image
-                              ? Image.file(File(file.path), fit: BoxFit.cover)
-                              : Container(
-                                  color: Colors.black54,
-                                  child: const Icon(Icons.videocam,
-                                      color: Colors.white, size: 50),
+              data: (profile) {
+                // Now we can safely check premium status
+                final isPremium = ref.watch(isPremiumProvider);
+
+                return SafeArea(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                      Text(
+                        l10n.shareActionTitle,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.shareActionSubtitle,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 20),
+                      // Show instant preview with original file paths (no processing yet)
+                      SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: files.length,
+                          itemBuilder: (context, index) {
+                            final file = files[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: file.type == SharedMediaType.image
+                                      ? Image.file(File(file.path), fit: BoxFit.cover)
+                                      : Container(
+                                          color: Colors.black54,
+                                          child: const Icon(Icons.videocam,
+                                              color: Colors.white, size: 50),
+                                        ),
                                 ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.add_circle_outline),
-                label: Text(l10n.shareCreateNewMemory),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () async {
-                  // Check premium limits BEFORE processing
-                  if (!isPremium && photoCount > 3) {
-                    Navigator.of(context).pop();
-                    await showPremiumDialog(context, l10n.premiumFeaturePhotos);
-                    return;
-                  }
-                  if (!isPremium && videoCount > 1) {
-                    Navigator.of(context).pop();
-                    await showPremiumDialog(context, l10n.premiumFeatureVideos);
-                    return;
-                  }
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add_circle_outline),
+                        label: Text(l10n.shareCreateNewMemory),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () async {
+                          // Check premium limits BEFORE processing
+                          if (!isPremium && photoCount > 3) {
+                            Navigator.of(context).pop();
+                            await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+                            return;
+                          }
+                          if (!isPremium && videoCount > 1) {
+                            Navigator.of(context).pop();
+                            await showPremiumDialog(context, l10n.premiumFeatureVideos);
+                            return;
+                          }
 
-                  Navigator.of(context).pop(); // Close bottom sheet
-                  // Pass raw files - processing will happen in MemoryEditScreen
-                  unawaited(Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => MemoryEditScreen(
-                        userId: userId,
-                        sharedFiles: files,
+                          Navigator.of(context).pop(); // Close bottom sheet
+                          // Pass raw files - processing will happen in MemoryEditScreen
+                          unawaited(Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => MemoryEditScreen(
+                                userId: userId,
+                                sharedFiles: files,
+                              ),
+                            ),
+                          ));
+                        },
                       ),
-                    ),
-                  ));
-                },
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.add_photo_alternate_outlined),
-                label: Text(l10n.shareAddToExisting),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  foregroundColor: Colors.white,
-                  side: BorderSide(
-                      color: Colors.white.withAlpha((255 * 0.5).round())),
-                ),
-                onPressed: () async {
-                  // Check premium limits BEFORE processing
-                  if (!isPremium && photoCount > 3) {
-                    Navigator.of(context).pop();
-                    await showPremiumDialog(context, l10n.premiumFeaturePhotos);
-                    return;
-                  }
-                  if (!isPremium && videoCount > 1) {
-                    Navigator.of(context).pop();
-                    await showPremiumDialog(context, l10n.premiumFeatureVideos);
-                    return;
-                  }
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.add_photo_alternate_outlined),
+                        label: Text(l10n.shareAddToExisting),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          foregroundColor: Colors.white,
+                          side: BorderSide(
+                              color: Colors.white.withAlpha((255 * 0.5).round())),
+                        ),
+                        onPressed: () async {
+                          // Check premium limits BEFORE processing
+                          if (!isPremium && photoCount > 3) {
+                            Navigator.of(context).pop();
+                            await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+                            return;
+                          }
+                          if (!isPremium && videoCount > 1) {
+                            Navigator.of(context).pop();
+                            await showPremiumDialog(context, l10n.premiumFeatureVideos);
+                            return;
+                          }
 
-                  Navigator.of(context).pop(); // Close bottom sheet
-                  // Pass raw files - processing will happen in SelectMemoryScreen
-                  unawaited(Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => SelectMemoryScreen(
-                        sharedFiles: files,
+                          Navigator.of(context).pop(); // Close bottom sheet
+                          // Pass raw files - processing will happen in SelectMemoryScreen
+                          unawaited(Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => SelectMemoryScreen(
+                                sharedFiles: files,
+                              ),
+                            ),
+                          ));
+                        },
                       ),
-                    ),
-                  ));
-                },
-              ),
-            ],
-          ),
-          ),
+                    ],
+                  ),
+                  ),
+                );
+              },
+            );
+          },
         );
       },
     );
