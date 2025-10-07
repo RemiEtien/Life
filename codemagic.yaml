@@ -41,13 +41,15 @@ workflows:
       - name: Generate localization files
         script: |
           flutter gen-l10n
-      - name: Check for GoogleService-Info.plist
+      - name: Create GoogleService-Info.plist from environment variable
         script: |
-          if [ ! -f "ios/Runner/GoogleService-Info.plist" ]; then
-            echo "ERROR: GoogleService-Info.plist not found!"
-            echo "Please add it to the repository or use Codemagic environment variables"
+          if [ -z "$GOOGLE_SERVICES_PLIST" ]; then
+            echo "ERROR: GOOGLE_SERVICES_PLIST environment variable not set!"
+            echo "Please add it in Codemagic Environment variables settings"
             exit 1
           fi
+          echo "$GOOGLE_SERVICES_PLIST" > ios/Runner/GoogleService-Info.plist
+          echo "✓ GoogleService-Info.plist created successfully"
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
