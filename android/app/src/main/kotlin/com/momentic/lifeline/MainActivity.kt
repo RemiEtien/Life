@@ -13,7 +13,11 @@ class MainActivity : FlutterFragmentActivity() {
         super.onCreate(savedInstanceState)
 
         // Android 15+ Edge-to-Edge enforcement
-        // This replaces deprecated setStatusBarColor/setNavigationBarColor APIs
+        // enableEdgeToEdge() automatically handles:
+        // - setStatusBarColor (deprecated)
+        // - setNavigationBarColor (deprecated)
+        // - setNavigationBarDividerColor (deprecated)
+        // - LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES (deprecated)
         // API 35 = Android 15 (VANILLA_ICE_CREAM)
         if (Build.VERSION.SDK_INT >= 35) {
             enableEdgeToEdge()

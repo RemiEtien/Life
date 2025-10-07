@@ -96,26 +96,52 @@ dart run build_runner build --delete-conflicting-outputs
 
 ---
 
-### 2. Edge-to-Edge Rendering
+### 2. Edge-to-Edge Rendering & Deprecated APIs
 
-**Status:** ✅ Already Implemented
+**Status:** ✅ Implemented with Android 15 Support
+
+**Problem:** Android 15 deprecates several Edge-to-Edge APIs:
+- `android.view.Window.setStatusBarColor`
+- `android.view.Window.setNavigationBarColor`
+- `android.view.Window.setNavigationBarDividerColor`
+- `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`
+
+**Solution:** Use `enableEdgeToEdge()` for Android 15+
 
 **MainActivity.kt:**
 ```kotlin
 package com.momentic.lifeline
 
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import io.flutter.embedding.android.FlutterFragmentActivity
 
 class MainActivity : FlutterFragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Edge-to-Edge rendering
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Android 15+ Edge-to-Edge enforcement
+        // enableEdgeToEdge() automatically handles:
+        // - setStatusBarColor (deprecated)
+        // - setNavigationBarColor (deprecated)
+        // - setNavigationBarDividerColor (deprecated)
+        // - LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES (deprecated)
+        if (Build.VERSION.SDK_INT >= 35) {
+            enableEdgeToEdge()
+        } else {
+            // For Android 14 and below
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        }
     }
 }
 ```
+
+**Important Note:** Google Play Console may still show warnings about deprecated APIs being present in the APK. This is because:
+1. Flutter SDK and plugins may contain these APIs for backward compatibility
+2. Our app uses `enableEdgeToEdge()` which means these deprecated methods are NOT called on Android 15+
+3. The warnings refer to API presence, not usage on target devices
 
 **Dependencies (already in build.gradle):**
 ```gradle
