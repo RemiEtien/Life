@@ -47,6 +47,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   String? _lastProfileCreationError;
   static const int _maxProfileCreationAttempts = 3;
 
+  // Track the last authenticated user to trigger sync on user change
+  String? _lastUserId;
+
   @override
   void initState() {
     super.initState();
@@ -561,6 +564,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       data: (user) {
         if (user == null) {
           unawaited(FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user is null). Navigating to LoginScreen.'));
+          // Clear last user ID when signing out
+          _lastUserId = null;
           return const LoginScreen();
         }
 
@@ -569,6 +574,20 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         if (isEmailPasswordProvider && !user.emailVerified) {
           unawaited(FirebaseCrashlytics.instance.log('AuthGate: Build state is authState.data (user not verified). Navigating to VerifyEmailScreen.'));
           return const VerifyEmailScreen();
+        }
+
+        // NEW: Trigger sync when user changes (e.g., switching accounts)
+        if (_lastUserId != user.uid) {
+          if (_lastUserId != null) {
+            // User switched - trigger cloud sync to load new user's data
+            unawaited(FirebaseCrashlytics.instance.log('AuthGate: User switched from $_lastUserId to ${user.uid}, triggering sync'));
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                ref.read(syncServiceProvider).syncFromCloudToLocal(isInitialSync: true);
+              }
+            });
+          }
+          _lastUserId = user.uid;
         }
 
         // --- FIX for problems 1 & 3: Watch providers directly to drive the UI state ---

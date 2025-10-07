@@ -138,9 +138,14 @@ class AuthService {
 
     futures.add(_firebaseAuth.signOut());
 
-    unawaited(IsarService.close().catchError((e) {
+    // CRITICAL FIX: Must await IsarService.close() to prevent race condition
+    // when switching users. If we don't wait, the next user's DB might try to
+    // open while the previous user's DB is still closing, causing data conflicts.
+    try {
+      await IsarService.close();
+    } catch (e) {
       if (kDebugMode) debugPrint('IsarService close error (ignored): $e');
-    }));
+    }
 
     try {
       await Future.wait(futures, eagerError: false);
