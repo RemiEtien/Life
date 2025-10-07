@@ -972,7 +972,16 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       _decryptContent();
     });
 
-    _decryptContent();
+    // IMPORTANT: Wrap _decryptContent in try-catch to prevent crashes in build()
+    try {
+      _decryptContent();
+    } catch (e) {
+      // Exceptions are handled inside _decryptContent, but we catch here
+      // to prevent build() from crashing. The _needsUnlock state will be set.
+      if (kDebugMode) {
+        debugPrint('[MemoryView] Decryption attempt in build failed: $e');
+      }
+    }
 
     final String? coverPath =
         _displayImagePaths.isNotEmpty ? _displayImagePaths.first : null;
