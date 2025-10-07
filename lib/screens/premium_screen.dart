@@ -237,7 +237,40 @@ class PremiumScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () async {
+          // Show loading indicator immediately
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => PopScope(
+              canPop: false,
+              child: Center(
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.premiumScreenProcessingPurchase,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+
           final success = await service.buyProduct(product);
+
+          // Close loading dialog
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+
           if (!success && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

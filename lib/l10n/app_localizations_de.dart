@@ -950,6 +950,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Am beliebtesten & Bestes Preis-Leistungs-Verhältnis';
 
   @override
+  String get premiumScreenProcessingPurchase => 'Verarbeite Kauf...';
+
+  @override
   String get premiumScreenRestore => 'Käufe wiederherstellen';
 
   @override

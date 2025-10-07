@@ -898,6 +898,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get premiumScreenYearlyPopular => '最受欢迎和最超值';
 
   @override
+  String get premiumScreenProcessingPurchase => '正在处理购买...';
+
+  @override
   String get premiumScreenRestore => '恢复购买';
 
   @override

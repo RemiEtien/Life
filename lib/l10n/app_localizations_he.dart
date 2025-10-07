@@ -929,6 +929,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get premiumScreenYearlyPopular => 'הפופולרי ביותר והתמורה הטובה ביותר';
 
   @override
+  String get premiumScreenProcessingPurchase => 'מעבד רכישה...';
+
+  @override
   String get premiumScreenRestore => 'שחזר רכישות';
 
   @override

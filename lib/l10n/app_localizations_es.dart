@@ -951,6 +951,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get premiumScreenYearlyPopular => 'Más popular y mejor valor';
 
   @override
+  String get premiumScreenProcessingPurchase => 'Procesando compra...';
+
+  @override
   String get premiumScreenRestore => 'Restaurar compras';
 
   @override

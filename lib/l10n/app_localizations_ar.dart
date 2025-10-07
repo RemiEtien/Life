@@ -938,6 +938,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get premiumScreenYearlyPopular => 'الأكثر شيوعًا وأفضل قيمة';
 
   @override
+  String get premiumScreenProcessingPurchase => 'جاري معالجة الشراء...';
+
+  @override
   String get premiumScreenRestore => 'استعادة المشتريات';
 
   @override

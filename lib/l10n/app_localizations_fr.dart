@@ -953,6 +953,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le plus populaire & le meilleur rapport qualité-prix';
 
   @override
+  String get premiumScreenProcessingPurchase => 'Traitement de l\'achat...';
+
+  @override
   String get premiumScreenRestore => 'Restaurer les achats';
 
   @override

@@ -934,6 +934,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumScreenYearlyPopular => 'Most Popular & Best Value';
 
   @override
+  String get premiumScreenProcessingPurchase => 'Processing purchase...';
+
+  @override
   String get premiumScreenRestore => 'Restore Purchases';
 
   @override

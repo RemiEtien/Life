@@ -940,6 +940,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get premiumScreenYearlyPopular => 'Самый популярный и выгодный';
 
   @override
+  String get premiumScreenProcessingPurchase => 'Обработка покупки...';
+
+  @override
   String get premiumScreenRestore => 'Восстановить покупки';
 
   @override

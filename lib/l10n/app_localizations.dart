@@ -1810,6 +1810,12 @@ abstract class AppLocalizations {
   /// **'Most Popular & Best Value'**
   String get premiumScreenYearlyPopular;
 
+  /// No description provided for @premiumScreenProcessingPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing purchase...'**
+  String get premiumScreenProcessingPurchase;
+
   /// No description provided for @premiumScreenRestore.
   ///
   /// In en, this message translates to:

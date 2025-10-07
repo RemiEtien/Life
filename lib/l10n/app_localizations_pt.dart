@@ -943,6 +943,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mais popular e melhor custo-benefício';
 
   @override
+  String get premiumScreenProcessingPurchase => 'Processando compra...';
+
+  @override
   String get premiumScreenRestore => 'Restaurar compras';
 
   @override
