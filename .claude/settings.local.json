@@ -48,7 +48,9 @@
       "Bash(findstr:*)",
       "Bash(git checkout:*)",
       "Bash(git ls-remote:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(tee:*)",
+      "Bash(unzip:*)"
     ],
     "deny": [],
     "ask": []
