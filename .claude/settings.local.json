@@ -45,7 +45,10 @@
       "Bash(firebase --version)",
       "Bash(firebase emulators:start:*)",
       "Bash(netstat:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git checkout:*)",
+      "Bash(git ls-remote:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

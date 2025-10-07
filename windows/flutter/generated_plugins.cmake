@@ -12,7 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_storage
   flutter_secure_storage_windows
   flutter_timezone
-  isar_flutter_libs
+  isar_community_flutter_libs
   local_auth_windows
   permission_handler_windows
   printing

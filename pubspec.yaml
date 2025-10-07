@@ -26,8 +26,11 @@ dependencies:
   cloud_functions: ^6.0.2
 
   # --- LOCAL DATABASE ---
-  isar: 3.1.0+1
-  isar_flutter_libs: 3.1.0+1
+  # MIGRATION: Switched from isar to isar_community for Android 15 16KB page size support
+  # Original Isar doesn't support 16KB pages (Google Play requirement by Nov 2025)
+  # https://github.com/isar/isar/issues/1699
+  isar_community: ^3.3.0-dev.3
+  isar_community_flutter_libs: ^3.3.0-dev.3
   path_provider: ^2.1.4
 
   # --- MEDIA & UTILS ---
@@ -85,7 +88,8 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   build_runner: ^2.4.11
-  isar_generator: 3.1.0+1
+  # MIGRATION: Using isar_community_generator
+  isar_community_generator: ^3.3.0-dev.3
   mockito: ^5.4.4
   flutter_launcher_icons: ^0.14.4
 
@@ -120,3 +124,5 @@ flutter:
         - asset: assets/fonts/Roboto-Regular.ttf
         - asset: assets/fonts/Roboto-Bold.ttf
           weight: 700
+
+# No dependency_overrides needed - using isar_community directly

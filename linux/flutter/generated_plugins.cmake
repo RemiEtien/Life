@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
   file_selector_linux
   flutter_secure_storage_linux
-  isar_flutter_libs
+  isar_community_flutter_libs
   printing
   record_linux
   url_launcher_linux
