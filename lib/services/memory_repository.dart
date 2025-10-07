@@ -4,6 +4,7 @@ import 'package:isar_community/isar.dart';
 import '../memory.dart';
 import 'encryption_service.dart';
 import 'isar_service.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class MemoryRepository {
   final String userId;
@@ -11,7 +12,22 @@ class MemoryRepository {
 
   MemoryRepository({required this.userId, required this.encryptionService});
 
-  Future<Isar> get _db async => IsarService.instance(userId);
+  Future<Isar> get _db async {
+    try {
+      final isar = await IsarService.instance(userId);
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] MemoryRepository: Got DB instance for userId: $userId');
+      return isar;
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ❌ MemoryRepository: Failed to get DB instance for userId: $userId');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'MemoryRepository failed to get isar_community instance',
+        fatal: true,
+      );
+      rethrow;
+    }
+  }
 
   Memory _encryptMemoryIfNeeded(Memory m) {
     // CRITICAL FIX: If memory is NOT encrypted, return as is (no encryption needed)
@@ -70,22 +86,36 @@ class MemoryRepository {
   }
 
   Future<int> create(Memory m) async {
-    final isar = await _db;
-    final memoryToSave = m.copyWith(
-        userId: userId,
-        syncStatus: 'pending',
-        lastModified: DateTime.now().toUtc(),
-        firestoreId: m.firestoreId ??
-            FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .collection('memories')
-                .doc()
-                .id);
+    try {
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Creating memory for userId: $userId');
+      final isar = await _db;
+      final memoryToSave = m.copyWith(
+          userId: userId,
+          syncStatus: 'pending',
+          lastModified: DateTime.now().toUtc(),
+          firestoreId: m.firestoreId ??
+              FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(userId)
+                  .collection('memories')
+                  .doc()
+                  .id);
 
-    final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
+      final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
 
-    return isar.writeTxn(() => isar.memorys.put(encryptedMemory));
+      final result = await isar.writeTxn(() => isar.memorys.put(encryptedMemory));
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ✅ Memory created successfully, id: $result');
+      return result;
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ❌ Failed to create memory for userId: $userId');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'isar_community memory create failed',
+        fatal: false,
+      );
+      rethrow;
+    }
   }
 
   Future<Memory> createDraft() async {
@@ -135,16 +165,31 @@ class MemoryRepository {
   Future<void> upsertMemories(List<Memory> memories) async {
     if (memories.isEmpty) return;
 
-    final normalized = memories.map((memory) {
-      final owner = memory.userId;
-      final needsNormalization = owner == null || owner.isEmpty;
-      return needsNormalization ? memory.copyWith(userId: userId) : memory;
-    }).toList();
+    try {
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Upserting ${memories.length} memories for userId: $userId');
 
-    final isar = await _db;
-    await isar.writeTxn(() async {
-      await isar.memorys.putAll(normalized);
-    });
+      final normalized = memories.map((memory) {
+        final owner = memory.userId;
+        final needsNormalization = owner == null || owner.isEmpty;
+        return needsNormalization ? memory.copyWith(userId: userId) : memory;
+      }).toList();
+
+      final isar = await _db;
+      await isar.writeTxn(() async {
+        await isar.memorys.putAll(normalized);
+      });
+
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ✅ Successfully upserted ${memories.length} memories');
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ❌ Failed to upsert ${memories.length} memories for userId: $userId');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'isar_community batch upsert failed',
+        fatal: false,
+      );
+      rethrow;
+    }
   }
 
   Future<int> repairOrphanedUserIds() async {
@@ -202,32 +247,47 @@ class MemoryRepository {
 
 
   Stream<List<Memory>> watchAllSortedByDate() async* {
-    if (kDebugMode) {
-      debugPrint('[DIAGNOSTIC] Subscribing to memories for userId: $userId');
-    }
-    final isar = await _db;
-
-    final query = isar.memorys
-        .where()
-        .userIdEqualTo(userId) 
-        .filter()
-        .not()
-        .syncStatusEqualTo('draft') 
-        .sortByDateDesc();
-
-    if (kDebugMode) {
-      final initialResults = await query.findAll();
-      debugPrint(
-          '[DIAGNOSTIC] Initial fetch for userId: $userId found ${initialResults.length} memories.');
-    }
-
-    yield* query.watch(fireImmediately: true).map((results) {
+    try {
       if (kDebugMode) {
-        debugPrint(
-            '[DIAGNOSTIC] Stream update for userId: $userId delivered ${results.length} memories.');
+        debugPrint('[DIAGNOSTIC] Subscribing to memories for userId: $userId');
       }
-      return results;
-    });
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] watchAllSortedByDate: Starting stream for userId: $userId');
+
+      final isar = await _db;
+
+      final query = isar.memorys
+          .where()
+          .userIdEqualTo(userId)
+          .filter()
+          .not()
+          .syncStatusEqualTo('draft')
+          .sortByDateDesc();
+
+      if (kDebugMode) {
+        final initialResults = await query.findAll();
+        debugPrint(
+            '[DIAGNOSTIC] Initial fetch for userId: $userId found ${initialResults.length} memories.');
+        FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Initial fetch found ${initialResults.length} memories');
+      }
+
+      yield* query.watch(fireImmediately: true).map((results) {
+        if (kDebugMode) {
+          debugPrint(
+              '[DIAGNOSTIC] Stream update for userId: $userId delivered ${results.length} memories.');
+        }
+        FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Stream update delivered ${results.length} memories');
+        return results;
+      });
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ❌ watchAllSortedByDate failed for userId: $userId');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'isar_community watch stream failed',
+        fatal: false,
+      );
+      rethrow;
+    }
   }
 
   Future<List<Memory>> getMemoriesToSync() async {
