@@ -1,0 +1,15 @@
+# Crashlytics - Stack trace
+# Application: com.momentic.lifeline
+# Platform: android
+# Version: 1.0.133 (133)
+# Issue: 17e71b25df67d367c72464ba9cf8d406
+# Session: 68E3FD6B00AE0001489085E87E85E695_DNE_0_v2
+# Date: Mon Oct 06 2025 20:33:37 GMT+0300 (Израиль, летнее время)
+
+Non-fatal Exception: io.flutter.plugins.firebase.crashlytics.FlutterError: GoogleSignInException(code GoogleSignInExceptionCode.canceled, [16] Cancelled by user., null). Error thrown Google Sign-In Failed.
+BuildId: dbcf9df9d8b2f1897e98f3ee70e75f30
+#00 abs 0000006c9b38a8f7 virt 0000000000d098f7 _kDartIsolateSnapshotInstructions+0x852fb7
+#01 abs 0000006c9b38a20b virt 0000000000d0920b _kDartIsolateSnapshotInstructions+0x8528cb
+#02 abs 0000006c9b3579c7 virt 0000000000cd69c7 _kDartIsolateSnapshotInstructions+0x820087
+#03 abs 0000006c9b356fe3 virt 0000000000cd5fe3 _kDartIsolateSnapshotInstructions+0x81f6a3
+#04 abs 0000006c9b356dc3 virt 0000000000cd5dc3 _kDartIsolateSnapshotInstructions+0x81f483

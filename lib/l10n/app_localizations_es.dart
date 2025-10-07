@@ -1282,4 +1282,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get lifelineInsightBuildStreak => '💪 Construye tu racha';
+
+  @override
+  String get purchaseSuccessMessage =>
+      '¡Compra exitosa! ¡Bienvenido a Premium!';
 }

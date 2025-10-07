@@ -1,0 +1,13 @@
+# Crashlytics - Stack trace
+# Application: com.momentic.lifeline
+# Platform: android
+# Version: 1.0.132 (132)
+# Issue: 529686e84b5f18a7f1c98517b43826c3
+# Session: 68E3C46701E900013C4DEF27495348CC_DNE_1_v2
+# Date: Mon Oct 06 2025 16:48:35 GMT+0300 (Израиль, летнее время)
+
+Non-fatal Exception: io.flutter.plugins.firebase.crashlytics.FlutterError: [firebase_storage/unknown] An unknown error occurred. Error thrown SyncService: _syncMemoryWithRetries failed on attempt 1.
+BuildId: dbcf9df9a3b9f7287e98f3ee7a9e7591
+#00 abs 0000006dbb6c717f virt 0000000000ca117f _kDartIsolateSnapshotInstructions+0x7ea83f
+#01 abs 0000006dbb6e58bb virt 0000000000cbf8bb _kDartIsolateSnapshotInstructions+0x808f7b
+#02 abs 0000006dbb6e53bb virt 0000000000cbf3bb _kDartIsolateSnapshotInstructions+0x808a7b

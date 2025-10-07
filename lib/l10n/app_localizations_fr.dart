@@ -1288,4 +1288,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get lifelineInsightBuildStreak => '💪 Construisez votre série';
+
+  @override
+  String get purchaseSuccessMessage =>
+      'Achat réussi ! Bienvenue dans Premium !';
 }

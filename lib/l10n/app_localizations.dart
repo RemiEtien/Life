@@ -2355,6 +2355,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'💪 Build your streak'**
   String get lifelineInsightBuildStreak;
+
+  /// No description provided for @purchaseSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase successful! Welcome to Premium!'**
+  String get purchaseSuccessMessage;
 }
 
 class _AppLocalizationsDelegate

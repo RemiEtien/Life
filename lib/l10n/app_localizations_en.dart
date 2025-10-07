@@ -1263,4 +1263,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lifelineInsightBuildStreak => '💪 Build your streak';
+
+  @override
+  String get purchaseSuccessMessage =>
+      'Purchase successful! Welcome to Premium!';
 }

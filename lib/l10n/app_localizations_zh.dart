@@ -1214,4 +1214,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lifelineInsightBuildStreak => '💪 建立连续记录';
+
+  @override
+  String get purchaseSuccessMessage => '购买成功！欢迎使用Premium！';
 }

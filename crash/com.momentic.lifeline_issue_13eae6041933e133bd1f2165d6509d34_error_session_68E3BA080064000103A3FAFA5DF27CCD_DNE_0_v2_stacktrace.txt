@@ -1,0 +1,26 @@
+# Crashlytics - Stack trace
+# Application: com.momentic.lifeline
+# Platform: android
+# Version: 1.0.133 (133)
+# Issue: 13eae6041933e133bd1f2165d6509d34
+# Session: 68E3BA080064000103A3FAFA5DF27CCD_DNE_0_v2
+# Date: Mon Oct 06 2025 15:52:44 GMT+0300 (Израиль, летнее время)
+
+Non-fatal Exception: io.flutter.plugins.firebase.crashlytics.FlutterError: [firebase_functions/unauthenticated] Unauthenticated
+
+#0      CloudFunctionsHostApi.call (package:cloud_functions_platform_interface/src/pigeon/messages.pigeon.dart:84)
+<asynchronous suspension>
+#1      MethodChannelHttpsCallable.call (package:cloud_functions_platform_interface/src/method_channel/method_channel_https_callable.dart:33)
+<asynchronous suspension>
+#2      HttpsCallable.call (package:cloud_functions/src/https_callable.dart:49)
+<asynchronous suspension>
+#3      SpotifyService.getTrackDetails (package:lifeline/services/spotify_service.dart:71)
+<asynchronous suspension>
+#4      FutureHandlerProviderElementMixin.handleFuture.<anonymous closure>.<anonymous closure> (package:riverpod/src/async_notifier/base.dart:355)
+<asynchronous suspension>
+. Error thrown Spotify GetDetails Failed (Cloud Function).
+       at CloudFunctionsHostApi.call(messages.pigeon.dart:84)
+       at MethodChannelHttpsCallable.call(method_channel_https_callable.dart:33)
+       at HttpsCallable.call(https_callable.dart:49)
+       at SpotifyService.getTrackDetails(spotify_service.dart:71)
+       at FutureHandlerProviderElementMixin.handleFuture.<fn>.<fn>(base.dart:355)

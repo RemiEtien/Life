@@ -36,7 +36,9 @@
       "Bash(grep:*)",
       "Read(//c//**)",
       "Bash(awk:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git reset:*)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []

@@ -1271,4 +1271,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get lifelineInsightBuildStreak => '💪 Создайте серию';
+
+  @override
+  String get purchaseSuccessMessage =>
+      'Покупка успешна! Добро пожаловать в Premium!';
 }

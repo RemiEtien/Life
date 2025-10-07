@@ -1,0 +1,14 @@
+# Crashlytics - Stack trace
+# Application: com.momentic.lifeline
+# Platform: android
+# Version: 1.0.132 (132)
+# Issue: 2df2ca113c45959e657de65ddfd6455e
+# Session: 68E3C46701E900013C4DEF27495348CC_DNE_2_v2
+# Date: Mon Oct 06 2025 17:05:16 GMT+0300 (Израиль, летнее время)
+
+Non-fatal Exception: io.flutter.plugins.firebase.crashlytics.FlutterError: [firebase_storage/retry-limit-exceeded] The maximum time limit on an operation (upload, download, delete, etc.) has been exceeded.. Error thrown Storage: uploadFiles failed for type photos.
+BuildId: dbcf9df9a3b9f7287e98f3ee7a9e7591
+#00 abs 0000006dbb6c717f virt 0000000000ca117f _kDartIsolateSnapshotInstructions+0x7ea83f
+#01 abs 0000006dbb6e81cf virt 0000000000cc21cf _kDartIsolateSnapshotInstructions+0x80b88f
+#02 abs 0000006dbb6e5bb7 virt 0000000000cbfbb7 _kDartIsolateSnapshotInstructions+0x809277
+#03 abs 0000006dbb6e53bb virt 0000000000cbf3bb _kDartIsolateSnapshotInstructions+0x808a7b
