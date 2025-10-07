@@ -9,6 +9,8 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.momentic.lifeline
+      groups:
+        - firebase
       vars:
         BUNDLE_ID: "com.momentic.lifeline"
         XCODE_WORKSPACE: "Runner.xcworkspace"
