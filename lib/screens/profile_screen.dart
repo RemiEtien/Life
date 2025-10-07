@@ -384,6 +384,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           title: Text(l10n.profileChangeNameTitle),
           content: TextField(
             controller: _displayNameController,
+            textCapitalization: TextCapitalization.words,
+            enableSuggestions: true,
+            autocorrect: true,
             decoration: InputDecoration(hintText: l10n.profileEnterYourName),
           ),
           actions: <Widget>[

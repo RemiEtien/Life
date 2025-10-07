@@ -51,6 +51,9 @@ class _SpotifySearchScreenState extends ConsumerState<SpotifySearchScreen> {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
+              textCapitalization: TextCapitalization.sentences,
+              enableSuggestions: true,
+              autocorrect: true,
               decoration: InputDecoration(
                 labelText: l10n.spotifySearchHint,
                 suffixIcon: IconButton(

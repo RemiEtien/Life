@@ -1742,6 +1742,9 @@ class _AutosavingTextFieldState extends State<_AutosavingTextField> {
           minLines: widget.minLines,
           maxLines: widget.maxLines,
           validator: widget.validator,
+          textCapitalization: TextCapitalization.sentences,
+          enableSuggestions: true,
+          autocorrect: true,
           decoration: InputDecoration(
             labelText: widget.labelText,
             border: const OutlineInputBorder(),
