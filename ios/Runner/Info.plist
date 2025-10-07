@@ -77,5 +77,20 @@
 		<string>ar</string>
 		<string>zh</string>
 	</array>
+
+	<!-- ========================================= -->
+	<!-- GOOGLE SIGN-IN CONFIGURATION             -->
+	<!-- ========================================= -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.325668503094-1k0lilps9c224oi4udb957dbl1rqid11</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

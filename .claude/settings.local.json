@@ -38,7 +38,9 @@
       "Bash(awk:*)",
       "Bash(rm:*)",
       "Bash(git reset:*)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(chmod:*)",
+      "Bash(echo \"$GOOGLE_SERVICES_PLIST\")"
     ],
     "deny": [],
     "ask": []
