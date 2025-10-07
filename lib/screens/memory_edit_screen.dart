@@ -491,12 +491,25 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       final imageProcessor = ref.read(imageProcessingServiceProvider);
       final l10n = AppLocalizations.of(context)!;
 
-      for (var file in widget.sharedFiles!) {
-        if (!mounted) break;
+      // Separate images and videos
+      final imageFiles = <SharedMediaFile>[];
+      final videoFiles = <SharedMediaFile>[];
 
+      for (var file in widget.sharedFiles!) {
         if (file.type == SharedMediaType.image) {
-          // Check file size before processing (10MB limit)
-          const maxImageSize = 10 * 1024 * 1024; // 10MB
+          imageFiles.add(file);
+        } else if (file.type == SharedMediaType.video) {
+          videoFiles.add(file);
+        }
+      }
+
+      // Process images in parallel (like regular image picker)
+      if (imageFiles.isNotEmpty) {
+        // Check file sizes first
+        const maxImageSize = 10 * 1024 * 1024; // 10MB
+        final validImageFiles = <SharedMediaFile>[];
+
+        for (var file in imageFiles) {
           final fileSize = await File(file.path).length();
           if (fileSize > maxImageSize) {
             if (mounted) {
@@ -504,22 +517,40 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                 SnackBar(content: Text(l10n.fileSizeTooLargeImage)),
               );
             }
-            continue; // Skip this file and process others
+            continue;
           }
+          validImageFiles.add(file);
+        }
 
-          final result = await imageProcessor.processPickedImage(XFile(file.path));
-          if (result != null && mounted) {
+        // Process all valid images in parallel
+        if (validImageFiles.isNotEmpty && mounted) {
+          final processingFutures = validImageFiles
+              .map((file) => imageProcessor.processPickedImage(XFile(file.path)))
+              .toList();
+          final results = await Future.wait(processingFutures);
+
+          if (mounted) {
+            final newMediaItems = results
+                .whereType<ProcessedImageResult>()
+                .map((result) => MediaItem(
+                      path: result.compressedImagePath,
+                      thumbPath: result.thumbnailPath,
+                      isLocal: true,
+                    ))
+                .toList();
+
             setState(() {
-              _mediaItems.add(MediaItem(
-                path: result.compressedImagePath,
-                thumbPath: result.thumbnailPath,
-                isLocal: true,
-              ));
+              _mediaItems.addAll(newMediaItems);
             });
           }
-        } else if (file.type == SharedMediaType.video) {
-          // Check file size before adding (100MB limit)
-          const maxVideoSize = 100 * 1024 * 1024; // 100MB
+        }
+      }
+
+      // Process videos (no processing needed, just validate size)
+      if (videoFiles.isNotEmpty && mounted) {
+        const maxVideoSize = 100 * 1024 * 1024; // 100MB
+
+        for (var file in videoFiles) {
           final fileSize = await File(file.path).length();
           if (fileSize > maxVideoSize) {
             if (mounted) {
@@ -527,7 +558,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                 SnackBar(content: Text(l10n.fileSizeTooLargeVideo)),
               );
             }
-            continue; // Skip this file and process others
+            continue;
           }
 
           if (mounted) {
