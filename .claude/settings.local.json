@@ -40,7 +40,12 @@
       "Bash(git reset:*)",
       "Bash(del nul)",
       "Bash(chmod:*)",
-      "Bash(echo \"$GOOGLE_SERVICES_PLIST\")"
+      "Bash(echo \"$GOOGLE_SERVICES_PLIST\")",
+      "Bash(timeout:*)",
+      "Bash(firebase --version)",
+      "Bash(firebase emulators:start:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
