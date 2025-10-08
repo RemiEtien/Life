@@ -66,9 +66,9 @@ class DeviceCapabilities {
     canHandleBlur: true,
     canHandleComplexGradients: true,
     canHandleManyParticles: true,
-    maxParticleCount: 150,
-    maxBlurRadius: 80,
-    effectsQuality: 1.0,
+    maxParticleCount: 250,      // Increased from 150
+    maxBlurRadius: 120,          // Increased from 80
+    effectsQuality: 1.5,         // Increased from 1.0 for extra layers
   );
 
   static const medium = DeviceCapabilities(
@@ -267,7 +267,8 @@ class DevicePerformanceDetector {
   static int getAdaptiveLayerCount(int baseLayerCount) {
     switch (capabilities.performance) {
       case DevicePerformance.high:
-        return baseLayerCount;
+        // High quality: add 50% more layers for richer visuals
+        return (baseLayerCount * 1.5).round();
       case DevicePerformance.medium:
         return (baseLayerCount * 0.6).round().clamp(1, baseLayerCount);
       case DevicePerformance.low:

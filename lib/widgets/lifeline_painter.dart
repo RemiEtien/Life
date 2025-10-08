@@ -139,16 +139,28 @@ class BackgroundPainter extends CustomPainter {
               cos(progress * pi * 2 * 0.3 + i) * 50)
           : center;
       final mistRadius = 300 + random.nextDouble() * 200;
+
+      // High quality: more vibrant and visible nebula
+      final isHighQuality = capabilities.performance == DevicePerformance.high;
+      final baseAlpha = isHighQuality ? 15 : 5;
+      final alphaRange = isHighQuality ? 15 : 5;
+      final redBase = isHighQuality ? 80 : 50;
+      final redRange = isHighQuality ? 50 : 30;
+      final greenBase = isHighQuality ? 50 : 30;
+      final greenRange = isHighQuality ? 40 : 30;
+      final blueBase = isHighQuality ? 100 : 60;
+      final blueRange = isHighQuality ? 60 : 30;
+
       final mistPaint = Paint()
         ..shader = ui.Gradient.radial(
           animatedCenter,
           mistRadius,
           [
             Color.fromARGB(
-                (5 + random.nextInt(5)).clamp(0, 255),
-                (50 + random.nextInt(30)),
-                (30 + random.nextInt(30)),
-                (60 + random.nextInt(30))),
+                (baseAlpha + random.nextInt(alphaRange)).clamp(0, 255),
+                (redBase + random.nextInt(redRange)),
+                (greenBase + random.nextInt(greenRange)),
+                (blueBase + random.nextInt(blueRange))),
             Colors.transparent
           ],
         );
@@ -162,8 +174,14 @@ class BackgroundPainter extends CustomPainter {
       final twinkle = (capabilities.performance != DevicePerformance.low)
           ? sin(progress * pi * 2 * 1.0 + i * 0.1) * 0.5 + 0.5
           : 0.75;
-      final opacity = (random.nextDouble() * 0.4 + 0.2) * twinkle;
-      final starSize = random.nextDouble() * 2.5 + 0.5;
+
+      // High quality: brighter, more visible stars
+      final isHighQuality = capabilities.performance == DevicePerformance.high;
+      final baseOpacity = isHighQuality ? 0.3 : 0.2;
+      final opacityRange = isHighQuality ? 0.6 : 0.4;
+      final opacity = (random.nextDouble() * opacityRange + baseOpacity) * twinkle;
+      final starSize = random.nextDouble() * (isHighQuality ? 3.5 : 2.5) + 0.5;
+
       final starPaint = Paint()
         ..color = Colors.white.withAlpha((255 * opacity).round())
         ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, starSize * 0.7);
