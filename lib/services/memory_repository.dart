@@ -71,19 +71,31 @@ class MemoryRepository {
   Memory _decryptMemory(Memory m) {
     if (!m.isEncrypted) return m;
 
-    final memoryCopy = m.copyWith();
+    try {
+      final memoryCopy = m.copyWith();
 
-    return memoryCopy.copyWith(
-      content: encryptionService.decrypt(m.content, memoryId: m.id),
-      reflectionImpact: encryptionService.decrypt(m.reflectionImpact, memoryId: m.id),
-      reflectionLesson: encryptionService.decrypt(m.reflectionLesson, memoryId: m.id),
-      reflectionAutoThought: encryptionService.decrypt(m.reflectionAutoThought, memoryId: m.id),
-      reflectionEvidenceFor: encryptionService.decrypt(m.reflectionEvidenceFor, memoryId: m.id),
-      reflectionEvidenceAgainst:
-          encryptionService.decrypt(m.reflectionEvidenceAgainst, memoryId: m.id),
-      reflectionReframe: encryptionService.decrypt(m.reflectionReframe, memoryId: m.id),
-      reflectionAction: encryptionService.decrypt(m.reflectionAction, memoryId: m.id),
-    );
+      return memoryCopy.copyWith(
+        content: encryptionService.decrypt(m.content, memoryId: m.id),
+        reflectionImpact: encryptionService.decrypt(m.reflectionImpact, memoryId: m.id),
+        reflectionLesson: encryptionService.decrypt(m.reflectionLesson, memoryId: m.id),
+        reflectionAutoThought: encryptionService.decrypt(m.reflectionAutoThought, memoryId: m.id),
+        reflectionEvidenceFor: encryptionService.decrypt(m.reflectionEvidenceFor, memoryId: m.id),
+        reflectionEvidenceAgainst:
+            encryptionService.decrypt(m.reflectionEvidenceAgainst, memoryId: m.id),
+        reflectionReframe: encryptionService.decrypt(m.reflectionReframe, memoryId: m.id),
+        reflectionAction: encryptionService.decrypt(m.reflectionAction, memoryId: m.id),
+      );
+    } on PerMemoryAuthenticationRequiredException {
+      // FIX: Don't auto-decrypt if per-memory authentication is required
+      // Return encrypted memory - UI will handle authentication when user opens it
+      if (kDebugMode) {
+        debugPrint('[MemoryRepository] Memory ${m.id} requires per-memory auth, returning encrypted');
+      }
+      return m; // Return encrypted memory as-is
+    } catch (e) {
+      // For other decryption errors, rethrow to let caller handle
+      rethrow;
+    }
   }
 
   Future<int> create(Memory m) async {
