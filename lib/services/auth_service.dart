@@ -14,6 +14,7 @@ import 'isar_service.dart';
 import 'user_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'analytics_service.dart';
 
 class AuthService {
   final Ref _ref;
@@ -87,6 +88,10 @@ class AuthService {
         await _userService.ensureUserProfileExists(
             userCredential.user!, context);
       }
+
+      // Log analytics
+      await AnalyticsService.logLogin('email');
+
       return userCredential;
     } on FirebaseAuthException {
       rethrow;
@@ -106,6 +111,10 @@ class AuthService {
       if (context.mounted) {
         await _userService.createUserProfile(userCredential.user!, context);
       }
+
+      // Log analytics
+      await AnalyticsService.logSignUp('email');
+
       return userCredential;
     } on FirebaseAuthException {
       rethrow;
@@ -113,6 +122,9 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    // Log analytics
+    await AnalyticsService.logLogout();
+
     // *** КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Вызываем полный сброс состояния шифрования ***
     // Это гарантирует, что при следующем запуске приложение не будет считать
     // себя заблокированным, а перейдет в состояние "notConfigured".
@@ -211,6 +223,15 @@ class AuthService {
             userCredential.user!, context);
       }
 
+
+      // Log analytics
+      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      if (isNewUser) {
+        await AnalyticsService.logSignUp('google');
+      } else {
+        await AnalyticsService.logLogin('google');
+      }
+
       return userCredential;
     } catch (e, stackTrace) {
       _signInCompleter = null;
@@ -257,6 +278,15 @@ class AuthService {
 
       if (context.mounted) {
         await _userService.ensureUserProfileExists(userCredential.user!, context);
+      }
+
+
+      // Log analytics
+      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      if (isNewUser) {
+        await AnalyticsService.logSignUp('apple');
+      } else {
+        await AnalyticsService.logLogin('apple');
       }
 
       return userCredential;

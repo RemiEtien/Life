@@ -57,7 +57,8 @@
       "Bash(git ls-tree:*)",
       "Bash(if [ -f coverage/lcov.info ])",
       "Bash(then echo \"Coverage file generated\")",
-      "Bash(else echo \"No coverage file found\")"
+      "Bash(else echo \"No coverage file found\")",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
