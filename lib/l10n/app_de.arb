@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "Jahrestags-Erinnerungen",
+  "notificationAnniversarySubtitle": "An wichtige Momente aus der Vergangenheit erinnern",
+  "notificationMotivationalTitle": "Gelegentliche Motivationen",
+  "notificationMotivationalSubtitle": "Sanfte Erinnerungen, wichtige Momente festzuhalten",
+  "notificationInsightTitle": "Emotionale Einblicke",
+  "notificationInsightSubtitle": "Reflexionen über Ihre emotionale Reise"
 }

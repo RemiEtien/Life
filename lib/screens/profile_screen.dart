@@ -1013,15 +1013,65 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildNotificationsSetting(
       UserProfile profile, AppLocalizations l10n) {
-    return SwitchListTile(
-      title:
-          Text(l10n.profileReminders, style: const TextStyle(fontSize: 16)),
-      subtitle: Text(l10n.profileRemindersSubtitle),
-      value: profile.notificationsEnabled,
-      onChanged: (value) {
-        final updatedProfile = profile.copyWith(notificationsEnabled: value);
-        ref.read(userServiceProvider).updateUserProfile(updatedProfile);
-      },
+    return Column(
+      children: [
+        SwitchListTile(
+          title:
+              Text(l10n.profileReminders, style: const TextStyle(fontSize: 16)),
+          subtitle: Text(l10n.profileRemindersSubtitle),
+          value: profile.notificationsEnabled,
+          onChanged: (value) {
+            final updatedProfile = profile.copyWith(notificationsEnabled: value);
+            ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+          },
+        ),
+        if (profile.notificationsEnabled) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text(l10n.notificationAnniversaryTitle,
+                      style: const TextStyle(fontSize: 14)),
+                  subtitle: Text(l10n.notificationAnniversarySubtitle,
+                      style: const TextStyle(fontSize: 12)),
+                  value: profile.anniversaryNotifications,
+                  onChanged: (value) {
+                    final updatedProfile =
+                        profile.copyWith(anniversaryNotifications: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+                SwitchListTile(
+                  title: Text(l10n.notificationMotivationalTitle,
+                      style: const TextStyle(fontSize: 14)),
+                  subtitle: Text(l10n.notificationMotivationalSubtitle,
+                      style: const TextStyle(fontSize: 12)),
+                  value: profile.motivationalNotifications,
+                  onChanged: (value) {
+                    final updatedProfile =
+                        profile.copyWith(motivationalNotifications: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+                SwitchListTile(
+                  title: Text(l10n.notificationInsightTitle,
+                      style: const TextStyle(fontSize: 14)),
+                  subtitle: Text(l10n.notificationInsightSubtitle,
+                      style: const TextStyle(fontSize: 12)),
+                  value: profile.insightNotifications,
+                  onChanged: (value) {
+                    final updatedProfile =
+                        profile.copyWith(insightNotifications: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 

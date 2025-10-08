@@ -14,6 +14,9 @@ class UserProfile {
   final String performanceMode;
   final String? manualPerformanceLevel;
   final bool notificationsEnabled;
+  final bool anniversaryNotifications;
+  final bool motivationalNotifications;
+  final bool insightNotifications;
   // --- ENCRYPTION FIELDS ---
   final bool isEncryptionEnabled;
   final String? wrappedDEK; // Data Encryption Key, encrypted with KEK
@@ -45,6 +48,9 @@ class UserProfile {
     this.performanceMode = 'auto',
     this.manualPerformanceLevel,
     this.notificationsEnabled = true,
+    this.anniversaryNotifications = true,
+    this.motivationalNotifications = true,
+    this.insightNotifications = true,
     this.isEncryptionEnabled = false,
     this.wrappedDEK,
     this.salt,
@@ -71,6 +77,9 @@ class UserProfile {
     String? performanceMode,
     String? manualPerformanceLevel,
     bool? notificationsEnabled,
+    bool? anniversaryNotifications,
+    bool? motivationalNotifications,
+    bool? insightNotifications,
     bool? isEncryptionEnabled,
     String? wrappedDEK,
     String? salt,
@@ -107,6 +116,9 @@ class UserProfile {
       manualPerformanceLevel:
           manualPerformanceLevel ?? this.manualPerformanceLevel,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      anniversaryNotifications: anniversaryNotifications ?? this.anniversaryNotifications,
+      motivationalNotifications: motivationalNotifications ?? this.motivationalNotifications,
+      insightNotifications: insightNotifications ?? this.insightNotifications,
       isEncryptionEnabled: isEncryptionEnabled ?? this.isEncryptionEnabled,
       wrappedDEK: wrappedDEK ?? this.wrappedDEK,
       salt: salt ?? this.salt,
@@ -140,6 +152,9 @@ class UserProfile {
       'performanceMode': performanceMode,
       'manualPerformanceLevel': manualPerformanceLevel,
       'notificationsEnabled': notificationsEnabled,
+      'anniversaryNotifications': anniversaryNotifications,
+      'motivationalNotifications': motivationalNotifications,
+      'insightNotifications': insightNotifications,
       'isEncryptionEnabled': isEncryptionEnabled,
       'wrappedDEK': wrappedDEK,
       'salt': salt,
@@ -172,6 +187,9 @@ class UserProfile {
       performanceMode: json['performanceMode'] as String? ?? 'auto',
       manualPerformanceLevel: json['manualPerformanceLevel'] as String?,
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+      anniversaryNotifications: json['anniversaryNotifications'] as bool? ?? true,
+      motivationalNotifications: json['motivationalNotifications'] as bool? ?? true,
+      insightNotifications: json['insightNotifications'] as bool? ?? true,
       isEncryptionEnabled: json['isEncryptionEnabled'] as bool? ?? false,
       wrappedDEK: json['wrappedDEK'] as String?,
       salt: json['salt'] as String?,

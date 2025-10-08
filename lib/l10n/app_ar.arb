@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "تذكيرات الذكرى السنوية",
+  "notificationAnniversarySubtitle": "تذكير باللحظات المهمة من الماضي",
+  "notificationMotivationalTitle": "تحفيزات عرضية",
+  "notificationMotivationalSubtitle": "تذكيرات لطيفة لتوثيق اللحظات المهمة",
+  "notificationInsightTitle": "رؤى عاطفية",
+  "notificationInsightSubtitle": "تأملات في رحلتك العاطفية"
 }

@@ -1252,4 +1252,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String graphicsQualityAutoDetected(String performance) {
     return '自动 ($performance)';
   }
+
+  @override
+  String get notificationAnniversaryTitle => '周年纪念提醒';
+
+  @override
+  String get notificationAnniversarySubtitle => '提醒过去有意义的时刻';
+
+  @override
+  String get notificationMotivationalTitle => '偶尔的激励';
+
+  @override
+  String get notificationMotivationalSubtitle => '温柔提醒记录重要时刻';
+
+  @override
+  String get notificationInsightTitle => '情感洞察';
+
+  @override
+  String get notificationInsightSubtitle => '关于你情感旅程的反思';
 }

@@ -1305,4 +1305,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String graphicsQualityAutoDetected(String performance) {
     return 'تلقائي ($performance)';
   }
+
+  @override
+  String get notificationAnniversaryTitle => 'تذكيرات الذكرى السنوية';
+
+  @override
+  String get notificationAnniversarySubtitle =>
+      'تذكير باللحظات المهمة من الماضي';
+
+  @override
+  String get notificationMotivationalTitle => 'تحفيزات عرضية';
+
+  @override
+  String get notificationMotivationalSubtitle =>
+      'تذكيرات لطيفة لتوثيق اللحظات المهمة';
+
+  @override
+  String get notificationInsightTitle => 'رؤى عاطفية';
+
+  @override
+  String get notificationInsightSubtitle => 'تأملات في رحلتك العاطفية';
 }

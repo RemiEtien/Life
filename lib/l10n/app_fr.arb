@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "Rappels d\"anniversaire",
+  "notificationAnniversarySubtitle": "Rappeler les moments importants du passé",
+  "notificationMotivationalTitle": "Motivations occasionnelles",
+  "notificationMotivationalSubtitle": "Rappels doux pour capturer des moments importants",
+  "notificationInsightTitle": "Perspectives émotionnelles",
+  "notificationInsightSubtitle": "Réflexions sur votre parcours émotionnel"
 }

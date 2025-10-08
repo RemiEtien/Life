@@ -1314,4 +1314,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String graphicsQualityAutoDetected(String performance) {
     return 'Авто ($performance)';
   }
+
+  @override
+  String get notificationAnniversaryTitle => 'Напоминания о годовщинах';
+
+  @override
+  String get notificationAnniversarySubtitle =>
+      'Напоминать о важных моментах из прошлого';
+
+  @override
+  String get notificationMotivationalTitle => 'Мотивационные напоминания';
+
+  @override
+  String get notificationMotivationalSubtitle =>
+      'Деликатные напоминания запечатлеть важные моменты';
+
+  @override
+  String get notificationInsightTitle => 'Эмоциональные инсайты';
+
+  @override
+  String get notificationInsightSubtitle =>
+      'Размышления о вашем эмоциональном пути';
 }

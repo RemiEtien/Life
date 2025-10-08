@@ -1295,4 +1295,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String graphicsQualityAutoDetected(String performance) {
     return 'אוטומטי ($performance)';
   }
+
+  @override
+  String get notificationAnniversaryTitle => 'תזכורות יום השנה';
+
+  @override
+  String get notificationAnniversarySubtitle => 'להזכיר רגעים משמעותיים מהעבר';
+
+  @override
+  String get notificationMotivationalTitle => 'מוטיבציות מדי פעם';
+
+  @override
+  String get notificationMotivationalSubtitle =>
+      'תזכורות עדינות לתעד רגעים חשובים';
+
+  @override
+  String get notificationInsightTitle => 'תובנות רגשיות';
+
+  @override
+  String get notificationInsightSubtitle => 'הרהורים על המסע הרגשי שלך';
 }

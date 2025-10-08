@@ -2427,6 +2427,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto ({performance})'**
   String graphicsQualityAutoDetected(String performance);
+
+  /// No description provided for @notificationAnniversaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anniversary reminders'**
+  String get notificationAnniversaryTitle;
+
+  /// No description provided for @notificationAnniversarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me of meaningful moments from the past'**
+  String get notificationAnniversarySubtitle;
+
+  /// No description provided for @notificationMotivationalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Occasional motivations'**
+  String get notificationMotivationalTitle;
+
+  /// No description provided for @notificationMotivationalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle reminders to capture important moments'**
+  String get notificationMotivationalSubtitle;
+
+  /// No description provided for @notificationInsightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotional insights'**
+  String get notificationInsightTitle;
+
+  /// No description provided for @notificationInsightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflections on your emotional journey'**
+  String get notificationInsightSubtitle;
 }
 
 class _AppLocalizationsDelegate

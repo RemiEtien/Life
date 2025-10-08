@@ -1325,4 +1325,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String graphicsQualityAutoDetected(String performance) {
     return 'Auto ($performance)';
   }
+
+  @override
+  String get notificationAnniversaryTitle => 'Jahrestags-Erinnerungen';
+
+  @override
+  String get notificationAnniversarySubtitle =>
+      'An wichtige Momente aus der Vergangenheit erinnern';
+
+  @override
+  String get notificationMotivationalTitle => 'Gelegentliche Motivationen';
+
+  @override
+  String get notificationMotivationalSubtitle =>
+      'Sanfte Erinnerungen, wichtige Momente festzuhalten';
+
+  @override
+  String get notificationInsightTitle => 'Emotionale Einblicke';
+
+  @override
+  String get notificationInsightSubtitle =>
+      'Reflexionen über Ihre emotionale Reise';
 }

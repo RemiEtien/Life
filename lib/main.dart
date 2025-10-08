@@ -21,8 +21,9 @@ import 'widgets/device_performance_detector.dart';
 import 'l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+import 'services/background_notification_worker.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +39,11 @@ void main() async {
 
     await Firebase.initializeApp();
     FirebaseAnalytics.instance;
+
+    // Initialize background notification worker (daily check at 20:00)
+    if (!kIsWeb) {
+      await BackgroundNotificationWorker.initialize();
+    }
 
     await FirebaseAppCheck.instance.activate(
       androidProvider:

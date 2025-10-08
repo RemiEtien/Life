@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "Recordatorios de aniversario",
+  "notificationAnniversarySubtitle": "Recordar momentos importantes del pasado",
+  "notificationMotivationalTitle": "Motivaciones ocasionales",
+  "notificationMotivationalSubtitle": "Recordatorios suaves para capturar momentos importantes",
+  "notificationInsightTitle": "Perspectivas emocionales",
+  "notificationInsightSubtitle": "Reflexiones sobre tu viaje emocional"
 }

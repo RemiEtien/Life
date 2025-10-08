@@ -212,5 +212,49 @@ class NotificationService {
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
   }
-}
 
+  /// Show a local notification immediately
+  Future<void> showLocalNotification({
+    required String title,
+    required String body,
+    String? payload,
+    int id = 0,
+  }) async {
+    final bool permissionsGranted = await _requestPermissions();
+
+    if (!permissionsGranted) {
+      if (kDebugMode) {
+        debugPrint('[NotificationService] Permissions not granted for local notification');
+      }
+      return;
+    }
+
+    try {
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'lifeline_channel_id',
+            'Lifeline Reminders',
+            channelDescription: 'Reminders for your action plans',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+        payload: payload,
+      );
+
+      if (kDebugMode) {
+        debugPrint('[NotificationService] Showed local notification: $title');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[NotificationService] Error showing local notification: $e');
+      }
+    }
+  }
+}

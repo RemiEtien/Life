@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "Lembretes de aniversário",
+  "notificationAnniversarySubtitle": "Lembrar momentos importantes do passado",
+  "notificationMotivationalTitle": "Motivações ocasionais",
+  "notificationMotivationalSubtitle": "Lembretes suaves para capturar momentos importantes",
+  "notificationInsightTitle": "Insights emocionais",
+  "notificationInsightSubtitle": "Reflexões sobre sua jornada emocional"
 }

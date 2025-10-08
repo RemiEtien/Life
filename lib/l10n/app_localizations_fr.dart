@@ -1331,4 +1331,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String graphicsQualityAutoDetected(String performance) {
     return 'Auto ($performance)';
   }
+
+  @override
+  String get notificationAnniversaryTitle => 'Rappels d\"anniversaire';
+
+  @override
+  String get notificationAnniversarySubtitle =>
+      'Rappeler les moments importants du passé';
+
+  @override
+  String get notificationMotivationalTitle => 'Motivations occasionnelles';
+
+  @override
+  String get notificationMotivationalSubtitle =>
+      'Rappels doux pour capturer des moments importants';
+
+  @override
+  String get notificationInsightTitle => 'Perspectives émotionnelles';
+
+  @override
+  String get notificationInsightSubtitle =>
+      'Réflexions sur votre parcours émotionnel';
 }

@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "Напоминания о годовщинах",
+  "notificationAnniversarySubtitle": "Напоминать о важных моментах из прошлого",
+  "notificationMotivationalTitle": "Мотивационные напоминания",
+  "notificationMotivationalSubtitle": "Деликатные напоминания запечатлеть важные моменты",
+  "notificationInsightTitle": "Эмоциональные инсайты",
+  "notificationInsightSubtitle": "Размышления о вашем эмоциональном пути"
 }

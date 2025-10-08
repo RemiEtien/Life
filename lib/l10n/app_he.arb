@@ -652,5 +652,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationAnniversaryTitle": "תזכורות יום השנה",
+  "notificationAnniversarySubtitle": "להזכיר רגעים משמעותיים מהעבר",
+  "notificationMotivationalTitle": "מוטיבציות מדי פעם",
+  "notificationMotivationalSubtitle": "תזכורות עדינות לתעד רגעים חשובים",
+  "notificationInsightTitle": "תובנות רגשיות",
+  "notificationInsightSubtitle": "הרהורים על המסע הרגשי שלך"
 }
