@@ -138,10 +138,29 @@ class MainActivity : FlutterFragmentActivity() {
 }
 ```
 
-**Important Note:** Google Play Console may still show warnings about deprecated APIs being present in the APK. This is because:
-1. Flutter SDK and plugins may contain these APIs for backward compatibility
-2. Our app uses `enableEdgeToEdge()` which means these deprecated methods are NOT called on Android 15+
-3. The warnings refer to API presence, not usage on target devices
+**Solution: windowOptOutEdgeToEdgeEnforcement**
+
+To suppress Google Play Console warnings about deprecated APIs, we use the temporary opt-out flag:
+
+**android/app/src/main/res/values-v35/styles.xml** (Android 15+ only):
+```xml
+<style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+</style>
+
+<style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+</style>
+```
+
+Also added to **values-night-v35/styles.xml** for dark mode support.
+
+**Important Notes:**
+1. ⚠️ This is a **temporary solution** - the flag will be deprecated in Android 16
+2. ✅ Gives us 1-2 years to properly migrate to full edge-to-edge
+3. ✅ Suppresses warnings in Google Play Console immediately
+4. ✅ App will still work correctly on all Android versions
+5. 📅 Plan full edge-to-edge migration before Android 16 release
 
 **Dependencies (already in build.gradle):**
 ```gradle
