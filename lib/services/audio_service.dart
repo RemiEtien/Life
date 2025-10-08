@@ -90,22 +90,15 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
 
     final assetPath = getSoundAssetPath(soundName);
     if (assetPath.isNotEmpty) {
-      try {
-        // Extract filename from path (e.g., 'sounds/forest_rain.mp3' -> 'forest_rain.mp3')
-        final fileName = assetPath.split('/').last;
+      // Extract filename from path (e.g., 'sounds/forest_rain.mp3' -> 'forest_rain.mp3')
+      final fileName = assetPath.split('/').last;
 
-        // Download sound from Firebase Storage using AudioAssetService
-        final audioFile = await AudioAssetService.getAudioFile(fileName, AudioCategory.sound);
+      // Download sound from Firebase Storage using AudioAssetService
+      final audioFile = await AudioAssetService.getAudioFile(fileName, AudioCategory.sound);
 
-        await _player.setReleaseMode(ReleaseMode.loop);
-        await _player.play(DeviceFileSource(audioFile.path));
-        state = state.copyWith(isPlaying: true, isGlobalPlayerActive: false);
-      } catch (e) {
-        // Fallback to local asset if download fails
-        await _player.setReleaseMode(ReleaseMode.loop);
-        await _player.play(AssetSource(assetPath));
-        state = state.copyWith(isPlaying: true, isGlobalPlayerActive: false);
-      }
+      await _player.setReleaseMode(ReleaseMode.loop);
+      await _player.play(DeviceFileSource(audioFile.path));
+      state = state.copyWith(isPlaying: true, isGlobalPlayerActive: false);
     }
   }
 
@@ -130,18 +123,13 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
 
     await _player.setReleaseMode(ReleaseMode.stop);
 
-    try {
-      // Extract filename from path (e.g., 'music/ambient-music-349056.mp3' -> 'ambient-music-349056.mp3')
-      final fileName = track.assetPath.split('/').last;
+    // Extract filename from path (e.g., 'music/ambient-music-349056.mp3' -> 'ambient-music-349056.mp3')
+    final fileName = track.assetPath.split('/').last;
 
-      // Download music from Firebase Storage using AudioAssetService
-      final audioFile = await AudioAssetService.getAudioFile(fileName, AudioCategory.music);
+    // Download music from Firebase Storage using AudioAssetService
+    final audioFile = await AudioAssetService.getAudioFile(fileName, AudioCategory.music);
 
-      await _player.play(DeviceFileSource(audioFile.path));
-    } catch (e) {
-      // Fallback to local asset if download fails
-      await _player.play(AssetSource(track.assetPath));
-    }
+    await _player.play(DeviceFileSource(audioFile.path));
 
     state = state.copyWith(
       isPlaying: true,

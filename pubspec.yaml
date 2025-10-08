@@ -1,7 +1,7 @@
 name: lifeline
 description: Lifeline MVP
 publish_to: "none"
-version: 1.0.142+142
+version: 1.0.143+143
 
 
 environment:
@@ -109,8 +109,6 @@ flutter:
     - assets/google_logo.png
     - assets/apple_logo.png
     - assets/fonts/
-    - assets/sounds/
-    - assets/music/
     - assets/legal/
 
   fonts:
