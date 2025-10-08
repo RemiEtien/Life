@@ -12,6 +12,7 @@ import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
 import '../widgets/premium_upsell_widgets.dart';
+import '../widgets/device_performance_detector.dart';
 import 'package:collection/collection.dart';
 
 // Dialog to create the master password for the first time.
@@ -900,6 +901,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const Divider(height: 40),
                     _buildSectionTitle(l10n.profileSectionSettings, context),
                     _buildNotificationsSetting(profile, l10n),
+                    _buildGraphicsQualitySetting(l10n),
                     const Divider(height: 40),
                     _buildSectionTitle(l10n.profileSectionSecurity, context),
                     _buildEncryptionSetting(profile, l10n),
@@ -1021,6 +1023,100 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ref.read(userServiceProvider).updateUserProfile(updatedProfile);
       },
     );
+  }
+
+  Widget _buildGraphicsQualitySetting(AppLocalizations l10n) {
+    final currentQuality = DevicePerformanceDetector.currentGraphicsQuality;
+    final autoDetected = DevicePerformanceDetector.autoDetectedPerformance;
+
+    String getQualityLabel(GraphicsQuality quality) {
+      switch (quality) {
+        case GraphicsQuality.auto:
+          return 'Auto (${_getPerformanceLabel(autoDetected)})';
+        case GraphicsQuality.low:
+          return 'Low';
+        case GraphicsQuality.medium:
+          return 'Medium';
+        case GraphicsQuality.high:
+          return 'High';
+      }
+    }
+
+    return ListTile(
+      leading: const Icon(Icons.graphic_eq),
+      title: const Text('Graphics Quality'),
+      subtitle: Text(getQualityLabel(currentQuality)),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => _showGraphicsQualityDialog(l10n),
+    );
+  }
+
+  String _getPerformanceLabel(DevicePerformance perf) {
+    switch (perf) {
+      case DevicePerformance.high:
+        return 'High';
+      case DevicePerformance.medium:
+        return 'Medium';
+      case DevicePerformance.low:
+        return 'Low';
+    }
+  }
+
+  Future<void> _showGraphicsQualityDialog(AppLocalizations l10n) async {
+    final currentQuality = DevicePerformanceDetector.currentGraphicsQuality;
+    final autoDetected = DevicePerformanceDetector.autoDetectedPerformance;
+
+    final selected = await showDialog<GraphicsQuality>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Graphics Quality'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<GraphicsQuality>(
+              title: Text('Auto (${_getPerformanceLabel(autoDetected)})'),
+              subtitle: const Text('Automatically detect device performance'),
+              value: GraphicsQuality.auto,
+              groupValue: currentQuality,
+              onChanged: (value) => Navigator.of(context).pop(value),
+            ),
+            RadioListTile<GraphicsQuality>(
+              title: const Text('Low'),
+              subtitle: const Text('Best battery life, minimal effects'),
+              value: GraphicsQuality.low,
+              groupValue: currentQuality,
+              onChanged: (value) => Navigator.of(context).pop(value),
+            ),
+            RadioListTile<GraphicsQuality>(
+              title: const Text('Medium'),
+              subtitle: const Text('Balanced performance and visuals'),
+              value: GraphicsQuality.medium,
+              groupValue: currentQuality,
+              onChanged: (value) => Navigator.of(context).pop(value),
+            ),
+            RadioListTile<GraphicsQuality>(
+              title: const Text('High'),
+              subtitle: const Text('Best visuals, more battery usage'),
+              value: GraphicsQuality.high,
+              groupValue: currentQuality,
+              onChanged: (value) => Navigator.of(context).pop(value),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (selected != null && selected != currentQuality) {
+      await DevicePerformanceDetector.setGraphicsQuality(selected);
+      // Rebuild UI to show new setting
+      setState(() {});
+    }
   }
 
   Widget _buildVersionInfo() {

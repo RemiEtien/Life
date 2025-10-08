@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // --- НОВЫЙ КЛАСС: Динамический бюджет рендеринга ---
 class PerformanceBudget {
@@ -30,6 +31,14 @@ class PerformanceBudget {
 }
 
 enum DevicePerformance { high, medium, low }
+
+/// User's manual graphics quality setting
+enum GraphicsQuality {
+  auto,   // Auto-detect based on device
+  low,    // Force low quality
+  medium, // Force medium quality
+  high,   // Force high quality
+}
 
 class DeviceCapabilities {
   final DevicePerformance performance;
@@ -85,14 +94,87 @@ class DeviceCapabilities {
 
 class DevicePerformanceDetector {
   static DeviceCapabilities? _cachedCapabilities;
+  static DeviceCapabilities? _autoDetectedCapabilities;
+  static GraphicsQuality _userPreference = GraphicsQuality.auto;
+  static const String _prefsKey = 'graphics_quality_setting';
 
   static DeviceCapabilities get capabilities {
+    // If user has manual preference, use it
+    if (_userPreference != GraphicsQuality.auto) {
+      switch (_userPreference) {
+        case GraphicsQuality.high:
+          return DeviceCapabilities.high;
+        case GraphicsQuality.medium:
+          return DeviceCapabilities.medium;
+        case GraphicsQuality.low:
+          return DeviceCapabilities.low;
+        case GraphicsQuality.auto:
+          break;
+      }
+    }
+
+    // Otherwise use auto-detected or default to medium
     return _cachedCapabilities ?? DeviceCapabilities.medium;
   }
 
   static Future<void> initialize() async {
-    _cachedCapabilities ??= await _detectCapabilities();
+    // Load user preference
+    await _loadUserPreference();
+
+    // Auto-detect capabilities
+    _autoDetectedCapabilities = await _detectCapabilities();
+
+    // Apply based on user preference
+    if (_userPreference == GraphicsQuality.auto) {
+      _cachedCapabilities = _autoDetectedCapabilities;
+    }
   }
+
+  static Future<void> _loadUserPreference() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedValue = prefs.getString(_prefsKey);
+      if (savedValue != null) {
+        _userPreference = GraphicsQuality.values.firstWhere(
+          (e) => e.name == savedValue,
+          orElse: () => GraphicsQuality.auto,
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[DevicePerformance] Error loading preference: $e');
+      }
+    }
+  }
+
+  /// Set user's graphics quality preference
+  static Future<void> setGraphicsQuality(GraphicsQuality quality) async {
+    _userPreference = quality;
+
+    // Update cached capabilities based on preference
+    if (quality == GraphicsQuality.auto) {
+      _cachedCapabilities = _autoDetectedCapabilities ?? DeviceCapabilities.medium;
+    } else {
+      // Force specific quality - will be handled by capabilities getter
+    }
+
+    // Save to SharedPreferences
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, quality.name);
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[DevicePerformance] Error saving preference: $e');
+      }
+    }
+  }
+
+  /// Get current graphics quality setting
+  static GraphicsQuality get currentGraphicsQuality => _userPreference;
+
+  /// Get auto-detected device performance level
+  static DevicePerformance get autoDetectedPerformance =>
+      _autoDetectedCapabilities?.performance ?? DevicePerformance.medium;
 
   static Future<DeviceCapabilities> _detectCapabilities() async {
     if (kDebugMode && !Platform.isAndroid && !Platform.isIOS) {
