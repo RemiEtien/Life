@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'analytics_service.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -88,6 +89,9 @@ class PurchaseService extends StateNotifier<PurchaseState> {
 
   Future<bool> buyProduct(ProductDetails productDetails) async {
     try {
+      // Log analytics - purchase initiated
+      await AnalyticsService.logPurchaseInitiated(productDetails.id);
+
       final PurchaseParam purchaseParam =
           PurchaseParam(productDetails: productDetails);
 
@@ -134,6 +138,13 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
           debugPrint('[PurchaseService] Purchase error: ${purchaseDetails.error}');
+
+          // Log analytics - purchase failed
+          unawaited(AnalyticsService.logPurchaseFailed(
+            purchaseDetails.productID,
+            reason: purchaseDetails.error?.message ?? 'Unknown error',
+          ));
+
           state = state.copyWith(
             isLoading: false,
             purchaseSuccess: false,
@@ -175,6 +186,22 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       });
 
       debugPrint('[PurchaseService] Cloud function call successful. Result: ${result.data}');
+
+      // Extract price from ProductDetails (we'll need to get it from state.products)
+      final product = state.products.firstWhere(
+        (p) => p.id == purchaseDetails.productID,
+        orElse: () => throw Exception('Product not found'),
+      );
+      final price = double.tryParse(product.rawPrice.toString()) ?? 0.0;
+      final currency = product.currencyCode;
+
+      // Log analytics - purchase completed
+      await AnalyticsService.logPurchaseCompleted(
+        purchaseDetails.productID,
+        purchaseDetails.purchaseID ?? 'unknown',
+        price,
+        currency: currency,
+      );
 
       // ИЗМЕНЕНИЕ: Принудительно обновляем профиль пользователя после успешной покупки
       // Это заставит isPremiumProvider пересчитаться

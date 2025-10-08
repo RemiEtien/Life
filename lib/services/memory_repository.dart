@@ -5,6 +5,7 @@ import '../memory.dart';
 import 'encryption_service.dart';
 import 'isar_service.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'analytics_service.dart';
 
 class MemoryRepository {
   final String userId;
@@ -103,8 +104,25 @@ class MemoryRepository {
 
       final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
 
+
       final result = await isar.writeTxn(() => isar.memorys.put(encryptedMemory));
       FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ✅ Memory created successfully, id: $result');
+
+      // Log analytics
+      final totalMediaCount = encryptedMemory.mediaPaths.length +
+                             encryptedMemory.videoPaths.length +
+                             encryptedMemory.audioNotePaths.length;
+      await AnalyticsService.logMemoryCreated(
+        hasMedia: totalMediaCount > 0,
+        mediaCount: totalMediaCount,
+        hasEmotions: encryptedMemory.emotions.isNotEmpty,
+        hasReflection: encryptedMemory.reflectionImpact != null ||
+                      encryptedMemory.reflectionLesson != null ||
+                      encryptedMemory.reflectionAutoThought != null,
+        wordCount: (encryptedMemory.content ?? '').split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
+        isEncrypted: encryptedMemory.isEncrypted,
+      );
+
       return result;
     } catch (e, stack) {
       FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] ❌ Failed to create memory for userId: $userId');
@@ -323,9 +341,16 @@ class MemoryRepository {
 
     final encryptedMemory = _encryptMemoryIfNeeded(memoryToSave);
 
+
     await isar.writeTxn(() async {
       await isar.memorys.put(encryptedMemory);
     });
+
+    // Log analytics
+    await AnalyticsService.logMemoryEdited(
+      contentChanged: true,
+      mediaChanged: false, // We don't track this in update()
+    );
 
     return encryptedMemory;
   }
@@ -338,7 +363,20 @@ class MemoryRepository {
 
   Future<bool> delete(int id) async {
     final isar = await _db;
-    return isar.writeTxn(() => isar.memorys.delete(id));
+
+    // Get memory before deleting for analytics
+    final memory = await isar.memorys.get(id);
+
+    final result = await isar.writeTxn(() => isar.memorys.delete(id));
+
+    // Log analytics if deletion was successful
+    if (result && memory != null) {
+      await AnalyticsService.logMemoryDeleted(
+        wasEncrypted: memory.isEncrypted,
+      );
+    }
+
+    return result;
   }
 }
 

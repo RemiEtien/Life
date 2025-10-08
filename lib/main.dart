@@ -16,6 +16,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'providers/application_providers.dart';
 import 'screens/splash_screen.dart';
 import 'services/notification_service.dart';
+import 'services/analytics_service.dart';
 import 'widgets/device_performance_detector.dart';
 import 'l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -119,6 +120,9 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
 
   Future<void> _initializeHeavyServices() async {
     try {
+      // Log session start analytics
+      await AnalyticsService.logSessionStart('1.0.142');
+
       // Initialize in parallel for faster startup
       await Future.wait([
         NotificationService().init(),
