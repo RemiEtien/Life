@@ -51,7 +51,8 @@
       "Bash(find:*)",
       "Bash(tee:*)",
       "Bash(unzip:*)",
-      "Bash(adb:*)"
+      "Bash(adb:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

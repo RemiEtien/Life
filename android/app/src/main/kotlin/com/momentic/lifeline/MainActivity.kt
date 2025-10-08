@@ -1,8 +1,6 @@
 package com.momentic.lifeline
 
-import android.os.Build
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import io.flutter.embedding.android.FlutterFragmentActivity
 
@@ -12,19 +10,10 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Android 15+ Edge-to-Edge enforcement
-        // enableEdgeToEdge() automatically handles:
-        // - setStatusBarColor (deprecated)
-        // - setNavigationBarColor (deprecated)
-        // - setNavigationBarDividerColor (deprecated)
-        // - LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES (deprecated)
-        // API 35 = Android 15 (VANILLA_ICE_CREAM)
-        if (Build.VERSION.SDK_INT >= 35) {
-            enableEdgeToEdge()
-        } else {
-            // For Android 14 and below, use the traditional approach
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-        }
+        // Edge-to-Edge rendering for all Android versions
+        // Android 15+ uses windowOptOutEdgeToEdgeEnforcement in styles-v35.xml
+        // to temporarily suppress deprecated API warnings until Android 16 migration
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 }
 
