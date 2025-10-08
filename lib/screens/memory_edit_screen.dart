@@ -757,20 +757,21 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     }
   }
 
-  Future<void> _handleReflectionReminder(Memory memory) async {
+  Future<void> _handleReflectionReminder(Memory memory, String? plaintextAction) async {
     final notificationService = ref.read(notificationServiceProvider);
     await notificationService.cancelNotification(memory.id);
 
     // FIX: Only schedule notification if action is not completed
     // This prevents re-triggering after memory date change when marked as done
+    // FIX: Use plaintextAction instead of memory.reflectionAction to avoid encrypted text in notifications
     if (memory.reflectionFollowUpAt != null &&
-        memory.reflectionAction != null &&
-        memory.reflectionAction!.isNotEmpty &&
+        plaintextAction != null &&
+        plaintextAction.isNotEmpty &&
         !memory.reflectionActionCompleted) {
       await notificationService.scheduleNotification(
           id: memory.id,
           title: memory.title,
-          body: memory.reflectionAction!,
+          body: plaintextAction,
           scheduledDate: memory.reflectionFollowUpAt!,
           payload: memory.id.toString());
     }
@@ -885,7 +886,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
       // Start async sync in background (don't await - let it run)
       unawaited(Future.microtask(() {
         ref.read(syncServiceProvider).queueSync(savedMemory.id);
-        _handleReflectionReminder(savedMemory);
+        _handleReflectionReminder(savedMemory, _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text);
       }));
     } catch (e) {
       if (mounted) {

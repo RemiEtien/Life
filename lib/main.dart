@@ -188,8 +188,23 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
     // 2. Profile entry (navigating to profile screen)
     // 3. Per-memory unlock (if requireBiometricForMemory is enabled)
 
+    // FIX: Stop audio when app goes to background
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      try {
+        final audioNotifier = ref.read(audioPlayerProvider.notifier);
+        audioNotifier.pauseAllAudio();
+        if (kDebugMode) {
+          debugPrint('[AppLifecycle] Audio paused - app in background');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('[AppLifecycle] Error pausing audio: $e');
+        }
+      }
+    }
+
     if (kDebugMode) {
-      debugPrint('[AppLifecycle] State changed to: $state (auto-lock disabled)');
+      debugPrint('[AppLifecycle] State changed to: $state');
     }
   }
 
