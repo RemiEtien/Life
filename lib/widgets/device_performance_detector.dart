@@ -87,7 +87,7 @@ class DevicePerformanceDetector {
   static DeviceCapabilities? _cachedCapabilities;
 
   static DeviceCapabilities get capabilities {
-    return _cachedCapabilities ?? DeviceCapabilities.low;
+    return _cachedCapabilities ?? DeviceCapabilities.medium;
   }
 
   static Future<void> initialize() async {
