@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -735,6 +736,122 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  Future<void> _showNotificationDiagnostics(BuildContext context) async {
+    final notificationService = ref.read(notificationServiceProvider);
+
+    // Show loading dialog while fetching diagnostics
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Checking notification status...'),
+          ],
+        ),
+      ),
+    );
+
+    final diagnostics = await notificationService.getDiagnosticInfo();
+
+    if (!mounted) return;
+    Navigator.of(context).pop(); // Close loading dialog
+
+    // Show diagnostic results
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Notification Diagnostics'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDiagnosticItem(
+                'Notifications Enabled',
+                diagnostics['notificationsEnabled']?.toString() ?? 'N/A',
+                diagnostics['notificationsEnabled'] == true,
+              ),
+              _buildDiagnosticItem(
+                'Can Schedule Exact Alarms',
+                diagnostics['canScheduleExactAlarms']?.toString() ?? 'N/A',
+                diagnostics['canScheduleExactAlarms'] == true,
+              ),
+              _buildDiagnosticItem(
+                'Pending Notifications',
+                diagnostics['pendingNotificationsCount']?.toString() ?? '0',
+                null,
+              ),
+              _buildDiagnosticItem(
+                'Current Timezone',
+                diagnostics['currentTimezone']?.toString() ?? 'N/A',
+                null,
+              ),
+              const Divider(height: 24),
+              const Text(
+                'Tap "Send Test" to receive an immediate test notification.',
+                style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final success = await notificationService.sendTestNotification();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success
+                        ? 'Test notification sent! Check your notification tray.'
+                        : 'Failed to send test notification. Check permissions.'),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Send Test'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiagnosticItem(String label, String value, bool? isGood) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isGood != null)
+            Icon(
+              isGood ? Icons.check_circle : Icons.error,
+              color: isGood ? Colors.green : Colors.red,
+              size: 20,
+            ),
+          if (isGood != null) const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(value, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showChangeMasterPasswordDialog(AppLocalizations l10n) {
     showDialog(
       context: context,
@@ -912,6 +1029,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       title: Text(l10n.profileReplayTutorial),
                       onTap: () => _replayOnboarding(l10n),
                     ),
+                    if (kDebugMode) ...[
+                      ListTile(
+                        leading: const Icon(Icons.bug_report, color: Colors.orange),
+                        title: const Text('Test Notifications'),
+                        subtitle: const Text('Debug: Check notification status'),
+                        onTap: () => _showNotificationDiagnostics(context),
+                      ),
+                    ],
                     const Divider(height: 40),
                     _buildSectionTitle(l10n.profileSectionAccount, context),
                     ListTile(

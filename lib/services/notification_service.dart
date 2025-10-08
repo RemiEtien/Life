@@ -257,4 +257,84 @@ class NotificationService {
       }
     }
   }
+
+  /// Get detailed notification diagnostic information
+  /// Returns a map with permission status, pending notifications, and system info
+  Future<Map<String, dynamic>> getDiagnosticInfo() async {
+    final diagnostics = <String, dynamic>{};
+
+    try {
+      // Check notification permissions
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        final androidImplementation = _flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+        if (androidImplementation != null) {
+          // Check if notifications are enabled
+          final areNotificationsEnabled = await androidImplementation.areNotificationsEnabled();
+          diagnostics['notificationsEnabled'] = areNotificationsEnabled;
+
+          // Check exact alarm permission (Android 13+)
+          final canScheduleExactAlarms = await androidImplementation.canScheduleExactNotifications();
+          diagnostics['canScheduleExactAlarms'] = canScheduleExactAlarms;
+        }
+      }
+
+      // Get pending notifications
+      final pendingNotifications = await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      diagnostics['pendingNotificationsCount'] = pendingNotifications.length;
+      diagnostics['pendingNotifications'] = pendingNotifications
+          .map((n) => {
+                'id': n.id,
+                'title': n.title,
+                'body': n.body,
+                'payload': n.payload,
+              })
+          .toList();
+
+      // Get active notifications
+      final activeNotifications = await _flutterLocalNotificationsPlugin.getActiveNotifications();
+      diagnostics['activeNotificationsCount'] = activeNotifications.length;
+
+      // Cached permission status
+      diagnostics['cachedPermissionStatus'] = _permissionsGranted;
+      diagnostics['lastPermissionCheckTime'] = _lastPermissionCheck?.toIso8601String();
+
+      // Timezone info
+      diagnostics['currentTimezone'] = tz.local.name;
+      diagnostics['currentTime'] = tz.TZDateTime.now(tz.local).toIso8601String();
+
+      if (kDebugMode) {
+        debugPrint('[NotificationService] Diagnostic Info:');
+        diagnostics.forEach((key, value) {
+          debugPrint('  $key: $value');
+        });
+      }
+    } catch (e) {
+      diagnostics['error'] = e.toString();
+      if (kDebugMode) {
+        debugPrint('[NotificationService] Error getting diagnostic info: $e');
+      }
+    }
+
+    return diagnostics;
+  }
+
+  /// Test notification - shows immediately for debugging
+  Future<bool> sendTestNotification() async {
+    try {
+      await showLocalNotification(
+        id: 999999,
+        title: 'Lifeline Test',
+        body: 'This is a test notification. Time: ${DateTime.now()}',
+        payload: 'test',
+      );
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[NotificationService] Test notification failed: $e');
+      }
+      return false;
+    }
+  }
 }
