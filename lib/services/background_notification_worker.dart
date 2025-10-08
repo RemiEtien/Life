@@ -97,7 +97,7 @@ class BackgroundNotificationWorker {
           networkType: NetworkType.connected,
           requiresBatteryNotLow: true,
         ),
-        existingWorkPolicy: ExistingWorkPolicy.replace,
+        existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
       );
 
       debugPrint('[BackgroundWorker] Initialized successfully');

@@ -22,15 +22,37 @@ allprojects {
     
     // ДОБАВЛЕНО: JVM Toolchain для всех подпроектов (включая внешние пакеты)
     afterEvaluate { project ->
+        // Специальная конфигурация для workmanager (принудительно)
+        if (project.name == 'workmanager') {
+            try {
+                project.android {
+                    compileOptions {
+                        sourceCompatibility JavaVersion.VERSION_17
+                        targetCompatibility JavaVersion.VERSION_17
+                    }
+                    kotlinOptions {
+                        jvmTarget = '17'
+                    }
+                }
+                project.kotlin {
+                    jvmToolchain(17)
+                }
+            } catch (Exception e) {
+                println "Warning: Failed to configure workmanager: ${e.message}"
+            }
+        }
+
         // Применяем ко всем проектам с Kotlin
-        if (project.plugins.hasPlugin('org.jetbrains.kotlin.android') || 
+        if (project.plugins.hasPlugin('org.jetbrains.kotlin.android') ||
             project.plugins.hasPlugin('kotlin-android') ||
             project.plugins.hasPlugin('org.jetbrains.kotlin.jvm')) {
-            
-            project.kotlin {
-                jvmToolchain(17)
-            }
-            
+
+            try {
+                project.kotlin {
+                    jvmToolchain(17)
+                }
+            } catch (Exception ignored) {}
+
             // Дополнительно устанавливаем kotlinOptions для совместимости
             if (project.hasProperty('android')) {
                 project.android {
@@ -40,27 +62,27 @@ allprojects {
                 }
             }
         }
-        
+
         // Применяем ко всем Android проектам
-        if (project.plugins.hasPlugin('com.android.application') || 
+        if (project.plugins.hasPlugin('com.android.application') ||
             project.plugins.hasPlugin('com.android.library')) {
             project.android {
                 compileOptions {
                     sourceCompatibility JavaVersion.VERSION_17
                     targetCompatibility JavaVersion.VERSION_17
                 }
-                
+
                 // Убеждаемся, что kotlinOptions установлен
-                if (project.android.hasProperty('kotlinOptions')) {
+                try {
                     kotlinOptions {
                         jvmTarget = '17'
                     }
-                }
+                } catch (Exception ignored) {}
             }
         }
-        
+
         // Для Java-only проектов
-        if (project.plugins.hasPlugin('java-library') || 
+        if (project.plugins.hasPlugin('java-library') ||
             project.plugins.hasPlugin('java')) {
             project.java {
                 toolchain {
