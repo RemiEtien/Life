@@ -250,7 +250,7 @@ class AudioAssetService {
   /// This is a static list. In a production app, you might want to
   /// fetch this from Firestore or a JSON file
   static List<AudioAssetInfo> getAvailableMusic() {
-    return [
+    return const [
       AudioAssetInfo(
         fileName: 'ambient-background-347405.mp3',
         displayName: 'Ambient Background',
@@ -310,7 +310,7 @@ class AudioAssetService {
 
   /// Get list of available sound effects
   static List<AudioAssetInfo> getAvailableSounds() {
-    return [
+    return const [
       AudioAssetInfo(
         fileName: 'ocean_waves.mp3',
         displayName: 'Ocean Waves',
