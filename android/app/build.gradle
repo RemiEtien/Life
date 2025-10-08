@@ -119,9 +119,12 @@ android {
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
             }
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // TEMPORARY: Disabled for Google Play Console analysis
+            // This allows us to see readable class names in Pre-launch report warnings
+            // Re-enable before final production release
+            minifyEnabled false
+            shrinkResources false
+            // proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             signingConfig signingConfigs.debug
