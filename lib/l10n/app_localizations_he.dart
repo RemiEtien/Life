@@ -1262,4 +1262,37 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get purchaseSuccessMessage => 'הרכישה הצליחה! ברוכים הבאים ל-Premium!';
+
+  @override
+  String get graphicsQualityTitle => 'איכות גרפיקה';
+
+  @override
+  String get graphicsQualityAuto => 'אוטומטי';
+
+  @override
+  String get graphicsQualityLow => 'נמוכה';
+
+  @override
+  String get graphicsQualityMedium => 'בינונית';
+
+  @override
+  String get graphicsQualityHigh => 'גבוהה';
+
+  @override
+  String get graphicsQualityAutoSubtitle => 'זיהוי אוטומטי של ביצועי המכשיר';
+
+  @override
+  String get graphicsQualityLowSubtitle =>
+      'חיי סוללה מירביים, אפקטים מינימליים';
+
+  @override
+  String get graphicsQualityMediumSubtitle => 'איזון בין ביצועים לגרפיקה';
+
+  @override
+  String get graphicsQualityHighSubtitle => 'גרפיקה מיטבית, צריכת סוללה מוגברת';
+
+  @override
+  String graphicsQualityAutoDetected(String performance) {
+    return 'אוטומטי ($performance)';
+  }
 }

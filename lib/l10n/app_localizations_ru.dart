@@ -1278,4 +1278,40 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get purchaseSuccessMessage =>
       'Покупка успешна! Добро пожаловать в Premium!';
+
+  @override
+  String get graphicsQualityTitle => 'Качество графики';
+
+  @override
+  String get graphicsQualityAuto => 'Авто';
+
+  @override
+  String get graphicsQualityLow => 'Низкое';
+
+  @override
+  String get graphicsQualityMedium => 'Среднее';
+
+  @override
+  String get graphicsQualityHigh => 'Высокое';
+
+  @override
+  String get graphicsQualityAutoSubtitle =>
+      'Автоматически определять производительность устройства';
+
+  @override
+  String get graphicsQualityLowSubtitle =>
+      'Максимальная экономия батареи, минимум эффектов';
+
+  @override
+  String get graphicsQualityMediumSubtitle =>
+      'Баланс производительности и визуальных эффектов';
+
+  @override
+  String get graphicsQualityHighSubtitle =>
+      'Максимальное качество графики, повышенный расход батареи';
+
+  @override
+  String graphicsQualityAutoDetected(String performance) {
+    return 'Авто ($performance)';
+  }
 }

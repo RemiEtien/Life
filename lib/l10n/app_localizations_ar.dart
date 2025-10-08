@@ -1272,4 +1272,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get purchaseSuccessMessage => 'تم الشراء بنجاح! مرحبًا بك في Premium!';
+
+  @override
+  String get graphicsQualityTitle => 'جودة الرسومات';
+
+  @override
+  String get graphicsQualityAuto => 'تلقائي';
+
+  @override
+  String get graphicsQualityLow => 'منخفضة';
+
+  @override
+  String get graphicsQualityMedium => 'متوسطة';
+
+  @override
+  String get graphicsQualityHigh => 'عالية';
+
+  @override
+  String get graphicsQualityAutoSubtitle => 'اكتشاف أداء الجهاز تلقائيًا';
+
+  @override
+  String get graphicsQualityLowSubtitle => 'أفضل عمر للبطارية، تأثيرات بسيطة';
+
+  @override
+  String get graphicsQualityMediumSubtitle => 'توازن بين الأداء والرسومات';
+
+  @override
+  String get graphicsQualityHighSubtitle =>
+      'أفضل رسومات، استهلاك أكبر للبطارية';
+
+  @override
+  String graphicsQualityAutoDetected(String performance) {
+    return 'تلقائي ($performance)';
+  }
 }

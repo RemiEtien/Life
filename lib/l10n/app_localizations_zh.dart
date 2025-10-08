@@ -1220,4 +1220,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get purchaseSuccessMessage => '购买成功！欢迎使用Premium！';
+
+  @override
+  String get graphicsQualityTitle => '图形质量';
+
+  @override
+  String get graphicsQualityAuto => '自动';
+
+  @override
+  String get graphicsQualityLow => '低';
+
+  @override
+  String get graphicsQualityMedium => '中';
+
+  @override
+  String get graphicsQualityHigh => '高';
+
+  @override
+  String get graphicsQualityAutoSubtitle => '自动检测设备性能';
+
+  @override
+  String get graphicsQualityLowSubtitle => '最佳电池寿命，最少效果';
+
+  @override
+  String get graphicsQualityMediumSubtitle => '平衡性能与视觉效果';
+
+  @override
+  String get graphicsQualityHighSubtitle => '最佳视觉效果，更高电池消耗';
+
+  @override
+  String graphicsQualityAutoDetected(String performance) {
+    return '自动 ($performance)';
+  }
 }

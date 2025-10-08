@@ -1,639 +1,656 @@
 {
-"@@locale": "he",
-"email": "אימייל",
-"password": "סיסמה",
-"signIn": "התחבר",
-"register": "הירשם",
-"createAccount": "צור חשבון חדש",
-"alreadyHaveAccount": "יש לי כבר חשבון",
-"orSignInWith": "או התחבר באמצעות",
-"passwordTooShort": "הסיסמה חייבת להכיל לפחות 6 תווים",
-"invalidEmail": "נא להזין כתובת אימייל חוקית",
-"consentWelcomeTitle": "ברוכים הבאים ל-Lifeline",
-"consentWelcomeSubtitle": "לפני שתתחיל, אנא עיין בתנאים שלנו והסכם להם.",
-"consentIAgreeTo": "קראתי ואני מסכים/ה ל",
-"consentTermsOfService": "תנאי השירות",
-"consentAnd": " ו",
-"consentPrivacyPolicy": "מדיניות הפרטיות",
-"consentContinue": "המשך",
-"consentErrorSaving": "שגיאה בשמירת ההגדרות: {error}",
-"@consentErrorSaving": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
-"splashMessageInitializing": "מאתחל...",
-"splashMessageCheckingSettings": "בודק הגדרות...",
-"splashMessageAuthenticating": "מאמת...",
-"splashMessageSyncing": "מסנכרן את ציר הזמן שלך...",
-"authGateLoadingMemories": "טוען זיכרונות...",
-"authGateAuthenticating": "מאמת...",
-"authGateSomethingWentWrong": "משהו השתבש",
-"authGateCouldNotLoad": "לא הצלחנו לטעון את הנתונים שלך. אנא בדוק את החיבור ונסה שוב.",
-"authGateTryAgain": "נסה שוב",
-"authGateEmptyState": "ציר הזמן שלך מוכן.\nהקש על כפתור + כדי להוסיף את הזיכרון הראשון שלך.",
-"authGateUnsavedDraftTitle": "זיכרון שלא נשמר",
-"authGateUnsavedDraftContent": "יש לך טיוטת זיכרון שלא נשמרה. האם תרצה להמשיך לערוך אותה?",
-"authGateDiscard": "מחק",
-"authGateContinueEditing": "המשך עריכה",
-"verifyEmailTitle": "אימות אימייל",
-"verifyEmailSentTo": "נשלח אימייל אימות לכתובת:",
-"verifyEmailInstructions": "אנא לחץ על הקישור באימייל להשלמת ההרשמה.",
-"verifyEmailResendButton": "שלח שוב אימייל",
-"verifyEmailCancelButton": "ביטול",
-"profileTitle": "פרופיל והגדרות",
-"profileSectionProfile": "פרופיל",
-"profileChangeNameTitle": "שנה שם",
-"profileEnterYourName": "הזן את שמך",
-"profileSave": "שמור",
-"profileCancel": "ביטול",
-"profileName": "שם",
-"profileEmail": "אימייל",
-"profileCountry": "מדינה",
-"profileCountryNotSelected": "לא נבחר",
-"profileLanguage": "שפת התוכן",
-"profileLanguageDefault": "אנגלית (ברירת מחדל)",
-"profileSelectLanguage": "בחר שפה",
-"profileSectionSettings": "הגדרות",
-"profileTheme": "ערכת נושא",
-"profileThemeSystem": "מערכת",
-"profileThemeLight": "בהיר",
-"profileThemeDark": "כהה",
-"profileGraphics": "איכות גרפיקה",
-"profileGraphicsAuto": "אוטומטי",
-"profileGraphicsLow": "נמוכה",
-"profileGraphicsMedium": "בינונית",
-"profileGraphicsHigh": "גבוהה",
-"profileReminders": "תזכורות לרפלקציה",
-"profileRemindersSubtitle": "קבל התראות על תוכניות הפעולה שלך",
-"profileSectionSecurity": "אבטחה",
-"profileChangePassword": "שנה סיסמת מאסטר",
-"profileEncryptionActive": "הצפנה מקצה לקצה פעילה",
-"profileDeleteAccountConfirmContent": "פעולה זו אינה הפיכה. כל חשבונך, כולל כל הזיכרונות וההגדרות, יימחק לצמיתות. כדי להמשיך, לחץ והחזק את לחצן המחיקה למשך 5 שניות.",
-"profileEnableEncryption": "הפעל הצפנה מקצה לקצה",
-"profileEnableEncryptionSubtitle": "הגן על הזיכרונות הרגישים שלך באמצעות סיסמת מאסטר.",
-"profileCreateMasterPassword": "צור סיסמת מאסטר",
-"profileMasterPasswordInfo": "סיסמה זו תגן על הזיכרונות שלך. לא ניתן לשחזר אותה אם תשכח אותה. אנא שמור אותה במקום בטוח.",
-"profileMasterPasswordHint": "סיסמת מאסטר",
-"profileConfirmPasswordHint": "אשר סיסמה",
-"profilePasswordMinLength": "הסיסמה חייבת להכיל לפחות 8 תווים",
-"profilePasswordsDoNotMatch": "הסיסמאות אינן תואמות",
-"profileEnable": "הפעל",
-"profileSectionHelp": "עזרה",
-"profileReauthTitle": "נדרש אימות מחדש",
-"profileReauthContent": "זוהי פעולה רגישה. אנא היכנס שוב לפני שתמשיך.",
-"profileReauthButton": "התחבר ומחק",
-"profileReauthPasswordDialogTitle": "אשר פעולה",
-"profileReauthPasswordDialogContent": "כדי למחוק את חשבונך, אנא הזן את סיסמתך הנוכחית.",
-"profilePasswordCannotBeEmpty": "סיסמה אינה יכולה להיות ריקה",
-"profileChangePasswordSuccess": "סיסמת המאסטר שונתה בהצלחה!",
-"profileChangePasswordErrorIncorrect": "סיסמת המאסטר הנוכחית שהזנת שגויה.",
-"profileOldPasswordHint": "סיסמה ישנה",
-"profileNewPasswordHint": "סיסמה חדשה",
-"profileChangePasswordCurrentPasswordHint": "סיסמת מאסטר נוכחית",
-"profileChangePasswordNewPasswordHint": "סיסמת מאסטר חדשה",
-"profileChangePasswordInfo": "אנא הזן את סיסמת המאסטר הנוכחית שלך כדי להגדיר סיסמה חדשה. פעולה זו תצפין מחדש את המפתח הסודי שלך.",
-"profileReplayTutorial": "הפעל שוב את המדריך",
-"profileReplayTutorialConfirmTitle": "להפעיל שוב את המדריך?",
-"profileReplayTutorialConfirmContent": "האם אתה בטוח שברצונך להפעיל מחדש את המדריך?",
-"profileRestart": "הפעל מחדש",
-"profileSectionAccount": "ניהול חשבון",
-"profileSignOut": "התנתק",
-"profileDeleteAccount": "מחק חשבון",
-"profileDeleteAccountConfirmTitle": "למחוק חשבון?",
-"profileDelete": "מחק",
-"profileDeletingAccount": "מוחק את חשבונך...",
-"profileErrorCouldNotFindProfile": "לא ניתן למצוא את פרופיל המשתמש.",
-"memoryEditNewTitle": "זיכרון חדש",
-"memoryEditEditTitle": "ערוך זיכרון",
-"memoryEditSave": "שמור",
-"memoryEditTitleHint": "כותרת",
-"memoryEditTitleValidator": "נא להזין כותרת",
-"memoryEditDescriptionHint": "תיאור",
-"memoryEditDateLabel": "תאריך:",
-"memoryEditSelectDateButton": "בחר תאריך",
-"memoryEditAmbientSoundLabel": "צליל רקע:",
-"memoryEditAmbientSoundDropdownHint": "בחר צליל רקע",
-"memoryEditMusicAnchorLabel": "עוגן מוזיקלי:",
-"memoryEditAttachTrackButton": "צרף רצועה מ-Spotify",
-"memoryEditPhotosLabel": "תמונות:",
-"memoryEditNoPhotosSelected": "לא נבחרו תמונות",
-"memoryEditAddPhotosButton": "הוסף תמונות",
-"memoryEditVideosLabel": "סרטונים:",
-"memoryEditNoVideosSelected": "לא נבחרו סרטונים",
-"memoryEditAddVideoButton": "הוסף סרטון",
-"memoryEditAudioNoteLabel": "הערה קולית:",
-"memoryEditAudioNoteSaved": "הערה קולית נשמרה",
-"memoryEditRecordButton": "הקלט",
-"memoryEditStopRecordingButton": "הפסק הקלטה",
-"memoryEditRecordingIndicator": "מקליט...",
-"memoryEditReflectionSectionTitle": "רפלקציה",
-"memoryEditEncryptLabel": "הצפן",
-"memoryEditEncryptionInfoTooltip": "מהי הצפנה?",
-"memoryEditImpactPrompt": "כיצד אירוע זה השפיע עליי?",
-"memoryEditLessonPrompt": "איזה לקח למדתי?",
-"memoryEditEmotionsLabel": "רגשות:",
-"emotionJoy": "שמחה",
-"emotionNostalgia": "נוסטלגיה",
-"emotionPride": "גאווה",
-"emotionSadness": "עצב",
-"emotionGratitude": "הכרת תודה",
-"emotionLove": "אהבה",
-"emotionFear": "פחד",
-"emotionAnger": "כעס",
-"memoryEditCbtHelperTitle": "עוזר רפלקציה",
-"memoryEditCbtStep1Title": "מה הייתה המחשבה או האמונה הראשונה?",
-"memoryEditCbtStep1Subtitle": "לדוגמה, 'אני אכשל' או 'עשיתי הכל נכון'.",
-"memoryEditCbtStep2Title": "מה תומך במחשבה זו?",
-"memoryEditCbtStep2Subtitle": "אילו עובדות או אירועים מוכיחים שמחשבה זו נכונה?",
-"memoryEditCbtStep3Title": "מהי ההשקפה מהצד השני?",
-"memoryEditCbtStep3Subtitle": "אילו עובדות או אירועים עשויים להפריך או לאתגר את המחשבה הראשונה?",
-"memoryEditCbtStep4Title": "איך אני יכול להסתכל על זה אחרת?",
-"memoryEditCbtStep4Subtitle": "בהתבסס על האמור לעיל, נסח נקודת מבט חדשה ומאוזנת יותר.",
-"memoryEditActionPlanTitle": "תוכנית פעולה",
-"memoryEditActionPrompt": "מהו צעד קטן אחד שאני יכול לעשות?",
-"memoryEditReminderLabel": "תזכורת:",
-"memoryEditReminderNotSet": "לא הוגדרה",
-"memoryEditSetReminderButton": "הגדר תאריך",
-"memoryEditYourThoughtsHint": "המחשבות שלך כאן...",
-"memoryEditDraftSavedMessage": "טיוטה נשמרה",
-"memoryEditErrorRepoUnavailable": "שגיאה: המאגר אינו זמין.",
-"memoryEditErrorSaving": "שגיאה בשמירת הזיכרון: {error}",
-"@memoryEditErrorSaving": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
-"memoryEditUnlockDialogTitle": "בטל נעילה כדי לשמור",
-"memoryEditUnlockDialogContent": "נא להזין את סיסמת המאסטר שלך כדי לשמור את הזיכרון המוצפן הזה.",
-"memoryEditMasterPasswordHint": "סיסמת מאסטר",
-"memoryEditUnlockButton": "בטל נעילה",
-"memoryEditEncryptionInfoDialogTitle": "הצפנה מקצה לקצה",
-"memoryEditEncryptionInfoDialogContent": "כאשר אתה מצפין זיכרון, שדות התיאור והרפלקציה שלו מוצפנים באמצעות מפתח הנגזר מסיסמת המאסטר שלך.\n\nהנתונים מאוחסנים בענן בפורמט לא קריא וניתן לפענח אותם רק במכשירים שלך באמצעות הסיסמה שלך.\n\nחשוב: איננו יכולים לשחזר את סיסמת המאסטר שלך. אם תשכח אותה, הנתונים המוצפנים שלך יאבדו לנצח.",
-"memoryEditOkButton": "אישור",
-"memoryEditPermissionDeniedSnackbar": "ההרשאה עבור {permissionName} נדחתה. אנא הפעל אותה בהגדרות.",
-"@memoryEditPermissionDeniedSnackbar": {
-"placeholders": {
-"permissionName": {
-"type": "String"
-}
-}
-},
-"memoryEditSettingsButton": "הגדרות",
-"memoryEditNoInternetSnackbar": "נדרש חיבור לאינטרנט כדי לחפש מוזיקה.",
-"memoryEditEmotionIntensityDialogTitle": "עוצמה עבור '{emotion}'",
-"@memoryEditEmotionIntensityDialogTitle": {
-"placeholders": {
-"emotion": {
-"type": "String"
-}
-}
-},
-"memoryViewBackTooltip": "חזור",
-"memoryViewShareTooltip": "שתף",
-"memoryViewEditTooltip": "ערוך",
-"memoryViewDeleteTooltip": "מחק",
-"memoryViewTabMemory": "זיכרון",
-"memoryViewTabInTheWorld": "בעולם",
-"memoryViewEncryptedTitle": "זיכרון מוצפן",
-"memoryViewReflectionTitle": "רפלקציה",
-"memoryViewReflectionImpact": "השפעה",
-"memoryViewReflectionLesson": "לקח שנלמד",
-"memoryViewCbtStep1Title": "מחשבה או אמונה ראשונה",
-"memoryViewCbtStep2Title": "ראיות התומכות במחשבה זו",
-"memoryViewCbtStep3Title": "ראיות הסותרות מחשבה זו",
-"memoryViewCbtStep4Title": "פרספקטיבה חדשה ומאוזנת (מסגור מחדש)",
-"memoryViewActionReminder": "תזכורת: {date}",
-"@memoryViewActionReminder": {
-"placeholders": {
-"date": {
-"type": "String"
-}
-}
-},
-"memoryViewMarkIncompleteTooltip": "סמן כלא הושלם",
-"memoryViewMarkCompleteTooltip": "סמן כהושלם",
-"memoryViewUnlockDialogTitle": "בטל נעילת זיכרון",
-"memoryViewUnlockDialogContent": "הזן את סיסמת המאסטר שלך כדי להציג תוכן זה.",
-"memoryViewIncorrectPassword": "סיסמה שגויה.",
-"memoryViewUnlockButton": "בטל נעילה",
-"memoryViewErrorCouldNotLoadProfile": "לא ניתן היה לטעון את הפרופיל שלך כדי להביא נתונים היסטוריים.",
-"memoryViewErrorCouldNotLoadHistoricalData": "לא ניתן היה לטעון נתונים היסטוריים עבור יום זה.",
-"memoryViewNoHistoricalData": "אין נתונים היסטוריים זמינים עבור יום זה.",
-"memoryViewErrorCouldNotLoadTrack": "לא ניתן היה לטעון את הרצועה",
-"memoryViewTabNews": "חדשות",
-"memoryViewTabMusic": "מוזיקה",
-"memoryViewNoDataForDay": "אין נתונים עבור יום זה.",
-"memoryViewNoNewsForDay": "אין חדשות היסטוריות עבור יום זה.",
-"memoryViewNewsSource": "מקור: {source}",
-"@memoryViewNewsSource": {
-"placeholders": {
-"source": {
-"type": "String"
-}
-}
-},
-"memoryViewConfirmDeleteTitle": "אשר מחיקה",
-"memoryViewConfirmDeleteContent": "פעולה זו אינה הפיכה. כדי להמשיך, לחץ והחזק את לחצן המחיקה למשך 5 שניות.",
-"memoryViewDeleteButton": "מחק",
-"memoryViewErrorLoadingProfile": "לא הצלחנו לטעון את הפרופיל שלך. אנא בדוק את החיבור ונסה שוב.",
-"memoryViewErrorLocalDb": "שגיאה: לא ניתן לגשת למסד הנתונים המקומי.",
-"memoryViewMemoryDeleted": "הזיכרון נמחק",
-"memoryViewSharingNotImplemented": "פונקציונליות השיתוף עדיין לא יושמה.",
-"memoryViewActionCompleted": "הפעולה סומנה כהושלמה!",
-"memoryViewActionIncomplete": "הפעולה סומנה כלא הושלמה.",
-"memoryViewErrorUpdatingAction": "שגיאה בעדכון הפעולה: {error}",
-"@memoryViewErrorUpdatingAction": {
-"placeholders": {
-"error": {
-"type": "String"
-}
-}
-},
-"memoryViewContentEncrypted": "התוכן מוצפן",
-"memoryViewReflectionEncrypted": "הרפלקציה מוצפנת",
-"memoryViewMediaEncrypted": "המדיה מוצפנת",
-"memoryViewAmbientSound": "צליל רקע: {sound}",
-"@memoryViewAmbientSound": {
-"placeholders": {
-"sound": {
-"type": "String"
-}
-}
-},
-"memoryViewAudioNote": "הערה קולית",
-"spotifySearchTitle": "חפש רצועה ב-Spotify",
-"spotifySearchHint": "שם שיר או אמן",
-"documentErrorLoading": "לא ניתן היה לטעון את המסמך.",
-"lifelineMemoriesCount": "זיכרונות: {count}",
-"@lifelineMemoriesCount": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelinePeriodRange": "תקופה: {startYear} - {endYear}",
-"@lifelinePeriodRange": {
-"placeholders": {
-"startYear": {
-"type": "int"
-},
-"endYear": {
-"type": "int"
-}
-}
-},
-"lifelineSyncStatus": "{status} (נותרו {jobs})",
-"@lifelineSyncStatus": {
-"placeholders": {
-"status": {
-"type": "String"
-},
-"jobs": {
-"type": "int"
-}
-}
-},
-"lifelineCalculating": "מחשב...",
-"lifelineScaleValue": "קנה מידה: {scale}%",
-"@lifelineScaleValue": {
-"placeholders": {
-"scale": {
-"type": "int"
-}
-}
-},
-"lifelineFpsValue": "FPS: {fps}",
-"@lifelineFpsValue": {
-"placeholders": {
-"fps": {
-"type": "String"
-}
-}
-},
-"lifelineFramePaintValue": "ציור פריים: {ms} אלפיות השנייה",
-"@lifelineFramePaintValue": {
-"placeholders": {
-"ms": {
-"type": "int"
-}
-}
-},
-"lifelineShowFullTimelineTooltip": "הצג ציר זמן מלא",
-"lifelineVisualSettingsTooltip": "הגדרות חזותיות",
-"lifelineMenuProfile": "פרופיל",
-"lifelineMenuDebugOn": "ניפוי באגים פועל",
-"lifelineMenuDebugOff": "ניפוי באגים כבוי",
-"lifelineMenuSignOut": "התנתק",
-"lifelineSearchHint": "חפש...",
-"lifelineMemoriesListTitle": "זיכרונות",
-"lifelineVisualSettingsDialogTitle": "הגדרות חזותיות",
-"lifelineVisualSettingsSpeed": "מהירות",
-"lifelineVisualSettingsAmplitude": "משרעת",
-"lifelineVisualSettingsYearLine": "מיקום קו השנה",
-"lifelineVisualSettingsBranchDensity": "צפיפות ענפים",
-"lifelineVisualSettingsBranchIntensity": "עוצמת ענפים",
-"lifelineVisualSettingsAnimate": "הנפש",
-"lifelineVisualSettingsDoneButton": "סיום",
-"onboardingWelcomeTitle": "ברוכים הבאים ל-Lifeline",
-"onboardingWelcomeSubtitle": "המסע האישי שלך, בצורה חזותית. בוא נערוך סיור מהיר כדי לראות איך תוכל להתחיל לתעד את הרגעים שלך.",
-"onboardingSkipButton": "דלג לעת עתה",
-"onboardingBeginTourButton": "התחל סיור",
-"onboardingGesturesTitle": "נווט בציר הזמן שלך",
-"onboardingGestureSwipe": "החלקה",
-"onboardingGesturePinch": "צביטה לזום",
-"onboardingGestureDoubleTap": "הקשה כפולה",
-"onboardingGesturesSubtitle": "ציר הזמן שלך יגדל איתך. צבוט לזום, הקש פעמיים לזום מהיר. החלק שמאלה וימינה כדי לנווט בזמן.",
-"onboardingContinueButton": "המשך",
-"onboardingFinalTitle": "אתה מוכן!",
-"onboardingFinalSubtitle": "המסע שלך מתחיל עכשיו. התחל לתעד את הרגעים החשובים.",
-"onboardingStartJourneyButton": "התחל את המסע שלי",
-"onboardingSkipTourButton": "דלג על הסיור",
-"onboardingLifelineIntroText": "זהו ציר הזמן שלך. כל זיכרון שתוסיף ייצור צומת ייחודי בנתיב זה, וייצור מפה יפה של מסע חייך.",
-"onboardingLifelineIntroButton": "הבא",
-"onboardingAddMemoryText": "הקש כאן כדי להוסיף זיכרון חדש. צומת יופיע על ציר הזמן שלך עבור כל רגע שתתעד.",
-"onboardingNavGesturesText": "נהדר! עכשיו, בוא נלמד כיצד לנווט בציר הזמן שלך.",
-"onboardingControlsPanelText": "השתמש בפקדים אלה כדי לנהל את התצוגה שלך. באפשרותך למרכז מחדש את ציר הזמן, להתאים אפקטים חזותיים ולגשת לפרופיל שלך.",
-"onboardingControlsPanelButton": "הבנתי",
-"onboardingStatsCardText": "כרטיס זה מציג סיכום של הזיכרונות שלך. הקש עליו כדי לפתוח רשימה מלאה וניתנת לחיפוש של כל המסע שלך.",
-"onboardingStatsCardButton": "כמעט סיימנו!",
-"audioPlayerPreviousTooltip": "הרצועה הקודמת",
-"audioPlayerPlayTooltip": "נגן",
-"audioPlayerPauseTooltip": "השהה",
-"audioPlayerNextTooltip": "הרצועה הבאה",
-"memoryEditCbtStepLabel": "שלב {step}: ",
-"@memoryEditCbtStepLabel": {
-"description": "Label for a step in the CBT reflection helper",
-"placeholders": {
-"step": {
-"type": "int",
-"example": "1"
-}
-}
-},
-"premiumBannerTitle": "פתח את Lifeline Premium",
-"premiumBannerSubtitle": "מדיה ללא הגבלה, רפלקציה מתקדמת, הקשר היסטורי ועוד!",
-"premiumDialogTitle": "שדרג ל-Premium",
-"premiumDialogContent": "פתח את היכולת ל{feature} וקבל גישה לכל תכונות הפרימיום.",
-"@premiumDialogContent": {
-"placeholders": {
-"feature": {
-"type": "String"
-}
-}
-},
-"premiumDialogGoPremium": "עבור ל-Premium",
-"premiumFeaturePhotos": "הוספת תמונות נוספות",
-"premiumFeatureVideos": "הוספת וידאו",
-"premiumFeatureAudio": "הוספת הערה קולית",
-"premiumFeatureSpotify": "הוספת רצועת Spotify",
-"premiumScreenTitle": "Lifeline Premium",
-"premiumScreenHeaderTitle": "גלה את מלוא הפוטנציאל שלך",
-"premiumScreenHeaderSubtitle": "חצה את הגבולות עם Lifeline Premium והפק את המרב ממסע הגילוי העצמי שלך.",
-"premiumFeatureUnlimitedPhotos": "תמונות וסרטונים ללא הגבלה",
-"premiumFeatureUnlimitedAudio": "הערות קוליות ללא הגבלה",
-"premiumFeatureUnlimitedSpotify": "רצועות Spotify ללא הגבלה",
-"premiumFeatureAdvancedCbt": "עוזר רפלקציה מתקדם",
-"premiumFeatureActionReminders": "תזכורות לתוכנית פעולה",
-"premiumFeatureHistoricalContext": "הקשר היסטורי 'בעולם'",
-"premiumFeatureSoundLibrary": "ספריית צלילי אווירה מלאה",
-"premiumScreenYearlyPopular": "הפופולרי ביותר והתמורה הטובה ביותר",
+  "@@locale": "he",
+  "email": "אימייל",
+  "password": "סיסמה",
+  "signIn": "התחבר",
+  "register": "הירשם",
+  "createAccount": "צור חשבון חדש",
+  "alreadyHaveAccount": "יש לי כבר חשבון",
+  "orSignInWith": "או התחבר באמצעות",
+  "passwordTooShort": "הסיסמה חייבת להכיל לפחות 6 תווים",
+  "invalidEmail": "נא להזין כתובת אימייל חוקית",
+  "consentWelcomeTitle": "ברוכים הבאים ל-Lifeline",
+  "consentWelcomeSubtitle": "לפני שתתחיל, אנא עיין בתנאים שלנו והסכם להם.",
+  "consentIAgreeTo": "קראתי ואני מסכים/ה ל",
+  "consentTermsOfService": "תנאי השירות",
+  "consentAnd": " ו",
+  "consentPrivacyPolicy": "מדיניות הפרטיות",
+  "consentContinue": "המשך",
+  "consentErrorSaving": "שגיאה בשמירת ההגדרות: {error}",
+  "@consentErrorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashMessageInitializing": "מאתחל...",
+  "splashMessageCheckingSettings": "בודק הגדרות...",
+  "splashMessageAuthenticating": "מאמת...",
+  "splashMessageSyncing": "מסנכרן את ציר הזמן שלך...",
+  "authGateLoadingMemories": "טוען זיכרונות...",
+  "authGateAuthenticating": "מאמת...",
+  "authGateSomethingWentWrong": "משהו השתבש",
+  "authGateCouldNotLoad": "לא הצלחנו לטעון את הנתונים שלך. אנא בדוק את החיבור ונסה שוב.",
+  "authGateTryAgain": "נסה שוב",
+  "authGateEmptyState": "ציר הזמן שלך מוכן.\nהקש על כפתור + כדי להוסיף את הזיכרון הראשון שלך.",
+  "authGateUnsavedDraftTitle": "זיכרון שלא נשמר",
+  "authGateUnsavedDraftContent": "יש לך טיוטת זיכרון שלא נשמרה. האם תרצה להמשיך לערוך אותה?",
+  "authGateDiscard": "מחק",
+  "authGateContinueEditing": "המשך עריכה",
+  "verifyEmailTitle": "אימות אימייל",
+  "verifyEmailSentTo": "נשלח אימייל אימות לכתובת:",
+  "verifyEmailInstructions": "אנא לחץ על הקישור באימייל להשלמת ההרשמה.",
+  "verifyEmailResendButton": "שלח שוב אימייל",
+  "verifyEmailCancelButton": "ביטול",
+  "profileTitle": "פרופיל והגדרות",
+  "profileSectionProfile": "פרופיל",
+  "profileChangeNameTitle": "שנה שם",
+  "profileEnterYourName": "הזן את שמך",
+  "profileSave": "שמור",
+  "profileCancel": "ביטול",
+  "profileName": "שם",
+  "profileEmail": "אימייל",
+  "profileCountry": "מדינה",
+  "profileCountryNotSelected": "לא נבחר",
+  "profileLanguage": "שפת התוכן",
+  "profileLanguageDefault": "אנגלית (ברירת מחדל)",
+  "profileSelectLanguage": "בחר שפה",
+  "profileSectionSettings": "הגדרות",
+  "profileTheme": "ערכת נושא",
+  "profileThemeSystem": "מערכת",
+  "profileThemeLight": "בהיר",
+  "profileThemeDark": "כהה",
+  "profileGraphics": "איכות גרפיקה",
+  "profileGraphicsAuto": "אוטומטי",
+  "profileGraphicsLow": "נמוכה",
+  "profileGraphicsMedium": "בינונית",
+  "profileGraphicsHigh": "גבוהה",
+  "profileReminders": "תזכורות לרפלקציה",
+  "profileRemindersSubtitle": "קבל התראות על תוכניות הפעולה שלך",
+  "profileSectionSecurity": "אבטחה",
+  "profileChangePassword": "שנה סיסמת מאסטר",
+  "profileEncryptionActive": "הצפנה מקצה לקצה פעילה",
+  "profileDeleteAccountConfirmContent": "פעולה זו אינה הפיכה. כל חשבונך, כולל כל הזיכרונות וההגדרות, יימחק לצמיתות. כדי להמשיך, לחץ והחזק את לחצן המחיקה למשך 5 שניות.",
+  "profileEnableEncryption": "הפעל הצפנה מקצה לקצה",
+  "profileEnableEncryptionSubtitle": "הגן על הזיכרונות הרגישים שלך באמצעות סיסמת מאסטר.",
+  "profileCreateMasterPassword": "צור סיסמת מאסטר",
+  "profileMasterPasswordInfo": "סיסמה זו תגן על הזיכרונות שלך. לא ניתן לשחזר אותה אם תשכח אותה. אנא שמור אותה במקום בטוח.",
+  "profileMasterPasswordHint": "סיסמת מאסטר",
+  "profileConfirmPasswordHint": "אשר סיסמה",
+  "profilePasswordMinLength": "הסיסמה חייבת להכיל לפחות 8 תווים",
+  "profilePasswordsDoNotMatch": "הסיסמאות אינן תואמות",
+  "profileEnable": "הפעל",
+  "profileSectionHelp": "עזרה",
+  "profileReauthTitle": "נדרש אימות מחדש",
+  "profileReauthContent": "זוהי פעולה רגישה. אנא היכנס שוב לפני שתמשיך.",
+  "profileReauthButton": "התחבר ומחק",
+  "profileReauthPasswordDialogTitle": "אשר פעולה",
+  "profileReauthPasswordDialogContent": "כדי למחוק את חשבונך, אנא הזן את סיסמתך הנוכחית.",
+  "profilePasswordCannotBeEmpty": "סיסמה אינה יכולה להיות ריקה",
+  "profileChangePasswordSuccess": "סיסמת המאסטר שונתה בהצלחה!",
+  "profileChangePasswordErrorIncorrect": "סיסמת המאסטר הנוכחית שהזנת שגויה.",
+  "profileOldPasswordHint": "סיסמה ישנה",
+  "profileNewPasswordHint": "סיסמה חדשה",
+  "profileChangePasswordCurrentPasswordHint": "סיסמת מאסטר נוכחית",
+  "profileChangePasswordNewPasswordHint": "סיסמת מאסטר חדשה",
+  "profileChangePasswordInfo": "אנא הזן את סיסמת המאסטר הנוכחית שלך כדי להגדיר סיסמה חדשה. פעולה זו תצפין מחדש את המפתח הסודי שלך.",
+  "profileReplayTutorial": "הפעל שוב את המדריך",
+  "profileReplayTutorialConfirmTitle": "להפעיל שוב את המדריך?",
+  "profileReplayTutorialConfirmContent": "האם אתה בטוח שברצונך להפעיל מחדש את המדריך?",
+  "profileRestart": "הפעל מחדש",
+  "profileSectionAccount": "ניהול חשבון",
+  "profileSignOut": "התנתק",
+  "profileDeleteAccount": "מחק חשבון",
+  "profileDeleteAccountConfirmTitle": "למחוק חשבון?",
+  "profileDelete": "מחק",
+  "profileDeletingAccount": "מוחק את חשבונך...",
+  "profileErrorCouldNotFindProfile": "לא ניתן למצוא את פרופיל המשתמש.",
+  "memoryEditNewTitle": "זיכרון חדש",
+  "memoryEditEditTitle": "ערוך זיכרון",
+  "memoryEditSave": "שמור",
+  "memoryEditTitleHint": "כותרת",
+  "memoryEditTitleValidator": "נא להזין כותרת",
+  "memoryEditDescriptionHint": "תיאור",
+  "memoryEditDateLabel": "תאריך:",
+  "memoryEditSelectDateButton": "בחר תאריך",
+  "memoryEditAmbientSoundLabel": "צליל רקע:",
+  "memoryEditAmbientSoundDropdownHint": "בחר צליל רקע",
+  "memoryEditMusicAnchorLabel": "עוגן מוזיקלי:",
+  "memoryEditAttachTrackButton": "צרף רצועה מ-Spotify",
+  "memoryEditPhotosLabel": "תמונות:",
+  "memoryEditNoPhotosSelected": "לא נבחרו תמונות",
+  "memoryEditAddPhotosButton": "הוסף תמונות",
+  "memoryEditVideosLabel": "סרטונים:",
+  "memoryEditNoVideosSelected": "לא נבחרו סרטונים",
+  "memoryEditAddVideoButton": "הוסף סרטון",
+  "memoryEditAudioNoteLabel": "הערה קולית:",
+  "memoryEditAudioNoteSaved": "הערה קולית נשמרה",
+  "memoryEditRecordButton": "הקלט",
+  "memoryEditStopRecordingButton": "הפסק הקלטה",
+  "memoryEditRecordingIndicator": "מקליט...",
+  "memoryEditReflectionSectionTitle": "רפלקציה",
+  "memoryEditEncryptLabel": "הצפן",
+  "memoryEditEncryptionInfoTooltip": "מהי הצפנה?",
+  "memoryEditImpactPrompt": "כיצד אירוע זה השפיע עליי?",
+  "memoryEditLessonPrompt": "איזה לקח למדתי?",
+  "memoryEditEmotionsLabel": "רגשות:",
+  "emotionJoy": "שמחה",
+  "emotionNostalgia": "נוסטלגיה",
+  "emotionPride": "גאווה",
+  "emotionSadness": "עצב",
+  "emotionGratitude": "הכרת תודה",
+  "emotionLove": "אהבה",
+  "emotionFear": "פחד",
+  "emotionAnger": "כעס",
+  "memoryEditCbtHelperTitle": "עוזר רפלקציה",
+  "memoryEditCbtStep1Title": "מה הייתה המחשבה או האמונה הראשונה?",
+  "memoryEditCbtStep1Subtitle": "לדוגמה, 'אני אכשל' או 'עשיתי הכל נכון'.",
+  "memoryEditCbtStep2Title": "מה תומך במחשבה זו?",
+  "memoryEditCbtStep2Subtitle": "אילו עובדות או אירועים מוכיחים שמחשבה זו נכונה?",
+  "memoryEditCbtStep3Title": "מהי ההשקפה מהצד השני?",
+  "memoryEditCbtStep3Subtitle": "אילו עובדות או אירועים עשויים להפריך או לאתגר את המחשבה הראשונה?",
+  "memoryEditCbtStep4Title": "איך אני יכול להסתכל על זה אחרת?",
+  "memoryEditCbtStep4Subtitle": "בהתבסס על האמור לעיל, נסח נקודת מבט חדשה ומאוזנת יותר.",
+  "memoryEditActionPlanTitle": "תוכנית פעולה",
+  "memoryEditActionPrompt": "מהו צעד קטן אחד שאני יכול לעשות?",
+  "memoryEditReminderLabel": "תזכורת:",
+  "memoryEditReminderNotSet": "לא הוגדרה",
+  "memoryEditSetReminderButton": "הגדר תאריך",
+  "memoryEditYourThoughtsHint": "המחשבות שלך כאן...",
+  "memoryEditDraftSavedMessage": "טיוטה נשמרה",
+  "memoryEditErrorRepoUnavailable": "שגיאה: המאגר אינו זמין.",
+  "memoryEditErrorSaving": "שגיאה בשמירת הזיכרון: {error}",
+  "@memoryEditErrorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryEditUnlockDialogTitle": "בטל נעילה כדי לשמור",
+  "memoryEditUnlockDialogContent": "נא להזין את סיסמת המאסטר שלך כדי לשמור את הזיכרון המוצפן הזה.",
+  "memoryEditMasterPasswordHint": "סיסמת מאסטר",
+  "memoryEditUnlockButton": "בטל נעילה",
+  "memoryEditEncryptionInfoDialogTitle": "הצפנה מקצה לקצה",
+  "memoryEditEncryptionInfoDialogContent": "כאשר אתה מצפין זיכרון, שדות התיאור והרפלקציה שלו מוצפנים באמצעות מפתח הנגזר מסיסמת המאסטר שלך.\n\nהנתונים מאוחסנים בענן בפורמט לא קריא וניתן לפענח אותם רק במכשירים שלך באמצעות הסיסמה שלך.\n\nחשוב: איננו יכולים לשחזר את סיסמת המאסטר שלך. אם תשכח אותה, הנתונים המוצפנים שלך יאבדו לנצח.",
+  "memoryEditOkButton": "אישור",
+  "memoryEditPermissionDeniedSnackbar": "ההרשאה עבור {permissionName} נדחתה. אנא הפעל אותה בהגדרות.",
+  "@memoryEditPermissionDeniedSnackbar": {
+    "placeholders": {
+      "permissionName": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryEditSettingsButton": "הגדרות",
+  "memoryEditNoInternetSnackbar": "נדרש חיבור לאינטרנט כדי לחפש מוזיקה.",
+  "memoryEditEmotionIntensityDialogTitle": "עוצמה עבור '{emotion}'",
+  "@memoryEditEmotionIntensityDialogTitle": {
+    "placeholders": {
+      "emotion": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewBackTooltip": "חזור",
+  "memoryViewShareTooltip": "שתף",
+  "memoryViewEditTooltip": "ערוך",
+  "memoryViewDeleteTooltip": "מחק",
+  "memoryViewTabMemory": "זיכרון",
+  "memoryViewTabInTheWorld": "בעולם",
+  "memoryViewEncryptedTitle": "זיכרון מוצפן",
+  "memoryViewReflectionTitle": "רפלקציה",
+  "memoryViewReflectionImpact": "השפעה",
+  "memoryViewReflectionLesson": "לקח שנלמד",
+  "memoryViewCbtStep1Title": "מחשבה או אמונה ראשונה",
+  "memoryViewCbtStep2Title": "ראיות התומכות במחשבה זו",
+  "memoryViewCbtStep3Title": "ראיות הסותרות מחשבה זו",
+  "memoryViewCbtStep4Title": "פרספקטיבה חדשה ומאוזנת (מסגור מחדש)",
+  "memoryViewActionReminder": "תזכורת: {date}",
+  "@memoryViewActionReminder": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewMarkIncompleteTooltip": "סמן כלא הושלם",
+  "memoryViewMarkCompleteTooltip": "סמן כהושלם",
+  "memoryViewUnlockDialogTitle": "בטל נעילת זיכרון",
+  "memoryViewUnlockDialogContent": "הזן את סיסמת המאסטר שלך כדי להציג תוכן זה.",
+  "memoryViewIncorrectPassword": "סיסמה שגויה.",
+  "memoryViewUnlockButton": "בטל נעילה",
+  "memoryViewErrorCouldNotLoadProfile": "לא ניתן היה לטעון את הפרופיל שלך כדי להביא נתונים היסטוריים.",
+  "memoryViewErrorCouldNotLoadHistoricalData": "לא ניתן היה לטעון נתונים היסטוריים עבור יום זה.",
+  "memoryViewNoHistoricalData": "אין נתונים היסטוריים זמינים עבור יום זה.",
+  "memoryViewErrorCouldNotLoadTrack": "לא ניתן היה לטעון את הרצועה",
+  "memoryViewTabNews": "חדשות",
+  "memoryViewTabMusic": "מוזיקה",
+  "memoryViewNoDataForDay": "אין נתונים עבור יום זה.",
+  "memoryViewNoNewsForDay": "אין חדשות היסטוריות עבור יום זה.",
+  "memoryViewNewsSource": "מקור: {source}",
+  "@memoryViewNewsSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewConfirmDeleteTitle": "אשר מחיקה",
+  "memoryViewConfirmDeleteContent": "פעולה זו אינה הפיכה. כדי להמשיך, לחץ והחזק את לחצן המחיקה למשך 5 שניות.",
+  "memoryViewDeleteButton": "מחק",
+  "memoryViewErrorLoadingProfile": "לא הצלחנו לטעון את הפרופיל שלך. אנא בדוק את החיבור ונסה שוב.",
+  "memoryViewErrorLocalDb": "שגיאה: לא ניתן לגשת למסד הנתונים המקומי.",
+  "memoryViewMemoryDeleted": "הזיכרון נמחק",
+  "memoryViewSharingNotImplemented": "פונקציונליות השיתוף עדיין לא יושמה.",
+  "memoryViewActionCompleted": "הפעולה סומנה כהושלמה!",
+  "memoryViewActionIncomplete": "הפעולה סומנה כלא הושלמה.",
+  "memoryViewErrorUpdatingAction": "שגיאה בעדכון הפעולה: {error}",
+  "@memoryViewErrorUpdatingAction": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewContentEncrypted": "התוכן מוצפן",
+  "memoryViewReflectionEncrypted": "הרפלקציה מוצפנת",
+  "memoryViewMediaEncrypted": "המדיה מוצפנת",
+  "memoryViewAmbientSound": "צליל רקע: {sound}",
+  "@memoryViewAmbientSound": {
+    "placeholders": {
+      "sound": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryViewAudioNote": "הערה קולית",
+  "spotifySearchTitle": "חפש רצועה ב-Spotify",
+  "spotifySearchHint": "שם שיר או אמן",
+  "documentErrorLoading": "לא ניתן היה לטעון את המסמך.",
+  "lifelineMemoriesCount": "זיכרונות: {count}",
+  "@lifelineMemoriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelinePeriodRange": "תקופה: {startYear} - {endYear}",
+  "@lifelinePeriodRange": {
+    "placeholders": {
+      "startYear": {
+        "type": "int"
+      },
+      "endYear": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineSyncStatus": "{status} (נותרו {jobs})",
+  "@lifelineSyncStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      },
+      "jobs": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineCalculating": "מחשב...",
+  "lifelineScaleValue": "קנה מידה: {scale}%",
+  "@lifelineScaleValue": {
+    "placeholders": {
+      "scale": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineFpsValue": "FPS: {fps}",
+  "@lifelineFpsValue": {
+    "placeholders": {
+      "fps": {
+        "type": "String"
+      }
+    }
+  },
+  "lifelineFramePaintValue": "ציור פריים: {ms} אלפיות השנייה",
+  "@lifelineFramePaintValue": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineShowFullTimelineTooltip": "הצג ציר זמן מלא",
+  "lifelineVisualSettingsTooltip": "הגדרות חזותיות",
+  "lifelineMenuProfile": "פרופיל",
+  "lifelineMenuDebugOn": "ניפוי באגים פועל",
+  "lifelineMenuDebugOff": "ניפוי באגים כבוי",
+  "lifelineMenuSignOut": "התנתק",
+  "lifelineSearchHint": "חפש...",
+  "lifelineMemoriesListTitle": "זיכרונות",
+  "lifelineVisualSettingsDialogTitle": "הגדרות חזותיות",
+  "lifelineVisualSettingsSpeed": "מהירות",
+  "lifelineVisualSettingsAmplitude": "משרעת",
+  "lifelineVisualSettingsYearLine": "מיקום קו השנה",
+  "lifelineVisualSettingsBranchDensity": "צפיפות ענפים",
+  "lifelineVisualSettingsBranchIntensity": "עוצמת ענפים",
+  "lifelineVisualSettingsAnimate": "הנפש",
+  "lifelineVisualSettingsDoneButton": "סיום",
+  "onboardingWelcomeTitle": "ברוכים הבאים ל-Lifeline",
+  "onboardingWelcomeSubtitle": "המסע האישי שלך, בצורה חזותית. בוא נערוך סיור מהיר כדי לראות איך תוכל להתחיל לתעד את הרגעים שלך.",
+  "onboardingSkipButton": "דלג לעת עתה",
+  "onboardingBeginTourButton": "התחל סיור",
+  "onboardingGesturesTitle": "נווט בציר הזמן שלך",
+  "onboardingGestureSwipe": "החלקה",
+  "onboardingGesturePinch": "צביטה לזום",
+  "onboardingGestureDoubleTap": "הקשה כפולה",
+  "onboardingGesturesSubtitle": "ציר הזמן שלך יגדל איתך. צבוט לזום, הקש פעמיים לזום מהיר. החלק שמאלה וימינה כדי לנווט בזמן.",
+  "onboardingContinueButton": "המשך",
+  "onboardingFinalTitle": "אתה מוכן!",
+  "onboardingFinalSubtitle": "המסע שלך מתחיל עכשיו. התחל לתעד את הרגעים החשובים.",
+  "onboardingStartJourneyButton": "התחל את המסע שלי",
+  "onboardingSkipTourButton": "דלג על הסיור",
+  "onboardingLifelineIntroText": "זהו ציר הזמן שלך. כל זיכרון שתוסיף ייצור צומת ייחודי בנתיב זה, וייצור מפה יפה של מסע חייך.",
+  "onboardingLifelineIntroButton": "הבא",
+  "onboardingAddMemoryText": "הקש כאן כדי להוסיף זיכרון חדש. צומת יופיע על ציר הזמן שלך עבור כל רגע שתתעד.",
+  "onboardingNavGesturesText": "נהדר! עכשיו, בוא נלמד כיצד לנווט בציר הזמן שלך.",
+  "onboardingControlsPanelText": "השתמש בפקדים אלה כדי לנהל את התצוגה שלך. באפשרותך למרכז מחדש את ציר הזמן, להתאים אפקטים חזותיים ולגשת לפרופיל שלך.",
+  "onboardingControlsPanelButton": "הבנתי",
+  "onboardingStatsCardText": "כרטיס זה מציג סיכום של הזיכרונות שלך. הקש עליו כדי לפתוח רשימה מלאה וניתנת לחיפוש של כל המסע שלך.",
+  "onboardingStatsCardButton": "כמעט סיימנו!",
+  "audioPlayerPreviousTooltip": "הרצועה הקודמת",
+  "audioPlayerPlayTooltip": "נגן",
+  "audioPlayerPauseTooltip": "השהה",
+  "audioPlayerNextTooltip": "הרצועה הבאה",
+  "memoryEditCbtStepLabel": "שלב {step}: ",
+  "@memoryEditCbtStepLabel": {
+    "description": "Label for a step in the CBT reflection helper",
+    "placeholders": {
+      "step": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "premiumBannerTitle": "פתח את Lifeline Premium",
+  "premiumBannerSubtitle": "מדיה ללא הגבלה, רפלקציה מתקדמת, הקשר היסטורי ועוד!",
+  "premiumDialogTitle": "שדרג ל-Premium",
+  "premiumDialogContent": "פתח את היכולת ל{feature} וקבל גישה לכל תכונות הפרימיום.",
+  "@premiumDialogContent": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumDialogGoPremium": "עבור ל-Premium",
+  "premiumFeaturePhotos": "הוספת תמונות נוספות",
+  "premiumFeatureVideos": "הוספת וידאו",
+  "premiumFeatureAudio": "הוספת הערה קולית",
+  "premiumFeatureSpotify": "הוספת רצועת Spotify",
+  "premiumScreenTitle": "Lifeline Premium",
+  "premiumScreenHeaderTitle": "גלה את מלוא הפוטנציאל שלך",
+  "premiumScreenHeaderSubtitle": "חצה את הגבולות עם Lifeline Premium והפק את המרב ממסע הגילוי העצמי שלך.",
+  "premiumFeatureUnlimitedPhotos": "תמונות וסרטונים ללא הגבלה",
+  "premiumFeatureUnlimitedAudio": "הערות קוליות ללא הגבלה",
+  "premiumFeatureUnlimitedSpotify": "רצועות Spotify ללא הגבלה",
+  "premiumFeatureAdvancedCbt": "עוזר רפלקציה מתקדם",
+  "premiumFeatureActionReminders": "תזכורות לתוכנית פעולה",
+  "premiumFeatureHistoricalContext": "הקשר היסטורי 'בעולם'",
+  "premiumFeatureSoundLibrary": "ספריית צלילי אווירה מלאה",
+  "premiumScreenYearlyPopular": "הפופולרי ביותר והתמורה הטובה ביותר",
   "premiumScreenProcessingPurchase": "מעבד רכישה...",
-"premiumScreenRestore": "שחזר רכישות",
-"premiumScreenTerms": "תנאי שירות",
-"premiumScreenPrivacy": "מדיניות פרטיות",
-"premiumStatusTitle": "חבר פרימיום",
-"premiumStatusExpiresOn": "תוקף עד {date}",
-"@premiumStatusExpiresOn": {
-"placeholders": {
-"date": {
-"type": "String"
-}
-}
-},
-"onboardingEncryptionTitle": "הזיכרונות שלך, מאובטחים",
-"onboardingEncryptionSubtitle": "Lifeline מציעה הצפנה מקצה לקצה. זה אומר שרק אתה יכול לקרוא את הזיכרונות הפרטיים שלך. בוא נגדיר את סיסמת המאסטר שלך כדי להגן עליהם.",
-"onboardingEncryptionSetupButton": "הגדר עכשיו",
-"onboardingEncryptionLaterButton": "אולי אחר כך",
-"onboardingEncryptionActiveTitle": "ההצפנה פעילה",
-"onboardingEncryptionActiveSubtitle": "הזיכרונות שלך כבר מוגנים. תוכל לנהל את סיסמת המאסטר שלך בהגדרות הפרופיל.",
-"onboardingEncryptionContinueButton": "המשך",
-"memoryEditEncryptMemory": "הצפן את הזיכרון הזה",
-"memoryEditSetupEncryptionTitle": "להפעיל הצפנה?",
-"memoryEditSetupEncryptionContent": "כדי להגן על זיכרון זה, עליך ליצור תחילה סיסמת מאסטר. זה יהיה המפתח היחיד שלך לכל הערכים המוצפנים.",
-"memoryEditCreatePasswordButton": "צור סיסמת מאסטר",
-"memoryViewExportPdf": "שתף כ-PDF",
-"shareActionTitle": "הוסף ל-Lifeline",
-"shareActionSubtitle": "מה תרצה לעשות עם קבצים אלה?",
-"shareCreateNewMemory": "צור זיכרון חדש",
-"shareAddToExisting": "הוסף לזיכרון קיים",
-"selectMemoryTitle": "בחר זיכרון",
-"selectMemorySearchHint": "חפש לפי כותרת או תוכן...",
-"selectMemoryEmpty": "לא נמצאו זיכרונות",
-"memoryUpdatedSuccess": "הזיכרון עודכן בהצלחה!",
-"unlocking": "פותח נעילה...",
-"exportingPdf": "מכין קובץ PDF...",
-"exportFailed": "הייצוא נכשל: {error}",
-"@exportFailed": {
+  "premiumScreenRestore": "שחזר רכישות",
+  "premiumScreenTerms": "תנאי שירות",
+  "premiumScreenPrivacy": "מדיניות פרטיות",
+  "premiumStatusTitle": "חבר פרימיום",
+  "premiumStatusExpiresOn": "תוקף עד {date}",
+  "@premiumStatusExpiresOn": {
     "placeholders": {
-        "error": {
-            "type": "String"
-        }
+      "date": {
+        "type": "String"
+      }
     }
-},
-"unlockFailedAttemptsRemaining": "הסיסמא שגויה. נותרו {count} ניסיונות.",
-"@unlockFailedAttemptsRemaining": {
+  },
+  "onboardingEncryptionTitle": "הזיכרונות שלך, מאובטחים",
+  "onboardingEncryptionSubtitle": "Lifeline מציעה הצפנה מקצה לקצה. זה אומר שרק אתה יכול לקרוא את הזיכרונות הפרטיים שלך. בוא נגדיר את סיסמת המאסטר שלך כדי להגן עליהם.",
+  "onboardingEncryptionSetupButton": "הגדר עכשיו",
+  "onboardingEncryptionLaterButton": "אולי אחר כך",
+  "onboardingEncryptionActiveTitle": "ההצפנה פעילה",
+  "onboardingEncryptionActiveSubtitle": "הזיכרונות שלך כבר מוגנים. תוכל לנהל את סיסמת המאסטר שלך בהגדרות הפרופיל.",
+  "onboardingEncryptionContinueButton": "המשך",
+  "memoryEditEncryptMemory": "הצפן את הזיכרון הזה",
+  "memoryEditSetupEncryptionTitle": "להפעיל הצפנה?",
+  "memoryEditSetupEncryptionContent": "כדי להגן על זיכרון זה, עליך ליצור תחילה סיסמת מאסטר. זה יהיה המפתח היחיד שלך לכל הערכים המוצפנים.",
+  "memoryEditCreatePasswordButton": "צור סיסמת מאסטר",
+  "memoryViewExportPdf": "שתף כ-PDF",
+  "shareActionTitle": "הוסף ל-Lifeline",
+  "shareActionSubtitle": "מה תרצה לעשות עם קבצים אלה?",
+  "shareCreateNewMemory": "צור זיכרון חדש",
+  "shareAddToExisting": "הוסף לזיכרון קיים",
+  "selectMemoryTitle": "בחר זיכרון",
+  "selectMemorySearchHint": "חפש לפי כותרת או תוכן...",
+  "selectMemoryEmpty": "לא נמצאו זיכרונות",
+  "memoryUpdatedSuccess": "הזיכרון עודכן בהצלחה!",
+  "unlocking": "פותח נעילה...",
+  "exportingPdf": "מכין קובץ PDF...",
+  "exportFailed": "הייצוא נכשל: {error}",
+  "@exportFailed": {
     "placeholders": {
-        "count": {
-            "type": "int"
-        }
+      "error": {
+        "type": "String"
+      }
     }
-},
-"unlockTooManyAttempts": "מידי נסיונות. נסה שוב בעוד {seconds} שניות.",
-"@unlockTooManyAttempts": {
+  },
+  "unlockFailedAttemptsRemaining": "הסיסמא שגויה. נותרו {count} ניסיונות.",
+  "@unlockFailedAttemptsRemaining": {
     "placeholders": {
-        "seconds": {
-            "type": "int"
-        }
+      "count": {
+        "type": "int"
+      }
     }
-},
-"profileEnableQuickUnlock": "הפעל נעילה מהירה",
-"profileQuickUnlockSubtitle": "השתמש בטביעת אצבע, בזיהוי פנים או בקוד ה-PIN של המכשיר כדי לפתוח.",
-"profileRequireBiometricsForMemoryTitle": "דרוש אימות ביומטרי לכל זיכרון",
-"profileRequireBiometricsForMemorySubtitle": "כאשר האפשרות מופעלת, יידרש אימות כדי לפתוח או לערוך זיכרונות מוצפנים בודדים, גם כאשר האפליקציה פתוחה.",
-"quickUnlockPrompt": "אמת את זהותך כדי לפתוח את Lifeline",
-"quickUnlockEnablePrompt": "אמת את זהותך כדי להפעיל נעילה מהירה",
-"masterPasswordRequiredTitle": "נדרשת סיסמת-על",
-"masterPasswordRequiredContent": "הזן את סיסמת-העל שלך כדי להפעיל את התכונה.",
-"unlockScreenTitle": "פתח את Lifeline",
-"unlockWithBiometrics": "פתח באמצעות אימות ביומטרי",
-"unlockEnterMasterPassword": "הזן סיסמת-על",
-"unlockForgotPassword": "שכחת סיסמה?",
-"unlockResetEncryptionTitle": "אפס הצפנה",
-"unlockResetEncryptionWarning": "⚠️ אזהרה: לא ניתן לבטל פעולה זו!",
-"unlockResetEncryptionDescription": "אם שכחת את סיסמת-העל, תוכל לאפס את ההצפנה. עם זאת, זה ימחק לצמיתות את כל הזיכרונות המוצפנים.",
-"unlockResetEncryptionConsequences": "מה יימחק:",
-"unlockResetEncryptionConsequence1": "כל הזיכרונות המוצפנים (מקומיים ובענן)",
-"unlockResetEncryptionConsequence2": "ההצפנה תבוטל",
-"unlockResetEncryptionConsequence3": "תוכל להמשיך להשתמש באפליקציה ללא הצפנה",
-"unlockResetEncryptionConfirm": "מחק זיכרונות מוצפנים",
-"unlockResetEncryptionSuccess": "ההצפנה אופסה. כעת תוכל להשתמש באפליקציה ללא סיסמת-על.",
-"unlockResetEncryptionError": "איפוס ההצפנה נכשל",
-"draftBannerSingleTitle": "יש לך זיכרון לא גמור",
-"draftBannerSingleSubtitle": "עריכה אחרונה: {timeAgo}",
-"@draftBannerSingleSubtitle": {
-"placeholders": {
-"timeAgo": {
-"type": "String"
-}
-}
-},
-"draftBannerMultipleTitle": "יש לך {count} זיכרונות לא גמורים",
-"@draftBannerMultipleTitle": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"draftBannerMultipleSubtitle": "הקש לצפייה בהכל",
-"draftBannerResume": "המשך",
-"draftBannerDelete": "מחק",
-"draftResumedSuccess": "הטיוטה חודשה בהצלחה",
-"draftDeleteDialogTitle": "למחוק טיוטה?",
-"draftDeleteDialogMessage": "טיוטה זו תימחק לצמיתות. לא ניתן לבטל פעולה זו.",
-"draftDeleteCancel": "ביטול",
-"draftDeleteConfirm": "מחק",
-"draftDeletedSuccess": "הטיוטה נמחקה בהצלחה",
-"draftDeletedError": "מחיקת הטיוטה נכשלה",
-"draftListDialogTitle": "יש לך {count} טיוטות",
-"@draftListDialogTitle": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"draftListItemNoTitle": "זיכרון ללא כותרת",
-"draftListItemNoContent": "אין תוכן",
-"draftListItemLastModified": "שינוי אחרון: {timeAgo}",
-"@draftListItemLastModified": {
-"placeholders": {
-"timeAgo": {
-"type": "String"
-}
-}
-},
-"timeAgoJustNow": "ממש עכשיו",
-"timeAgoMinutes": "לפני {count} דקות",
-"@timeAgoMinutes": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"timeAgoHours": "לפני {count} שעות",
-"@timeAgoHours": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"timeAgoDays": "לפני {count} ימים",
-"@timeAgoDays": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"timeAgoWeeks": "לפני {count} שבועות",
-"@timeAgoWeeks": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"fileSizeTooLargeImage": "קובץ התמונה גדול מדי. הגודל המרבי הוא 10 מגה-בייט.",
-"fileSizeTooLargeVideo": "קובץ הווידאו גדול מדי. הגודל המרבי הוא 100 מגה-בייט.",
-"fileSizeTooLargeAudio": "קובץ האודיו גדול מדי. הגודל המרבי הוא 25 מגה-בייט.",
-"biometricUnlockFailedMessage": "יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך.",
-"lifelineInsightStreakDays": "🔥 רצף של {count} ימים",
-"@lifelineInsightStreakDays": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightMemoriesThisMonth": "📝 {count} זיכרונות החודש",
-"@lifelineInsightMemoriesThisMonth": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightMemoriesThisWeek": "✨ {count} חדשים השבוע",
-"@lifelineInsightMemoriesThisWeek": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightReflectionsCount": "⭐ {count} הרהורים",
-"@lifelineInsightReflectionsCount": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightPhotosCount": "📸 {count} תמונות",
-"@lifelineInsightPhotosCount": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightAudioCount": "🎵 {count} הערות אודיו",
-"@lifelineInsightAudioCount": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightSpanningYears": "📅 משתרע על פני {years} שנים",
-"@lifelineInsightSpanningYears": {
-"placeholders": {
-"years": {
-"type": "int"
-}
-}
-},
-"lifelineInsightTotalMemories": "📖 {count} רגעים שנשמרו",
-"@lifelineInsightTotalMemories": {
-"placeholders": {
-"count": {
-"type": "int"
-}
-}
-},
-"lifelineInsightPositiveVibes": "😊 רגשות חיוביים בעיקר",
-"lifelineInsightGrowthJourney": "🌱 מסע צמיחה",
-"lifelineInsightBalancedEmotions": "⚖️ רגשות מאוזנים",
-"lifelineInsightStartJourney": "✍️ התחל את המסע שלך",
-"lifelineInsightBuildStreak": "💪 בנה את הרצף שלך"
-,"purchaseSuccessMessage": "הרכישה הצליחה! ברוכים הבאים ל-Premium!"
+  },
+  "unlockTooManyAttempts": "מידי נסיונות. נסה שוב בעוד {seconds} שניות.",
+  "@unlockTooManyAttempts": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEnableQuickUnlock": "הפעל נעילה מהירה",
+  "profileQuickUnlockSubtitle": "השתמש בטביעת אצבע, בזיהוי פנים או בקוד ה-PIN של המכשיר כדי לפתוח.",
+  "profileRequireBiometricsForMemoryTitle": "דרוש אימות ביומטרי לכל זיכרון",
+  "profileRequireBiometricsForMemorySubtitle": "כאשר האפשרות מופעלת, יידרש אימות כדי לפתוח או לערוך זיכרונות מוצפנים בודדים, גם כאשר האפליקציה פתוחה.",
+  "quickUnlockPrompt": "אמת את זהותך כדי לפתוח את Lifeline",
+  "quickUnlockEnablePrompt": "אמת את זהותך כדי להפעיל נעילה מהירה",
+  "masterPasswordRequiredTitle": "נדרשת סיסמת-על",
+  "masterPasswordRequiredContent": "הזן את סיסמת-העל שלך כדי להפעיל את התכונה.",
+  "unlockScreenTitle": "פתח את Lifeline",
+  "unlockWithBiometrics": "פתח באמצעות אימות ביומטרי",
+  "unlockEnterMasterPassword": "הזן סיסמת-על",
+  "unlockForgotPassword": "שכחת סיסמה?",
+  "unlockResetEncryptionTitle": "אפס הצפנה",
+  "unlockResetEncryptionWarning": "⚠️ אזהרה: לא ניתן לבטל פעולה זו!",
+  "unlockResetEncryptionDescription": "אם שכחת את סיסמת-העל, תוכל לאפס את ההצפנה. עם זאת, זה ימחק לצמיתות את כל הזיכרונות המוצפנים.",
+  "unlockResetEncryptionConsequences": "מה יימחק:",
+  "unlockResetEncryptionConsequence1": "כל הזיכרונות המוצפנים (מקומיים ובענן)",
+  "unlockResetEncryptionConsequence2": "ההצפנה תבוטל",
+  "unlockResetEncryptionConsequence3": "תוכל להמשיך להשתמש באפליקציה ללא הצפנה",
+  "unlockResetEncryptionConfirm": "מחק זיכרונות מוצפנים",
+  "unlockResetEncryptionSuccess": "ההצפנה אופסה. כעת תוכל להשתמש באפליקציה ללא סיסמת-על.",
+  "unlockResetEncryptionError": "איפוס ההצפנה נכשל",
+  "draftBannerSingleTitle": "יש לך זיכרון לא גמור",
+  "draftBannerSingleSubtitle": "עריכה אחרונה: {timeAgo}",
+  "@draftBannerSingleSubtitle": {
+    "placeholders": {
+      "timeAgo": {
+        "type": "String"
+      }
+    }
+  },
+  "draftBannerMultipleTitle": "יש לך {count} זיכרונות לא גמורים",
+  "@draftBannerMultipleTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "draftBannerMultipleSubtitle": "הקש לצפייה בהכל",
+  "draftBannerResume": "המשך",
+  "draftBannerDelete": "מחק",
+  "draftResumedSuccess": "הטיוטה חודשה בהצלחה",
+  "draftDeleteDialogTitle": "למחוק טיוטה?",
+  "draftDeleteDialogMessage": "טיוטה זו תימחק לצמיתות. לא ניתן לבטל פעולה זו.",
+  "draftDeleteCancel": "ביטול",
+  "draftDeleteConfirm": "מחק",
+  "draftDeletedSuccess": "הטיוטה נמחקה בהצלחה",
+  "draftDeletedError": "מחיקת הטיוטה נכשלה",
+  "draftListDialogTitle": "יש לך {count} טיוטות",
+  "@draftListDialogTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "draftListItemNoTitle": "זיכרון ללא כותרת",
+  "draftListItemNoContent": "אין תוכן",
+  "draftListItemLastModified": "שינוי אחרון: {timeAgo}",
+  "@draftListItemLastModified": {
+    "placeholders": {
+      "timeAgo": {
+        "type": "String"
+      }
+    }
+  },
+  "timeAgoJustNow": "ממש עכשיו",
+  "timeAgoMinutes": "לפני {count} דקות",
+  "@timeAgoMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoHours": "לפני {count} שעות",
+  "@timeAgoHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoDays": "לפני {count} ימים",
+  "@timeAgoDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoWeeks": "לפני {count} שבועות",
+  "@timeAgoWeeks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fileSizeTooLargeImage": "קובץ התמונה גדול מדי. הגודל המרבי הוא 10 מגה-בייט.",
+  "fileSizeTooLargeVideo": "קובץ הווידאו גדול מדי. הגודל המרבי הוא 100 מגה-בייט.",
+  "fileSizeTooLargeAudio": "קובץ האודיו גדול מדי. הגודל המרבי הוא 25 מגה-בייט.",
+  "biometricUnlockFailedMessage": "יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך.",
+  "lifelineInsightStreakDays": "🔥 רצף של {count} ימים",
+  "@lifelineInsightStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightMemoriesThisMonth": "📝 {count} זיכרונות החודש",
+  "@lifelineInsightMemoriesThisMonth": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightMemoriesThisWeek": "✨ {count} חדשים השבוע",
+  "@lifelineInsightMemoriesThisWeek": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightReflectionsCount": "⭐ {count} הרהורים",
+  "@lifelineInsightReflectionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightPhotosCount": "📸 {count} תמונות",
+  "@lifelineInsightPhotosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightAudioCount": "🎵 {count} הערות אודיו",
+  "@lifelineInsightAudioCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightSpanningYears": "📅 משתרע על פני {years} שנים",
+  "@lifelineInsightSpanningYears": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightTotalMemories": "📖 {count} רגעים שנשמרו",
+  "@lifelineInsightTotalMemories": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lifelineInsightPositiveVibes": "😊 רגשות חיוביים בעיקר",
+  "lifelineInsightGrowthJourney": "🌱 מסע צמיחה",
+  "lifelineInsightBalancedEmotions": "⚖️ רגשות מאוזנים",
+  "lifelineInsightStartJourney": "✍️ התחל את המסע שלך",
+  "lifelineInsightBuildStreak": "💪 בנה את הרצף שלך",
+  "purchaseSuccessMessage": "הרכישה הצליחה! ברוכים הבאים ל-Premium!",
+  "graphicsQualityTitle": "איכות גרפיקה",
+  "graphicsQualityAuto": "אוטומטי",
+  "graphicsQualityLow": "נמוכה",
+  "graphicsQualityMedium": "בינונית",
+  "graphicsQualityHigh": "גבוהה",
+  "graphicsQualityAutoSubtitle": "זיהוי אוטומטי של ביצועי המכשיר",
+  "graphicsQualityLowSubtitle": "חיי סוללה מירביים, אפקטים מינימליים",
+  "graphicsQualityMediumSubtitle": "איזון בין ביצועים לגרפיקה",
+  "graphicsQualityHighSubtitle": "גרפיקה מיטבית, צריכת סוללה מוגברת",
+  "graphicsQualityAutoDetected": "אוטומטי ({performance})",
+  "@graphicsQualityAutoDetected": {
+    "placeholders": {
+      "performance": {
+        "type": "String"
+      }
+    }
+  }
 }

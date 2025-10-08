@@ -1290,4 +1290,39 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get purchaseSuccessMessage =>
       'Kauf erfolgreich! Willkommen bei Premium!';
+
+  @override
+  String get graphicsQualityTitle => 'Grafikqualität';
+
+  @override
+  String get graphicsQualityAuto => 'Automatisch';
+
+  @override
+  String get graphicsQualityLow => 'Niedrig';
+
+  @override
+  String get graphicsQualityMedium => 'Mittel';
+
+  @override
+  String get graphicsQualityHigh => 'Hoch';
+
+  @override
+  String get graphicsQualityAutoSubtitle =>
+      'Geräteleistung automatisch erkennen';
+
+  @override
+  String get graphicsQualityLowSubtitle =>
+      'Beste Akkulaufzeit, minimale Effekte';
+
+  @override
+  String get graphicsQualityMediumSubtitle => 'Ausgewogene Leistung und Optik';
+
+  @override
+  String get graphicsQualityHighSubtitle =>
+      'Beste Grafik, höherer Akkuverbrauch';
+
+  @override
+  String graphicsQualityAutoDetected(String performance) {
+    return 'Auto ($performance)';
+  }
 }

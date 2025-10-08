@@ -2367,6 +2367,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Purchase successful! Welcome to Premium!'**
   String get purchaseSuccessMessage;
+
+  /// No description provided for @graphicsQualityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Graphics Quality'**
+  String get graphicsQualityTitle;
+
+  /// No description provided for @graphicsQualityAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get graphicsQualityAuto;
+
+  /// No description provided for @graphicsQualityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get graphicsQualityLow;
+
+  /// No description provided for @graphicsQualityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get graphicsQualityMedium;
+
+  /// No description provided for @graphicsQualityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get graphicsQualityHigh;
+
+  /// No description provided for @graphicsQualityAutoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically detect device performance'**
+  String get graphicsQualityAutoSubtitle;
+
+  /// No description provided for @graphicsQualityLowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Best battery life, minimal effects'**
+  String get graphicsQualityLowSubtitle;
+
+  /// No description provided for @graphicsQualityMediumSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced performance and visuals'**
+  String get graphicsQualityMediumSubtitle;
+
+  /// No description provided for @graphicsQualityHighSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Best visuals, more battery usage'**
+  String get graphicsQualityHighSubtitle;
+
+  /// No description provided for @graphicsQualityAutoDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto ({performance})'**
+  String graphicsQualityAutoDetected(String performance);
 }
 
 class _AppLocalizationsDelegate

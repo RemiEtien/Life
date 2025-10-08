@@ -1295,4 +1295,40 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get purchaseSuccessMessage =>
       'Achat réussi ! Bienvenue dans Premium !';
+
+  @override
+  String get graphicsQualityTitle => 'Qualité graphique';
+
+  @override
+  String get graphicsQualityAuto => 'Auto';
+
+  @override
+  String get graphicsQualityLow => 'Faible';
+
+  @override
+  String get graphicsQualityMedium => 'Moyenne';
+
+  @override
+  String get graphicsQualityHigh => 'Élevée';
+
+  @override
+  String get graphicsQualityAutoSubtitle =>
+      'Détecter automatiquement les performances de l\"appareil';
+
+  @override
+  String get graphicsQualityLowSubtitle =>
+      'Meilleure autonomie, effets minimaux';
+
+  @override
+  String get graphicsQualityMediumSubtitle =>
+      'Performances et visuels équilibrés';
+
+  @override
+  String get graphicsQualityHighSubtitle =>
+      'Meilleurs visuels, plus de consommation de batterie';
+
+  @override
+  String graphicsQualityAutoDetected(String performance) {
+    return 'Auto ($performance)';
+  }
 }

@@ -1032,33 +1032,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     String getQualityLabel(GraphicsQuality quality) {
       switch (quality) {
         case GraphicsQuality.auto:
-          return 'Auto (${_getPerformanceLabel(autoDetected)})';
+          return l10n.graphicsQualityAutoDetected(_getPerformanceLabel(autoDetected, l10n));
         case GraphicsQuality.low:
-          return 'Low';
+          return l10n.graphicsQualityLow;
         case GraphicsQuality.medium:
-          return 'Medium';
+          return l10n.graphicsQualityMedium;
         case GraphicsQuality.high:
-          return 'High';
+          return l10n.graphicsQualityHigh;
       }
     }
 
     return ListTile(
       leading: const Icon(Icons.graphic_eq),
-      title: const Text('Graphics Quality'),
+      title: Text(l10n.graphicsQualityTitle),
       subtitle: Text(getQualityLabel(currentQuality)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showGraphicsQualityDialog(l10n),
     );
   }
 
-  String _getPerformanceLabel(DevicePerformance perf) {
+  String _getPerformanceLabel(DevicePerformance perf, AppLocalizations l10n) {
     switch (perf) {
       case DevicePerformance.high:
-        return 'High';
+        return l10n.graphicsQualityHigh;
       case DevicePerformance.medium:
-        return 'Medium';
+        return l10n.graphicsQualityMedium;
       case DevicePerformance.low:
-        return 'Low';
+        return l10n.graphicsQualityLow;
     }
   }
 
@@ -1069,34 +1069,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final selected = await showDialog<GraphicsQuality>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Graphics Quality'),
+        title: Text(l10n.graphicsQualityTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<GraphicsQuality>(
-              title: Text('Auto (${_getPerformanceLabel(autoDetected)})'),
-              subtitle: const Text('Automatically detect device performance'),
+              title: Text(l10n.graphicsQualityAutoDetected(_getPerformanceLabel(autoDetected, l10n))),
+              subtitle: Text(l10n.graphicsQualityAutoSubtitle),
               value: GraphicsQuality.auto,
               groupValue: currentQuality,
               onChanged: (value) => Navigator.of(context).pop(value),
             ),
             RadioListTile<GraphicsQuality>(
-              title: const Text('Low'),
-              subtitle: const Text('Best battery life, minimal effects'),
+              title: Text(l10n.graphicsQualityLow),
+              subtitle: Text(l10n.graphicsQualityLowSubtitle),
               value: GraphicsQuality.low,
               groupValue: currentQuality,
               onChanged: (value) => Navigator.of(context).pop(value),
             ),
             RadioListTile<GraphicsQuality>(
-              title: const Text('Medium'),
-              subtitle: const Text('Balanced performance and visuals'),
+              title: Text(l10n.graphicsQualityMedium),
+              subtitle: Text(l10n.graphicsQualityMediumSubtitle),
               value: GraphicsQuality.medium,
               groupValue: currentQuality,
               onChanged: (value) => Navigator.of(context).pop(value),
             ),
             RadioListTile<GraphicsQuality>(
-              title: const Text('High'),
-              subtitle: const Text('Best visuals, more battery usage'),
+              title: Text(l10n.graphicsQualityHigh),
+              subtitle: Text(l10n.graphicsQualityHighSubtitle),
               value: GraphicsQuality.high,
               groupValue: currentQuality,
               onChanged: (value) => Navigator.of(context).pop(value),
@@ -1106,7 +1106,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.profileCancel),
           ),
         ],
       ),
