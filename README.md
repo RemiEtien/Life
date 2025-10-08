@@ -134,9 +134,12 @@ The app uses Firebase for:
 
 Current configuration:
 - **Bundle ID:** `com.momentic.lifeline`
-- **Version:** 1.0.137+137
+- **Version:** 1.0.142+142
 - **Min Android SDK:** 26 (Android 8.0)
+- **Target Android SDK:** 35 (Android 15)
 - **Min iOS:** 13.0
+- **Android 15 Support:** ✅ 16KB page size support with isar_community
+- **Edge-to-Edge:** ✅ Android 15/16 compatible
 
 ## Development
 
@@ -194,8 +197,19 @@ See `docs/ios_setup_requirements.md` for detailed iOS troubleshooting.
 
 ## Documentation
 
+- [Architecture Guide](docs/ARCHITECTURE.md) - System design and technical decisions
 - [iOS Setup Requirements](docs/ios_setup_requirements.md) - Critical iOS setup guide
 - [Firebase Setup](ios/Runner/README_FIREBASE.md) - Firebase configuration for iOS
+- [Android 15 Migration Guide](docs/ANDROID15_MIGRATION.md) - Android 15/16 edge-to-edge migration
+- [Release Notes](RELEASE_NOTES_139.md) - Latest release information
+
+## Testing
+
+The project includes comprehensive test coverage:
+- **161 unit tests** covering core business logic
+- **Integration tests** for critical workflows
+- Run tests: `flutter test --exclude-tags=integration`
+- Generate coverage: `flutter test --coverage --exclude-tags=integration`
 
 ## License
 

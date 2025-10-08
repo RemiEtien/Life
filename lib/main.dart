@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,11 +26,9 @@ void main() async {
   await runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Edge-to-edge is managed via:
-    // - MainActivity.kt: WindowCompat.setDecorFitsSystemWindows(window, false)
-    // - Android themes: values-v35/styles.xml with windowOptOutEdgeToEdgeEnforcement
-    // This suppresses Google Play Console warnings about deprecated APIs
-    // DO NOT use SystemChrome.setEnabledSystemUIMode - it conflicts with opt-out flag
+    // Enable edge-to-edge display mode (Android 15+ compatible)
+    // System bar styling is handled by Android themes (values/styles.xml, values-v35/styles.xml)
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     final prefs = await SharedPreferences.getInstance();
     final savedLocaleCode = prefs.getString('appLocale');

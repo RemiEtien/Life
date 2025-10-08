@@ -1,0 +1,220 @@
+Resolving dependencies...
+Downloading packages...
+  build 3.1.0 (4.0.1 available)
+  build_resolvers 3.0.3 (3.0.4 available)
+  build_runner 2.7.1 (2.9.0 available)
+  build_runner_core 9.3.1 (9.3.2 available)
+  characters 1.4.0 (1.4.1 available)
+  flutter_riverpod 2.6.1 (3.0.2 available)
+  flutter_secure_storage_linux 1.2.3 (2.0.1 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.0.1 available)
+  flutter_secure_storage_web 1.2.1 (2.0.0 available)
+  flutter_secure_storage_windows 3.1.2 (4.0.0 available)
+  flutter_timezone 3.0.1 (5.0.0 available)
+  google_sign_in_android 7.1.0 (7.2.0 available)
+  in_app_purchase_storekit 0.4.4+1 (0.4.6 available)
+  js 0.6.7 (0.7.2 available)
+  local_auth_android 1.0.53 (1.0.54 available)
+  local_auth_platform_interface 1.0.10 (1.1.0 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.16.0 (1.17.0 available)
+  mime 1.0.6 (2.0.0 available)
+  pointycastle 3.9.1 (4.0.0 available)
+  record 6.1.1 (6.1.2 available)
+  record_android 1.4.2 (1.4.3 available)
+  record_ios 1.1.2 (1.1.4 available)
+  record_macos 1.1.1 (1.1.2 available)
+  riverpod 2.6.1 (3.0.2 available)
+  shared_preferences_android 2.4.12 (2.4.14 available)
+  shelf_web_socket 2.0.1 (3.0.0 available)
+  source_gen 3.1.0 (4.0.1 available)
+  test_api 0.7.6 (0.7.7 available)
+  url_launcher_android 6.3.22 (6.3.23 available)
+  video_player_android 2.8.13 (2.8.14 available)
+  watcher 1.1.3 (1.1.4 available)
+  win32 5.14.0 (5.15.0 available)
+Got dependencies!
+34 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading C:/Users/gambi/Desktop/Lifeline/test/integration/auth_flow_integration_test.dart
+00:00 +0: C:/Users/gambi/Desktop/Lifeline/test/integration/auth_flow_integration_test.dart: (setUpAll)
+00:00 +0 -1: C:/Users/gambi/Desktop/Lifeline/test/integration/auth_flow_integration_test.dart: (setUpAll) [E]
+  PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+  package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart 301:7  FirebaseCoreHostApi.initializeCore
+  
+00:00 +0 -1: C:/Users/gambi/Desktop/Lifeline/test/integration/auth_flow_integration_test.dart: (tearDownAll)
+00:00 +0 -1: C:/Users/gambi/Desktop/Lifeline/test/integration/cloud_functions_integration_test.dart: (setUpAll)
+00:00 +0 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/cloud_functions_integration_test.dart: (setUpAll) [E]
+  PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+  package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart 301:7  FirebaseCoreHostApi.initializeCore
+  
+00:00 +0 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/cloud_functions_integration_test.dart: (tearDownAll)
+00:00 +0 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration creates memory with encrypted content and preserves structure
+00:00 +1 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration validates and encrypts memory content in correct order
+00:00 +2 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration handles memory with encrypted reflections
+00:00 +3 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration copyWith preserves encryption state and re-encrypts if needed
+00:00 +4 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration validates title and content together before encryption
+00:00 +5 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration encrypts memory with emotions and preserves emotional data
+00:00 +6 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration handles edge case: empty content encryption
+00:00 +7 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Creation with Encryption Integration encryption workflow: validate → sanitize → encrypt → store
+00:00 +8 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Media Encryption Integration validates media paths before adding to memory
+00:00 +9 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Memory Media Encryption Integration maintains media order with encrypted content
+00:00 +10 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Error Handling Integration validation fails prevent memory creation via copyWith
+00:00 +11 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/memory_encryption_integration_test.dart: Error Handling Integration encryption with wrong key produces unreadable data
+00:00 +12 -2: C:/Users/gambi/Desktop/Lifeline/test/integration/premium_purchase_integration_test.dart: (setUpAll)
+00:00 +12 -3: C:/Users/gambi/Desktop/Lifeline/test/integration/premium_purchase_integration_test.dart: (setUpAll) [E]
+  PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+  package:firebase_core_platform_interface/src/pigeon/messages.pigeon.dart 301:7  FirebaseCoreHostApi.initializeCore
+  
+00:00 +12 -3: C:/Users/gambi/Desktop/Lifeline/test/integration/premium_purchase_integration_test.dart: (tearDownAll)
+00:01 +12 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Biometric Authentication Logic Tests BiometricService should have correct authentication options
+00:01 +13 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Biometric Authentication Logic Tests should verify BiometricService exists and is instantiable
+00:01 +14 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Biometric Authentication Logic Tests should handle PlatformException error code format
+00:01 +15 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Sign in with Apple Tests should handle Apple Sign-In credential structure
+00:01 +16 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Sign in with Apple Tests should handle Apple Sign-In cancellation error code
+00:01 +17 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Sign in with Apple Tests should handle Apple Sign-In scopes
+00:01 +18 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Info.plist Configuration Tests should have correct Bundle ID format
+00:01 +19 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Info.plist Configuration Tests should have correct REVERSED_CLIENT_ID format
+00:01 +20 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Info.plist Configuration Tests should have valid Firebase project ID
+00:01 +21 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Permissions Tests should request camera permission before accessing camera
+00:01 +22 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Permissions Tests should request microphone permission before recording
+00:01 +23 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Permissions Tests should request photo library permission before accessing photos
+00:01 +24 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Permissions Tests should request Face ID permission before biometric auth
+00:01 +25 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS In-App Purchase Tests should have correct product IDs for iOS
+00:01 +26 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS In-App Purchase Tests should handle iOS platform detection correctly
+00:01 +27 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS URL Scheme Tests should have correct Google Sign-In URL Scheme
+00:01 +28 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS URL Scheme Tests should handle deep links correctly
+00:01 +29 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Firebase Integration Tests should have correct Firebase iOS configuration keys
+00:01 +30 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Firebase Integration Tests should have correct Firebase API key format
+00:01 +31 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Firebase Integration Tests should have correct Firebase storage bucket format
+00:01 +32 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Media Handling Tests should handle iOS image picker source correctly
+00:01 +33 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Media Handling Tests should handle iOS video picker correctly
+00:01 +34 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Media Handling Tests should handle iOS audio recording format
+00:01 +35 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Build Configuration Tests should use correct iOS deployment target
+00:01 +36 -3: C:/Users/gambi/Desktop/Lifeline/test/ios_specific_test.dart: iOS Build Configuration Tests should have correct app display name
+00:01 +37 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Basic Properties creates memory with default values
+00:01 +38 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Basic Properties sets and retrieves title and content
+00:01 +39 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Basic Properties isSynced computed property works correctly
+00:01 +40 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Basic Properties universalId returns firestoreId when available
+00:01 +41 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Basic Properties universalId returns local id when firestoreId is null
+00:01 +42 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Basic Properties touch updates lastModified timestamp
+00:01 +43 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Emotions Getter/Setter converts emotionsData list to map correctly
+00:01 +44 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Emotions Getter/Setter handles malformed emotion entries gracefully
+00:01 +45 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Emotions Getter/Setter emotions setter converts map to emotionsData list
+00:01 +46 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Emotions Getter/Setter emotions round-trip conversion works correctly
+00:01 +47 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Emotions Getter/Setter returns empty map for empty emotionsData
+00:01 +48 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Valence Calculation calculates positive valence for positive emotions
+00:01 +49 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Valence Calculation calculates negative valence for negative emotions
+00:01 +50 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Valence Calculation calculates mixed valence for mixed emotions
+00:01 +51 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Valence Calculation returns 0.0 for empty emotions
+00:01 +52 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Valence Calculation handles neutral emotions correctly
+00:01 +53 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Insight Score Calculation returns 0 for memory with no reflections
+00:01 +54 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Insight Score Calculation counts each non-empty reflection field
+00:01 +55 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Insight Score Calculation ignores empty string reflections
+00:01 +56 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Insight Score Calculation maximum score is 4
+00:01 +57 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Cover Path Helpers coverPath returns first displayable media path
+00:01 +58 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Cover Path Helpers coverPath returns null when no media
+00:01 +59 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Cover Path Helpers coverThumbPath returns first displayable thumbnail
+00:01 +60 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Cover Path Helpers coverThumbPath returns null when no thumbnails
+00:01 +61 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method creates new instance with same values when no params
+00:01 +62 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method updates title when provided
+00:01 +63 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method updates content when provided
+00:01 +64 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method updates date when provided
+00:01 +65 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method creates deep copy of lists
+00:01 +66 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method updates emotions map correctly
+00:01 +67 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method throws error for invalid title
+00:01 +68 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method throws error for excessively long title
+00:01 +69 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests copyWith Method throws error for excessively long content
+00:01 +70 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableMediaPaths returns empty list when no media
+00:01 +71 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableMediaPaths respects mediaKeysOrder
+00:01 +72 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableMediaPaths works with URLs
+00:01 +73 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableVideoPaths respects videoKeysOrder
+00:01 +74 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableAudioPaths respects audioKeysOrder
+00:01 +75 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableThumbPaths falls back to main media when no thumbs
+00:01 +76 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: Memory Model Tests Displayable Paths Ordering displayableThumbPaths uses actual thumbnails when available
+00:01 +77 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function extracts filename from simple path
+00:01 +78 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function extracts filename from URL
+00:01 +79 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function removes query parameters
+00:01 +80 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function handles URL encoding
+00:01 +81 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function removes timestamp prefix
+00:01 +82 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function normalizes thumbnail names
+00:01 +83 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function handles complex URL with all transformations
+00:01 +84 -3: C:/Users/gambi/Desktop/Lifeline/test/models/memory_test.dart: getFileKey Helper Function handles malformed paths gracefully
+00:01 +85 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Basic AES-GCM Encryption encrypts and decrypts text correctly
+00:01 +86 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Basic AES-GCM Encryption preserves newlines in encrypted text
+00:01 +87 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Basic AES-GCM Encryption different IVs produce different ciphertexts
+00:01 +88 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Basic AES-GCM Encryption wrong key cannot decrypt
+00:01 +89 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Basic AES-GCM Encryption encrypts empty string as empty
+00:01 +90 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Basic AES-GCM Encryption handles unicode characters correctly
+00:01 +91 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Encrypted Payload Format (gcm_v1) matches expected format: gcm_v1:IV:CIPHER
+00:01 +92 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Encrypted Payload Format (gcm_v1) can detect encrypted vs plain text
+00:01 +93 -3: C:/Users/gambi/Desktop/Lifeline/test/services/encryption_service_test.dart: Base64 Encoding IV and cipher are valid base64
+00:03 +94 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests creates state with default values
+00:03 +95 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests creates state with custom values
+00:03 +96 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method returns identical state when no parameters provided
+00:03 +97 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method updates pendingJobs only
+00:03 +98 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method updates isSyncing only
+00:03 +99 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method updates currentStatus only
+00:03 +100 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method updates progress only
+00:03 +101 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method updates all fields at once
+00:03 +102 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests copyWith Method handles null progress correctly
+00:03 +103 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Immutability is immutable (annotated with @immutable)
+00:03 +104 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Typical Workflows idle state
+00:03 +105 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Typical Workflows queued state
+00:03 +106 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Typical Workflows syncing state with progress
+00:03 +107 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Typical Workflows paused for unlock state
+00:03 +108 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Typical Workflows sync complete state
+00:03 +109 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests SyncState Typical Workflows sync failed state
+00:03 +110 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Progress Values progress can be null (indeterminate)
+00:03 +111 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Progress Values progress can be 0.0 (starting)
+00:03 +112 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Progress Values progress can be 1.0 (complete)
+00:03 +113 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Progress Values progress values during upload stages
+00:03 +114 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Status Messages common status messages used in SyncService
+00:03 +115 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Status Messages status message with retry delay
+00:03 +116 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Edge Cases handles negative pending jobs (should not happen in practice)
+00:03 +117 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Edge Cases handles progress greater than 1.0
+00:03 +118 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Edge Cases handles empty status string
+00:03 +119 -3: C:/Users/gambi/Desktop/Lifeline/test/services/sync_service_test.dart: SyncState Tests Edge Cases handles very large pending jobs count
+00:03 +120 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Streak Calculation Logic Returns 0 for empty list
+00:03 +121 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Streak Calculation Logic Calculates streak correctly for consecutive days
+00:03 +122 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Streak Calculation Logic Breaks streak after missing day
+00:03 +123 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Streak Calculation Logic Returns 0 if last memory is more than 1 day old
+00:03 +124 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Streak Calculation Logic Handles multiple memories on same day
+00:03 +125 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Streak Calculation Logic Handles unsorted dates
+00:03 +126 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Timeline Span Calculation Returns 0 for less than 2 memories
+00:03 +127 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Timeline Span Calculation Returns 0 for empty list
+00:03 +128 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Timeline Span Calculation Calculates year span correctly
+00:03 +129 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Timeline Span Calculation Returns 0 for memories in same year
+00:03 +130 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Timeline Span Calculation Handles many years correctly
+00:03 +131 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Emotional Balance Detection Detects positive vibes correctly
+00:03 +132 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Emotional Balance Detection Detects negative emotions correctly
+00:03 +133 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Emotional Balance Detection Detects balanced emotions correctly
+00:03 +134 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Insight Rotation Logic Rotates based on hour correctly
+00:03 +135 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Insight Rotation Logic Different hours produce different indices
+00:03 +136 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Content Counting Counts items correctly
+00:03 +137 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Content Counting Filters by date correctly
+00:03 +138 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Content Counting Filters by month correctly
+00:03 +139 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Priority System Sorts by priority correctly
+00:03 +140 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Priority System Prioritizes streak highest
+00:03 +141 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Edge Cases Handles single memory
+00:03 +142 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Edge Cases Handles very large memory count
+00:03 +143 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Edge Cases Handles dates far in past
+00:03 +144 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/lifeline_insights_test.dart: Lifeline Insights Logic Tests Edge Cases Handles dates in future
+00:04 +145 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumBannerCard Widget Tests shows banner when user is not premium
+00:05 +146 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumBannerCard Widget Tests hides banner when user is premium
+00:05 +147 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumBannerCard Widget Tests banner is tappable with InkWell
+00:05 +148 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumBannerCard Widget Tests displays correct styling
+00:05 +149 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumFeatureLockTile Widget Tests displays icon and text correctly
+00:05 +150 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumFeatureLockTile Widget Tests shows lock icon in trailing position
+00:05 +151 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumFeatureLockTile Widget Tests tile is tappable
+00:05 +152 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumFeatureLockTile Widget Tests displays greyed out style for disabled feature
+00:05 +153 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumStatusCard Widget Tests displays premium status with expiry date
+00:05 +154 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumStatusCard Widget Tests displays premium status without date when null
+00:05 +155 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumStatusCard Widget Tests has correct styling with amber border
+00:05 +156 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: PremiumStatusCard Widget Tests displays premium icon in amber color
+00:05 +157 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: showPremiumDialog Function Tests displays dialog with correct content
+00:05 +158 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: showPremiumDialog Function Tests has cancel and go premium buttons
+00:05 +159 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: showPremiumDialog Function Tests cancel button closes dialog
+00:05 +160 -3: C:/Users/gambi/Desktop/Lifeline/test/widgets/premium_upsell_widgets_test.dart: showPremiumDialog Function Tests go premium button has onPressed callback
+00:06 +161 -3: Some tests failed.
