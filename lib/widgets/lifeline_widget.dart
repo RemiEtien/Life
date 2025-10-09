@@ -30,7 +30,7 @@ import '../services/onboarding_service.dart';
 import '../services/sync_service.dart';
 import 'onboarding_overlay.dart';
 
-enum TappableType { singleNode, dailyCluster, monthlyCluster }
+enum TappableType { singleNode, dailyCluster, monthlyCluster, monthInCluster }
 
 class TappableItem {
   final TappableType type;
@@ -41,19 +41,34 @@ class TappableItem {
   String title(BuildContext context) {
     if (type == TappableType.singleNode) {
       return (data as Memory).title;
-    } else {
+    } else if (type == TappableType.dailyCluster) {
       final memories = data as List<Memory>;
       if (memories.isEmpty) return 'Cluster';
       final date = memories.first.date;
       return 'Day: ${DateFormat.yMd().format(date)} (${memories.length})';
+    } else if (type == TappableType.monthInCluster) {
+      final mapData = data as Map<String, dynamic>;
+      final memories = mapData['memories'] as List<Memory>;
+      final month = mapData['month'] as DateTime;
+      return '${DateFormat.MMMM().format(month)}\n${memories.length}';
+    } else {
+      // monthlyCluster - data is Map
+      final mapData = data as Map<String, dynamic>;
+      final memories = mapData['memories'] as List<Memory>;
+      final month = mapData['month'] as DateTime;
+      return 'Month: ${DateFormat.yMMM().format(month)} (${memories.length})';
     }
   }
 
   IconData get icon {
     if (type == TappableType.singleNode) {
       return Icons.history_edu_outlined;
-    } else {
+    } else if (type == TappableType.dailyCluster) {
       return Icons.style_outlined;
+    } else if (type == TappableType.monthInCluster) {
+      return Icons.calendar_today;
+    } else {
+      return Icons.calendar_month;
     }
   }
 }
@@ -127,7 +142,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   Size _lastKnownSize = Size.zero;
   final Map<String, Offset> _nodePositions = {};
   final Map<String, (Offset, List<Memory>)> _dailyClusterData = {};
-  final Map<String, (Offset, List<Memory>, DateTime)> _monthlyClusterData = {};
+  final Map<String, (Offset, List<Memory>, DateTime, List<String>)> _monthlyClusterData = {};
 
   RenderData? _renderData;
   ui.Picture? _structureCache;
@@ -901,8 +916,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   void _onDailyClusterPosition(String id, Offset pos, List<Memory> memories) =>
       _dailyClusterData[id] = (pos, memories);
 
-  void _onMonthlyClusterPosition(String monthKey, Offset pos, List<Memory> memories, DateTime month) =>
-      _monthlyClusterData[monthKey] = (pos, memories, month);
+  void _onMonthlyClusterPosition(List<String> monthKeys, Offset pos, List<Memory> memories, DateTime month) {
+    // Use first month key as the ID for the cluster
+    final clusterId = monthKeys.first;
+    _monthlyClusterData[clusterId] = (pos, memories, month, monthKeys);
+  }
 
   void _onTapDown(TapDownDetails d) {
     if (_selectionItems != null) {
@@ -920,7 +938,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final scenePosition = _transformationController.toScene(d.localPosition);
     final hitRadiusInScene = kTapRadiusOnScreen / currentScale;
     final List<TappableItem> hits =
-        _findTappableItems(scenePosition, hitRadiusInScene);
+        _findTappableItems(scenePosition, hitRadiusInScene, currentScale);
 
     final userId = ref.read(authStateChangesProvider).asData?.value?.uid;
     if (userId == null) return;
@@ -1035,57 +1053,109 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         });
       }
     } else if (item.type == TappableType.monthlyCluster) {
+      try {
+        final data = item.data;
+        if (kDebugMode) {
+          print('[MONTHLY CLUSTER TAP] data type: ${data.runtimeType}');
+          print('[MONTHLY CLUSTER TAP] data: $data');
+        }
+
+        if (data is! Map<String, dynamic>) {
+          if (kDebugMode) {
+            print('[ERROR] monthlyCluster data is not a Map, it is: ${data.runtimeType}');
+          }
+          return;
+        }
+
+        final monthKeys = data['monthKeys'] as List<String>?;
+        final month = data['month'] as DateTime?;
+        final memoriesList = data['memories'];
+
+        if (monthKeys == null || monthKeys.isEmpty || month == null || memoriesList == null) {
+          if (kDebugMode) {
+            print('[ERROR] Missing required fields in monthlyCluster data');
+          }
+          return;
+        }
+
+        if (memoriesList is! List<Memory>) {
+          if (kDebugMode) {
+            print('[ERROR] memories field is not List<Memory>, it is: ${memoriesList.runtimeType}');
+          }
+          return;
+        }
+
+        // If single month, show directly; if multiple, show month selection
+        if (monthKeys.length == 1) {
+          _showMonthlyClusterBottomSheet(monthKeys.first, month, memoriesList);
+        } else {
+          _showMonthSelectionMenu(monthKeys, memoriesList);
+        }
+      } catch (e, stackTrace) {
+        if (kDebugMode) {
+          print('[ERROR] Error handling monthlyCluster tap: $e');
+          print('[STACKTRACE] $stackTrace');
+        }
+      }
+    } else if (item.type == TappableType.monthInCluster) {
+      // Handle selection of a specific month from the cluster selection menu
       final data = item.data as Map<String, dynamic>;
-      _showMonthlyClusterBottomSheet(
-        data['monthKey'] as String,
-        data['month'] as DateTime,
-        data['memories'] as List<Memory>,
-      );
+      final monthKey = data['monthKey'] as String;
+      final month = data['month'] as DateTime;
+      final memories = data['memories'] as List<Memory>;
+      _showMonthlyClusterBottomSheet(monthKey, month, memories);
     }
   }
 
-  List<TappableItem> _findTappableItems(Offset scenePosition, double hitRadius) {
+  List<TappableItem> _findTappableItems(Offset scenePosition, double hitRadius, double currentScale) {
     final memories = ref.read(memoriesStreamProvider).asData?.value ?? [];
     final List<TappableItem> hits = [];
     final List<String> processedNodeIds = [];
 
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    _monthlyClusterData.forEach((monthKey, data) {
-      final pos = data.$1;
-      final memoriesInCluster = data.$2;
-      final month = data.$3;
-      // Увеличенный радиус тапа для месячных кластеров (они крупнее)
-      if ((pos - scenePosition).distance < hitRadius * 2) {
-        hits.add(TappableItem(
-            type: TappableType.monthlyCluster,
-            data: {'monthKey': monthKey, 'memories': memoriesInCluster, 'month': month}));
-        for (var mem in memoriesInCluster) {
-          processedNodeIds.add(mem.universalId);
+    // Месячные кластеры видны только в диапазоне zoom 0.6-1.2 (соответствует LEVEL 2)
+    if (currentScale >= 0.6 && currentScale < 1.2) {
+      _monthlyClusterData.forEach((clusterId, data) {
+        final pos = data.$1;
+        final memoriesInCluster = data.$2;
+        final month = data.$3;
+        final monthKeys = data.$4;
+        // Увеличенный радиус тапа для месячных кластеров (они крупнее)
+        if ((pos - scenePosition).distance < hitRadius * 2) {
+          hits.add(TappableItem(
+              type: TappableType.monthlyCluster,
+              data: {'monthKeys': monthKeys, 'memories': memoriesInCluster, 'month': month}));
+          for (var mem in memoriesInCluster) {
+            processedNodeIds.add(mem.universalId);
+          }
         }
-      }
-    });
+      });
+    }
 
-    _dailyClusterData.forEach((id, data) {
-      final pos = data.$1;
-      final memoriesInCluster = data.$2;
-      if ((pos - scenePosition).distance < hitRadius) {
-        hits.add(TappableItem(
-            type: TappableType.dailyCluster, data: memoriesInCluster));
-        for (var mem in memoriesInCluster) {
-          processedNodeIds.add(mem.universalId);
+    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 1.2)
+    if (currentScale >= 1.2) {
+      _dailyClusterData.forEach((id, data) {
+        final pos = data.$1;
+        final memoriesInCluster = data.$2;
+        if ((pos - scenePosition).distance < hitRadius) {
+          hits.add(TappableItem(
+              type: TappableType.dailyCluster, data: memoriesInCluster));
+          for (var mem in memoriesInCluster) {
+            processedNodeIds.add(mem.universalId);
+          }
         }
-      }
-    });
+      });
 
-    _nodePositions.forEach((id, pos) {
-      if (!processedNodeIds.contains(id) &&
-          (pos - scenePosition).distance < hitRadius) {
-        final memory = memories.firstWhereOrNull((m) => m.universalId == id);
-        if (memory != null) {
-          hits.add(TappableItem(type: TappableType.singleNode, data: memory));
+      _nodePositions.forEach((id, pos) {
+        if (!processedNodeIds.contains(id) &&
+            (pos - scenePosition).distance < hitRadius) {
+          final memory = memories.firstWhereOrNull((m) => m.universalId == id);
+          if (memory != null) {
+            hits.add(TappableItem(type: TappableType.singleNode, data: memory));
+          }
         }
-      }
-    });
+      });
+    }
 
     return hits;
   }
@@ -1101,8 +1171,46 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         }));
   }
 
+  void _showMonthSelectionMenu(List<String> monthKeys, List<Memory> allMemories) {
+    // Group memories by month
+    final Map<String, List<Memory>> memoriesByMonth = {};
+    for (final memory in allMemories) {
+      final monthKey = '${memory.date.year}-${memory.date.month.toString().padLeft(2, '0')}';
+      memoriesByMonth.putIfAbsent(monthKey, () => []).add(memory);
+    }
+
+    // Create TappableItem for each month
+    final items = monthKeys.map((monthKey) {
+      final parts = monthKey.split('-');
+      final year = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final monthDate = DateTime(year, month);
+      final memories = memoriesByMonth[monthKey] ?? [];
+
+      return TappableItem(
+        type: TappableType.monthInCluster,
+        data: {
+          'monthKey': monthKey,
+          'month': monthDate,
+          'memories': memories,
+        },
+      );
+    }).toList();
+
+    // Show circular selection menu
+    if (mounted) {
+      setState(() {
+        _selectionItems = items;
+        _selectionCenter = _lastKnownSize.center(Offset.zero);
+      });
+    }
+  }
+
   void _showMonthlyClusterBottomSheet(
       String monthKey, DateTime month, List<Memory> memories) {
+    final userId = ref.read(authStateChangesProvider).asData?.value?.uid;
+    if (userId == null) return;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1118,6 +1226,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
               month: month,
               memories: memories,
               onZoomToMonth: () => _zoomToMonth(month, memories),
+              userId: userId,
+              images: _cachedImages,
+              scrollController: scrollController,
             );
           },
         );
@@ -2514,8 +2625,16 @@ class _SelectionMenuState extends State<SelectionMenu>
       String? coverPath;
       if (item.type == TappableType.singleNode) {
         coverPath = (item.data as Memory).coverPath;
-      } else {
+      } else if (item.type == TappableType.dailyCluster) {
         coverPath = (item.data as List<Memory>).first.coverPath;
+      } else if (item.type == TappableType.monthlyCluster) {
+        final mapData = item.data as Map<String, dynamic>;
+        final memories = mapData['memories'] as List<Memory>;
+        coverPath = memories.first.coverPath;
+      } else if (item.type == TappableType.monthInCluster) {
+        final mapData = item.data as Map<String, dynamic>;
+        final memories = mapData['memories'] as List<Memory>;
+        coverPath = memories.isNotEmpty ? memories.first.coverPath : null;
       }
       final image = (coverPath != null) ? widget.images[coverPath] : null;
 

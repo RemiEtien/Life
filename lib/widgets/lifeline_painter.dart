@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../memory.dart';
 import '../models/user_profile.dart';
 import '../utils/emotion_colors.dart';
@@ -76,7 +77,7 @@ typedef DailyClusterPosCallback = void Function(
 typedef NodePosCallback = void Function(String id, Offset pos);
 
 typedef MonthlyClusterPosCallback = void Function(
-    String monthKey, Offset pos, List<Memory> memories, DateTime month);
+    List<String> monthKeys, Offset pos, List<Memory> memories, DateTime month);
 
 class PlacementInfo {
   final Memory memory;
@@ -517,11 +518,6 @@ class LifelinePainter extends CustomPainter {
     int labelsTime = 0;
     int macroViewTime = 0;
 
-    // DEBUG: Log zoom scale for calibration
-    if (kDebugMode) {
-      debugPrint('[ZOOM] Current zoom scale: ${zoomScale.toStringAsFixed(3)}');
-    }
-
     if (size.width <= 0 || size.height <= 0 || memories.isEmpty) return;
 
     final mainPath = renderData.mainPath;
@@ -540,7 +536,7 @@ class LifelinePainter extends CustomPainter {
     // LEVEL 2: Medium zoom - monthly clusters (zoom 0.6-1.2 / 250%-460%)
     else if (zoomScale >= 0.6 && zoomScale < 1.2) {
       stopwatch.start();
-      _drawMonthlyClusters(canvas, mainPath, size, zoomScale);
+      _drawMonthlyClusters(canvas, mainPath, size, zoomScale, placementResults);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
@@ -592,26 +588,25 @@ class LifelinePainter extends CustomPainter {
     }
     // --- End of branch drawing ---
 
-    if (detailOpacity > 0) {
-      // Labels fade in after zoom 1.2 (Level 3)
-      final labelsOpacity = ((zoomScale - 1.2) / 0.5).clamp(0.0, 1.0);
-      if (labelsOpacity > 0) {
-        final singleNodeInfos =
-            placementResults.whereType<PlacementInfo>().toList();
-        stopwatch.start();
-        _drawMemoryLabels(
-            canvas,
-            size, // ИСПРАВЛЕНО: Используем полный размер холста, а не границы пути
-            singleNodeInfos,
-            visibleRect,
-            detailOpacity * labelsOpacity);
-        stopwatch.stop();
-        labelsTime = stopwatch.elapsedMicroseconds;
-        stopwatch.reset();
-      }
-
+    // Labels fade in after zoom 1.2 (Level 3)
+    final labelsOpacity = ((zoomScale - 1.2) / 0.5).clamp(0.0, 1.0);
+    if (labelsOpacity > 0) {
+      final singleNodeInfos =
+          placementResults.whereType<PlacementInfo>().toList();
       stopwatch.start();
-      // PASS 1: Draw all auras first (background layer)
+      _drawMemoryLabels(
+          canvas,
+          size, // ИСПРАВЛЕНО: Используем полный размер холста, а не границы пути
+          singleNodeInfos,
+          visibleRect,
+          detailOpacity * labelsOpacity);
+      stopwatch.stop();
+      labelsTime = stopwatch.elapsedMicroseconds;
+      stopwatch.reset();
+    }
+
+    stopwatch.start();
+    // PASS 1: Draw all auras first (background layer)
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           if (visibleRect
@@ -677,10 +672,9 @@ class LifelinePainter extends CustomPainter {
           }
         }
       }
-      stopwatch.stop();
-      nodesTime = stopwatch.elapsedMicroseconds;
-      stopwatch.reset();
-    }
+    stopwatch.stop();
+    nodesTime = stopwatch.elapsedMicroseconds;
+    stopwatch.reset();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (timingsNotifier != null) {
@@ -694,10 +688,11 @@ class LifelinePainter extends CustomPainter {
     });
   }
 
-  /// LEVEL 1: Draw yearly gradient with large blurred circles at each memory position
+  /// LEVEL 1: Draw yearly gradient - one averaged circle per year
   void _drawYearlyGradient(Canvas canvas, ui.Path path, Size size, double zoomScale) {
     if (!userProfile!.enableYearlyGradient) return;
-    if (memories.isEmpty) return;
+    if (memories.length < 2) return;
+    if (path.computeMetrics().isEmpty) return;
 
     // Fade in/out transitions
     final fadeInOpacity = (zoomScale < 0.15)
@@ -715,56 +710,26 @@ class LifelinePainter extends CustomPainter {
     final blur = userProfile!.yearlyGradientBlur;
     final saturation = userProfile!.yearlyGradientSaturation;
 
-    // Draw a large blurred circle at each memory position
-    for (final memory in memories) {
-      final emotionColor = EmotionColors.getColor(memory.primaryEmotion);
-      final saturatedColor = _boostSaturation(emotionColor, saturation);
+    final metrics = path.computeMetrics().first;
+    final totalLen = metrics.length;
+    final sortedMemories = List<Memory>.from(memories)
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final minDate = sortedMemories.first.date;
+    final maxDate = sortedMemories.last.date;
+    final totalSpan = maxDate.difference(minDate).inMilliseconds;
+    if (totalSpan == 0) return;
 
-      final paint = Paint()
-        ..color = saturatedColor.withOpacity(intensity * finalOpacity)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
-
-      // Find memory position on path
-      final pos = _getMemoryPositionOnPath(path, memory);
-      if (pos != null) {
-        canvas.drawCircle(pos, radius, paint);
-      }
-    }
-  }
-
-  /// LEVEL 2: Draw monthly cluster nodes
-  void _drawMonthlyClusters(Canvas canvas, ui.Path path, Size size, double zoomScale) {
-    if (!userProfile!.enableMonthlyClusters) return;
-    if (memories.isEmpty) return;
-
-    // Fade in/out transitions
-    final fadeInOpacity = (zoomScale < 0.75)
-        ? ((zoomScale - 0.6) / 0.15).clamp(0.0, 1.0)
-        : 1.0;
-    final fadeOutOpacity = (zoomScale > 1.05)
-        ? ((1.2 - zoomScale) / 0.15).clamp(0.0, 1.0)
-        : 1.0;
-    final finalOpacity = fadeInOpacity * fadeOutOpacity;
-
-    if (finalOpacity <= 0.0) return;
-
-    final intensity = userProfile!.monthlyClusterIntensity;
-    final auraRadius = userProfile!.monthlyClusterRadius;
-    final blur = userProfile!.monthlyClusterBlur;
-    final saturation = userProfile!.monthlyClusterSaturation;
-
-    // Group memories by month
-    final Map<String, List<Memory>> monthlyGroups = {};
-    for (final memory in memories) {
-      final monthKey = '${memory.date.year}-${memory.date.month.toString().padLeft(2, '0')}';
-      monthlyGroups.putIfAbsent(monthKey, () => []).add(memory);
+    // Group memories by year and calculate average emotion color
+    final Map<int, List<Memory>> memoriesByYear = {};
+    for (final memory in sortedMemories) {
+      memoriesByYear.putIfAbsent(memory.date.year, () => []).add(memory);
     }
 
-    // Draw each monthly cluster
-    monthlyGroups.forEach((monthKey, monthMemories) {
-      // Calculate average emotion color for the month
+    // Draw one circle per year with averaged emotion color
+    memoriesByYear.forEach((year, yearMemories) {
+      // Calculate average emotion color for the year
       final emotionCounts = <String, int>{};
-      for (final memory in monthMemories) {
+      for (final memory in yearMemories) {
         if (memory.primaryEmotion != null) {
           emotionCounts[memory.primaryEmotion!] =
               (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
@@ -784,65 +749,414 @@ class LifelinePainter extends CustomPainter {
       final emotionColor = EmotionColors.getColor(dominantEmotion);
       final saturatedColor = _boostSaturation(emotionColor, saturation);
 
-      // Find average position of memories in this month
-      double sumX = 0, sumY = 0;
-      int count = 0;
-      for (final memory in monthMemories) {
-        final pos = _getMemoryPositionOnPath(path, memory);
-        if (pos != null) {
-          sumX += pos.dx;
-          sumY += pos.dy;
-          count++;
+      // Position at start of year
+      final firstDayOfYear = DateTime(year);
+      final t = (firstDayOfYear.difference(minDate).inMilliseconds / totalSpan)
+          .clamp(0.0, 1.0);
+      final pos = metrics.getTangentForOffset(t * totalLen)?.position;
+
+      if (pos != null) {
+        final paint = Paint()
+          ..color = saturatedColor.withOpacity(intensity * finalOpacity)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+        canvas.drawCircle(pos, radius, paint);
+      }
+    });
+  }
+
+  /// LEVEL 2: Draw monthly cluster nodes (like daily clusters with photos)
+  void _drawMonthlyClusters(
+    Canvas canvas,
+    ui.Path path,
+    Size size,
+    double zoomScale,
+    List<dynamic> placementResults,
+  ) {
+    if (!userProfile!.enableMonthlyClusters) return;
+    if (memories.isEmpty) return;
+    if (path.computeMetrics().isEmpty) return;
+
+    // Fade in/out transitions
+    final fadeInOpacity = (zoomScale < 0.75)
+        ? ((zoomScale - 0.6) / 0.15).clamp(0.0, 1.0)
+        : 1.0;
+    final fadeOutOpacity = (zoomScale > 0.95)
+        ? ((1.15 - zoomScale) / 0.2).clamp(0.0, 1.0)
+        : 1.0;
+    final finalOpacity = fadeInOpacity * fadeOutOpacity;
+
+    if (finalOpacity <= 0.0) return;
+
+    final sortedMemories = List<Memory>.from(memories)
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final minDate = sortedMemories.first.date;
+    final maxDate = sortedMemories.last.date;
+    final totalSpan = maxDate.difference(minDate).inMilliseconds;
+    if (totalSpan == 0) return;
+
+    // Group ALL memories by month using actual placement positions
+    // Build a lookup map for faster position finding
+    final Map<String, Offset> memoryPositions = {};
+    for (final item in placementResults) {
+      if (item is PlacementInfo) {
+        memoryPositions[item.memory.universalId] = item.nodePosition;
+      } else if (item is DailyClusterPlacementInfo) {
+        // Use cluster position for all memories in the cluster
+        for (final memory in item.memories) {
+          memoryPositions[memory.universalId] = item.position;
+        }
+      }
+    }
+
+    final Map<String, ({List<Memory> memories, List<Offset> positions})> monthlyGroups = {};
+
+    // Group ALL memories, not just those in placementResults
+    for (final memory in memories) {
+      final monthKey = '${memory.date.year}-${memory.date.month.toString().padLeft(2, '0')}';
+
+      if (!monthlyGroups.containsKey(monthKey)) {
+        monthlyGroups[monthKey] = (memories: [], positions: []);
+      }
+      monthlyGroups[monthKey]!.memories.add(memory);
+
+      // Try to find position in placementResults
+      final position = memoryPositions[memory.universalId];
+      if (position != null) {
+        monthlyGroups[monthKey]!.positions.add(position);
+      }
+    }
+
+    // Sort month keys chronologically
+    final sortedMonthKeys = monthlyGroups.keys.toList()
+      ..sort((a, b) => a.compareTo(b));
+
+    // Calculate cluster positions using REAL positions from placementResults
+    final List<({String key, Offset pos, List<Memory> memories})> clusterPositions = [];
+
+    for (final monthKey in sortedMonthKeys) {
+      final group = monthlyGroups[monthKey]!;
+      final monthMemories = group.memories;
+
+      // Calculate position based on the middle timestamp of the month
+      final parts = monthKey.split('-');
+      final year = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final monthStart = DateTime(year, month, 1);
+      final monthEnd = DateTime(year, month + 1, 1); // First day of next month
+      final monthMiddle = monthStart.millisecondsSinceEpoch +
+                          (monthEnd.millisecondsSinceEpoch - monthStart.millisecondsSinceEpoch) ~/ 2;
+
+      // Find position on path based on timestamp (same logic as in lifeline_widget.dart)
+      final t = ((monthMiddle - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
+
+      final pathMetric = path.computeMetrics().first;
+      final pathLength = pathMetric.length;
+      final tangent = pathMetric.getTangentForOffset(t * pathLength);
+
+      if (tangent != null) {
+        final avgPos = tangent.position;
+        clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
+      }
+    }
+
+    // Group nearby monthly clusters (if they're too close, combine them)
+    const minMonthSpacing = 40.0; // Minimum distance between month clusters (diameter of node is ~60px)
+    final List<({
+      List<String> monthKeys,
+      Offset pos,
+      List<Memory> memories,
+    })> groupedClusters = [];
+
+    for (int i = 0; i < clusterPositions.length; i++) {
+      final current = clusterPositions[i];
+
+      // Check if this cluster should be merged with the last grouped cluster
+      if (groupedClusters.isNotEmpty) {
+        final lastGroup = groupedClusters.last;
+
+        // Calculate actual distance considering the path curve (not just X distance)
+        final dx = current.pos.dx - lastGroup.pos.dx;
+        final dy = current.pos.dy - lastGroup.pos.dy;
+        final distance = sqrt(dx * dx + dy * dy);
+
+        if (distance < minMonthSpacing) {
+          // Merge into last group
+          final combinedMemories = [...lastGroup.memories, ...current.memories];
+
+          // Find position on path at the middle point between the two clusters
+          final avgTimestamp = (() {
+            final firstParts = lastGroup.monthKeys.first.split('-');
+            final lastParts = current.key.split('-');
+            final firstYear = int.parse(firstParts[0]);
+            final firstMonth = int.parse(firstParts[1]);
+            final lastYear = int.parse(lastParts[0]);
+            final lastMonth = int.parse(lastParts[1]);
+
+            final firstDate = DateTime(firstYear, firstMonth, 15);
+            final lastDate = DateTime(lastYear, lastMonth, 15);
+
+            return (firstDate.millisecondsSinceEpoch + lastDate.millisecondsSinceEpoch) ~/ 2;
+          })();
+
+          final t = ((avgTimestamp - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
+          final pathMetric = path.computeMetrics().first;
+          final tangent = pathMetric.getTangentForOffset(t * pathMetric.length);
+          final avgPos = tangent?.position ?? Offset((lastGroup.pos.dx + current.pos.dx) / 2, (lastGroup.pos.dy + current.pos.dy) / 2);
+
+          groupedClusters[groupedClusters.length - 1] = (
+            monthKeys: [...lastGroup.monthKeys, current.key],
+            pos: avgPos,
+            memories: combinedMemories,
+          );
+          continue;
         }
       }
 
-      if (count == 0) return;
-      final centerPosition = Offset(sumX / count, sumY / count);
+      // Start new group
+      groupedClusters.add((
+        monthKeys: [current.key],
+        pos: current.pos,
+        memories: current.memories,
+      ));
+    }
 
-      // Draw aura (background glow)
+    // Node radius for drawing - clusters stay ON the lifeline, no displacement
+    const nodeRadius = 30.0;
+
+    // PASS 1: Draw auras
+    final intensity = userProfile!.monthlyClusterIntensity;
+    final auraRadius = userProfile!.monthlyClusterRadius;
+    final blur = userProfile!.monthlyClusterBlur;
+    final saturation = userProfile!.monthlyClusterSaturation;
+
+    for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
+      final cluster = groupedClusters[clusterIndex];
+
+      // Calculate breathing animation (same as daily clusters)
+      final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
+      final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
+      final combinedPulse = individualPulse * breathPulse;
+
+      // Get dominant emotion
+      final emotionCounts = <String, int>{};
+      for (final memory in cluster.memories) {
+        if (memory.primaryEmotion != null) {
+          emotionCounts[memory.primaryEmotion!] =
+              (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+        }
+      }
+
+      String? dominantEmotion;
+      int maxCount = 0;
+      emotionCounts.forEach((emotion, count) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantEmotion = emotion;
+        }
+      });
+
+      final emotionColor = EmotionColors.getColor(dominantEmotion);
+      final saturatedColor = _boostSaturation(emotionColor, saturation);
+
+      // Draw aura (background glow) with breathing animation
       final auraPaint = Paint()
         ..color = saturatedColor.withOpacity(intensity * finalOpacity)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
-      canvas.drawCircle(centerPosition, auraRadius * intensity, auraPaint);
 
-      // Draw node (solid circle)
-      const nodeRadius = 30.0;
-      final nodePaint = Paint()
-        ..color = saturatedColor.withOpacity(finalOpacity)
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(centerPosition, nodeRadius, nodePaint);
+      final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
+      canvas.drawCircle(adjustedPos, auraRadius * intensity * combinedPulse, auraPaint);
+    }
 
-      // Draw white border
-      final borderPaint = Paint()
-        ..color = Colors.white.withOpacity(finalOpacity)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
-      canvas.drawCircle(centerPosition, nodeRadius, borderPaint);
+    // PASS 2: Draw nodes with photos
+    for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
+      final cluster = groupedClusters[clusterIndex];
+      // Calculate breathing animation (same as daily clusters)
+      final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
+      final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
+      final combinedPulse = individualPulse * breathPulse;
+      final animatedRadius = nodeRadius * combinedPulse;
 
-      // Draw memory count in center
-      final textSpan = TextSpan(
-        text: monthMemories.length.toString(),
-        style: TextStyle(
-          color: Colors.white.withOpacity(finalOpacity),
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+      // Pick first memory with a photo, or first memory if none have photos
+      Memory? selectedMemory;
+      for (final memory in cluster.memories) {
+        if (memory.coverPath != null && images[memory.coverPath] != null) {
+          selectedMemory = memory;
+          break;
+        }
+      }
+      selectedMemory ??= cluster.memories.first;
+      final image = images[selectedMemory.coverPath];
+
+      final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
+
+      // Draw photo or default node
+      if (image != null) {
+        final imageRect = Rect.fromCircle(center: adjustedPos, radius: animatedRadius);
+        final imagePath = Path()..addOval(imageRect);
+
+        canvas.save();
+        canvas.clipPath(imagePath);
+
+        final double imgWidth = image.width.toDouble();
+        final double imgHeight = image.height.toDouble();
+        final double aspectRatio = imgWidth / imgHeight;
+
+        Rect srcRect;
+        if (aspectRatio > 1.0) {
+          final croppedWidth = imgHeight;
+          srcRect = Rect.fromLTWH(
+              (imgWidth - croppedWidth) / 2, 0, croppedWidth, imgHeight);
+        } else {
+          final croppedHeight = imgWidth;
+          srcRect = Rect.fromLTWH(
+              0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
+        }
+
+        canvas.drawImageRect(image, srcRect, imageRect, Paint());
+        canvas.restore();
+
+        // Draw border
+        final borderPaint = Paint()
+          ..color = Colors.white.withOpacity(finalOpacity)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0;
+        canvas.drawPath(imagePath, borderPaint);
+      } else {
+        // Draw default colored node
+        final emotionCounts = <String, int>{};
+        for (final memory in cluster.memories) {
+          if (memory.primaryEmotion != null) {
+            emotionCounts[memory.primaryEmotion!] =
+                (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+          }
+        }
+
+        String? dominantEmotion;
+        int maxCount = 0;
+        emotionCounts.forEach((emotion, count) {
+          if (count > maxCount) {
+            maxCount = count;
+            dominantEmotion = emotion;
+          }
+        });
+
+        final emotionColor = EmotionColors.getColor(dominantEmotion);
+        final nodePaint = Paint()..color = emotionColor.withOpacity(finalOpacity);
+        canvas.drawCircle(adjustedPos, animatedRadius, nodePaint);
+
+        final borderPaint = Paint()
+          ..color = Colors.white.withOpacity(finalOpacity)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0;
+        canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
+      }
+
+      // Draw count text INSIDE node (centered like daily clusters)
+      final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
+      final textStyle = GoogleFonts.orbitron(
+        color: ringColor.withOpacity(finalOpacity),
+        fontSize: 10.0,
+        fontWeight: FontWeight.bold,
+        shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
       );
+      final textSpan = TextSpan(text: cluster.memories.length.toString(), style: textStyle);
       final textPainter = TextPainter(
         text: textSpan,
-        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+        textDirection: ui.TextDirection.ltr,
       );
       textPainter.layout();
-      final textOffset = centerPosition - Offset(textPainter.width / 2, textPainter.height / 2);
-      textPainter.paint(canvas, textOffset);
+      final textPos = Offset(
+        adjustedPos.dx - textPainter.width / 2,
+        adjustedPos.dy - textPainter.height / 2,  // Center inside node
+      );
+      textPainter.paint(canvas, textPos);
+    }
+
+    // PASS 3: Draw month labels with connector lines (stems)
+    const verticalOffset = 40.0;
+    bool wasLastAbove = false;
+
+    for (int i = 0; i < groupedClusters.length; i++) {
+      final cluster = groupedClusters[i];
+
+      // Generate label text based on number of months in cluster
+      final String monthName;
+      final DateTime monthDate;
+      if (cluster.monthKeys.length == 1) {
+        final parts = cluster.monthKeys.first.split('-');
+        final year = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        monthDate = DateTime(year, month);
+        monthName = DateFormat.yMMM().format(monthDate); // "Jan 2025"
+      } else {
+        // Multiple months - show range
+        final firstParts = cluster.monthKeys.first.split('-');
+        final lastParts = cluster.monthKeys.last.split('-');
+        final firstYear = int.parse(firstParts[0]);
+        final firstMonth = int.parse(firstParts[1]);
+        final lastYear = int.parse(lastParts[0]);
+        final lastMonth = int.parse(lastParts[1]);
+
+        final firstDate = DateTime(firstYear, firstMonth);
+        final lastDate = DateTime(lastYear, lastMonth);
+        monthDate = firstDate;
+
+        if (firstYear == lastYear) {
+          // Same year: "Jan-Mar 2025"
+          monthName = '${DateFormat.MMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+        } else {
+          // Different years: "Dec 2024-Feb 2025"
+          monthName = '${DateFormat.yMMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+        }
+      }
+
+      final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
+
+      // Create label paragraph
+      final labelStyle = TextStyle(
+        color: Colors.white.withOpacity(finalOpacity),
+        fontSize: 14.0,
+        fontWeight: FontWeight.bold,
+        shadows: const [
+          ui.Shadow(color: Colors.black, blurRadius: 12.0),
+          ui.Shadow(color: Colors.black, blurRadius: 8.0),
+          ui.Shadow(color: Colors.black, blurRadius: 4.0),
+        ],
+      );
+      final labelSpan = TextSpan(text: monthName, style: labelStyle);
+      final labelPainter = TextPainter(
+        text: labelSpan,
+        textAlign: TextAlign.center,
+        textDirection: ui.TextDirection.ltr,
+      );
+      labelPainter.layout();
+
+      // Alternate label position (above/below) like memory labels
+      final placeAbove = !wasLastAbove;
+      wasLastAbove = placeAbove;
+
+      final labelX = adjustedPos.dx - labelPainter.width / 2;
+      final labelY = placeAbove
+          ? adjustedPos.dy - verticalOffset - labelPainter.height
+          : adjustedPos.dy + verticalOffset;
+
+      final textRect = Rect.fromLTWH(labelX, labelY, labelPainter.width, labelPainter.height);
+
+      // Draw connector line (stem)
+      _drawConnectorLine(canvas, cluster.pos, textRect, placeAbove, finalOpacity);
+
+      // Draw label with full opacity (like daily clusters)
+      canvas.saveLayer(
+        textRect.inflate(2),
+        Paint()..color = Colors.white.withAlpha((255 * finalOpacity).round())
+      );
+      labelPainter.paint(canvas, Offset(labelX, labelY));
+      canvas.restore();
 
       // Report position for tap detection
-      final monthDate = DateTime(
-        int.parse(monthKey.split('-')[0]),
-        int.parse(monthKey.split('-')[1])
-      );
-      onMonthlyClusterPosition?.call(monthKey, centerPosition, monthMemories, monthDate);
-    });
+      onMonthlyClusterPosition?.call(cluster.monthKeys, cluster.pos, cluster.memories, monthDate);
+    }
   }
 
   /// Helper: Get position of a memory on the path
@@ -1039,7 +1353,8 @@ class LifelinePainter extends CustomPainter {
             Rect.fromLTWH(0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
       }
 
-      canvas.drawImageRect(image, srcRect, imageRect, Paint());
+      final imagePaint = Paint()..color = Colors.white.withOpacity(opacity);
+      canvas.drawImageRect(image, srcRect, imageRect, imagePaint);
       canvas.restore();
 
       canvas.drawPath(imagePath, borderPaint);
@@ -1094,11 +1409,7 @@ class LifelinePainter extends CustomPainter {
 
     // Адаптивный blur radius для производительности
     final blurRadius = DevicePerformanceDetector.getAdaptiveBlurRadius(30.0 * intensity);
-    if (kDebugMode) {
-      debugPrint('[AURA] BlurRadius: $blurRadius (intensity: $intensity), color: $emotionColor, radius: ${nodeRadius * 2.5 * intensity}');
-    }
     if (blurRadius <= 0) {
-      if (kDebugMode) debugPrint('[AURA] SKIPPED - blur radius is 0 (low-end device)');
       return; // Skip на low-end устройствах
     }
 
@@ -1168,7 +1479,7 @@ class LifelinePainter extends CustomPainter {
     final textPainter = TextPainter(
         text: textSpan,
         textAlign: TextAlign.center,
-        textDirection: TextDirection.ltr);
+        textDirection: ui.TextDirection.ltr);
     textPainter.layout();
     final textPos = Offset(
         adjustedPos.dx - textPainter.width / 2, adjustedPos.dy - textPainter.height / 2);
@@ -1192,7 +1503,7 @@ class LifelinePainter extends CustomPainter {
     final textPainter = TextPainter(
         text: textSpan,
         textAlign: TextAlign.center,
-        textDirection: TextDirection.ltr,
+        textDirection: ui.TextDirection.ltr,
     );
     textPainter.layout();
 
@@ -1231,7 +1542,7 @@ class LifelinePainter extends CustomPainter {
     final textPainter = TextPainter(
       text: textSpan,
       textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
+      textDirection: ui.TextDirection.ltr,
     );
     textPainter.layout();
     final textPos = Offset(pos.dx - textPainter.width / 2, pos.dy);
