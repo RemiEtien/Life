@@ -1019,6 +1019,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     _buildSectionTitle(l10n.profileSectionSettings, context),
                     _buildNotificationsSetting(profile, l10n),
                     _buildGraphicsQualitySetting(l10n),
+                    _buildEmotionVisualizationSettings(profile, l10n),
                     const Divider(height: 40),
                     _buildSectionTitle(l10n.profileSectionSecurity, context),
                     _buildEncryptionSetting(profile, l10n),
@@ -1235,6 +1236,358 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       case DevicePerformance.low:
         return l10n.graphicsQualityLow;
     }
+  }
+
+  Widget _buildEmotionVisualizationSettings(UserProfile profile, AppLocalizations l10n) {
+    final isPremium = ref.watch(isPremiumProvider);
+
+    return ExpansionTile(
+      leading: const Icon(Icons.palette_outlined),
+      title: const Text('🎨 Эмоциональная Визуализация'),
+      subtitle: const Text('Настройте отображение эмоций'),
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            'На жизненной линии:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+        ),
+        SwitchListTile(
+          title: const Text('Аура вокруг узлов'),
+          subtitle: const Text('Свечение в цвете эмоции'),
+          value: profile.enableNodeAura,
+          onChanged: (value) {
+            final updatedProfile = profile.copyWith(enableNodeAura: value);
+            ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+          },
+          secondary: const Icon(Icons.blur_on),
+        ),
+        // Level 1: Yearly Gradient
+        ExpansionTile(
+          leading: const Icon(Icons.gradient),
+          title: const Text('Уровень 1: Годовой градиент'),
+          subtitle: const Text('Общее свечение эмоций (зум < 250%)'),
+          children: [
+            SwitchListTile(
+              title: const Text('Включить'),
+              value: profile.enableYearlyGradient,
+              onChanged: (value) {
+                final updatedProfile = profile.copyWith(enableYearlyGradient: value);
+                ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+              },
+            ),
+            if (profile.enableYearlyGradient) ...[
+              ListTile(
+                leading: const Icon(Icons.opacity),
+                title: const Text('Интенсивность'),
+                subtitle: Slider(
+                  value: profile.yearlyGradientIntensity,
+                  min: 0.0,
+                  max: 1.0,
+                  divisions: 20,
+                  label: '${(profile.yearlyGradientIntensity * 100).toStringAsFixed(0)}%',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(yearlyGradientIntensity: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.circle_outlined),
+                title: const Text('Радиус'),
+                subtitle: Slider(
+                  value: profile.yearlyGradientRadius,
+                  min: 100.0,
+                  max: 400.0,
+                  divisions: 30,
+                  label: '${profile.yearlyGradientRadius.toStringAsFixed(0)} px',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(yearlyGradientRadius: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.blur_circular),
+                title: const Text('Размытие'),
+                subtitle: Slider(
+                  value: profile.yearlyGradientBlur,
+                  min: 50.0,
+                  max: 300.0,
+                  divisions: 25,
+                  label: '${profile.yearlyGradientBlur.toStringAsFixed(0)} px',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(yearlyGradientBlur: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.palette),
+                title: const Text('Насыщенность'),
+                subtitle: Slider(
+                  value: profile.yearlyGradientSaturation,
+                  min: 1.0,
+                  max: 3.0,
+                  divisions: 20,
+                  label: '${profile.yearlyGradientSaturation.toStringAsFixed(1)}x',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(yearlyGradientSaturation: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        // Level 2: Monthly Clusters
+        ExpansionTile(
+          leading: const Icon(Icons.view_module),
+          title: const Text('Уровень 2: Месячные кластеры'),
+          subtitle: const Text('Кластеры по месяцам (зум 250%-460%)'),
+          children: [
+            SwitchListTile(
+              title: const Text('Включить'),
+              value: profile.enableMonthlyClusters,
+              onChanged: (value) {
+                final updatedProfile = profile.copyWith(enableMonthlyClusters: value);
+                ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+              },
+            ),
+            if (profile.enableMonthlyClusters) ...[
+              ListTile(
+                leading: const Icon(Icons.opacity),
+                title: const Text('Интенсивность'),
+                subtitle: Slider(
+                  value: profile.monthlyClusterIntensity,
+                  min: 0.0,
+                  max: 1.0,
+                  divisions: 20,
+                  label: '${(profile.monthlyClusterIntensity * 100).toStringAsFixed(0)}%',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(monthlyClusterIntensity: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.circle_outlined),
+                title: const Text('Радиус'),
+                subtitle: Slider(
+                  value: profile.monthlyClusterRadius,
+                  min: 50.0,
+                  max: 200.0,
+                  divisions: 30,
+                  label: '${profile.monthlyClusterRadius.toStringAsFixed(0)} px',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(monthlyClusterRadius: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.blur_circular),
+                title: const Text('Размытие'),
+                subtitle: Slider(
+                  value: profile.monthlyClusterBlur,
+                  min: 30.0,
+                  max: 150.0,
+                  divisions: 24,
+                  label: '${profile.monthlyClusterBlur.toStringAsFixed(0)} px',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(monthlyClusterBlur: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.palette),
+                title: const Text('Насыщенность'),
+                subtitle: Slider(
+                  value: profile.monthlyClusterSaturation,
+                  min: 1.0,
+                  max: 3.0,
+                  divisions: 20,
+                  label: '${profile.monthlyClusterSaturation.toStringAsFixed(1)}x',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(monthlyClusterSaturation: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        // Level 3: Node Aura
+        ExpansionTile(
+          leading: const Icon(Icons.blur_on),
+          title: const Text('Уровень 3: Аура узлов'),
+          subtitle: const Text('Свечение вокруг узлов (зум > 460%)'),
+          children: [
+            SwitchListTile(
+              title: const Text('Включить'),
+              value: profile.enableNodeAura,
+              onChanged: (value) {
+                final updatedProfile = profile.copyWith(enableNodeAura: value);
+                ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+              },
+            ),
+            if (profile.enableNodeAura) ...[
+              ListTile(
+                leading: const Icon(Icons.opacity),
+                title: const Text('Интенсивность'),
+                subtitle: Slider(
+                  value: profile.nodeAuraIntensity,
+                  min: 0.0,
+                  max: 1.0,
+                  divisions: 20,
+                  label: '${(profile.nodeAuraIntensity * 100).toStringAsFixed(0)}%',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(nodeAuraIntensity: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.circle_outlined),
+                title: const Text('Радиус (множитель)'),
+                subtitle: Slider(
+                  value: profile.nodeAuraRadius,
+                  min: 1.0,
+                  max: 6.0,
+                  divisions: 50,
+                  label: '${profile.nodeAuraRadius.toStringAsFixed(2)}x',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(nodeAuraRadius: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.blur_circular),
+                title: const Text('Размытие (множитель)'),
+                subtitle: Slider(
+                  value: profile.nodeAuraBlur,
+                  min: 0.5,
+                  max: 2.0,
+                  divisions: 30,
+                  label: '${profile.nodeAuraBlur.toStringAsFixed(2)}x',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(nodeAuraBlur: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.palette),
+                title: const Text('Насыщенность'),
+                subtitle: Slider(
+                  value: profile.nodeAuraSaturation,
+                  min: 0.5,
+                  max: 2.0,
+                  divisions: 30,
+                  label: '${profile.nodeAuraSaturation.toStringAsFixed(2)}x',
+                  onChanged: (value) {
+                    final updatedProfile = profile.copyWith(nodeAuraSaturation: value);
+                    ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+        const Divider(),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            'При просмотре воспоминания:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+        ),
+        SwitchListTile(
+          title: const Text('Эмоциональный фон'),
+          subtitle: const Text('Цветной градиент экрана'),
+          value: profile.enableMemoryViewGradient,
+          onChanged: (value) {
+            final updatedProfile = profile.copyWith(enableMemoryViewGradient: value);
+            ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+          },
+          secondary: const Icon(Icons.color_lens_outlined),
+        ),
+        SwitchListTile(
+          title: Row(
+            children: [
+              const Text('Анимированный фон'),
+              const SizedBox(width: 8),
+              if (!isPremium)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade700,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'PREMIUM',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          ),
+          subtitle: const Text('Частицы дождя/снега на экране'),
+          value: profile.enableMemoryViewParticles,
+          onChanged: isPremium
+            ? (value) {
+                final updatedProfile = profile.copyWith(enableMemoryViewParticles: value);
+                ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+              }
+            : null,
+          secondary: const Icon(Icons.animation),
+        ),
+        SwitchListTile(
+          title: Row(
+            children: [
+              const Text('Цветовая коррекция фото'),
+              const SizedBox(width: 8),
+              if (!isPremium)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade700,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'PREMIUM',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          ),
+          subtitle: const Text('Subtle фильтр в цвете эмоции'),
+          value: profile.enablePhotoColorGrading,
+          onChanged: isPremium
+            ? (value) {
+                final updatedProfile = profile.copyWith(enablePhotoColorGrading: value);
+                ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+              }
+            : null,
+          secondary: const Icon(Icons.photo_filter_outlined),
+        ),
+        const Divider(),
+        SwitchListTile(
+          title: const Text('Высокое качество эффектов'),
+          subtitle: const Text('Может снизить производительность'),
+          value: profile.enableHighQualityEffects,
+          onChanged: (value) {
+            final updatedProfile = profile.copyWith(enableHighQualityEffects: value);
+            ref.read(userServiceProvider).updateUserProfile(updatedProfile);
+          },
+          secondary: const Icon(Icons.high_quality_outlined),
+        ),
+      ],
+    );
   }
 
   Future<void> _showGraphicsQualityDialog(AppLocalizations l10n) async {

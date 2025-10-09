@@ -53,7 +53,7 @@ class AnalyticsService {
       name: 'login',
       parameters: {
         'method': method,
-        'biometric_enabled': biometricEnabled,
+        'biometric_enabled': biometricEnabled ? 1 : 0,
       },
     );
   }
@@ -95,12 +95,12 @@ class AnalyticsService {
     await _analytics.logEvent(
       name: 'memory_created',
       parameters: {
-        'has_media': hasMedia,
+        'has_media': hasMedia ? 1 : 0,
         'media_count': mediaCount,
-        'has_emotions': hasEmotions,
-        'has_reflection': hasReflection,
+        'has_emotions': hasEmotions ? 1 : 0,
+        'has_reflection': hasReflection ? 1 : 0,
         'word_count': wordCount,
-        'is_encrypted': isEncrypted,
+        'is_encrypted': isEncrypted ? 1 : 0,
       },
     );
   }
@@ -117,8 +117,8 @@ class AnalyticsService {
     await _analytics.logEvent(
       name: 'memory_edited',
       parameters: {
-        'content_changed': contentChanged,
-        'media_changed': mediaChanged,
+        'content_changed': contentChanged ? 1 : 0,
+        'media_changed': mediaChanged ? 1 : 0,
       },
     );
   }
@@ -132,7 +132,7 @@ class AnalyticsService {
     await _analytics.logEvent(
       name: 'memory_deleted',
       parameters: {
-        'was_encrypted': wasEncrypted,
+        'was_encrypted': wasEncrypted ? 1 : 0,
       },
     );
   }
@@ -145,8 +145,8 @@ class AnalyticsService {
     await _analytics.logEvent(
       name: 'memory_viewed',
       parameters: {
-        'has_media': hasMedia,
-        'has_reflection': hasReflection,
+        'has_media': hasMedia ? 1 : 0,
+        'has_reflection': hasReflection ? 1 : 0,
       },
     );
   }
@@ -467,7 +467,7 @@ class AnalyticsService {
       parameters: {
         'asset_name': assetName,
         'category': category,
-        'was_preloaded': wasPreloaded,
+        'was_preloaded': wasPreloaded ? 1 : 0,
       },
     );
   }

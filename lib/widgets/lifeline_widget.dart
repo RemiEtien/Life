@@ -24,12 +24,13 @@ import 'floating_message_overlay.dart';
 import 'global_audio_player_widget.dart';
 import 'lifeline_painter.dart';
 import 'device_performance_detector.dart';
+import 'monthly_cluster_bottom_sheet.dart';
 import '../services/lifeline_calculator.dart';
 import '../services/onboarding_service.dart';
 import '../services/sync_service.dart';
 import 'onboarding_overlay.dart';
 
-enum TappableType { singleNode, dailyCluster }
+enum TappableType { singleNode, dailyCluster, monthlyCluster }
 
 class TappableItem {
   final TappableType type;
@@ -126,6 +127,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   Size _lastKnownSize = Size.zero;
   final Map<String, Offset> _nodePositions = {};
   final Map<String, (Offset, List<Memory>)> _dailyClusterData = {};
+  final Map<String, (Offset, List<Memory>, DateTime)> _monthlyClusterData = {};
 
   RenderData? _renderData;
   ui.Picture? _structureCache;
@@ -151,6 +153,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Переменные для очереди перерасчета ---
   bool _recalculationNeeded = false;
   List<Memory>? _pendingMemoriesForRecalculation;
+
+  // NEW: Кэш UserProfile для использования в асинхронных операциях
+  UserProfile? _cachedUserProfile;
   // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
 
   final ValueNotifier<PaintTimings?> _paintTimingsNotifier =
@@ -788,7 +793,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           setState(() {
             _renderData = newRenderData;
             _updateStructureCache(newRenderData,
-                Size(totalWidth, _lastKnownSize.height), memories);
+                Size(totalWidth, _lastKnownSize.height), memories, _cachedUserProfile);
             _isCalculating = false;
 
             // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Проверяем, не нужно ли пересчитать снова ---
@@ -849,7 +854,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _updateStructureCache(
-      RenderData data, Size size, List<Memory> memories) {
+      RenderData data, Size size, List<Memory> memories, UserProfile? userProfile) {
     if (!mounted || size.isEmpty || _isDisposed) return;
 
     final recorder = ui.PictureRecorder();
@@ -865,6 +870,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       memories,
       data.yearPositions,
       _yearLineYPosition,
+      userProfile: userProfile, // NEW: передаем настройки
     );
     stopwatch.stop();
     final structureTime = (stopwatch.elapsedMicroseconds / 1000).round();
@@ -894,6 +900,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   void _onNodePosition(String id, Offset pos) => _nodePositions[id] = pos;
   void _onDailyClusterPosition(String id, Offset pos, List<Memory> memories) =>
       _dailyClusterData[id] = (pos, memories);
+
+  void _onMonthlyClusterPosition(String monthKey, Offset pos, List<Memory> memories, DateTime month) =>
+      _monthlyClusterData[monthKey] = (pos, memories, month);
 
   void _onTapDown(TapDownDetails d) {
     if (_selectionItems != null) {
@@ -1025,6 +1034,13 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           _selectionCenter = _lastKnownSize.center(Offset.zero);
         });
       }
+    } else if (item.type == TappableType.monthlyCluster) {
+      final data = item.data as Map<String, dynamic>;
+      _showMonthlyClusterBottomSheet(
+        data['monthKey'] as String,
+        data['month'] as DateTime,
+        data['memories'] as List<Memory>,
+      );
     }
   }
 
@@ -1032,6 +1048,22 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final memories = ref.read(memoriesStreamProvider).asData?.value ?? [];
     final List<TappableItem> hits = [];
     final List<String> processedNodeIds = [];
+
+    // Проверяем месячные кластеры (приоритет выше чем дневные)
+    _monthlyClusterData.forEach((monthKey, data) {
+      final pos = data.$1;
+      final memoriesInCluster = data.$2;
+      final month = data.$3;
+      // Увеличенный радиус тапа для месячных кластеров (они крупнее)
+      if ((pos - scenePosition).distance < hitRadius * 2) {
+        hits.add(TappableItem(
+            type: TappableType.monthlyCluster,
+            data: {'monthKey': monthKey, 'memories': memoriesInCluster, 'month': month}));
+        for (var mem in memoriesInCluster) {
+          processedNodeIds.add(mem.universalId);
+        }
+      }
+    });
 
     _dailyClusterData.forEach((id, data) {
       final pos = data.$1;
@@ -1067,6 +1099,64 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
               .chain(CurveTween(curve: Curves.easeInOut));
           return SlideTransition(position: animation.drive(tween), child: child);
         }));
+  }
+
+  void _showMonthlyClusterBottomSheet(
+      String monthKey, DateTime month, List<Memory> memories) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.9,
+          builder: (context, scrollController) {
+            return MonthlyClusterBottomSheet(
+              monthKey: monthKey,
+              month: month,
+              memories: memories,
+              onZoomToMonth: () => _zoomToMonth(month, memories),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _zoomToMonth(DateTime month, List<Memory> memories) {
+    // Находим среднюю позицию всех воспоминаний месяца
+    if (memories.isEmpty) return;
+
+    double sumX = 0;
+    int count = 0;
+
+    for (final memory in memories) {
+      final pos = _nodePositions[memory.universalId];
+      if (pos != null) {
+        sumX += pos.dx;
+        count++;
+      }
+    }
+
+    if (count == 0) return;
+
+    final centerX = sumX / count;
+    final screenWidth = _lastKnownSize.width;
+
+    // Целевой масштаб - достаточно близко чтобы видеть индивидуальные узлы (Level 3)
+    const targetScale = 2.0; // Это примерно zoom 765% (2.0 * 0.261 базового)
+
+    // Вычисляем смещение чтобы центрировать месяц на экране
+    final tx = screenWidth / 2 - centerX * targetScale;
+    final ty = _lastKnownSize.height / 2; // Центрируем по вертикали
+
+    final targetMatrix = Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(targetScale);
+
+    _animateToMatrix(targetMatrix);
   }
 
   void _showMemoriesListPopup(List<Memory> memories, AppLocalizations l10n) {
@@ -1247,7 +1337,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                       _renderData!,
                                       Size(_cachedLayoutResult!.totalWidth,
                                           _lastKnownSize.height),
-                                      memories);
+                                      memories,
+                                      _cachedUserProfile);
                                 }
                               },
                             ),
@@ -1311,6 +1402,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final syncState = ref.watch(syncNotifierProvider);
     final userId = ref.watch(authStateChangesProvider).asData?.value?.uid;
     final onboardingState = ref.watch(onboardingServiceProvider);
+    final userProfile = ref.watch(userProfileProvider).asData?.value; // NEW: для эмоциональных эффектов
+    _cachedUserProfile = userProfile; // Кэшируем для использования в асинхронных операциях
 
     final isTimelineInteractionDisabled = onboardingState.isActive &&
         onboardingState.currentStep == OnboardingStep.addFirstMemory;
@@ -1438,6 +1531,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                         onNodePosition: _onNodePosition,
                                         onDailyClusterPosition:
                                             _onDailyClusterPosition,
+                                        onMonthlyClusterPosition:
+                                            _onMonthlyClusterPosition,
                                         zoomScale: currentScale,
                                         pulseValue: _pulseController.value,
                                         renderData: _renderData!,
@@ -1445,6 +1540,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                             _paintTimingsNotifier,
                                         images: _cachedImages,
                                         branchIntensity: _branchIntensity,
+                                        userProfile: userProfile, // NEW: для условного рендеринга
                                       ),
                                     );
                                   },

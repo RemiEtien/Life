@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../memory.dart';
+import '../models/user_profile.dart';
+import '../utils/emotion_colors.dart';
 import 'device_performance_detector.dart';
 import 'lifeline_widget.dart'; // Import for YearPosition
 
@@ -72,6 +74,9 @@ typedef DailyClusterPosCallback = void Function(
     String id, Offset pos, List<Memory> memories);
 
 typedef NodePosCallback = void Function(String id, Offset pos);
+
+typedef MonthlyClusterPosCallback = void Function(
+    String monthKey, Offset pos, List<Memory> memories, DateTime month);
 
 class PlacementInfo {
   final Memory memory;
@@ -167,7 +172,8 @@ class BackgroundPainter extends CustomPainter {
       canvas.drawCircle(animatedCenter, mistRadius, mistPaint);
     }
 
-    final starCount = DevicePerformanceDetector.getAdaptiveParticleCount(200);
+    // Снижено для производительности: было 200, стало 50
+    final starCount = DevicePerformanceDetector.getAdaptiveParticleCount(50);
     for (int i = 0; i < starCount; i++) {
       final starPos =
           Offset(random.nextDouble() * size.width, random.nextDouble() * size.height);
@@ -219,15 +225,19 @@ class StructurePainter extends CustomPainter {
       List<ui.Path> roots,
       List<Memory> memories,
       List<YearPosition> yearPositions,
-      double yearLineYFactor) {
+      double yearLineYFactor,
+      {UserProfile? userProfile}) {
     _drawRoots(canvas, roots);
+
+    // Стандартная красная линия (градиент удален - выглядел плохо)
     _drawArterySystem(canvas, mainPath);
+
     _drawYearLine(canvas, yearPath);
     _drawYearLabels(
         canvas, yearPositions, size.height * yearLineYFactor, memories);
   }
 
-  // --- MODIFIED: Only draws the main path now ---
+  // Стандартная линия без градиента
   static void _drawArterySystem(Canvas canvas, ui.Path mainPath) {
     const pulse = 1.0;
     const arteryColor = Color(0xFFFF8A80);
@@ -239,6 +249,60 @@ class StructurePainter extends CustomPainter {
         width: 1.0,
         pulse: pulse,
         maxLayers: mainLayerCount);
+  }
+
+  // Новый метод: линия с градиентом на основе эмоций
+  static void _drawEmotionalGradientLine(Canvas canvas, ui.Path mainPath, List<Memory> memories) {
+    const pulse = 1.0;
+
+    // Создаем список цветов на основе эмоций воспоминаний
+    final colors = <Color>[];
+    for (final memory in memories) {
+      colors.add(_getEmotionColorStatic(memory.primaryEmotion));
+    }
+
+    // Если меньше 2 цветов, используем стандартный цвет
+    if (colors.length < 2) {
+      _drawArterySystem(canvas, mainPath);
+      return;
+    }
+
+    // Создаем вертикальный градиент (Timeline идет сверху вниз по оси Y)
+    final bounds = mainPath.getBounds();
+    final gradient = ui.Gradient.linear(
+      Offset(bounds.center.dx, bounds.top),     // Начало по центру X, сверху по Y
+      Offset(bounds.center.dx, bounds.bottom),  // Конец по центру X, снизу по Y
+      colors,
+      List.generate(colors.length, (i) => i / (colors.length - 1)),
+    );
+
+    final mainLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(7);
+
+    // Рисуем с градиентом используя _drawSingleArtery логику
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    // Слои для свечения (упрощенная версия _drawSingleArtery)
+    for (int layer = mainLayerCount; layer >= 1; layer--) {
+      final layerProgress = layer / mainLayerCount;
+      paint.strokeWidth = (160.0 * pulse * layerProgress).clamp(1.0, 350.0);
+      paint.shader = gradient;
+
+      if (layer > 3) {
+        paint.maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, 20.0 * (layerProgress));
+      } else if (layer > 1) {
+        paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 5.0);
+      } else {
+        paint.maskFilter = null;
+      }
+
+      canvas.drawPath(mainPath, paint);
+    }
+  }
+
+  static Color _getEmotionColorStatic(String? emotion) {
+    return EmotionColors.getColor(emotion);
   }
 
   static void _drawRoots(Canvas canvas, List<ui.Path> roots) {
@@ -415,6 +479,7 @@ class LifelinePainter extends CustomPainter {
   final Map<String, ui.Paragraph> paragraphs;
   final NodePosCallback? onNodePosition;
   final DailyClusterPosCallback? onDailyClusterPosition;
+  final MonthlyClusterPosCallback? onMonthlyClusterPosition;
   final double zoomScale;
   final double pulseValue;
   final double branchIntensity; // NEW
@@ -422,9 +487,8 @@ class LifelinePainter extends CustomPainter {
   final RenderData renderData;
   final Map<String, ui.Image> images;
   final ValueNotifier<PaintTimings?>? timingsNotifier;
+  final UserProfile? userProfile; // NEW: для условного рендеринга эффектов
 
-  static const double kMacroDetailThreshold = 0.8;
-  static const double kTransitionRange = 0.3;
   static const double kNodeBaseRadius = 10.0;
   static const double kDailyClusterBaseRadius = 13.0;
   static const double kVisibilityBuffer = 100.0;
@@ -437,11 +501,13 @@ class LifelinePainter extends CustomPainter {
     required this.paragraphs,
     this.onNodePosition,
     this.onDailyClusterPosition,
+    this.onMonthlyClusterPosition,
     this.zoomScale = 1.0,
     this.pulseValue = 0.0,
     this.timingsNotifier,
     required this.images,
     required this.branchIntensity,
+    this.userProfile, // NEW: может быть null
   });
 
   @override
@@ -451,22 +517,40 @@ class LifelinePainter extends CustomPainter {
     int labelsTime = 0;
     int macroViewTime = 0;
 
+    // DEBUG: Log zoom scale for calibration
+    if (kDebugMode) {
+      debugPrint('[ZOOM] Current zoom scale: ${zoomScale.toStringAsFixed(3)}');
+    }
+
     if (size.width <= 0 || size.height <= 0 || memories.isEmpty) return;
 
     final mainPath = renderData.mainPath;
     final placementResults = renderData.placementResults;
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
-    final macroToDetail = ((zoomScale - (kMacroDetailThreshold - kTransitionRange / 2)) / kTransitionRange).clamp(0.0, 1.0);
-    final macroOpacity = 1.0 - macroToDetail;
-    final detailOpacity = macroToDetail;
 
-    if (macroOpacity > 0) {
+    // === 3-LEVEL ZOOM SYSTEM ===
+    // LEVEL 1: Far zoom - yearly gradient (zoom < 0.6 / < 250%)
+    if (zoomScale < 0.6) {
       stopwatch.start();
-      _drawMacroView(canvas, mainPath, size, macroOpacity);
+      _drawYearlyGradient(canvas, mainPath, size, zoomScale);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
+    // LEVEL 2: Medium zoom - monthly clusters (zoom 0.6-1.2 / 250%-460%)
+    else if (zoomScale >= 0.6 && zoomScale < 1.2) {
+      stopwatch.start();
+      _drawMonthlyClusters(canvas, mainPath, size, zoomScale);
+      stopwatch.stop();
+      macroViewTime = stopwatch.elapsedMicroseconds;
+      stopwatch.reset();
+    }
+
+    // Calculate detailOpacity for Level 3 (zoom >= 1.2 / >= 460%)
+    // Fade in individual nodes as we zoom past 1.2
+    final detailOpacity = (zoomScale < 1.05)
+        ? 0.0
+        : ((zoomScale - 1.05) / 0.15).clamp(0.0, 1.0);
 
     // --- Draw animated branches dynamically ---
     // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
@@ -509,8 +593,8 @@ class LifelinePainter extends CustomPainter {
     // --- End of branch drawing ---
 
     if (detailOpacity > 0) {
-      final labelsOpacity =
-          ((zoomScale - kMacroDetailThreshold) / 0.5).clamp(0.0, 1.0);
+      // Labels fade in after zoom 1.2 (Level 3)
+      final labelsOpacity = ((zoomScale - 1.2) / 0.5).clamp(0.0, 1.0);
       if (labelsOpacity > 0) {
         final singleNodeInfos =
             placementResults.whereType<PlacementInfo>().toList();
@@ -527,6 +611,44 @@ class LifelinePainter extends CustomPainter {
       }
 
       stopwatch.start();
+      // PASS 1: Draw all auras first (background layer)
+      for (final item in placementResults) {
+        if (item is PlacementInfo) {
+          if (visibleRect
+              .inflate(kNodeBaseRadius * 2)
+              .contains(item.nodePosition)) {
+            final index = memories
+                .indexWhere((m) => m.universalId == item.memory.universalId);
+            final individualPulse = sin(pulseValue * pi * 2 + index * 0.8) * 0.3 + 0.7;
+            final breathPulse = sin(progress * pi * 0.5 + index * 0.5) * 0.2 + 0.8;
+            final combinedPulse = individualPulse * breathPulse;
+            final nodeRadius = kNodeBaseRadius * combinedPulse * 1.5;
+            final adjustedPos = item.nodePosition.translate(0, kNodeVerticalOffset);
+
+            if (item.memory.primaryEmotion != null) {
+              _drawEmotionAura(canvas, adjustedPos, nodeRadius, detailOpacity, item.memory);
+            }
+          }
+        } else if (item is DailyClusterPlacementInfo) {
+          if (visibleRect
+              .inflate(kDailyClusterBaseRadius * 2)
+              .contains(item.position)) {
+            final index = memories
+                .indexWhere((m) => m.universalId == item.memories.first.universalId);
+            final individualPulse = sin(pulseValue * pi * 2 + index * 0.8) * 0.3 + 0.7;
+            final breathPulse = sin(progress * pi * 0.5 + index * 0.5) * 0.2 + 0.8;
+            final combinedPulse = individualPulse * breathPulse;
+            final nodeRadius = kDailyClusterBaseRadius * combinedPulse;
+            final adjustedPos = item.position.translate(0, kNodeVerticalOffset);
+
+            if (item.memories.first.primaryEmotion != null) {
+              _drawEmotionAura(canvas, adjustedPos, nodeRadius, detailOpacity, item.memories.first);
+            }
+          }
+        }
+      }
+
+      // PASS 2: Draw all nodes on top (foreground layer)
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           if (visibleRect
@@ -570,6 +692,183 @@ class LifelinePainter extends CustomPainter {
         );
       }
     });
+  }
+
+  /// LEVEL 1: Draw yearly gradient with large blurred circles at each memory position
+  void _drawYearlyGradient(Canvas canvas, ui.Path path, Size size, double zoomScale) {
+    if (!userProfile!.enableYearlyGradient) return;
+    if (memories.isEmpty) return;
+
+    // Fade in/out transitions
+    final fadeInOpacity = (zoomScale < 0.15)
+        ? ((zoomScale - 0.0) / 0.15).clamp(0.0, 1.0)
+        : 1.0;
+    final fadeOutOpacity = (zoomScale > 0.45)
+        ? ((0.6 - zoomScale) / 0.15).clamp(0.0, 1.0)
+        : 1.0;
+    final finalOpacity = fadeInOpacity * fadeOutOpacity;
+
+    if (finalOpacity <= 0.0) return;
+
+    final intensity = userProfile!.yearlyGradientIntensity;
+    final radius = userProfile!.yearlyGradientRadius;
+    final blur = userProfile!.yearlyGradientBlur;
+    final saturation = userProfile!.yearlyGradientSaturation;
+
+    // Draw a large blurred circle at each memory position
+    for (final memory in memories) {
+      final emotionColor = EmotionColors.getColor(memory.primaryEmotion);
+      final saturatedColor = _boostSaturation(emotionColor, saturation);
+
+      final paint = Paint()
+        ..color = saturatedColor.withOpacity(intensity * finalOpacity)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+
+      // Find memory position on path
+      final pos = _getMemoryPositionOnPath(path, memory);
+      if (pos != null) {
+        canvas.drawCircle(pos, radius, paint);
+      }
+    }
+  }
+
+  /// LEVEL 2: Draw monthly cluster nodes
+  void _drawMonthlyClusters(Canvas canvas, ui.Path path, Size size, double zoomScale) {
+    if (!userProfile!.enableMonthlyClusters) return;
+    if (memories.isEmpty) return;
+
+    // Fade in/out transitions
+    final fadeInOpacity = (zoomScale < 0.75)
+        ? ((zoomScale - 0.6) / 0.15).clamp(0.0, 1.0)
+        : 1.0;
+    final fadeOutOpacity = (zoomScale > 1.05)
+        ? ((1.2 - zoomScale) / 0.15).clamp(0.0, 1.0)
+        : 1.0;
+    final finalOpacity = fadeInOpacity * fadeOutOpacity;
+
+    if (finalOpacity <= 0.0) return;
+
+    final intensity = userProfile!.monthlyClusterIntensity;
+    final auraRadius = userProfile!.monthlyClusterRadius;
+    final blur = userProfile!.monthlyClusterBlur;
+    final saturation = userProfile!.monthlyClusterSaturation;
+
+    // Group memories by month
+    final Map<String, List<Memory>> monthlyGroups = {};
+    for (final memory in memories) {
+      final monthKey = '${memory.date.year}-${memory.date.month.toString().padLeft(2, '0')}';
+      monthlyGroups.putIfAbsent(monthKey, () => []).add(memory);
+    }
+
+    // Draw each monthly cluster
+    monthlyGroups.forEach((monthKey, monthMemories) {
+      // Calculate average emotion color for the month
+      final emotionCounts = <String, int>{};
+      for (final memory in monthMemories) {
+        if (memory.primaryEmotion != null) {
+          emotionCounts[memory.primaryEmotion!] =
+              (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+        }
+      }
+
+      // Get dominant emotion
+      String? dominantEmotion;
+      int maxCount = 0;
+      emotionCounts.forEach((emotion, count) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantEmotion = emotion;
+        }
+      });
+
+      final emotionColor = EmotionColors.getColor(dominantEmotion);
+      final saturatedColor = _boostSaturation(emotionColor, saturation);
+
+      // Find average position of memories in this month
+      double sumX = 0, sumY = 0;
+      int count = 0;
+      for (final memory in monthMemories) {
+        final pos = _getMemoryPositionOnPath(path, memory);
+        if (pos != null) {
+          sumX += pos.dx;
+          sumY += pos.dy;
+          count++;
+        }
+      }
+
+      if (count == 0) return;
+      final centerPosition = Offset(sumX / count, sumY / count);
+
+      // Draw aura (background glow)
+      final auraPaint = Paint()
+        ..color = saturatedColor.withOpacity(intensity * finalOpacity)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+      canvas.drawCircle(centerPosition, auraRadius * intensity, auraPaint);
+
+      // Draw node (solid circle)
+      const nodeRadius = 30.0;
+      final nodePaint = Paint()
+        ..color = saturatedColor.withOpacity(finalOpacity)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(centerPosition, nodeRadius, nodePaint);
+
+      // Draw white border
+      final borderPaint = Paint()
+        ..color = Colors.white.withOpacity(finalOpacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+      canvas.drawCircle(centerPosition, nodeRadius, borderPaint);
+
+      // Draw memory count in center
+      final textSpan = TextSpan(
+        text: monthMemories.length.toString(),
+        style: TextStyle(
+          color: Colors.white.withOpacity(finalOpacity),
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      final textOffset = centerPosition - Offset(textPainter.width / 2, textPainter.height / 2);
+      textPainter.paint(canvas, textOffset);
+
+      // Report position for tap detection
+      final monthDate = DateTime(
+        int.parse(monthKey.split('-')[0]),
+        int.parse(monthKey.split('-')[1])
+      );
+      onMonthlyClusterPosition?.call(monthKey, centerPosition, monthMemories, monthDate);
+    });
+  }
+
+  /// Helper: Get position of a memory on the path
+  Offset? _getMemoryPositionOnPath(ui.Path path, Memory memory) {
+    if (path.computeMetrics().isEmpty) return null;
+    final metrics = path.computeMetrics().first;
+    final totalLen = metrics.length;
+
+    final sortedMemories = List<Memory>.from(memories)
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final minDate = sortedMemories.first.date;
+    final maxDate = sortedMemories.last.date;
+    final totalSpan = maxDate.difference(minDate).inMilliseconds;
+
+    if (totalSpan == 0) return metrics.getTangentForOffset(0)?.position;
+
+    final t = (memory.date.difference(minDate).inMilliseconds / totalSpan).clamp(0.0, 1.0);
+    return metrics.getTangentForOffset(t * totalLen)?.position;
+  }
+
+  /// Helper: Boost color saturation
+  Color _boostSaturation(Color color, double multiplier) {
+    final hslColor = HSLColor.fromColor(color);
+    return hslColor
+        .withSaturation((hslColor.saturation * multiplier).clamp(0.0, 1.0))
+        .toColor();
   }
 
   void _drawMacroView(Canvas canvas, ui.Path path, Size size, double opacity) {
@@ -711,6 +1010,8 @@ class LifelinePainter extends CustomPainter {
 
     final adjustedPos = pos.translate(0, kNodeVerticalOffset);
 
+    // AURA is now drawn in separate pass before nodes (see paint() method)
+
     if (image != null) {
       final imageRect = Rect.fromCircle(center: adjustedPos, radius: nodeRadius);
       final imagePath = Path()..addOval(imageRect);
@@ -744,11 +1045,6 @@ class LifelinePainter extends CustomPainter {
       canvas.drawPath(imagePath, borderPaint);
     } else {
       _drawDefaultNode(canvas, adjustedPos, nodeRadius, opacity, index, memory);
-    }
-
-    // ЭМОЦИОНАЛЬНАЯ АУРА: добавляем свечение вокруг узлов с эмоциями
-    if (memory.primaryEmotion != null) {
-      _drawEmotionAura(canvas, adjustedPos, nodeRadius, opacity, memory);
     }
 
     // --- ИЗМЕНЕНИЕ: Рисуем замок, если воспоминание зашифровано ---
@@ -786,28 +1082,41 @@ class LifelinePainter extends CustomPainter {
 
   /// Рисует ауру (свечение) вокруг узла с эмоцией
   void _drawEmotionAura(Canvas canvas, Offset pos, double nodeRadius, double opacity, Memory memory) {
+    // Проверка: аура включена в настройках и воспоминание имеет эмоцию
+    if (memory.primaryEmotion == null) return;
+
+    // DEBUG: Проверяем настройку
+    final auraEnabled = userProfile?.enableNodeAura ?? true;
+    if (!auraEnabled) return;
+
     final emotionColor = _getEmotionColor(memory.primaryEmotion);
     final intensity = memory.emotionIntensity;
 
     // Адаптивный blur radius для производительности
-    final blurRadius = DevicePerformanceDetector.getAdaptiveBlurRadius(20.0 * intensity);
-    if (blurRadius <= 0) return; // Skip на low-end устройствах
+    final blurRadius = DevicePerformanceDetector.getAdaptiveBlurRadius(30.0 * intensity);
+    if (kDebugMode) {
+      debugPrint('[AURA] BlurRadius: $blurRadius (intensity: $intensity), color: $emotionColor, radius: ${nodeRadius * 2.5 * intensity}');
+    }
+    if (blurRadius <= 0) {
+      if (kDebugMode) debugPrint('[AURA] SKIPPED - blur radius is 0 (low-end device)');
+      return; // Skip на low-end устройствах
+    }
 
     final auraPaint = Paint()
-      ..color = emotionColor.withValues(alpha: 0.3 * intensity * opacity)
+      ..color = emotionColor.withValues(alpha: 0.525 * intensity * opacity) // Увеличено на 50%
       ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, blurRadius);
 
-    // Основная аура
-    canvas.drawCircle(pos, nodeRadius * 1.8 * intensity, auraPaint);
+    // Основная аура (рисуется ДО узла, поэтому будет "за" ним)
+    canvas.drawCircle(pos, nodeRadius * 2.5 * intensity, auraPaint);
 
     // Вторичная эмоция (если есть) — второе кольцо ауры
     if (memory.secondaryEmotion != null) {
       final secondaryColor = _getEmotionColor(memory.secondaryEmotion);
       final secondaryPaint = Paint()
-        ..color = secondaryColor.withValues(alpha: 0.2 * intensity * opacity)
+        ..color = secondaryColor.withValues(alpha: 0.375 * intensity * opacity) // Увеличено на 50%
         ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, blurRadius * 1.5);
 
-      canvas.drawCircle(pos, nodeRadius * 2.5 * intensity, secondaryPaint);
+      canvas.drawCircle(pos, nodeRadius * 3.5 * intensity, secondaryPaint);
     }
   }
 
@@ -931,30 +1240,9 @@ class LifelinePainter extends CustomPainter {
 
   // === EMOTION VISUALIZATION HELPERS ===
 
-  /// Возвращает цвет эмоции для узла
+  /// Возвращает цвет эмоции для узла (насыщенный, яркий)
   Color _getEmotionColor(String? emotion) {
-    if (emotion == null) return const Color(0xFFFF6B6B); // default red
-
-    switch (emotion) {
-      case 'joy':
-        return const Color(0xFFFFC107); // yellow
-      case 'sadness':
-        return const Color(0xFF2196F3); // blue
-      case 'anger':
-        return const Color(0xFFF44336); // red
-      case 'fear':
-        return const Color(0xFF4CAF50); // green
-      case 'disgust':
-        return const Color(0xFFCDDC39); // lime
-      case 'surprise':
-        return const Color(0xFFFF9800); // orange
-      case 'love':
-        return const Color(0xFFE91E63); // pink
-      case 'pride':
-        return const Color(0xFF9C27B0); // purple
-      default:
-        return const Color(0xFFFF6B6B); // default red
-    }
+    return EmotionColors.getColor(emotion);
   }
 
   @override

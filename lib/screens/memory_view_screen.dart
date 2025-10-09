@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import '../memory.dart';
 import '../models/anchors/anchor_models.dart';
 import '../providers/application_providers.dart';
+import '../utils/emotion_colors.dart';
 import 'memory_edit_screen.dart';
 import '../services/audio_service.dart';
 import '../services/encryption_service.dart';
@@ -26,6 +27,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/premium_upsell_widgets.dart';
+import '../widgets/emotion_particles.dart';
 
 class MemoryViewScreen extends ConsumerStatefulWidget {
   final Memory memory;
@@ -964,10 +966,30 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     });
   }
 
+  /// Возвращает цвет эмоции для градиентного фона (насыщенный)
+  Color _getEmotionColor(String? emotion) {
+    if (emotion == null) return const Color(0xFF0D0C11); // Базовый цвет фона
+    return EmotionColors.getColor(emotion);
+  }
+
+  /// Создает ColorFilter для color grading фотографий
+  ColorFilter? _getColorGradingFilter(String? emotion, double intensity) {
+    if (emotion == null) return null;
+
+    final emotionColor = _getEmotionColor(emotion);
+    final opacity = (0.15 * intensity).clamp(0.0, 0.3);
+
+    return ColorFilter.mode(
+      emotionColor.withOpacity(opacity),
+      BlendMode.overlay,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // ... (rest of the build method is unchanged)
     final l10n = AppLocalizations.of(context)!;
+    final userProfile = ref.watch(userProfileProvider).asData?.value; // NEW: для эмоциональных эффектов
     ref.listen(encryptionServiceProvider, (previous, next) {
       _decryptContent();
     });
@@ -992,7 +1014,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     Widget coverImageWidget = const SizedBox.shrink();
 
     if (hasCover) {
-      coverImageWidget = coverThumbPath.startsWith('http')
+      Widget baseImage = coverThumbPath.startsWith('http')
           ? CachedNetworkImage(
               imageUrl: coverThumbPath,
               fit: BoxFit.cover,
@@ -1009,6 +1031,23 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
               color: Colors.black.withAlpha((255 * 0.3).round()),
               colorBlendMode: BlendMode.darken,
             );
+
+      // Применяем color grading если включено (PREMIUM)
+      if (userProfile?.enablePhotoColorGrading == true &&
+          _currentMemory.primaryEmotion != null) {
+        final colorFilter = _getColorGradingFilter(
+          _currentMemory.primaryEmotion,
+          _currentMemory.emotionIntensity,
+        );
+        if (colorFilter != null) {
+          baseImage = ColorFiltered(
+            colorFilter: colorFilter,
+            child: baseImage,
+          );
+        }
+      }
+
+      coverImageWidget = baseImage;
     }
 
     return PopScope(
@@ -1029,6 +1068,40 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
           backgroundColor: const Color(0xFF0D0C11),
           body: Stack(
             children: [
+              // Эмоциональный градиент фона (если включено)
+              if (_currentMemory.primaryEmotion != null &&
+                  userProfile?.enableMemoryViewGradient == true)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: Alignment.topRight,
+                        radius: 1.5,
+                        colors: [
+                          _getEmotionColor(_currentMemory.primaryEmotion)
+                              .withOpacity(0.15 * _currentMemory.emotionIntensity),
+                          _currentMemory.secondaryEmotion != null
+                              ? _getEmotionColor(_currentMemory.secondaryEmotion)
+                                  .withOpacity(0.1 * _currentMemory.emotionIntensity)
+                              : Colors.transparent,
+                          const Color(0xFF0D0C11),
+                        ],
+                        stops: const [0.0, 0.4, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+              // Анимированные частицы (PREMIUM)
+              if (_currentMemory.primaryEmotion != null &&
+                  userProfile?.enableMemoryViewParticles == true)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: EmotionParticlesWidget(
+                      emotion: _currentMemory.primaryEmotion!,
+                      intensity: _currentMemory.emotionIntensity,
+                    ),
+                  ),
+                ),
               if (hasCover && !_needsUnlock)
                 Positioned.fill(
                   child: AnimatedSwitcher(

@@ -1,5 +1,5 @@
 import 'package:isar_community/isar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart' hide Index;
+import 'package:cloud_firestore/cloud_firestore.dart' hide Index, Query;
 import 'package:flutter/foundation.dart';
 import 'utils/input_validator.dart';
 
@@ -152,13 +152,13 @@ class Memory {
     final sorted = oldEmotions.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    // Берем самую сильную эмоцию как primary
-    primaryEmotion = sorted.first.key;
+    // Берем самую сильную эмоцию как primary (normalize to lowercase)
+    primaryEmotion = sorted.first.key.toLowerCase();
     emotionIntensity = sorted.first.value / 100.0; // 0-100 -> 0.0-1.0
 
-    // Если есть вторая эмоция — берем ее как secondary
+    // Если есть вторая эмоция — берем ее как secondary (normalize to lowercase)
     if (sorted.length > 1) {
-      secondaryEmotion = sorted[1].key;
+      secondaryEmotion = sorted[1].key.toLowerCase();
     }
 
     if (kDebugMode) {

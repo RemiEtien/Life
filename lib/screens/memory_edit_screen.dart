@@ -12,6 +12,7 @@ import '../l10n/app_localizations.dart';
 import '../memory.dart';
 import '../models/anchors/anchor_models.dart';
 import '../providers/application_providers.dart';
+import '../utils/emotion_colors.dart';
 import 'profile_screen.dart';
 import 'spotify_search_screen.dart';
 import '../services/audio_service.dart';
@@ -1591,10 +1592,10 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         children: [
           Icon(Icons.lightbulb_outline, color: Colors.yellow.shade700),
           const SizedBox(width: 12),
-          Expanded(
+          const Expanded(
             child: Text(
               'Добавьте эмоцию, чтобы увидеть воспоминание в цвете на жизненной линии!',
-              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              style: TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ),
         ],
@@ -1784,26 +1785,7 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   }
 
   Color _getEmotionColor(String emotion) {
-    switch (emotion) {
-      case 'joy':
-        return Colors.yellow.shade700;
-      case 'sadness':
-        return Colors.blue.shade600;
-      case 'anger':
-        return Colors.red.shade700;
-      case 'fear':
-        return Colors.green.shade700;
-      case 'disgust':
-        return Colors.lime.shade700;
-      case 'surprise':
-        return Colors.orange.shade700;
-      case 'love':
-        return Colors.pink.shade400;
-      case 'pride':
-        return Colors.purple.shade400;
-      default:
-        return Colors.grey;
-    }
+    return EmotionColors.getColor(emotion);
   }
 
   // СТАРЫЙ МЕТОД УДАЛЕН - используем новый UI с inline slider
