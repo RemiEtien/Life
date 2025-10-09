@@ -470,14 +470,32 @@ class LifelinePainter extends CustomPainter {
 
     // --- Draw animated branches dynamically ---
     // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
-    if (branchIntensity > 0) {
+    // OPTIMIZATION: Skip branches entirely when zoomed out very far (not visible anyway)
+    if (branchIntensity > 0 && zoomScale > 0.2) {
       final branches =
           renderData.branches; // These paths are pre-animated from the isolate
       const arteryColor = Color(0xFFFF8A80);
-      final branchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(4);
+      final baseBranchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(4);
+
+      // LOD OPTIMIZATION: Reduce layers when zoomed out (less detail needed)
+      // At zoom < 0.5, reduce to 60% of layers (saves GPU time)
+      // At zoom < 0.3, reduce to 40% of layers
+      final branchLayerCount = zoomScale < 0.3
+          ? (baseBranchLayerCount * 0.4).round().clamp(1, baseBranchLayerCount)
+          : zoomScale < 0.5
+              ? (baseBranchLayerCount * 0.6).round().clamp(1, baseBranchLayerCount)
+              : baseBranchLayerCount;
+
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
 
-      for (final branchPath in branches) {
+      // LOD OPTIMIZATION: Draw fewer branches when zoomed out
+      // At zoom < 0.3, draw every 4th branch
+      // At zoom < 0.5, draw every 2nd branch
+      // At zoom >= 0.5, draw all branches
+      final branchStep = zoomScale < 0.3 ? 4 : zoomScale < 0.5 ? 2 : 1;
+
+      for (int i = 0; i < branches.length; i += branchStep) {
+        final branchPath = branches[i];
         // We use the static method from StructurePainter, but call it here for dynamic rendering
         StructurePainter._drawSingleArtery(canvas, branchPath,
             baseColor: arteryColor,
