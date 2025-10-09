@@ -743,7 +743,12 @@ class LifelinePainter extends CustomPainter {
 
       canvas.drawPath(imagePath, borderPaint);
     } else {
-      _drawDefaultNode(canvas, adjustedPos, nodeRadius, opacity, index);
+      _drawDefaultNode(canvas, adjustedPos, nodeRadius, opacity, index, memory);
+    }
+
+    // ЭМОЦИОНАЛЬНАЯ АУРА: добавляем свечение вокруг узлов с эмоциями
+    if (memory.primaryEmotion != null) {
+      _drawEmotionAura(canvas, adjustedPos, nodeRadius, opacity, memory);
     }
 
     // --- ИЗМЕНЕНИЕ: Рисуем замок, если воспоминание зашифровано ---
@@ -753,22 +758,57 @@ class LifelinePainter extends CustomPainter {
   }
 
   void _drawDefaultNode(
-      Canvas canvas, Offset adjustedPos, double nodeRadius, double opacity, int index) {
+      Canvas canvas, Offset adjustedPos, double nodeRadius, double opacity, int index, Memory memory) {
     final combinedPulse = nodeRadius / (kNodeBaseRadius * 1.5);
     final paint = Paint();
-    const nodeColor = Color(0xFFFF6B6B);
 
-    paint.color = nodeColor.withValues(alpha: (0.6 * combinedPulse) * opacity);
+    // ЭМОЦИОНАЛЬНАЯ ОКРАСКА: используем цвет эмоции или выцветший серый
+    final hasEmotion = memory.primaryEmotion != null;
+    final nodeColor = hasEmotion
+        ? _getEmotionColor(memory.primaryEmotion)
+        : Colors.grey.shade700; // "выцветшее" воспоминание
+
+    // Для воспоминаний без эмоции: уменьшаем opacity (эффект выцветшей фотографии)
+    final emotionOpacityMultiplier = hasEmotion ? 1.0 : 0.3;
+
+    paint.color = nodeColor.withValues(alpha: (0.6 * combinedPulse) * opacity * emotionOpacityMultiplier);
     canvas.drawCircle(adjustedPos, nodeRadius, paint);
 
     final coreColor = Color.lerp(nodeColor, Colors.white, 0.6)!;
-    paint.color = coreColor.withValues(alpha: (0.9 * combinedPulse) * opacity);
+    paint.color = coreColor.withValues(alpha: (0.9 * combinedPulse) * opacity * emotionOpacityMultiplier);
     canvas.drawCircle(adjustedPos, nodeRadius * 0.7, paint);
 
     final brightIntensity = 0.7 + sin(pulseValue * pi * 4 + index * 1.2) * 0.3;
     paint.color =
-        Colors.white.withValues(alpha: 0.9 * brightIntensity * combinedPulse * opacity);
+        Colors.white.withValues(alpha: 0.9 * brightIntensity * combinedPulse * opacity * emotionOpacityMultiplier);
     canvas.drawCircle(adjustedPos, nodeRadius * 0.3, paint);
+  }
+
+  /// Рисует ауру (свечение) вокруг узла с эмоцией
+  void _drawEmotionAura(Canvas canvas, Offset pos, double nodeRadius, double opacity, Memory memory) {
+    final emotionColor = _getEmotionColor(memory.primaryEmotion);
+    final intensity = memory.emotionIntensity;
+
+    // Адаптивный blur radius для производительности
+    final blurRadius = DevicePerformanceDetector.getAdaptiveBlurRadius(20.0 * intensity);
+    if (blurRadius <= 0) return; // Skip на low-end устройствах
+
+    final auraPaint = Paint()
+      ..color = emotionColor.withValues(alpha: 0.3 * intensity * opacity)
+      ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, blurRadius);
+
+    // Основная аура
+    canvas.drawCircle(pos, nodeRadius * 1.8 * intensity, auraPaint);
+
+    // Вторичная эмоция (если есть) — второе кольцо ауры
+    if (memory.secondaryEmotion != null) {
+      final secondaryColor = _getEmotionColor(memory.secondaryEmotion);
+      final secondaryPaint = Paint()
+        ..color = secondaryColor.withValues(alpha: 0.2 * intensity * opacity)
+        ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, blurRadius * 1.5);
+
+      canvas.drawCircle(pos, nodeRadius * 2.5 * intensity, secondaryPaint);
+    }
   }
 
   void _drawDailyClusterNode(Canvas canvas, Offset pos,
@@ -887,6 +927,34 @@ class LifelinePainter extends CustomPainter {
     textPainter.layout();
     final textPos = Offset(pos.dx - textPainter.width / 2, pos.dy);
     textPainter.paint(canvas, textPos);
+  }
+
+  // === EMOTION VISUALIZATION HELPERS ===
+
+  /// Возвращает цвет эмоции для узла
+  Color _getEmotionColor(String? emotion) {
+    if (emotion == null) return const Color(0xFFFF6B6B); // default red
+
+    switch (emotion) {
+      case 'joy':
+        return const Color(0xFFFFC107); // yellow
+      case 'sadness':
+        return const Color(0xFF2196F3); // blue
+      case 'anger':
+        return const Color(0xFFF44336); // red
+      case 'fear':
+        return const Color(0xFF4CAF50); // green
+      case 'disgust':
+        return const Color(0xFFCDDC39); // lime
+      case 'surprise':
+        return const Color(0xFFFF9800); // orange
+      case 'love':
+        return const Color(0xFFE91E63); // pink
+      case 'pride':
+        return const Color(0xFF9C27B0); // purple
+      default:
+        return const Color(0xFFFF6B6B); // default red
+    }
   }
 
   @override
