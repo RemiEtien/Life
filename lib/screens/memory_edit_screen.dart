@@ -97,17 +97,23 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   final Map<String, SpotifyTrackDetails> _spotifyTrackDetailsMap = {};
   String _ambientSound = 'None';
 
+  // НОВАЯ СИСТЕМА ЭМОЦИЙ
+  String? _primaryEmotion;
+  String? _secondaryEmotion;
+  double _emotionIntensity = 0.5;
+
+  // СТАРАЯ СИСТЕМА (deprecated, для обратной совместимости)
   late Map<String, int> _selectedEmotionsWithIntensity;
 
   final List<String> _availableEmotionKeys = [
     'joy',
-    'nostalgia',
+    'love',
+    'surprise',
     'pride',
     'sadness',
-    'gratitude',
-    'love',
+    'anger',
     'fear',
-    'anger'
+    'disgust'
   ];
 
   bool _isEncrypted = false;
@@ -168,6 +174,12 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     _isEncrypted = _draftMemory?.isEncrypted ?? false;
     _followUpDate = _draftMemory?.reflectionFollowUpAt;
 
+    // НОВАЯ СИСТЕМА ЭМОЦИЙ: Load from draft memory
+    _primaryEmotion = _draftMemory?.primaryEmotion;
+    _secondaryEmotion = _draftMemory?.secondaryEmotion;
+    _emotionIntensity = _draftMemory?.emotionIntensity ?? 0.5;
+
+    // СТАРАЯ СИСТЕМА: для обратной совместимости
     _selectedEmotionsWithIntensity = Map.from(_draftMemory?.emotions ?? {});
 
     if (_draftMemory != null) {
@@ -347,7 +359,11 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
           _actionCtrl.text.trim().isEmpty ? null : _actionCtrl.text,
       reflectionFollowUpAt: _followUpDate,
       isEncrypted: _isEncrypted,
-      emotions: _selectedEmotionsWithIntensity,
+      emotions: _selectedEmotionsWithIntensity, // старая система (deprecated)
+      // НОВАЯ СИСТЕМА ЭМОЦИЙ:
+      primaryEmotion: _primaryEmotion,
+      secondaryEmotion: _secondaryEmotion,
+      emotionIntensity: _emotionIntensity,
       mediaKeysOrder: _mediaItems.map((item) => getFileKey(item.path)).toList(),
       videoKeysOrder: _videoItems.map((item) => getFileKey(item.path)).toList(),
       audioKeysOrder:
@@ -1544,83 +1560,253 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     );
   }
 
+  // НОВЫЙ UI ЭМОЦИЙ
   Widget _buildEmotionChips() {
     final l10n = AppLocalizations.of(context)!;
-    return Wrap(
-      spacing: 8.0,
-      runSpacing: 4.0,
-      children: _availableEmotionKeys.map((key) {
-        final translatedEmotion = _getTranslatedEmotion(key, l10n);
-        final intensity = _selectedEmotionsWithIntensity[key];
-        final isSelected = intensity != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Если эмоция не выбрана — показываем промпт
+        if (_primaryEmotion == null)
+          _buildEmotionPrompt(l10n)
+        else
+          _buildSelectedEmotionView(l10n),
 
-        return ChoiceChip(
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
+        const SizedBox(height: 12),
+
+        // Круговой пикер (8 иконок)
+        _buildCircularEmotionPicker(l10n),
+      ],
+    );
+  }
+
+  Widget _buildEmotionPrompt(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade800.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.lightbulb_outline, color: Colors.yellow.shade700),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Добавьте эмоцию, чтобы увидеть воспоминание в цвете на жизненной линии!',
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedEmotionView(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _getEmotionColor(_primaryEmotion!).withOpacity(0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(translatedEmotion),
-              if (isSelected) ...[
-                const SizedBox(width: 8),
-                Text(intensity.toString(),
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              ],
+              Text(
+                '${_getEmotionIcon(_primaryEmotion!)} ${_getTranslatedEmotion(_primaryEmotion!, l10n)}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.clear, size: 20),
+                onPressed: () {
+                  setState(() {
+                    _primaryEmotion = null;
+                    _secondaryEmotion = null;
+                  });
+                  _autoSaveDraft();
+                },
+              ),
             ],
           ),
-          selected: isSelected,
-          onSelected: (selected) {
-            if (selected) {
-              _showEmotionIntensityDialog(key, translatedEmotion);
-            } else {
-              setState(() {
-                _selectedEmotionsWithIntensity.remove(key);
-              });
+
+          // Вторичная эмоция (опционально)
+          if (_secondaryEmotion != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                children: [
+                  Text('+ ${_getEmotionIcon(_secondaryEmotion!)} ${_getTranslatedEmotion(_secondaryEmotion!, l10n)}'),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.clear, size: 18),
+                    onPressed: () {
+                      setState(() => _secondaryEmotion = null);
+                      _autoSaveDraft();
+                    },
+                  ),
+                ],
+              ),
+            )
+          else
+            TextButton.icon(
+              onPressed: () => _showSecondaryEmotionPicker(l10n),
+              icon: const Icon(Icons.add, size: 16),
+              label: const Text('Добавить вторую эмоцию'),
+            ),
+
+          const SizedBox(height: 12),
+
+          // Слайдер интенсивности
+          Text('Интенсивность: ${(_emotionIntensity * 100).round()}%'),
+          Slider(
+            value: _emotionIntensity,
+            min: 0.0,
+            max: 1.0,
+            divisions: 10,
+            onChanged: (value) {
+              setState(() => _emotionIntensity = value);
               _autoSaveDraft();
-            }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCircularEmotionPicker(AppLocalizations l10n) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _availableEmotionKeys.map((emotion) {
+        final isSelected = _primaryEmotion == emotion;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _primaryEmotion = emotion;
+              if (_emotionIntensity == 0.5 && _secondaryEmotion == null) {
+                _emotionIntensity = 0.5; // reset to default
+              }
+            });
+            _autoSaveDraft();
           },
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? _getEmotionColor(emotion).withOpacity(0.3)
+                  : Colors.grey.shade800.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(30),
+              border: isSelected
+                  ? Border.all(color: _getEmotionColor(emotion), width: 2)
+                  : null,
+            ),
+            child: Center(
+              child: Text(
+                _getEmotionIcon(emotion),
+                style: const TextStyle(fontSize: 28),
+              ),
+            ),
+          ),
         );
       }).toList(),
     );
   }
 
-  void _showEmotionIntensityDialog(
-      String emotionKey, String translatedEmotion) {
-    final l10n = AppLocalizations.of(context)!;
-    int currentIntensity = _selectedEmotionsWithIntensity[emotionKey] ?? 50;
+  void _showSecondaryEmotionPicker(AppLocalizations l10n) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              title: Text(
-                  l10n.memoryEditEmotionIntensityDialogTitle(translatedEmotion)),
-              content: StatefulBuilder(builder: (context, setStateInDialog) {
-                return Column(mainAxisSize: MainAxisSize.min, children: [
-                  Slider(
-                      value: currentIntensity.toDouble(),
-                      min: 0,
-                      max: 100,
-                      divisions: 10,
-                      label: currentIntensity.toString(),
-                      onChanged: (newValue) => setStateInDialog(
-                          () => currentIntensity = newValue.round()))
-                ]);
-              }),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(l10n.profileCancel)),
-                TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedEmotionsWithIntensity[emotionKey] =
-                            currentIntensity;
-                      });
-                      _autoSaveDraft();
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(l10n.profileSave))
-              ]);
-        });
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Выберите вторую эмоцию'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _availableEmotionKeys
+                  .where((e) => e != _primaryEmotion)
+                  .map((emotion) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() => _secondaryEmotion = emotion);
+                    _autoSaveDraft();
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: _getEmotionColor(emotion).withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _getEmotionIcon(emotion),
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
   }
+
+  // Хелперы для эмоций
+  String _getEmotionIcon(String emotion) {
+    switch (emotion) {
+      case 'joy':
+        return '☀️';
+      case 'sadness':
+        return '🌧️';
+      case 'anger':
+        return '⚡';
+      case 'fear':
+        return '🌫️';
+      case 'disgust':
+        return '🍂';
+      case 'surprise':
+        return '✨';
+      case 'love':
+        return '❤️';
+      case 'pride':
+        return '🏆';
+      default:
+        return '😐';
+    }
+  }
+
+  Color _getEmotionColor(String emotion) {
+    switch (emotion) {
+      case 'joy':
+        return Colors.yellow.shade700;
+      case 'sadness':
+        return Colors.blue.shade600;
+      case 'anger':
+        return Colors.red.shade700;
+      case 'fear':
+        return Colors.green.shade700;
+      case 'disgust':
+        return Colors.lime.shade700;
+      case 'surprise':
+        return Colors.orange.shade700;
+      case 'love':
+        return Colors.pink.shade400;
+      case 'pride':
+        return Colors.purple.shade400;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  // СТАРЫЙ МЕТОД УДАЛЕН - используем новый UI с inline slider
 
   Widget _buildAmbientSoundPicker() {
     final l10n = AppLocalizations.of(context)!;
