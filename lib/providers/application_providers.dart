@@ -284,16 +284,39 @@ class LocaleNotifier extends StateNotifier<Locale?> {
       final prefs = await SharedPreferences.getInstance();
       if (_disposed) return;
 
+      // FIX: On fresh install (no saved locale), sync Firestore with system language
+      final savedCode = prefs.getString('appLocale');
+      final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      final isFirstLaunch = savedCode == null;
+
       if (userProfile?.languageCode != null) {
-        final newLocale = Locale(userProfile!.languageCode!);
-        if (!_disposed && state != newLocale) {
-          state = newLocale;
-        }
-        if (!_disposed) {
-          await prefs.setString('appLocale', userProfile.languageCode!);
+        // If this is first launch after install and Firestore language differs from system,
+        // update Firestore to match system language (user expectation on reinstall)
+        if (isFirstLaunch && userProfile!.languageCode != systemLocale.languageCode) {
+          debugPrint('[LocaleNotifier] First launch: updating Firestore languageCode from ${userProfile.languageCode} to ${systemLocale.languageCode}');
+          // Update Firestore with system language
+          final updatedProfile = userProfile.copyWith(languageCode: systemLocale.languageCode);
+          await userService.updateUserProfile(updatedProfile);
+          // Use system locale
+          final newLocale = Locale(systemLocale.languageCode);
+          if (!_disposed && state != newLocale) {
+            state = newLocale;
+          }
+          if (!_disposed) {
+            await prefs.setString('appLocale', systemLocale.languageCode);
+          }
+        } else {
+          // Normal case: use Firestore language
+          final newLocale = Locale(userProfile!.languageCode!);
+          if (!_disposed && state != newLocale) {
+            state = newLocale;
+          }
+          if (!_disposed) {
+            await prefs.setString('appLocale', userProfile.languageCode!);
+          }
         }
       } else {
-        final savedCode = prefs.getString('appLocale');
+        // No languageCode in Firestore
         if (savedCode != null && !_disposed) {
           if (state?.languageCode != savedCode) {
             state = Locale(savedCode);

@@ -1,6 +1,31 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.13)
+
+# Some Windows shells (notably when invoked via automation tools) can concatenate
+# `-T` and `-A` arguments into a single value (e.g. "-T host=x86 -A win32").
+# CMake then treats this as part of the toolset string and aborts before
+# configuration. Strip the platform portion back out and forward it via the
+# canonical cache entries so the project() call sees clean values.
+if(DEFINED CMAKE_GENERATOR_TOOLSET AND CMAKE_GENERATOR_TOOLSET MATCHES " -A ")
+  set(_claude_original_toolset "${CMAKE_GENERATOR_TOOLSET}")
+  string(REGEX MATCH " -A[ ]+([^ ]+)" _claude_platform_match "${_claude_original_toolset}")
+  if(_claude_platform_match)
+    string(REGEX REPLACE " -A[ ]+" "" _claude_platform "${_claude_platform_match}")
+    string(STRIP "${_claude_platform}" _claude_platform)
+    if(NOT _claude_platform STREQUAL "")
+      set(CMAKE_GENERATOR_PLATFORM "${_claude_platform}" CACHE STRING "" FORCE)
+    endif()
+  endif()
+  string(REGEX REPLACE " -A[ ]+[^ ]+" "" _claude_toolset "${_claude_original_toolset}")
+  string(STRIP "${_claude_toolset}" _claude_toolset)
+  set(CMAKE_GENERATOR_TOOLSET "${_claude_toolset}")
+endif()
+
 project(runner LANGUAGES CXX)
+
+if(DEFINED _claude_original_toolset)
+  set(CMAKE_GENERATOR_TOOLSET "${_claude_original_toolset}" CACHE STRING "" FORCE)
+endif()
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.

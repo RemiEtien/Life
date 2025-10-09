@@ -145,6 +145,17 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       return;
     }
 
+    // FIX: Verify user is actually authenticated before switching to locked state
+    // This prevents showing biometric prompt after sign-out when stale profile data arrives
+    final currentUser = _ref.read(authStateChangesProvider).asData?.value;
+    if (currentUser == null || currentUser.uid != newProfile.uid) {
+      // Profile data doesn't match current auth state - ignore it
+      if (kDebugMode) {
+        debugPrint('[EncryptionService] Profile data for ${newProfile.uid} ignored - no matching authenticated user');
+      }
+      return;
+    }
+
     // Condition 2: User has changed. Reset everything for the new user.
     if (_currentUserId != newProfile.uid) {
       _unlockedDEK = null;

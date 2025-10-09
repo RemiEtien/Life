@@ -124,9 +124,25 @@ class DevicePerformanceDetector {
     // Auto-detect capabilities
     _autoDetectedCapabilities = await _detectCapabilities();
 
-    // Apply based on user preference
+    // FIX: Apply capabilities based on user preference
     if (_userPreference == GraphicsQuality.auto) {
       _cachedCapabilities = _autoDetectedCapabilities;
+    } else {
+      // Set capabilities based on manual preference
+      switch (_userPreference) {
+        case GraphicsQuality.high:
+          _cachedCapabilities = DeviceCapabilities.high;
+          break;
+        case GraphicsQuality.medium:
+          _cachedCapabilities = DeviceCapabilities.medium;
+          break;
+        case GraphicsQuality.low:
+          _cachedCapabilities = DeviceCapabilities.low;
+          break;
+        case GraphicsQuality.auto:
+          // Already handled above
+          break;
+      }
     }
   }
 
@@ -267,8 +283,9 @@ class DevicePerformanceDetector {
   static int getAdaptiveLayerCount(int baseLayerCount) {
     switch (capabilities.performance) {
       case DevicePerformance.high:
-        // High quality: add 50% more layers for richer visuals
-        return (baseLayerCount * 1.5).round();
+        // High quality: add 70% more layers for ultra-smooth gradients and natural glow
+        // Base 7 layers → 12 layers for professional look
+        return (baseLayerCount * 1.7).round();
       case DevicePerformance.medium:
         return (baseLayerCount * 0.6).round().clamp(1, baseLayerCount);
       case DevicePerformance.low:

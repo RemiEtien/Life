@@ -58,7 +58,8 @@
       "Bash(if [ -f coverage/lcov.info ])",
       "Bash(then echo \"Coverage file generated\")",
       "Bash(else echo \"No coverage file found\")",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Read(//c/Users/gambi/**)"
     ],
     "deny": [],
     "ask": []

@@ -49,10 +49,20 @@ class AudioAssetService {
       final cachedFile = await _getCachedFile(fileName);
 
       if (await cachedFile.exists()) {
-        if (kDebugMode) {
-          debugPrint('[AudioAsset] Using cached: $fileName');
+        // FIX: Verify file is not empty/corrupted before using it
+        final fileSize = await cachedFile.length();
+        if (fileSize > 0) {
+          if (kDebugMode) {
+            debugPrint('[AudioAsset] Using cached: $fileName (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)');
+          }
+          return cachedFile;
+        } else {
+          // File exists but is empty - delete and re-download
+          if (kDebugMode) {
+            debugPrint('[AudioAsset] Cached file is empty, re-downloading: $fileName');
+          }
+          await cachedFile.delete();
         }
-        return cachedFile;
       }
 
       // Download from Firebase Storage
@@ -62,8 +72,13 @@ class AudioAssetService {
 
       await _downloadFile(fileName, cachedFile, category);
 
-      // Log analytics
+      // Verify download succeeded
       final fileSize = await cachedFile.length();
+      if (fileSize == 0) {
+        throw Exception('Downloaded file is empty');
+      }
+
+      // Log analytics
       final sizeMB = fileSize / (1024 * 1024);
 
       await AnalyticsService.logAudioAssetDownloaded(
@@ -198,8 +213,13 @@ class AudioAssetService {
   }
 
   /// Get cache directory, creating if needed
+  ///
+  /// FIX: Use getApplicationSupportDirectory() instead of getApplicationDocumentsDirectory()
+  /// to ensure files persist across app restarts and are not cleared by system.
+  /// ApplicationSupport directory is designed for app-generated content that should
+  /// persist but is not user-visible (perfect for audio cache).
   static Future<Directory> _getCacheDirectory() async {
-    final appDir = await getApplicationDocumentsDirectory();
+    final appDir = await getApplicationSupportDirectory();
     final cacheDir = Directory('${appDir.path}/$_cacheDirectoryName');
 
     if (!await cacheDir.exists()) {

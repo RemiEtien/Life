@@ -1,0 +1,397 @@
+# Crashlytics - Stack trace
+# Application: com.momentic.lifeline
+# Platform: android
+# Version: 1.0.144 (144)
+# Issue: a2c925341c6533401c0545148b4be658
+# Session: 68E6655E00BC00017E6E8F432349A530_DNE_1_v2
+# Date: Wed Oct 08 2025 16:21:34 GMT+0300 (Израиль, летнее время)
+
+Fatal Exception: io.flutter.plugins.firebase.crashlytics.FlutterError: Unable to load asset: "assets/sounds/intro_phrase.mp3".
+BuildId: dbcf9df9f344c13d7e98f3ee563b27c5
+#00 abs 00000073874efc47 virt 0000000000690c47 _kDartIsolateSnapshotInstructions+0x1da307
+#01 abs 0000007387ad7e47 virt 0000000000c78e47 _kDartIsolateSnapshotInstructions+0x7c2507
+#02 abs 000000738731fc9b virt 00000000004c0c9b _kDartIsolateSnapshotInstructions+0xa35b
+#03 abs 0000007387ad81b3 virt 0000000000c791b3 _kDartIsolateSnapshotInstructions+0x7c2873
+#04 abs 0000007387b32283 virt 0000000000cd3283 _kDartIsolateSnapshotInstructions+0x81c943
+#05 abs 0000007387b321ab virt 0000000000cd31ab _kDartIsolateSnapshotInstructions+0x81c86b
+#06 abs 0000007387b32113 virt 0000000000cd3113 _kDartIsolateSnapshotInstructions+0x81c7d3
+#07 abs 0000007387b3207b virt 0000000000cd307b _kDartIsolateSnapshotInstructions+0x81c73b
+#08 abs 0000007387b31cb3 virt 0000000000cd2cb3 _kDartIsolateSnapshotInstructions+0x81c373
+#09 abs 0000007387b31b5f virt 0000000000cd2b5f _kDartIsolateSnapshotInstructions+0x81c21f
+
+Firebase Background Thread #2:
+#00 pc 0x0 com.momentic.lifeline (java.lang.StringFactory.newStringFromBytes [StringFactory.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.lang.StringLatin1.newString [StringLatin1.java:738]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.lang.StringBuilder.toString [StringBuilder.java:474]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (org.json.JSONStringer.toString [JSONStringer.java:443]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (org.json.JSONObject.toString [JSONObject.java:703]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.metadata.MetaDataStore.keysDataToJson [SourceFile:6]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.metadata.MetaDataStore.writeKeyData [SourceFile:3]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.metadata.UserMetadata$SerializeableKeysMap.serializeIfMarked [SourceFile:55]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.metadata.UserMetadata$SerializeableKeysMap.lambda$scheduleSerializationTaskIfNeeded$0 [SourceFile:7]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.metadata.UserMetadata$SerializeableKeysMap.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.metadata.b.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#11 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.concurrency.CrashlyticsWorker.lambda$submit$1 [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#12 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.concurrency.CrashlyticsWorker.d [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#13 pc 0x0 com.momentic.lifeline (A1.H.then [SourceFile:2]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#14 pc 0x0 com.momentic.lifeline (com.google.android.gms.tasks.zze.run [SourceFile:9]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#15 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1145]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#16 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#17 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#18 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#19 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#20 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+GoogleApiHandler:
+#00 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.nativePollOnce [MessageQueue.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.next [MessageQueue.java:346]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (android.os.Looper.loopOnce [Looper.java:214]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (android.os.Looper.loop [Looper.java:342]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (android.os.HandlerThread.run [HandlerThread.java:85]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+pool-13-thread-2:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+main:
+#00 pc 0x0 com.momentic.lifeline (android.graphics.HardwareRenderer.nSetStopped [HardwareRenderer.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.graphics.HardwareRenderer.setStopped [HardwareRenderer.java:591]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (android.view.ViewRootImpl.performDraw [ViewRootImpl.java:6412]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (android.view.ViewRootImpl.performTraversals [ViewRootImpl.java:5282]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (android.view.ViewRootImpl.doTraversal [ViewRootImpl.java:3708]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (android.view.ViewRootImpl$TraversalRunnable.run [ViewRootImpl.java:12542]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (android.view.Choreographer$CallbackRecord.run [Choreographer.java:1751]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (android.view.Choreographer$CallbackRecord.run [Choreographer.java:1760]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (android.view.Choreographer.doCallbacks [Choreographer.java:1216]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (android.view.Choreographer.doFrame [Choreographer.java:1142]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (android.view.Choreographer$FrameDisplayEventReceiver.run [Choreographer.java:1707]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#11 pc 0x0 com.momentic.lifeline (android.os.Handler.handleCallback [Handler.java:959]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#12 pc 0x0 com.momentic.lifeline (android.os.Handler.dispatchMessage [Handler.java:100]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#13 pc 0x0 com.momentic.lifeline (android.os.Looper.loopOnce [Looper.java:257]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#14 pc 0x0 com.momentic.lifeline (android.os.Looper.loop [Looper.java:342]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#15 pc 0x0 com.momentic.lifeline (android.app.ActivityThread.main [ActivityThread.java:9634]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#16 pc 0x0 com.momentic.lifeline (java.lang.reflect.Method.invoke [Method.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#17 pc 0x0 com.momentic.lifeline (com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run [RuntimeInit.java:619]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#18 pc 0x0 com.momentic.lifeline (com.android.internal.os.ZygoteInit.main [ZygoteInit.java:929]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+flutter-worker-1:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+DefaultDispatcher-worker-2:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:376]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (V4.a.run [SourceFile:317]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+pool-13-thread-4:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+pool-13-thread-5:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+TokenRefresher:
+#00 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.nativePollOnce [MessageQueue.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.next [MessageQueue.java:346]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (android.os.Looper.loopOnce [Looper.java:214]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (android.os.Looper.loop [Looper.java:342]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (android.os.HandlerThread.run [HandlerThread.java:85]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Blocking Thread #3:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+DefaultDispatcher-worker-1:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:376]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (V4.a.run [SourceFile:317]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Background Thread #1:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.park [LockSupport.java:211]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.FutureTask.awaitDone [FutureTask.java:447]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.FutureTask.get [FutureTask.java:190]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.settings.SettingsController$1.then [SourceFile:5]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.settings.SettingsController$1.then [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (com.google.android.gms.tasks.zzo.run [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1145]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#11 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#12 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Background Thread #3:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.park [LockSupport.java:341]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block [AbstractQueuedSynchronizer.java:506]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.ForkJoinPool.unmanagedBlock [ForkJoinPool.java:3466]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ForkJoinPool.managedBlock [ForkJoinPool.java:3437]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await [AbstractQueuedSynchronizer.java:1623]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.LinkedBlockingQueue.take [LinkedBlockingQueue.java:435]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1071]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#11 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#12 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#13 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+SurfaceSyncGroupTimer:
+#00 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.nativePollOnce [MessageQueue.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.next [MessageQueue.java:346]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (android.os.Looper.loopOnce [Looper.java:214]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (android.os.Looper.loop [Looper.java:342]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (android.os.HandlerThread.run [HandlerThread.java:85]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+pool-13-thread-1:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+FileObserver:
+#00 pc 0x0 com.momentic.lifeline (android.os.FileObserver$ObserverThread.observe [FileObserver.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.os.FileObserver$ObserverThread.run [FileObserver.java:116]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+com.it_nomads.fluttersecurestorage.worker:
+#00 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.nativePollOnce [MessageQueue.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.next [MessageQueue.java:346]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (android.os.Looper.loopOnce [Looper.java:214]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (android.os.Looper.loop [Looper.java:342]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (android.os.HandlerThread.run [HandlerThread.java:85]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+ProcessStablePhenotypeFlag:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.park [LockSupport.java:341]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block [AbstractQueuedSynchronizer.java:506]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.ForkJoinPool.unmanagedBlock [ForkJoinPool.java:3466]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ForkJoinPool.managedBlock [ForkJoinPool.java:3437]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await [AbstractQueuedSynchronizer.java:1623]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take [ScheduledThreadPoolExecutor.java:1176]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take [ScheduledThreadPoolExecutor.java:905]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1071]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#11 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+pool-6-thread-1:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.park [LockSupport.java:341]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block [AbstractQueuedSynchronizer.java:506]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.ForkJoinPool.unmanagedBlock [ForkJoinPool.java:3466]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ForkJoinPool.managedBlock [ForkJoinPool.java:3437]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await [AbstractQueuedSynchronizer.java:1623]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.LinkedBlockingQueue.take [LinkedBlockingQueue.java:435]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1071]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+OkHttp ConnectionPool:
+#00 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (com.android.okhttp.ConnectionPool$1.run [ConnectionPool.java:106]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1145]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+SharedPreferences:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos [AbstractQueuedSynchronizer.java:1672]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.LinkedBlockingQueue.poll [LinkedBlockingQueue.java:460]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+ScionFrontendApi:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos [AbstractQueuedSynchronizer.java:1672]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.LinkedBlockingQueue.poll [LinkedBlockingQueue.java:460]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+ReferenceQueueDaemon:
+#00 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:405]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:543]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.lang.Daemons$ReferenceQueueDaemon.runInternal [Daemons.java:251]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.lang.Daemons$Daemon.run [Daemons.java:131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Blocking Thread #2:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+GmsDynamite:
+#00 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:405]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:543]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (com.google.android.gms.dynamite.zza.run [SourceFile:7]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+DefaultDispatcher-worker-3:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:376]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (V4.a.run [SourceFile:317]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+queued-work-looper:
+#00 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.nativePollOnce [MessageQueue.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (android.os.MessageQueue.next [MessageQueue.java:346]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (android.os.Looper.loopOnce [Looper.java:214]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (android.os.Looper.loop [Looper.java:342]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (android.os.HandlerThread.run [HandlerThread.java:85]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Blocking Thread #0:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+flutter-worker-0:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+pool-13-thread-3:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Measurement Worker:
+#00 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:405]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (m7.qw.run [:com.google.android.gms.dynamite_measurementdynamite@253830035@25.38.30 (260400-0):67]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+FinalizerWatchdogDaemon:
+#00 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:405]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:543]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.lang.Daemons$FinalizerWatchdogDaemon.sleepUntilNeeded [Daemons.java:464]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.lang.Daemons$FinalizerWatchdogDaemon.runInternal [Daemons.java:444]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.lang.Daemons$Daemon.run [Daemons.java:131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Blocking Thread #4:
+#00 pc 0x0 com.momentic.lifeline (jdk.internal.misc.Unsafe.park [Unsafe.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.util.concurrent.locks.LockSupport.parkNanos [LockSupport.java:252]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue$TransferStack.transfer [SynchronousQueue.java:401]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.util.concurrent.SynchronousQueue.poll [SynchronousQueue.java:903]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.getTask [ThreadPoolExecutor.java:1070]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+FinalizerDaemon:
+#00 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.lang.Object.wait [Object.java:405]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.lang.ref.ReferenceQueue.remove [ReferenceQueue.java:207]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.lang.ref.ReferenceQueue.remove [ReferenceQueue.java:228]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (java.lang.Daemons$FinalizerDaemon.runInternal [Daemons.java:331]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (java.lang.Daemons$Daemon.run [Daemons.java:131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+
+Firebase Blocking Thread #1:
+#00 pc 0x0 com.momentic.lifeline (java.net.SocketInputStream.socketRead0 [SocketInputStream.java]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#01 pc 0x0 com.momentic.lifeline (java.net.SocketInputStream.socketRead [SocketInputStream.java:118]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#02 pc 0x0 com.momentic.lifeline (java.net.SocketInputStream.read [SocketInputStream.java:173]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#03 pc 0x0 com.momentic.lifeline (java.net.SocketInputStream.read [SocketInputStream.java:143]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#04 pc 0x0 com.momentic.lifeline (com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.readFromSocket [ConscryptEngineSocket.java:989]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#05 pc 0x0 com.momentic.lifeline (com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket [ConscryptEngineSocket.java:953]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#06 pc 0x0 com.momentic.lifeline (com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#07 pc 0x0 com.momentic.lifeline (com.android.org.conscrypt.ConscryptEngineSocket.doHandshake [ConscryptEngineSocket.java:240]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#08 pc 0x0 com.momentic.lifeline (com.android.org.conscrypt.ConscryptEngineSocket.startHandshake [ConscryptEngineSocket.java:222]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#09 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.io.RealConnection.connectTls [RealConnection.java:196]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#10 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.io.RealConnection.connectSocket [RealConnection.java:153]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#11 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.io.RealConnection.connect [RealConnection.java:116]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#12 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.http.StreamAllocation.findConnection [StreamAllocation.java:186]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#13 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.http.StreamAllocation.findHealthyConnection [StreamAllocation.java:128]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#14 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.http.StreamAllocation.newStream [StreamAllocation.java:97]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#15 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.http.HttpEngine.connect [HttpEngine.java:289]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#16 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.http.HttpEngine.sendRequest [HttpEngine.java:232]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#17 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.huc.HttpURLConnectionImpl.execute [HttpURLConnectionImpl.java:465]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#18 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.huc.HttpURLConnectionImpl.connect [HttpURLConnectionImpl.java:131]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#19 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.huc.DelegatingHttpsURLConnection.connect [DelegatingHttpsURLConnection.java:90]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#20 pc 0x0 com.momentic.lifeline (com.android.okhttp.internal.huc.HttpsURLConnectionImpl.connect [HttpsURLConnectionImpl.java:30]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#21 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.network.HttpGetRequest.execute [SourceFile:98]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#22 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.settings.DefaultSettingsSpiCall.invoke [SourceFile:58]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#23 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.settings.SettingsController$1.lambda$then$0 [SourceFile:14]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#24 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.settings.SettingsController$1.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#25 pc 0x0 com.momentic.lifeline (com.google.firebase.crashlytics.internal.settings.a.call [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#26 pc 0x0 com.momentic.lifeline (java.util.concurrent.FutureTask.run [FutureTask.java:264]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#27 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor.runWorker [ThreadPoolExecutor.java:1145]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#28 pc 0x0 com.momentic.lifeline (java.util.concurrent.ThreadPoolExecutor$Worker.run [ThreadPoolExecutor.java:644]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#29 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.lambda$newThread$0 [SourceFile:13]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#30 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.CustomThreadFactory.a [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#31 pc 0x0 com.momentic.lifeline (com.google.firebase.concurrent.a.run [SourceFile:1]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)
+#32 pc 0x0 com.momentic.lifeline (java.lang.Thread.run [Thread.java:1012]) (BuildId: dbcf9df9f344c13d7e98f3ee563b27c5)

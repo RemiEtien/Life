@@ -1331,9 +1331,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         });
       }
 
-      final totalWidth =
-          _cachedLayoutResult?.totalWidth ?? constraints.maxWidth;
+      // FIX: Don't use fallback width until we have real layout data
+      // This prevents incorrect geometry on first render
+      final totalWidth = _cachedLayoutResult?.totalWidth;
       final screenWidth = constraints.maxWidth;
+
+      // If we don't have layout data yet, show loading indicator
+      if (totalWidth == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
       final minScale = _calculateMinScale(totalWidth, screenWidth);
       final maxScale = _calculateMaxScale(minScale, screenWidth);
