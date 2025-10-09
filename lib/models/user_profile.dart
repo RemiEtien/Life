@@ -37,6 +37,18 @@ class UserProfile {
   final double visualBranchIntensity;
   final bool visualAnimationEnabled;
 
+  // --- EMOTION VISUALIZATION SETTINGS ---
+  // Timeline (Lifeline) Settings
+  final bool enableEmotionalGradient;
+  final bool enableNodeAura;
+  final bool enableWeatherEffects;
+  // Memory View Screen Settings
+  final bool enableMemoryViewGradient;
+  final bool enableMemoryViewParticles;
+  final bool enablePhotoColorGrading;
+  // Performance
+  final bool enableHighQualityEffects;
+
   const UserProfile({
     required this.uid,
     required this.displayName,
@@ -66,6 +78,14 @@ class UserProfile {
     this.visualBranchDensity = 0.35,
     this.visualBranchIntensity = 0.6,
     this.visualAnimationEnabled = true,
+    // --- EMOTION VISUALIZATION PARAMS with defaults ---
+    this.enableEmotionalGradient = true,      // ON по умолчанию
+    this.enableNodeAura = true,               // ON по умолчанию
+    this.enableWeatherEffects = false,        // OFF по умолчанию (PREMIUM)
+    this.enableMemoryViewGradient = true,     // ON по умолчанию
+    this.enableMemoryViewParticles = false,   // OFF по умолчанию (PREMIUM)
+    this.enablePhotoColorGrading = false,     // OFF по умолчанию (PREMIUM)
+    this.enableHighQualityEffects = true,     // ON по умолчанию
   });
 
   UserProfile copyWith({
@@ -95,6 +115,14 @@ class UserProfile {
     double? visualBranchDensity,
     double? visualBranchIntensity,
     bool? visualAnimationEnabled,
+    // --- EMOTION VISUALIZATION copyWith PARAMS ---
+    bool? enableEmotionalGradient,
+    bool? enableNodeAura,
+    bool? enableWeatherEffects,
+    bool? enableMemoryViewGradient,
+    bool? enableMemoryViewParticles,
+    bool? enablePhotoColorGrading,
+    bool? enableHighQualityEffects,
   }) {
     // Validate displayName if provided
     if (displayName != null) {
@@ -138,6 +166,14 @@ class UserProfile {
           visualBranchIntensity ?? this.visualBranchIntensity,
       visualAnimationEnabled:
           visualAnimationEnabled ?? this.visualAnimationEnabled,
+      // --- EMOTION VISUALIZATION copyWith ASSIGNMENTS ---
+      enableEmotionalGradient: enableEmotionalGradient ?? this.enableEmotionalGradient,
+      enableNodeAura: enableNodeAura ?? this.enableNodeAura,
+      enableWeatherEffects: enableWeatherEffects ?? this.enableWeatherEffects,
+      enableMemoryViewGradient: enableMemoryViewGradient ?? this.enableMemoryViewGradient,
+      enableMemoryViewParticles: enableMemoryViewParticles ?? this.enableMemoryViewParticles,
+      enablePhotoColorGrading: enablePhotoColorGrading ?? this.enablePhotoColorGrading,
+      enableHighQualityEffects: enableHighQualityEffects ?? this.enableHighQualityEffects,
     );
   }
 
@@ -172,6 +208,14 @@ class UserProfile {
       'visualBranchDensity': visualBranchDensity,
       'visualBranchIntensity': visualBranchIntensity,
       'visualAnimationEnabled': visualAnimationEnabled,
+      // --- EMOTION VISUALIZATION toJson FIELDS ---
+      'enableEmotionalGradient': enableEmotionalGradient,
+      'enableNodeAura': enableNodeAura,
+      'enableWeatherEffects': enableWeatherEffects,
+      'enableMemoryViewGradient': enableMemoryViewGradient,
+      'enableMemoryViewParticles': enableMemoryViewParticles,
+      'enablePhotoColorGrading': enablePhotoColorGrading,
+      'enableHighQualityEffects': enableHighQualityEffects,
     };
   }
 
@@ -209,6 +253,14 @@ class UserProfile {
       visualBranchIntensity:
           (json['visualBranchIntensity'] as num?)?.toDouble() ?? 0.6,
       visualAnimationEnabled: json['visualAnimationEnabled'] as bool? ?? true,
+      // --- EMOTION VISUALIZATION fromJson ASSIGNMENTS with defaults ---
+      enableEmotionalGradient: json['enableEmotionalGradient'] as bool? ?? true,
+      enableNodeAura: json['enableNodeAura'] as bool? ?? true,
+      enableWeatherEffects: json['enableWeatherEffects'] as bool? ?? false,
+      enableMemoryViewGradient: json['enableMemoryViewGradient'] as bool? ?? true,
+      enableMemoryViewParticles: json['enableMemoryViewParticles'] as bool? ?? false,
+      enablePhotoColorGrading: json['enablePhotoColorGrading'] as bool? ?? false,
+      enableHighQualityEffects: json['enableHighQualityEffects'] as bool? ?? true,
     );
   }
 }
