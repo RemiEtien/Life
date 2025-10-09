@@ -92,6 +92,12 @@ class Memory {
   List<String> videoKeysOrder = [];
   List<String> audioKeysOrder = [];
 
+  // === НОВАЯ СИСТЕМА ЭМОЦИЙ ===
+  String? primaryEmotion;     // 'joy' | 'sadness' | 'anger' | ... (nullable)
+  String? secondaryEmotion;   // для смешанных чувств (nullable)
+  double emotionIntensity = 0.5;  // 0.0 (слабо) - 1.0 (сильно)
+
+  // СТАРАЯ СИСТЕМА (deprecated, для миграции)
   List<String> emotionsData = [];
 
   /// **НОВОЕ ПОЛЕ:** Временное поле для отслеживания миграции данных на лету.
@@ -100,6 +106,11 @@ class Memory {
 
   @ignore
   Map<String, int> get emotions {
+    // Автоматическая миграция при первом чтении
+    if (emotionsData.isNotEmpty && primaryEmotion == null) {
+      _migrateFromOldFormat();
+    }
+
     final map = <String, int>{};
     for (final entry in emotionsData) {
       final parts = entry.split(':');
@@ -117,6 +128,42 @@ class Memory {
   set emotions(Map<String, int> newEmotions) {
     emotionsData =
         newEmotions.entries.map((e) => '${e.key}:${e.value}').toList();
+  }
+
+  /// Миграция из старого формата (множественные эмоции) в новый (primary + secondary)
+  void _migrateFromOldFormat() {
+    if (emotionsData.isEmpty) return;
+
+    final oldEmotions = <String, int>{};
+    for (final entry in emotionsData) {
+      final parts = entry.split(':');
+      if (parts.length == 2) {
+        final key = parts[0];
+        final value = int.tryParse(parts[1]);
+        if (value != null) {
+          oldEmotions[key] = value;
+        }
+      }
+    }
+
+    if (oldEmotions.isEmpty) return;
+
+    // Сортируем по интенсивности (наибольшая -> наименьшая)
+    final sorted = oldEmotions.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    // Берем самую сильную эмоцию как primary
+    primaryEmotion = sorted.first.key;
+    emotionIntensity = sorted.first.value / 100.0; // 0-100 -> 0.0-1.0
+
+    // Если есть вторая эмоция — берем ее как secondary
+    if (sorted.length > 1) {
+      secondaryEmotion = sorted[1].key;
+    }
+
+    if (kDebugMode) {
+      debugPrint('[EMOTION MIGRATION] Migrated: $oldEmotions -> primary=$primaryEmotion, secondary=$secondaryEmotion, intensity=$emotionIntensity');
+    }
   }
 
   Memory() {
@@ -254,7 +301,10 @@ class Memory {
     List<String>? mediaKeysOrder,
     List<String>? videoKeysOrder,
     List<String>? audioKeysOrder,
-    Map<String, int>? emotions,
+    Map<String, int>? emotions, // deprecated, для обратной совместимости
+    String? primaryEmotion, // NEW
+    String? secondaryEmotion, // NEW
+    double? emotionIntensity, // NEW
   }) {
     // Validate title if provided
     if (title != null) {
@@ -343,8 +393,13 @@ class Memory {
       ..audioUrls = audioUrls ?? List.from(this.audioUrls)
       ..mediaKeysOrder = mediaKeysOrder ?? List.from(this.mediaKeysOrder)
       ..videoKeysOrder = videoKeysOrder ?? List.from(this.videoKeysOrder)
-      ..audioKeysOrder = audioKeysOrder ?? List.from(this.audioKeysOrder);
+      ..audioKeysOrder = audioKeysOrder ?? List.from(this.audioKeysOrder)
+      // NEW: Эмоции (новая система)
+      ..primaryEmotion = primaryEmotion ?? this.primaryEmotion
+      ..secondaryEmotion = secondaryEmotion ?? this.secondaryEmotion
+      ..emotionIntensity = emotionIntensity ?? this.emotionIntensity;
 
+    // Старая система эмоций (для обратной совместимости)
     if (emotions != null) {
       newMemory.emotions = emotions;
     } else {
@@ -380,7 +435,11 @@ class Memory {
           : null,
       'isEncrypted': isEncrypted,
       'reflectionActionCompleted': reflectionActionCompleted,
-      'emotions': emotions,
+      'emotions': emotions, // старый формат для обратной совместимости
+      // НОВЫЕ ПОЛЯ:
+      'primaryEmotion': primaryEmotion,
+      'secondaryEmotion': secondaryEmotion,
+      'emotionIntensity': emotionIntensity,
       'mediaKeysOrder': mediaKeysOrder.map((key) => getFileKey(key)).toList(),
       'videoKeysOrder': videoKeysOrder.map((key) => getFileKey(key)).toList(),
       'audioKeysOrder': audioKeysOrder.map((key) => getFileKey(key)).toList(),
@@ -420,7 +479,11 @@ class Memory {
           ? (data['reflectionFollowUpAt'] as Timestamp).toDate()
           : null
       ..isEncrypted = data['isEncrypted'] ?? data['reflectionPrivate'] ?? false
-      ..reflectionActionCompleted = data['reflectionActionCompleted'] ?? false;
+      ..reflectionActionCompleted = data['reflectionActionCompleted'] ?? false
+      // НОВЫЕ ПОЛЯ эмоций:
+      ..primaryEmotion = data['primaryEmotion']
+      ..secondaryEmotion = data['secondaryEmotion']
+      ..emotionIntensity = (data['emotionIntensity'] as num?)?.toDouble() ?? 0.5;
 
     memory.wasMigrated =
         false; // По умолчанию считаем, что миграция не требовалась

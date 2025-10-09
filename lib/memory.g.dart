@@ -47,128 +47,143 @@ const MemorySchema = CollectionSchema(
       name: r'date',
       type: IsarType.dateTime,
     ),
-    r'emotionsData': PropertySchema(
+    r'emotionIntensity': PropertySchema(
       id: 6,
+      name: r'emotionIntensity',
+      type: IsarType.double,
+    ),
+    r'emotionsData': PropertySchema(
+      id: 7,
       name: r'emotionsData',
       type: IsarType.stringList,
     ),
     r'firestoreId': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'firestoreId',
       type: IsarType.string,
     ),
     r'isEncrypted': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'isEncrypted',
       type: IsarType.bool,
     ),
     r'lastModified': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'lastModified',
       type: IsarType.dateTime,
     ),
     r'mediaKeysOrder': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'mediaKeysOrder',
       type: IsarType.stringList,
     ),
     r'mediaPaths': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'mediaPaths',
       type: IsarType.stringList,
     ),
     r'mediaThumbPaths': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'mediaThumbPaths',
       type: IsarType.stringList,
     ),
     r'mediaThumbUrls': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'mediaThumbUrls',
       type: IsarType.stringList,
     ),
     r'mediaUrls': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'mediaUrls',
       type: IsarType.stringList,
     ),
+    r'primaryEmotion': PropertySchema(
+      id: 16,
+      name: r'primaryEmotion',
+      type: IsarType.string,
+    ),
     r'reflectionAction': PropertySchema(
-      id: 15,
+      id: 17,
       name: r'reflectionAction',
       type: IsarType.string,
     ),
     r'reflectionActionCompleted': PropertySchema(
-      id: 16,
+      id: 18,
       name: r'reflectionActionCompleted',
       type: IsarType.bool,
     ),
     r'reflectionAutoThought': PropertySchema(
-      id: 17,
+      id: 19,
       name: r'reflectionAutoThought',
       type: IsarType.string,
     ),
     r'reflectionEvidenceAgainst': PropertySchema(
-      id: 18,
+      id: 20,
       name: r'reflectionEvidenceAgainst',
       type: IsarType.string,
     ),
     r'reflectionEvidenceFor': PropertySchema(
-      id: 19,
+      id: 21,
       name: r'reflectionEvidenceFor',
       type: IsarType.string,
     ),
     r'reflectionFollowUpAt': PropertySchema(
-      id: 20,
+      id: 22,
       name: r'reflectionFollowUpAt',
       type: IsarType.dateTime,
     ),
     r'reflectionImpact': PropertySchema(
-      id: 21,
+      id: 23,
       name: r'reflectionImpact',
       type: IsarType.string,
     ),
     r'reflectionLesson': PropertySchema(
-      id: 22,
+      id: 24,
       name: r'reflectionLesson',
       type: IsarType.string,
     ),
     r'reflectionReframe': PropertySchema(
-      id: 23,
+      id: 25,
       name: r'reflectionReframe',
       type: IsarType.string,
     ),
+    r'secondaryEmotion': PropertySchema(
+      id: 26,
+      name: r'secondaryEmotion',
+      type: IsarType.string,
+    ),
     r'spotifyTrackIds': PropertySchema(
-      id: 24,
+      id: 27,
       name: r'spotifyTrackIds',
       type: IsarType.stringList,
     ),
     r'syncStatus': PropertySchema(
-      id: 25,
+      id: 28,
       name: r'syncStatus',
       type: IsarType.string,
     ),
     r'title': PropertySchema(
-      id: 26,
+      id: 29,
       name: r'title',
       type: IsarType.string,
     ),
     r'userId': PropertySchema(
-      id: 27,
+      id: 30,
       name: r'userId',
       type: IsarType.string,
     ),
     r'videoKeysOrder': PropertySchema(
-      id: 28,
+      id: 31,
       name: r'videoKeysOrder',
       type: IsarType.stringList,
     ),
     r'videoPaths': PropertySchema(
-      id: 29,
+      id: 32,
       name: r'videoPaths',
       type: IsarType.stringList,
     ),
     r'videoUrls': PropertySchema(
-      id: 30,
+      id: 33,
       name: r'videoUrls',
       type: IsarType.stringList,
     )
@@ -328,6 +343,12 @@ int _memoryEstimateSize(
     }
   }
   {
+    final value = object.primaryEmotion;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.reflectionAction;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -365,6 +386,12 @@ int _memoryEstimateSize(
   }
   {
     final value = object.reflectionReframe;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.secondaryEmotion;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
@@ -420,31 +447,34 @@ void _memorySerialize(
   writer.writeStringList(offsets[3], object.audioUrls);
   writer.writeString(offsets[4], object.content);
   writer.writeDateTime(offsets[5], object.date);
-  writer.writeStringList(offsets[6], object.emotionsData);
-  writer.writeString(offsets[7], object.firestoreId);
-  writer.writeBool(offsets[8], object.isEncrypted);
-  writer.writeDateTime(offsets[9], object.lastModified);
-  writer.writeStringList(offsets[10], object.mediaKeysOrder);
-  writer.writeStringList(offsets[11], object.mediaPaths);
-  writer.writeStringList(offsets[12], object.mediaThumbPaths);
-  writer.writeStringList(offsets[13], object.mediaThumbUrls);
-  writer.writeStringList(offsets[14], object.mediaUrls);
-  writer.writeString(offsets[15], object.reflectionAction);
-  writer.writeBool(offsets[16], object.reflectionActionCompleted);
-  writer.writeString(offsets[17], object.reflectionAutoThought);
-  writer.writeString(offsets[18], object.reflectionEvidenceAgainst);
-  writer.writeString(offsets[19], object.reflectionEvidenceFor);
-  writer.writeDateTime(offsets[20], object.reflectionFollowUpAt);
-  writer.writeString(offsets[21], object.reflectionImpact);
-  writer.writeString(offsets[22], object.reflectionLesson);
-  writer.writeString(offsets[23], object.reflectionReframe);
-  writer.writeStringList(offsets[24], object.spotifyTrackIds);
-  writer.writeString(offsets[25], object.syncStatus);
-  writer.writeString(offsets[26], object.title);
-  writer.writeString(offsets[27], object.userId);
-  writer.writeStringList(offsets[28], object.videoKeysOrder);
-  writer.writeStringList(offsets[29], object.videoPaths);
-  writer.writeStringList(offsets[30], object.videoUrls);
+  writer.writeDouble(offsets[6], object.emotionIntensity);
+  writer.writeStringList(offsets[7], object.emotionsData);
+  writer.writeString(offsets[8], object.firestoreId);
+  writer.writeBool(offsets[9], object.isEncrypted);
+  writer.writeDateTime(offsets[10], object.lastModified);
+  writer.writeStringList(offsets[11], object.mediaKeysOrder);
+  writer.writeStringList(offsets[12], object.mediaPaths);
+  writer.writeStringList(offsets[13], object.mediaThumbPaths);
+  writer.writeStringList(offsets[14], object.mediaThumbUrls);
+  writer.writeStringList(offsets[15], object.mediaUrls);
+  writer.writeString(offsets[16], object.primaryEmotion);
+  writer.writeString(offsets[17], object.reflectionAction);
+  writer.writeBool(offsets[18], object.reflectionActionCompleted);
+  writer.writeString(offsets[19], object.reflectionAutoThought);
+  writer.writeString(offsets[20], object.reflectionEvidenceAgainst);
+  writer.writeString(offsets[21], object.reflectionEvidenceFor);
+  writer.writeDateTime(offsets[22], object.reflectionFollowUpAt);
+  writer.writeString(offsets[23], object.reflectionImpact);
+  writer.writeString(offsets[24], object.reflectionLesson);
+  writer.writeString(offsets[25], object.reflectionReframe);
+  writer.writeString(offsets[26], object.secondaryEmotion);
+  writer.writeStringList(offsets[27], object.spotifyTrackIds);
+  writer.writeString(offsets[28], object.syncStatus);
+  writer.writeString(offsets[29], object.title);
+  writer.writeString(offsets[30], object.userId);
+  writer.writeStringList(offsets[31], object.videoKeysOrder);
+  writer.writeStringList(offsets[32], object.videoPaths);
+  writer.writeStringList(offsets[33], object.videoUrls);
 }
 
 Memory _memoryDeserialize(
@@ -460,32 +490,35 @@ Memory _memoryDeserialize(
   object.audioUrls = reader.readStringList(offsets[3]) ?? [];
   object.content = reader.readStringOrNull(offsets[4]);
   object.date = reader.readDateTime(offsets[5]);
-  object.emotionsData = reader.readStringList(offsets[6]) ?? [];
-  object.firestoreId = reader.readStringOrNull(offsets[7]);
+  object.emotionIntensity = reader.readDouble(offsets[6]);
+  object.emotionsData = reader.readStringList(offsets[7]) ?? [];
+  object.firestoreId = reader.readStringOrNull(offsets[8]);
   object.id = id;
-  object.isEncrypted = reader.readBool(offsets[8]);
-  object.lastModified = reader.readDateTime(offsets[9]);
-  object.mediaKeysOrder = reader.readStringList(offsets[10]) ?? [];
-  object.mediaPaths = reader.readStringList(offsets[11]) ?? [];
-  object.mediaThumbPaths = reader.readStringList(offsets[12]) ?? [];
-  object.mediaThumbUrls = reader.readStringList(offsets[13]) ?? [];
-  object.mediaUrls = reader.readStringList(offsets[14]) ?? [];
-  object.reflectionAction = reader.readStringOrNull(offsets[15]);
-  object.reflectionActionCompleted = reader.readBool(offsets[16]);
-  object.reflectionAutoThought = reader.readStringOrNull(offsets[17]);
-  object.reflectionEvidenceAgainst = reader.readStringOrNull(offsets[18]);
-  object.reflectionEvidenceFor = reader.readStringOrNull(offsets[19]);
-  object.reflectionFollowUpAt = reader.readDateTimeOrNull(offsets[20]);
-  object.reflectionImpact = reader.readStringOrNull(offsets[21]);
-  object.reflectionLesson = reader.readStringOrNull(offsets[22]);
-  object.reflectionReframe = reader.readStringOrNull(offsets[23]);
-  object.spotifyTrackIds = reader.readStringList(offsets[24]) ?? [];
-  object.syncStatus = reader.readString(offsets[25]);
-  object.title = reader.readString(offsets[26]);
-  object.userId = reader.readStringOrNull(offsets[27]);
-  object.videoKeysOrder = reader.readStringList(offsets[28]) ?? [];
-  object.videoPaths = reader.readStringList(offsets[29]) ?? [];
-  object.videoUrls = reader.readStringList(offsets[30]) ?? [];
+  object.isEncrypted = reader.readBool(offsets[9]);
+  object.lastModified = reader.readDateTime(offsets[10]);
+  object.mediaKeysOrder = reader.readStringList(offsets[11]) ?? [];
+  object.mediaPaths = reader.readStringList(offsets[12]) ?? [];
+  object.mediaThumbPaths = reader.readStringList(offsets[13]) ?? [];
+  object.mediaThumbUrls = reader.readStringList(offsets[14]) ?? [];
+  object.mediaUrls = reader.readStringList(offsets[15]) ?? [];
+  object.primaryEmotion = reader.readStringOrNull(offsets[16]);
+  object.reflectionAction = reader.readStringOrNull(offsets[17]);
+  object.reflectionActionCompleted = reader.readBool(offsets[18]);
+  object.reflectionAutoThought = reader.readStringOrNull(offsets[19]);
+  object.reflectionEvidenceAgainst = reader.readStringOrNull(offsets[20]);
+  object.reflectionEvidenceFor = reader.readStringOrNull(offsets[21]);
+  object.reflectionFollowUpAt = reader.readDateTimeOrNull(offsets[22]);
+  object.reflectionImpact = reader.readStringOrNull(offsets[23]);
+  object.reflectionLesson = reader.readStringOrNull(offsets[24]);
+  object.reflectionReframe = reader.readStringOrNull(offsets[25]);
+  object.secondaryEmotion = reader.readStringOrNull(offsets[26]);
+  object.spotifyTrackIds = reader.readStringList(offsets[27]) ?? [];
+  object.syncStatus = reader.readString(offsets[28]);
+  object.title = reader.readString(offsets[29]);
+  object.userId = reader.readStringOrNull(offsets[30]);
+  object.videoKeysOrder = reader.readStringList(offsets[31]) ?? [];
+  object.videoPaths = reader.readStringList(offsets[32]) ?? [];
+  object.videoUrls = reader.readStringList(offsets[33]) ?? [];
   return object;
 }
 
@@ -509,15 +542,15 @@ P _memoryDeserializeProp<P>(
     case 5:
       return (reader.readDateTime(offset)) as P;
     case 6:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readDouble(offset)) as P;
     case 7:
-      return (reader.readStringOrNull(offset)) as P;
-    case 8:
-      return (reader.readBool(offset)) as P;
-    case 9:
-      return (reader.readDateTime(offset)) as P;
-    case 10:
       return (reader.readStringList(offset) ?? []) as P;
+    case 8:
+      return (reader.readStringOrNull(offset)) as P;
+    case 9:
+      return (reader.readBool(offset)) as P;
+    case 10:
+      return (reader.readDateTime(offset)) as P;
     case 11:
       return (reader.readStringList(offset) ?? []) as P;
     case 12:
@@ -527,36 +560,42 @@ P _memoryDeserializeProp<P>(
     case 14:
       return (reader.readStringList(offset) ?? []) as P;
     case 15:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 16:
-      return (reader.readBool(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 17:
       return (reader.readStringOrNull(offset)) as P;
     case 18:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 19:
       return (reader.readStringOrNull(offset)) as P;
     case 20:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 21:
       return (reader.readStringOrNull(offset)) as P;
     case 22:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 23:
       return (reader.readStringOrNull(offset)) as P;
     case 24:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 25:
-      return (reader.readString(offset)) as P;
-    case 26:
-      return (reader.readString(offset)) as P;
-    case 27:
       return (reader.readStringOrNull(offset)) as P;
+    case 25:
+      return (reader.readStringOrNull(offset)) as P;
+    case 26:
+      return (reader.readStringOrNull(offset)) as P;
+    case 27:
+      return (reader.readStringList(offset) ?? []) as P;
     case 28:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 29:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 30:
+      return (reader.readStringOrNull(offset)) as P;
+    case 31:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 32:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 33:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1988,6 +2027,69 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionIntensityEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'emotionIntensity',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      emotionIntensityGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'emotionIntensity',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionIntensityLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'emotionIntensity',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> emotionIntensityBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'emotionIntensity',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -3589,6 +3691,154 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'primaryEmotion',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      primaryEmotionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'primaryEmotion',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'primaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'primaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'primaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'primaryEmotion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'primaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'primaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'primaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'primaryEmotion',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> primaryEmotionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'primaryEmotion',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      primaryEmotionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'primaryEmotion',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterFilterCondition> reflectionActionIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -4739,6 +4989,157 @@ extension MemoryQueryFilter on QueryBuilder<Memory, Memory, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'reflectionReframe',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'secondaryEmotion',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      secondaryEmotionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'secondaryEmotion',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'secondaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      secondaryEmotionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'secondaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'secondaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'secondaryEmotion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      secondaryEmotionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'secondaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'secondaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'secondaryEmotion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition> secondaryEmotionMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'secondaryEmotion',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      secondaryEmotionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'secondaryEmotion',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterFilterCondition>
+      secondaryEmotionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'secondaryEmotion',
         value: '',
       ));
     });
@@ -6081,6 +6482,18 @@ extension MemoryQuerySortBy on QueryBuilder<Memory, Memory, QSortBy> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterSortBy> sortByEmotionIntensity() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'emotionIntensity', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> sortByEmotionIntensityDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'emotionIntensity', Sort.desc);
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterSortBy> sortByFirestoreId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'firestoreId', Sort.asc);
@@ -6114,6 +6527,18 @@ extension MemoryQuerySortBy on QueryBuilder<Memory, Memory, QSortBy> {
   QueryBuilder<Memory, Memory, QAfterSortBy> sortByLastModifiedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastModified', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> sortByPrimaryEmotion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'primaryEmotion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> sortByPrimaryEmotionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'primaryEmotion', Sort.desc);
     });
   }
 
@@ -6227,6 +6652,18 @@ extension MemoryQuerySortBy on QueryBuilder<Memory, Memory, QSortBy> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterSortBy> sortBySecondaryEmotion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secondaryEmotion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> sortBySecondaryEmotionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secondaryEmotion', Sort.desc);
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterSortBy> sortBySyncStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncStatus', Sort.asc);
@@ -6301,6 +6738,18 @@ extension MemoryQuerySortThenBy on QueryBuilder<Memory, Memory, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterSortBy> thenByEmotionIntensity() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'emotionIntensity', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> thenByEmotionIntensityDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'emotionIntensity', Sort.desc);
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterSortBy> thenByFirestoreId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'firestoreId', Sort.asc);
@@ -6346,6 +6795,18 @@ extension MemoryQuerySortThenBy on QueryBuilder<Memory, Memory, QSortThenBy> {
   QueryBuilder<Memory, Memory, QAfterSortBy> thenByLastModifiedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastModified', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> thenByPrimaryEmotion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'primaryEmotion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> thenByPrimaryEmotionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'primaryEmotion', Sort.desc);
     });
   }
 
@@ -6459,6 +6920,18 @@ extension MemoryQuerySortThenBy on QueryBuilder<Memory, Memory, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QAfterSortBy> thenBySecondaryEmotion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secondaryEmotion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QAfterSortBy> thenBySecondaryEmotionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secondaryEmotion', Sort.desc);
+    });
+  }
+
   QueryBuilder<Memory, Memory, QAfterSortBy> thenBySyncStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncStatus', Sort.asc);
@@ -6535,6 +7008,12 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
     });
   }
 
+  QueryBuilder<Memory, Memory, QDistinct> distinctByEmotionIntensity() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'emotionIntensity');
+    });
+  }
+
   QueryBuilder<Memory, Memory, QDistinct> distinctByEmotionsData() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'emotionsData');
@@ -6587,6 +7066,14 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
   QueryBuilder<Memory, Memory, QDistinct> distinctByMediaUrls() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'mediaUrls');
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QDistinct> distinctByPrimaryEmotion(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'primaryEmotion',
+          caseSensitive: caseSensitive);
     });
   }
 
@@ -6655,6 +7142,14 @@ extension MemoryQueryWhereDistinct on QueryBuilder<Memory, Memory, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'reflectionReframe',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Memory, Memory, QDistinct> distinctBySecondaryEmotion(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'secondaryEmotion',
           caseSensitive: caseSensitive);
     });
   }
@@ -6750,6 +7245,12 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Memory, double, QQueryOperations> emotionIntensityProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'emotionIntensity');
+    });
+  }
+
   QueryBuilder<Memory, List<String>, QQueryOperations> emotionsDataProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'emotionsData');
@@ -6804,6 +7305,12 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
   QueryBuilder<Memory, List<String>, QQueryOperations> mediaUrlsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'mediaUrls');
+    });
+  }
+
+  QueryBuilder<Memory, String?, QQueryOperations> primaryEmotionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'primaryEmotion');
     });
   }
 
@@ -6863,6 +7370,12 @@ extension MemoryQueryProperty on QueryBuilder<Memory, Memory, QQueryProperty> {
   QueryBuilder<Memory, String?, QQueryOperations> reflectionReframeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'reflectionReframe');
+    });
+  }
+
+  QueryBuilder<Memory, String?, QQueryOperations> secondaryEmotionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'secondaryEmotion');
     });
   }
 
