@@ -776,7 +776,6 @@ class LifelinePainter extends CustomPainter {
     double zoomScale,
     List<dynamic> placementResults,
   ) {
-    if (!userProfile!.enableMonthlyClusters) return;
     if (memories.isEmpty) return;
     if (path.computeMetrics().isEmpty) return;
 
@@ -919,48 +918,50 @@ class LifelinePainter extends CustomPainter {
     // Node radius for drawing - clusters stay ON the lifeline, no displacement
     const nodeRadius = 30.0;
 
-    // PASS 1: Draw auras
-    final intensity = userProfile!.monthlyClusterIntensity;
-    final auraRadius = userProfile!.monthlyClusterRadius;
-    final blur = userProfile!.monthlyClusterBlur;
-    final saturation = userProfile!.monthlyClusterSaturation;
+    // PASS 1: Draw auras (only if enabled in settings)
+    if (userProfile!.enableMonthlyClusters) {
+      final intensity = userProfile!.monthlyClusterIntensity;
+      final auraRadius = userProfile!.monthlyClusterRadius;
+      final blur = userProfile!.monthlyClusterBlur;
+      final saturation = userProfile!.monthlyClusterSaturation;
 
-    for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
-      final cluster = groupedClusters[clusterIndex];
+      for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
+        final cluster = groupedClusters[clusterIndex];
 
-      // Calculate breathing animation (same as daily clusters)
-      final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
-      final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
-      final combinedPulse = individualPulse * breathPulse;
+        // Calculate breathing animation (same as daily clusters)
+        final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
+        final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
+        final combinedPulse = individualPulse * breathPulse;
 
-      // Get dominant emotion
-      final emotionCounts = <String, int>{};
-      for (final memory in cluster.memories) {
-        if (memory.primaryEmotion != null) {
-          emotionCounts[memory.primaryEmotion!] =
-              (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+        // Get dominant emotion
+        final emotionCounts = <String, int>{};
+        for (final memory in cluster.memories) {
+          if (memory.primaryEmotion != null) {
+            emotionCounts[memory.primaryEmotion!] =
+                (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+          }
         }
+
+        String? dominantEmotion;
+        int maxCount = 0;
+        emotionCounts.forEach((emotion, count) {
+          if (count > maxCount) {
+            maxCount = count;
+            dominantEmotion = emotion;
+          }
+        });
+
+        final emotionColor = EmotionColors.getColor(dominantEmotion);
+        final saturatedColor = _boostSaturation(emotionColor, saturation);
+
+        // Draw aura (background glow) with breathing animation
+        final auraPaint = Paint()
+          ..color = saturatedColor.withOpacity(intensity * finalOpacity)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+
+        final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
+        canvas.drawCircle(adjustedPos, auraRadius * intensity * combinedPulse, auraPaint);
       }
-
-      String? dominantEmotion;
-      int maxCount = 0;
-      emotionCounts.forEach((emotion, count) {
-        if (count > maxCount) {
-          maxCount = count;
-          dominantEmotion = emotion;
-        }
-      });
-
-      final emotionColor = EmotionColors.getColor(dominantEmotion);
-      final saturatedColor = _boostSaturation(emotionColor, saturation);
-
-      // Draw aura (background glow) with breathing animation
-      final auraPaint = Paint()
-        ..color = saturatedColor.withOpacity(intensity * finalOpacity)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
-
-      final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
-      canvas.drawCircle(adjustedPos, auraRadius * intensity * combinedPulse, auraPaint);
     }
 
     // PASS 2: Draw nodes with photos
