@@ -154,7 +154,7 @@ class PremiumScreen extends ConsumerWidget {
                 )
               else
                 ...purchaseState.products.map((p) =>
-                    _buildProductCard(context, p, purchaseNotifier, l10n)),
+                    _buildProductCard(context, p, purchaseNotifier, l10n, ref)),
               const SizedBox(height: 24),
               // ИСПРАВЛЕНИЕ: Передаем ref в _buildFooter
               _buildFooter(context, ref, purchaseNotifier, l10n),
@@ -223,7 +223,7 @@ class PremiumScreen extends ConsumerWidget {
   }
 
   Widget _buildProductCard(BuildContext context, ProductDetails product,
-      PurchaseService service, AppLocalizations l10n) {
+      PurchaseService service, AppLocalizations l10n, WidgetRef ref) {
     final bool isYearly = product.id.contains('yearly');
     return Card(
       elevation: 4,
@@ -241,7 +241,7 @@ class PremiumScreen extends ConsumerWidget {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => PopScope(
+            builder: (dialogContext) => PopScope(
               canPop: false,
               child: Center(
                 child: Card(
@@ -266,18 +266,55 @@ class PremiumScreen extends ConsumerWidget {
 
           final success = await service.buyProduct(product);
 
-          // Close loading dialog
-          if (context.mounted) {
-            Navigator.of(context).pop();
-          }
-
           if (!success && context.mounted) {
+            // Close loading dialog only if purchase initiation failed
+            Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Failed to initiate purchase. Please try again.'),
                 backgroundColor: Colors.red,
               ),
             );
+          } else {
+            // Purchase initiated successfully, wait for completion
+            // Listen to purchase state changes and close dialog when done
+            bool dialogClosed = false;
+            ref.listen(purchaseServiceProvider, (previous, next) {
+              if (context.mounted && !next.isLoading && !dialogClosed) {
+                // Purchase completed (success or error)
+                dialogClosed = true;
+                Navigator.of(context).pop();
+
+                if (next.purchaseSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Purchase successful!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else if (next.errorMessage != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(next.errorMessage!),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            });
+
+            // Cleanup listener after 60 seconds (safety timeout)
+            Future.delayed(const Duration(seconds: 60), () {
+              if (context.mounted && !dialogClosed) {
+                dialogClosed = true;
+                // Force close dialog if still open
+                try {
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  // Dialog already closed
+                }
+              }
+            });
           }
         },
         borderRadius: BorderRadius.circular(12),
