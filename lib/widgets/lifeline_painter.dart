@@ -696,16 +696,12 @@ class LifelinePainter extends CustomPainter {
     if (memories.length < 2) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fade in/out transitions for yearly gradient (LEVEL 1: 100%-250%)
-    // Fade in from 100% to 120%
-    final fadeInOpacity = (zoomScale < 1.2)
-        ? ((zoomScale - 1.0) / 0.2).clamp(0.0, 1.0)
-        : 1.0;
-    // Fade out from 220% to 250%
+    // Fade out transition for yearly gradient (LEVEL 1: 100%-250%)
+    // Fully visible from 100% to 220%, then fade out from 220% to 250%
     final fadeOutOpacity = (zoomScale > 2.2)
         ? ((2.5 - zoomScale) / 0.3).clamp(0.0, 1.0)
         : 1.0;
-    final finalOpacity = fadeInOpacity * fadeOutOpacity;
+    final finalOpacity = fadeOutOpacity;
 
     if (finalOpacity <= 0.0) return;
 
