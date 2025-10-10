@@ -836,27 +836,17 @@ class LifelinePainter extends CustomPainter {
     for (final monthKey in sortedMonthKeys) {
       final group = monthlyGroups[monthKey]!;
       final monthMemories = group.memories;
+      final positions = group.positions;
 
-      // Calculate position based on the middle timestamp of the month
-      final parts = monthKey.split('-');
-      final year = int.parse(parts[0]);
-      final month = int.parse(parts[1]);
-      final monthStart = DateTime(year, month, 1);
-      final monthEnd = DateTime(year, month + 1, 1); // First day of next month
-      final monthMiddle = monthStart.millisecondsSinceEpoch +
-                          (monthEnd.millisecondsSinceEpoch - monthStart.millisecondsSinceEpoch) ~/ 2;
+      // Skip if no positions found for this month
+      if (positions.isEmpty) continue;
 
-      // Find position on path based on timestamp (same logic as in lifeline_widget.dart)
-      final t = ((monthMiddle - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
+      // Calculate average position from ACTUAL memory positions on the path
+      final avgX = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
+      final avgY = positions.map((p) => p.dy).reduce((a, b) => a + b) / positions.length;
+      final avgPos = Offset(avgX, avgY);
 
-      final pathMetric = path.computeMetrics().first;
-      final pathLength = pathMetric.length;
-      final tangent = pathMetric.getTangentForOffset(t * pathLength);
-
-      if (tangent != null) {
-        final avgPos = tangent.position;
-        clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
-      }
+      clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
     }
 
     // Group nearby monthly clusters (if they're too close, combine them)
