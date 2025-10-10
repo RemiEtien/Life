@@ -938,7 +938,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     // Calculate relative zoom for consistent behavior across devices
     final totalWidth = _cachedLayoutResult?.totalWidth ?? _lastKnownSize.width;
     final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
-    final relativeZoom = minScale > 0.0001 ? currentScale / minScale : 1.0;
+    // If currentScale is close to 1.0, it means initial centering hasn't happened yet
+    final isUninitialized = (currentScale - 1.0).abs() < 0.01;
+    final relativeZoom = isUninitialized || minScale <= 0.0001
+        ? 1.0
+        : currentScale / minScale;
 
     final scenePosition = _transformationController.toScene(d.localPosition);
     final hitRadiusInScene = kTapRadiusOnScreen / currentScale;
@@ -1640,7 +1644,12 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                         _transformationController.value
                                             .getMaxScaleOnAxis();
                                     final minScale = _calculateMinScale(totalWidth, screenWidth);
-                                    final relativeZoom = minScale > 0.0001 ? currentScale / minScale : 1.0;
+                                    // If currentScale is close to 1.0, it means initial centering hasn't happened yet
+                                    // Use minScale as fallback to prevent showing wrong zoom level on first frame
+                                    final isUninitialized = (currentScale - 1.0).abs() < 0.01;
+                                    final relativeZoom = isUninitialized || minScale <= 0.0001
+                                        ? 1.0
+                                        : currentScale / minScale;
                                     return CustomPaint(
                                       size: Size(totalWidth, contentHeight),
                                       painter: LifelinePainter(
