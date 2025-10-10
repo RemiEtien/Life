@@ -935,10 +935,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     final currentScale = _transformationController.value.getMaxScaleOnAxis();
 
+    // Calculate relative zoom for consistent behavior across devices
+    final totalWidth = _cachedLayoutResult?.totalWidth ?? _lastKnownSize.width;
+    final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
+    final relativeZoom = minScale > 0.0001 ? currentScale / minScale : 1.0;
+
     final scenePosition = _transformationController.toScene(d.localPosition);
     final hitRadiusInScene = kTapRadiusOnScreen / currentScale;
     final List<TappableItem> hits =
-        _findTappableItems(scenePosition, hitRadiusInScene, currentScale);
+        _findTappableItems(scenePosition, hitRadiusInScene, relativeZoom);
 
     final userId = ref.read(authStateChangesProvider).asData?.value?.uid;
     if (userId == null) return;
@@ -1132,8 +1137,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       });
     }
 
-    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 1.2)
-    if (currentScale >= 1.2) {
+    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 460%)
+    // Using relative zoom (currentScale / minScale) for device-independent behavior
+    if (currentScale >= 4.6) {
       _dailyClusterData.forEach((id, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
@@ -1633,6 +1639,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                     final currentScale =
                                         _transformationController.value
                                             .getMaxScaleOnAxis();
+                                    final minScale = _calculateMinScale(totalWidth, screenWidth);
+                                    final relativeZoom = minScale > 0.0001 ? currentScale / minScale : 1.0;
                                     return CustomPaint(
                                       size: Size(totalWidth, contentHeight),
                                       painter: LifelinePainter(
@@ -1644,7 +1652,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                             _onDailyClusterPosition,
                                         onMonthlyClusterPosition:
                                             _onMonthlyClusterPosition,
-                                        zoomScale: currentScale,
+                                        zoomScale: relativeZoom,
                                         pulseValue: _pulseController.value,
                                         renderData: _renderData!,
                                         timingsNotifier:

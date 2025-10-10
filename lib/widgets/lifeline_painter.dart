@@ -525,16 +525,17 @@ class LifelinePainter extends CustomPainter {
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
 
     // === 3-LEVEL ZOOM SYSTEM ===
-    // LEVEL 1: Far zoom - yearly gradient (zoom < 0.6 / < 250%)
-    if (zoomScale < 0.6) {
+    // Using relative zoom (currentScale / minScale) for device-independent behavior
+    // LEVEL 1: Far zoom - yearly gradient (zoom < 2.5 / < 250%)
+    if (zoomScale < 2.5) {
       stopwatch.start();
       _drawYearlyGradient(canvas, mainPath, size, zoomScale);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
-    // LEVEL 2: Medium zoom - monthly clusters (zoom 0.6-1.2 / 250%-460%)
-    else if (zoomScale >= 0.6 && zoomScale < 1.2) {
+    // LEVEL 2: Medium zoom - monthly clusters (zoom 2.5-4.6 / 250%-460%)
+    else if (zoomScale >= 2.5 && zoomScale < 4.6) {
       stopwatch.start();
       _drawMonthlyClusters(canvas, mainPath, size, zoomScale, placementResults);
       stopwatch.stop();
@@ -542,37 +543,37 @@ class LifelinePainter extends CustomPainter {
       stopwatch.reset();
     }
 
-    // Calculate detailOpacity for Level 3 (zoom >= 1.2 / >= 460%)
-    // Fade in individual nodes as we zoom past 1.2
-    final detailOpacity = (zoomScale < 1.05)
+    // Calculate detailOpacity for Level 3 (zoom >= 4.6 / >= 460%)
+    // Fade in individual nodes as we zoom past 4.6
+    final detailOpacity = (zoomScale < 4.4)
         ? 0.0
-        : ((zoomScale - 1.05) / 0.15).clamp(0.0, 1.0);
+        : ((zoomScale - 4.4) / 0.6).clamp(0.0, 1.0);
 
     // --- Draw animated branches dynamically ---
     // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
     // OPTIMIZATION: Skip branches entirely when zoomed out very far (not visible anyway)
-    if (branchIntensity > 0 && zoomScale > 0.2) {
+    if (branchIntensity > 0 && zoomScale > 0.8) {
       final branches =
           renderData.branches; // These paths are pre-animated from the isolate
       const arteryColor = Color(0xFFFF8A80);
       final baseBranchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(4);
 
       // LOD OPTIMIZATION: Reduce layers when zoomed out (less detail needed)
-      // At zoom < 0.5, reduce to 60% of layers (saves GPU time)
-      // At zoom < 0.3, reduce to 40% of layers
-      final branchLayerCount = zoomScale < 0.3
+      // At zoom < 2.0 (< 200%), reduce to 60% of layers (saves GPU time)
+      // At zoom < 1.5 (< 150%), reduce to 40% of layers
+      final branchLayerCount = zoomScale < 1.5
           ? (baseBranchLayerCount * 0.4).round().clamp(1, baseBranchLayerCount)
-          : zoomScale < 0.5
+          : zoomScale < 2.0
               ? (baseBranchLayerCount * 0.6).round().clamp(1, baseBranchLayerCount)
               : baseBranchLayerCount;
 
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
 
       // LOD OPTIMIZATION: Draw fewer branches when zoomed out
-      // At zoom < 0.3, draw every 4th branch
-      // At zoom < 0.5, draw every 2nd branch
-      // At zoom >= 0.5, draw all branches
-      final branchStep = zoomScale < 0.3 ? 4 : zoomScale < 0.5 ? 2 : 1;
+      // At zoom < 1.5, draw every 4th branch
+      // At zoom < 2.0, draw every 2nd branch
+      // At zoom >= 2.0, draw all branches
+      final branchStep = zoomScale < 1.5 ? 4 : zoomScale < 2.0 ? 2 : 1;
 
       for (int i = 0; i < branches.length; i += branchStep) {
         final branchPath = branches[i];
@@ -665,7 +666,8 @@ class LifelinePainter extends CustomPainter {
             onDailyClusterPosition?.call(item.id, item.position, item.memories);
           }
         } else if (item is TimeGapPlacementInfo) {
-          if (zoomScale >= 3 && zoomScale <= 5.0) {
+          // Show time gaps at high zoom levels (300%-500%)
+          if (zoomScale >= 3.0 && zoomScale <= 5.0) {
             if (visibleRect.inflate(20).contains(item.position)) {
               _drawTimeGapMarker(canvas, item, size, detailOpacity);
             }
@@ -776,12 +778,14 @@ class LifelinePainter extends CustomPainter {
     if (memories.isEmpty) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fade in/out transitions
-    final fadeInOpacity = (zoomScale < 0.75)
-        ? ((zoomScale - 0.6) / 0.15).clamp(0.0, 1.0)
+    // Fade in/out transitions for monthly clusters (LEVEL 2: 250%-460%)
+    // Fade in from 250% to 280%
+    final fadeInOpacity = (zoomScale < 2.8)
+        ? ((zoomScale - 2.5) / 0.3).clamp(0.0, 1.0)
         : 1.0;
-    final fadeOutOpacity = (zoomScale > 0.95)
-        ? ((1.15 - zoomScale) / 0.2).clamp(0.0, 1.0)
+    // Fade out from 420% to 460%
+    final fadeOutOpacity = (zoomScale > 4.2)
+        ? ((4.6 - zoomScale) / 0.4).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeInOpacity * fadeOutOpacity;
 
