@@ -77,10 +77,44 @@ void main() async {
       };
     } else {
       FlutterError.onError = (details) {
-        FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+        // Filter out network errors from causing fatal crashes
+        final errorString = details.exception.toString();
+        if (errorString.contains('ClientException') ||
+            errorString.contains('Connection closed') ||
+            errorString.contains('SocketException') ||
+            errorString.contains('TimeoutException')) {
+          // Log as non-fatal
+          FirebaseCrashlytics.instance.recordError(
+            details.exception,
+            details.stack,
+            fatal: false,
+            reason: 'Network error (non-fatal)',
+          );
+          debugPrint('Network error (handled): ${details.exception}');
+        } else {
+          // All other errors are fatal
+          FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+        }
       };
       PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        // Filter out network errors
+        final errorString = error.toString();
+        if (errorString.contains('ClientException') ||
+            errorString.contains('Connection closed') ||
+            errorString.contains('SocketException') ||
+            errorString.contains('TimeoutException')) {
+          // Log as non-fatal
+          FirebaseCrashlytics.instance.recordError(
+            error,
+            stack,
+            fatal: false,
+            reason: 'Network error (non-fatal)',
+          );
+          debugPrint('Network error (handled): $error');
+        } else {
+          // All other errors are fatal
+          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        }
         return true;
       };
     }
