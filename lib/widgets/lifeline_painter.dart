@@ -842,10 +842,18 @@ class LifelinePainter extends CustomPainter {
       // Skip if no positions found for this month
       if (positions.isEmpty) continue;
 
-      // Calculate average position from ACTUAL memory positions on the path
-      final avgX = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
-      final avgY = positions.map((p) => p.dy).reduce((a, b) => a + b) / positions.length;
-      final avgPos = Offset(avgX, avgY);
+      // Calculate average timestamp and find position on path
+      // This ensures monthly clusters are always ON the path, not offset vertically
+      final avgTimestamp = monthMemories
+          .map((m) => m.date.millisecondsSinceEpoch)
+          .reduce((a, b) => a + b) ~/ monthMemories.length;
+
+      final t = ((avgTimestamp - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
+      final pathMetric = path.computeMetrics().first;
+      final tangent = pathMetric.getTangentForOffset(t * pathMetric.length);
+
+      if (tangent == null) continue;
+      final avgPos = tangent.position;
 
       clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
     }
