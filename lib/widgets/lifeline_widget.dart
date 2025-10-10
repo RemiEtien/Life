@@ -1118,8 +1118,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final List<String> processedNodeIds = [];
 
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    // Месячные кластеры видны только в диапазоне zoom 0.6-1.2 (соответствует LEVEL 2)
-    if (currentScale >= 0.6 && currentScale < 1.2) {
+    // Месячные кластеры видны только в диапазоне zoom 2.5-4.6 (соответствует LEVEL 2: 250%-460%)
+    if (currentScale >= 2.5 && currentScale < 4.6) {
       _monthlyClusterData.forEach((clusterId, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
