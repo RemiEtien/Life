@@ -9,6 +9,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
 import '../utils/error_handler.dart';
@@ -118,7 +120,7 @@ class LifelineWidget extends ConsumerStatefulWidget {
 }
 
 class _LifelineWidgetState extends ConsumerState<LifelineWidget>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with TickerProviderStateMixin, WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
   late final AnimationController _mainController;
   late final AnimationController _pulseController;
   late final AnimationController _geometryController;
@@ -133,6 +135,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   LayoutResult? _cachedLayoutResult;
   bool _isAdmin = false;
+  bool _hasLoadedMemoriesOnce = false; // Track if memories have been loaded at least once
 
   List<TappableItem>? _selectionItems;
   Offset? _selectionCenter;
@@ -175,6 +178,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   final ValueNotifier<PaintTimings?> _paintTimingsNotifier =
       ValueNotifier(null);
+
+  // AutomaticKeepAliveClientMixin: Keep widget alive during navigation
+  @override
+  bool get wantKeepAlive => true;
 
   final String _adminUid = 'BGnE9FuIasfIOj5ln3rQHIBiulv2';
 
@@ -367,6 +374,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     if (next is AsyncData<List<Memory>>) {
       final memories = next.value;
       if (mounted && !_isDisposed) {
+        // Mark that memories have been loaded at least once
+        _hasLoadedMemoriesOnce = true;
+
         // FIX: Load images and paragraphs immediately, even if size not known yet
         // This prevents "empty lifeline on fresh install" issue
         _loadMemoryImages(memories);
@@ -828,11 +838,32 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
             } else if (_centerOnNextLayout) {
               // Центрируем только если нет ожидающего перерасчета
               _centerOnNextLayout = false; // Сбрасываем флаг
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && !_isDisposed) {
-                  _animateToFullTimeline();
-                }
-              });
+
+              // FIX: Set initial scale immediately (without animation) to prevent showing wrong zoom level on first frame
+              final currentScale = _transformationController.value.getMaxScaleOnAxis();
+              final isFirstInitialization = (currentScale - 1.0).abs() < 0.01;
+
+              if (isFirstInitialization && totalWidth > 0 && _lastKnownSize.width > 0) {
+                // First initialization - set scale immediately without animation
+                final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
+                final screenCenter = _lastKnownSize.center(Offset.zero);
+                final contentCenterY = _lastKnownSize.height / 2;
+                final contentCenter = Offset(totalWidth / 2, contentCenterY);
+
+                final targetMatrix = Matrix4.identity();
+                targetMatrix.translate(screenCenter.dx, screenCenter.dy);
+                targetMatrix.scale(minScale, minScale);
+                targetMatrix.translate(-contentCenter.dx, -contentCenter.dy);
+
+                _transformationController.value = targetMatrix;
+              } else {
+                // Subsequent calls - use animation
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted && !_isDisposed) {
+                    _animateToFullTimeline();
+                  }
+                });
+              }
             }
             // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
           });
@@ -859,13 +890,18 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     return minScale;
   }
 
-  // ИЗМЕНЕНИЕ: Отдельная функция для расчета максимального зума
+  // Calculate maximum scale based on fixed baseline content width (1200px)
+  // This ensures IDENTICAL zoom depth across all timeline lengths
   double _calculateMaxScale(double minScale, double screenWidth) {
     const double kBaseContentWidth = 1200.0;
     final baseScale = _calculateMinScale(kBaseContentWidth, screenWidth);
     const zoomFactor = 6.0;
-    final desiredMaxScale = baseScale * zoomFactor;
-    return max(minScale, desiredMaxScale);
+    final standardMaxScale = baseScale * zoomFactor;
+
+    // For very short timelines, ensure we can reach at least 460% (individual nodes)
+    // Otherwise, use the standard maxScale for consistent zoom depth
+    final minRequiredScale = minScale * 4.6;
+    return max(standardMaxScale, minRequiredScale);
   }
 
   void _updateStructureCache(
@@ -1377,6 +1413,29 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   }
 
   void _toggleDebugMode() => setState(() => _debugMode = !_debugMode);
+
+  Future<void> _sharePerformanceLog(String log) async {
+    try {
+      // Save log to temporary file
+      final directory = await getTemporaryDirectory();
+      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final file = File('${directory.path}/performance_log_$timestamp.txt');
+      await file.writeAsString(log);
+
+      // Share the file
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        subject: 'Lifeline Performance Log',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to export log: $e')),
+        );
+      }
+    }
+  }
+
   void _toggleAnimation() {
     setState(() {
       _animationEnabled = !_animationEnabled;
@@ -1514,6 +1573,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Keep widget alive
     final l10n = AppLocalizations.of(context)!;
     _nodePositions.clear();
     _dailyClusterData.clear();
@@ -1529,7 +1589,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final isTimelineInteractionDisabled = onboardingState.isActive &&
         onboardingState.currentStep == OnboardingStep.addFirstMemory;
 
-    _isAdmin = userId == _adminUid;
+    // Check admin status from userProfile or fallback to hardcoded UID
+    _isAdmin = (userProfile?.isAdmin ?? false) || userId == _adminUid;
 
     return LayoutBuilder(builder: (context, constraints) {
       final newSize = Size(constraints.maxWidth, constraints.maxHeight);
@@ -1550,8 +1611,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       final totalWidth = _cachedLayoutResult?.totalWidth;
       final screenWidth = constraints.maxWidth;
 
-      // If we don't have layout data yet, show loading indicator
-      if (totalWidth == null) {
+      // If we don't have layout data yet OR memories haven't loaded once, show loading indicator
+      // This prevents showing empty lifeline geometry on fresh install
+      if (totalWidth == null || !_hasLoadedMemoriesOnce) {
         return const Center(child: CircularProgressIndicator());
       }
 
@@ -1936,10 +1998,20 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                 ? (rawScale / minScale * 100).round()
                                 : 0;
 
-                            return Text(
-                              l10n.lifelineScaleValue(displayScale),
-                              style: const TextStyle(
-                                  color: Colors.white70, fontSize: 10),
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.lifelineScaleValue(displayScale),
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 10),
+                                ),
+                                Text(
+                                  'Timeline width: ${totalWidth.toStringAsFixed(0)}px',
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 10),
+                                ),
+                              ],
                             );
                           },
                         ),
@@ -1953,6 +2025,60 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold));
                           },
+                        ),
+                        // Performance recording controls
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  if (_performanceMonitor.isRecording) {
+                                    _performanceMonitor.stopRecording();
+                                  } else {
+                                    _performanceMonitor.startRecording();
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                _performanceMonitor.isRecording
+                                    ? Icons.stop
+                                    : Icons.fiber_manual_record,
+                                size: 16,
+                              ),
+                              label: Text(
+                                _performanceMonitor.isRecording ? 'Stop' : 'Record',
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _performanceMonitor.isRecording
+                                    ? Colors.red
+                                    : Colors.green,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                minimumSize: Size.zero,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton.icon(
+                              onPressed: _performanceMonitor.performanceLog.isEmpty
+                                  ? null
+                                  : () async {
+                                      final log = _performanceMonitor.exportLog();
+                                      await _sharePerformanceLog(log);
+                                    },
+                              icon: const Icon(Icons.share, size: 16),
+                              label: const Text('Export',
+                                  style: TextStyle(fontSize: 11)),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                minimumSize: Size.zero,
+                              ),
+                            ),
+                          ],
                         ),
                         ValueListenableBuilder<PaintTimings?>(
                           valueListenable: _paintTimingsNotifier,
@@ -2743,17 +2869,86 @@ class PerformanceMonitor {
   final Stopwatch _stopwatch = Stopwatch()..start();
   final ValueNotifier<double> fpsNotifier = ValueNotifier(0.0);
 
+  // Performance logging
+  final List<String> _performanceLog = [];
+  bool _isRecording = false;
+  DateTime? _recordingStartTime;
+
+  // Performance metrics
+  double _minFps = double.infinity;
+  double _maxFps = 0;
+  double _avgFps = 0;
+  int _fpsCount = 0;
+
   double get fps => fpsNotifier.value;
+  bool get isRecording => _isRecording;
+  List<String> get performanceLog => List.unmodifiable(_performanceLog);
 
   void tick() {
     _frameCount++;
     if (_stopwatch.elapsedMilliseconds >= 1000) {
       final elapsedSeconds = _stopwatch.elapsedMilliseconds / 1000.0;
-      fpsNotifier.value = _frameCount / elapsedSeconds;
+      final currentFps = _frameCount / elapsedSeconds;
+      fpsNotifier.value = currentFps;
+
+      // Update metrics
+      if (currentFps < _minFps) _minFps = currentFps;
+      if (currentFps > _maxFps) _maxFps = currentFps;
+      _avgFps = (_avgFps * _fpsCount + currentFps) / (_fpsCount + 1);
+      _fpsCount++;
+
+      // Record to log if recording
+      if (_isRecording) {
+        final timestamp = DateTime.now().difference(_recordingStartTime!).inSeconds;
+        _performanceLog.add('[$timestamp s] FPS: ${currentFps.toStringAsFixed(1)}');
+      }
+
       _frameCount = 0;
       _stopwatch.reset();
       _stopwatch.start();
     }
+  }
+
+  void startRecording() {
+    _isRecording = true;
+    _recordingStartTime = DateTime.now();
+    _performanceLog.clear();
+    _minFps = double.infinity;
+    _maxFps = 0;
+    _avgFps = 0;
+    _fpsCount = 0;
+    _performanceLog.add('=== Performance Recording Started ===');
+    _performanceLog.add('Start Time: ${_recordingStartTime!.toIso8601String()}');
+  }
+
+  void stopRecording() {
+    if (_isRecording) {
+      _isRecording = false;
+      _performanceLog.add('=== Performance Recording Stopped ===');
+      _performanceLog.add('Duration: ${DateTime.now().difference(_recordingStartTime!).inSeconds} seconds');
+      _performanceLog.add('Min FPS: ${_minFps.toStringAsFixed(1)}');
+      _performanceLog.add('Max FPS: ${_maxFps.toStringAsFixed(1)}');
+      _performanceLog.add('Avg FPS: ${_avgFps.toStringAsFixed(1)}');
+    }
+  }
+
+  void logMetric(String metric) {
+    if (_isRecording) {
+      final timestamp = DateTime.now().difference(_recordingStartTime!).inSeconds;
+      _performanceLog.add('[$timestamp s] $metric');
+    }
+  }
+
+  String exportLog() {
+    return _performanceLog.join('\n');
+  }
+
+  void clearLog() {
+    _performanceLog.clear();
+    _minFps = double.infinity;
+    _maxFps = 0;
+    _avgFps = 0;
+    _fpsCount = 0;
   }
 
   void dispose() {

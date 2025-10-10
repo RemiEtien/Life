@@ -1335,4 +1335,83 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get notificationInsightSubtitle =>
       'Размышления о вашем эмоциональном пути';
+
+  @override
+  String get emotionVisualizationTitle => '🎨 Эмоциональная Визуализация';
+
+  @override
+  String get emotionVisualizationSubtitle => 'Настройте отображение эмоций';
+
+  @override
+  String get emotionVisualizationTimelineSection => 'На жизненной линии:';
+
+  @override
+  String get emotionVisualizationLevel1Title => 'Уровень 1: Годовой градиент';
+
+  @override
+  String get emotionVisualizationLevel1Subtitle =>
+      'Общее свечение эмоций (зум < 250%)';
+
+  @override
+  String get emotionVisualizationLevel2Title => 'Уровень 2: Месячные кластеры';
+
+  @override
+  String get emotionVisualizationLevel2Subtitle =>
+      'Эмоции по месяцам (зум 250%-460%)';
+
+  @override
+  String get emotionVisualizationLevel3Title => 'Уровень 3: Аура узлов';
+
+  @override
+  String get emotionVisualizationLevel3Subtitle =>
+      'Свечение вокруг узлов (зум > 460%)';
+
+  @override
+  String get emotionVisualizationEnable => 'Включить';
+
+  @override
+  String get emotionVisualizationIntensity => 'Интенсивность';
+
+  @override
+  String get emotionVisualizationRadius => 'Радиус';
+
+  @override
+  String get emotionVisualizationRadiusMultiplier => 'Радиус (множитель)';
+
+  @override
+  String get emotionVisualizationBlur => 'Размытие';
+
+  @override
+  String get emotionVisualizationBlurMultiplier => 'Размытие (множитель)';
+
+  @override
+  String get emotionVisualizationSaturation => 'Насыщенность';
+
+  @override
+  String get emotionVisualizationMemoryViewSection =>
+      'При просмотре воспоминания:';
+
+  @override
+  String get emotionVisualizationMemoryGradientTitle =>
+      'Эмоциональный градиент';
+
+  @override
+  String get emotionVisualizationMemoryGradientSubtitle =>
+      'Цветной фон на основе эмоций';
+
+  @override
+  String get emotionVisualizationMemoryParticlesTitle =>
+      'Эмоциональные частицы';
+
+  @override
+  String get emotionVisualizationMemoryParticlesSubtitle =>
+      'Анимированные частицы (Premium)';
+
+  @override
+  String get emotionVisualizationPhotoColorGradingTitle =>
+      'Цветокоррекция фото';
+
+  @override
+  String get emotionVisualizationPhotoColorGradingSubtitle =>
+      'Подстройка фото под эмоции (Premium)';
 }

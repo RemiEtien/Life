@@ -2463,6 +2463,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reflections on your emotional journey'**
   String get notificationInsightSubtitle;
+
+  /// No description provided for @emotionVisualizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎨 Emotion Visualization'**
+  String get emotionVisualizationTitle;
+
+  /// No description provided for @emotionVisualizationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize emotion display'**
+  String get emotionVisualizationSubtitle;
+
+  /// No description provided for @emotionVisualizationTimelineSection.
+  ///
+  /// In en, this message translates to:
+  /// **'On the lifeline:'**
+  String get emotionVisualizationTimelineSection;
+
+  /// No description provided for @emotionVisualizationLevel1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Level 1: Yearly Gradient'**
+  String get emotionVisualizationLevel1Title;
+
+  /// No description provided for @emotionVisualizationLevel1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall emotion glow (zoom < 250%)'**
+  String get emotionVisualizationLevel1Subtitle;
+
+  /// No description provided for @emotionVisualizationLevel2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Level 2: Monthly Clusters'**
+  String get emotionVisualizationLevel2Title;
+
+  /// No description provided for @emotionVisualizationLevel2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotions by month (zoom 250%-460%)'**
+  String get emotionVisualizationLevel2Subtitle;
+
+  /// No description provided for @emotionVisualizationLevel3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Level 3: Node Aura'**
+  String get emotionVisualizationLevel3Title;
+
+  /// No description provided for @emotionVisualizationLevel3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Glow around nodes (zoom > 460%)'**
+  String get emotionVisualizationLevel3Subtitle;
+
+  /// No description provided for @emotionVisualizationEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get emotionVisualizationEnable;
+
+  /// No description provided for @emotionVisualizationIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity'**
+  String get emotionVisualizationIntensity;
+
+  /// No description provided for @emotionVisualizationRadius.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius'**
+  String get emotionVisualizationRadius;
+
+  /// No description provided for @emotionVisualizationRadiusMultiplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius (multiplier)'**
+  String get emotionVisualizationRadiusMultiplier;
+
+  /// No description provided for @emotionVisualizationBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur'**
+  String get emotionVisualizationBlur;
+
+  /// No description provided for @emotionVisualizationBlurMultiplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur (multiplier)'**
+  String get emotionVisualizationBlurMultiplier;
+
+  /// No description provided for @emotionVisualizationSaturation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get emotionVisualizationSaturation;
+
+  /// No description provided for @emotionVisualizationMemoryViewSection.
+  ///
+  /// In en, this message translates to:
+  /// **'When viewing memory:'**
+  String get emotionVisualizationMemoryViewSection;
+
+  /// No description provided for @emotionVisualizationMemoryGradientTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotion gradient'**
+  String get emotionVisualizationMemoryGradientTitle;
+
+  /// No description provided for @emotionVisualizationMemoryGradientSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored background based on emotions'**
+  String get emotionVisualizationMemoryGradientSubtitle;
+
+  /// No description provided for @emotionVisualizationMemoryParticlesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotion particles'**
+  String get emotionVisualizationMemoryParticlesTitle;
+
+  /// No description provided for @emotionVisualizationMemoryParticlesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Animated particles (Premium)'**
+  String get emotionVisualizationMemoryParticlesSubtitle;
+
+  /// No description provided for @emotionVisualizationPhotoColorGradingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo color grading'**
+  String get emotionVisualizationPhotoColorGradingTitle;
+
+  /// No description provided for @emotionVisualizationPhotoColorGradingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust photos to emotions (Premium)'**
+  String get emotionVisualizationPhotoColorGradingSubtitle;
 }
 
 class _AppLocalizationsDelegate

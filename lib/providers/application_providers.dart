@@ -284,32 +284,33 @@ class LocaleNotifier extends StateNotifier<Locale?> {
       final prefs = await SharedPreferences.getInstance();
       if (_disposed) return;
 
-      // FIX: On fresh install (no saved locale), sync Firestore with system language
       final savedCode = prefs.getString('appLocale');
       final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
-      final isFirstLaunch = savedCode == null;
 
       if (userProfile?.languageCode != null) {
-        // If this is first launch after install and Firestore language differs from system,
-        // update Firestore to match system language (user expectation on reinstall)
-        if (isFirstLaunch && userProfile!.languageCode != systemLocale.languageCode) {
-          debugPrint('[LocaleNotifier] First launch: updating Firestore languageCode from ${userProfile.languageCode} to ${systemLocale.languageCode}');
-          // Update Firestore with system language
-          final updatedProfile = userProfile.copyWith(languageCode: systemLocale.languageCode);
-          await userService.updateUserProfile(updatedProfile);
-          // Use system locale
-          final newLocale = Locale(systemLocale.languageCode);
-          if (!_disposed && state != newLocale) {
-            state = newLocale;
+        // Check if this is first launch after reinstall (no saved locale in SharedPreferences)
+        final isFirstLaunchAfterReinstall = savedCode == null;
+
+        if (isFirstLaunchAfterReinstall) {
+          // First launch after reinstall: use system language and update Firestore
+          debugPrint('[LocaleNotifier] First launch after reinstall detected. Using system locale: ${systemLocale.languageCode}');
+
+          if (!_disposed && state != systemLocale) {
+            state = systemLocale;
           }
           if (!_disposed) {
             await prefs.setString('appLocale', systemLocale.languageCode);
+            // Update Firestore with system language
+            final updatedProfile = userProfile!.copyWith(languageCode: systemLocale.languageCode);
+            await userService.updateUserProfile(updatedProfile);
+            debugPrint('[LocaleNotifier] Updated Firestore language to: ${systemLocale.languageCode}');
           }
         } else {
-          // Normal case: use Firestore language
+          // Normal case: use Firestore language (user's saved preference)
           final newLocale = Locale(userProfile!.languageCode!);
           if (!_disposed && state != newLocale) {
             state = newLocale;
+            debugPrint('[LocaleNotifier] Synced locale with Firestore: ${userProfile.languageCode}');
           }
           if (!_disposed) {
             await prefs.setString('appLocale', userProfile.languageCode!);

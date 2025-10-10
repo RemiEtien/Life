@@ -559,21 +559,21 @@ class LifelinePainter extends CustomPainter {
       final baseBranchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(4);
 
       // LOD OPTIMIZATION: Reduce layers when zoomed out (less detail needed)
-      // At zoom < 2.0 (< 200%), reduce to 60% of layers (saves GPU time)
-      // At zoom < 1.5 (< 150%), reduce to 40% of layers
+      // At zoom < 2.5 (< 250%), reduce to 70% of layers (more visible at yearly zoom)
+      // At zoom < 1.5 (< 150%), reduce to 50% of layers
       final branchLayerCount = zoomScale < 1.5
-          ? (baseBranchLayerCount * 0.4).round().clamp(1, baseBranchLayerCount)
-          : zoomScale < 2.0
-              ? (baseBranchLayerCount * 0.6).round().clamp(1, baseBranchLayerCount)
+          ? (baseBranchLayerCount * 0.5).round().clamp(1, baseBranchLayerCount)
+          : zoomScale < 2.5
+              ? (baseBranchLayerCount * 0.7).round().clamp(1, baseBranchLayerCount)
               : baseBranchLayerCount;
 
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
 
-      // LOD OPTIMIZATION: Draw fewer branches when zoomed out
-      // At zoom < 1.5, draw every 4th branch
-      // At zoom < 2.0, draw every 2nd branch
-      // At zoom >= 2.0, draw all branches
-      final branchStep = zoomScale < 1.5 ? 4 : zoomScale < 2.0 ? 2 : 1;
+      // LOD OPTIMIZATION: Draw more branches at yearly zoom level
+      // At zoom < 1.5, draw every 2nd branch (was: every 4th)
+      // At zoom < 2.5, draw all branches (was: every 2nd at < 2.0)
+      // At zoom >= 2.5, draw all branches
+      final branchStep = zoomScale < 1.5 ? 2 : 1;
 
       for (int i = 0; i < branches.length; i += branchStep) {
         final branchPath = branches[i];
@@ -842,20 +842,32 @@ class LifelinePainter extends CustomPainter {
       // Skip if no positions found for this month
       if (positions.isEmpty) continue;
 
-      // Calculate average timestamp and find position on path
-      // This ensures monthly clusters are always ON the path, not offset vertically
-      final avgTimestamp = monthMemories
-          .map((m) => m.date.millisecondsSinceEpoch)
-          .reduce((a, b) => a + b) ~/ monthMemories.length;
+      // Calculate average X from REAL memory positions, but find Y on path
+      // This ensures horizontal position matches actual memories, but stays ON the path vertically
+      final avgX = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
 
-      final t = ((avgTimestamp - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
+      // Find closest point on path to this X coordinate
       final pathMetric = path.computeMetrics().first;
-      final tangent = pathMetric.getTangentForOffset(t * pathMetric.length);
+      final pathLength = pathMetric.length;
 
-      if (tangent == null) continue;
-      final avgPos = tangent.position;
+      Offset? bestPos;
+      double minXDiff = double.infinity;
 
-      clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
+      // Sample path to find point with closest X coordinate
+      for (double t = 0; t <= 1.0; t += 0.01) {
+        final tangent = pathMetric.getTangentForOffset(t * pathLength);
+        if (tangent != null) {
+          final xDiff = (tangent.position.dx - avgX).abs();
+          if (xDiff < minXDiff) {
+            minXDiff = xDiff;
+            bestPos = tangent.position;
+          }
+        }
+      }
+
+      if (bestPos == null) continue;
+
+      clusterPositions.add((key: monthKey, pos: bestPos, memories: monthMemories));
     }
 
     // Group nearby monthly clusters (if they're too close, combine them)
@@ -1052,26 +1064,28 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
       }
 
-      // Draw count text INSIDE node (centered like daily clusters)
-      final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
-      final textStyle = GoogleFonts.orbitron(
-        color: ringColor.withOpacity(finalOpacity),
-        fontSize: 10.0,
-        fontWeight: FontWeight.bold,
-        shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
-      );
-      final textSpan = TextSpan(text: cluster.memories.length.toString(), style: textStyle);
-      final textPainter = TextPainter(
-        text: textSpan,
-        textAlign: TextAlign.center,
-        textDirection: ui.TextDirection.ltr,
-      );
-      textPainter.layout();
-      final textPos = Offset(
-        adjustedPos.dx - textPainter.width / 2,
-        adjustedPos.dy - textPainter.height / 2,  // Center inside node
-      );
-      textPainter.paint(canvas, textPos);
+      // Only show count text at high zoom level (>= 460%, LEVEL 3)
+      if (zoomScale >= 4.6) {
+        final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
+        final textStyle = GoogleFonts.orbitron(
+          color: ringColor.withOpacity(finalOpacity),
+          fontSize: 10.0,
+          fontWeight: FontWeight.bold,
+          shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
+        );
+        final textSpan = TextSpan(text: cluster.memories.length.toString(), style: textStyle);
+        final textPainter = TextPainter(
+          text: textSpan,
+          textAlign: TextAlign.center,
+          textDirection: ui.TextDirection.ltr,
+        );
+        textPainter.layout();
+        final textPos = Offset(
+          adjustedPos.dx - textPainter.width / 2,
+          adjustedPos.dy - textPainter.height / 2,  // Center inside node
+        );
+        textPainter.paint(canvas, textPos);
+      }
     }
 
     // PASS 3: Draw month labels with connector lines (stems)
@@ -1470,21 +1484,24 @@ class LifelinePainter extends CustomPainter {
       _drawLockIcon(canvas, adjustedPos, nodeRadius * 1.5, opacity);
     }
 
-    final textStyle = GoogleFonts.orbitron(
-        color: ringColor.withValues(alpha: opacity),
-        fontSize: 10.0,
-        fontWeight: FontWeight.bold,
-        shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)]);
-    final textSpan =
-        TextSpan(text: clusterInfo.memories.length.toString(), style: textStyle);
-    final textPainter = TextPainter(
-        text: textSpan,
-        textAlign: TextAlign.center,
-        textDirection: ui.TextDirection.ltr);
-    textPainter.layout();
-    final textPos = Offset(
-        adjustedPos.dx - textPainter.width / 2, adjustedPos.dy - textPainter.height / 2);
-    textPainter.paint(canvas, textPos);
+    // Only show count text at high zoom level (>= 460%, LEVEL 3)
+    if (zoomScale >= 4.6) {
+      final textStyle = GoogleFonts.orbitron(
+          color: ringColor.withValues(alpha: opacity),
+          fontSize: 10.0,
+          fontWeight: FontWeight.bold,
+          shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)]);
+      final textSpan =
+          TextSpan(text: clusterInfo.memories.length.toString(), style: textStyle);
+      final textPainter = TextPainter(
+          text: textSpan,
+          textAlign: TextAlign.center,
+          textDirection: ui.TextDirection.ltr);
+      textPainter.layout();
+      final textPos = Offset(
+          adjustedPos.dx - textPainter.width / 2, adjustedPos.dy - textPainter.height / 2);
+      textPainter.paint(canvas, textPos);
+    }
   }
 
   // --- НОВЫЙ МЕТОД: Рисует иконку замка ---

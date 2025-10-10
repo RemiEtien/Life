@@ -248,6 +248,9 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       state = EncryptionState.unlocked;
       _failedAttempts = 0;
       _lockoutEndTime = null;
+
+      // Auto-enable quick unlock if it was enabled but keys are missing (after reinstall)
+      await _autoEnableQuickUnlockIfNeeded(masterPassword, userProfile);
     } catch (e) {
       try {
         final dek = await _unwrapDek(masterPassword, userProfile!.salt!,
@@ -257,6 +260,9 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         state = EncryptionState.unlocked;
         _failedAttempts = 0;
         _lockoutEndTime = null;
+
+        // Auto-enable quick unlock if it was enabled but keys are missing (after reinstall)
+        await _autoEnableQuickUnlockIfNeeded(masterPassword, userProfile);
       } catch (finalError) {
         _handleFailedAttempt();
         final remaining = _maxFailedAttempts - _failedAttempts;
@@ -266,6 +272,23 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         } else {
           throw const EncryptionUnlockException('Incorrect password.');
         }
+      }
+    }
+  }
+
+  /// Auto-enables quick unlock if it was previously enabled but keys are missing
+  Future<void> _autoEnableQuickUnlockIfNeeded(String masterPassword, UserProfile profile) async {
+    // Check if quick unlock is enabled in profile but keys are missing (after reinstall)
+    if (profile.isQuickUnlockEnabled) {
+      const aOptions = AndroidOptions(encryptedSharedPreferences: true);
+      final sessionKeyB64 = await _secureStorage.read(key: _kSessionKey, aOptions: aOptions);
+
+      // If profile says quick unlock is enabled but keys are missing, re-enable it
+      if (sessionKeyB64 == null) {
+        if (kDebugMode) {
+          debugPrint('[EncryptionService] Auto-enabling quick unlock after reinstall');
+        }
+        await enableQuickUnlock(masterPassword);
       }
     }
   }

@@ -24,6 +24,9 @@ class UserProfile {
   final bool isQuickUnlockEnabled; // NEW: Flag for biometric/PIN unlock
   final bool requireBiometricForMemory; // NEW: Flag for per-memory unlock
 
+  // --- ADMIN FIELD ---
+  final bool isAdmin; // Admin flag for debug menu access
+
   // --- PREMIUM FIELDS ---
   final bool isPremium;
   final DateTime? premiumUntil;
@@ -88,6 +91,7 @@ class UserProfile {
     this.salt,
     this.isQuickUnlockEnabled = false, // Default to false
     this.requireBiometricForMemory = false, // Default to false
+    this.isAdmin = false, // Default to false
     this.isPremium = false,
     this.premiumUntil,
     this.trialStartedAt,
@@ -100,24 +104,24 @@ class UserProfile {
     this.visualAnimationEnabled = true,
     // --- EMOTION VISUALIZATION PARAMS with defaults ---
     this.enableEmotionalGradient = true,      // ON по умолчанию
-    // Level 1: Yearly Gradient
+    // Level 1: Yearly Gradient (25% of max values)
     this.enableYearlyGradient = true,         // ON по умолчанию
-    this.yearlyGradientIntensity = 0.4,       // Прозрачность 0.0-1.0
-    this.yearlyGradientRadius = 200.0,        // Радиус свечения
-    this.yearlyGradientBlur = 150.0,          // Размытие
-    this.yearlyGradientSaturation = 1.5,      // Насыщенность цвета
-    // Level 2: Monthly Clusters
+    this.yearlyGradientIntensity = 0.25,      // 25% of max (1.0)
+    this.yearlyGradientRadius = 175.0,        // 25% between 100-400
+    this.yearlyGradientBlur = 112.5,          // 25% between 50-300
+    this.yearlyGradientSaturation = 1.5,      // 25% between 1.0-3.0
+    // Level 2: Monthly Clusters (25% of max values)
     this.enableMonthlyClusters = true,        // ON по умолчанию
-    this.monthlyClusterIntensity = 0.5,       // Прозрачность 0.0-1.0
-    this.monthlyClusterRadius = 100.0,        // Радиус свечения
-    this.monthlyClusterBlur = 80.0,           // Размытие
-    this.monthlyClusterSaturation = 1.5,      // Насыщенность цвета
-    // Level 3: Node Aura (одиночные узлы)
+    this.monthlyClusterIntensity = 0.25,      // 25% of max (1.0)
+    this.monthlyClusterRadius = 87.5,         // 25% between 50-200
+    this.monthlyClusterBlur = 60.0,           // 25% between 30-150
+    this.monthlyClusterSaturation = 1.5,      // 25% between 1.0-3.0
+    // Level 3: Node Aura (25% of max values)
     this.enableNodeAura = true,               // ON по умолчанию
-    this.nodeAuraIntensity = 0.525,           // Прозрачность (увеличено на 50%)
-    this.nodeAuraRadius = 3.75,               // Множитель радиуса (nodeRadius * 3.75)
-    this.nodeAuraBlur = 1.0,                  // Множитель размытия
-    this.nodeAuraSaturation = 1.0,            // Насыщенность цвета
+    this.nodeAuraIntensity = 0.25,            // 25% of max (1.0)
+    this.nodeAuraRadius = 2.25,               // 25% between 1.0-6.0
+    this.nodeAuraBlur = 0.875,                // 25% between 0.5-2.0
+    this.nodeAuraSaturation = 0.875,          // 25% between 0.5-2.0
     // Memory View Screen
     this.enableMemoryViewGradient = true,     // ON по умолчанию
     this.enableMemoryViewParticles = false,   // OFF по умолчанию (PREMIUM)
@@ -142,6 +146,7 @@ class UserProfile {
     String? salt,
     bool? isQuickUnlockEnabled,
     bool? requireBiometricForMemory,
+    bool? isAdmin,
     bool? isPremium,
     DateTime? premiumUntil,
     DateTime? trialStartedAt,
@@ -207,6 +212,7 @@ class UserProfile {
       isQuickUnlockEnabled: isQuickUnlockEnabled ?? this.isQuickUnlockEnabled,
       requireBiometricForMemory:
           requireBiometricForMemory ?? this.requireBiometricForMemory,
+      isAdmin: isAdmin ?? this.isAdmin,
       isPremium: isPremium ?? this.isPremium,
       premiumUntil: premiumUntil ?? this.premiumUntil,
       trialStartedAt: trialStartedAt ?? this.trialStartedAt,
@@ -267,6 +273,7 @@ class UserProfile {
       'salt': salt,
       'isQuickUnlockEnabled': isQuickUnlockEnabled,
       'requireBiometricForMemory': requireBiometricForMemory,
+      'isAdmin': isAdmin,
       'isPremium': isPremium,
       'premiumUntil':
           premiumUntil != null ? Timestamp.fromDate(premiumUntil!) : null,
@@ -328,6 +335,7 @@ class UserProfile {
       isQuickUnlockEnabled: json['isQuickUnlockEnabled'] as bool? ?? false,
       requireBiometricForMemory:
           json['requireBiometricForMemory'] as bool? ?? false,
+      isAdmin: json['isAdmin'] as bool? ?? false,
       isPremium: json['isPremium'] as bool? ?? false,
       premiumUntil: (json['premiumUntil'] as Timestamp?)?.toDate(),
       trialStartedAt: (json['trialStartedAt'] as Timestamp?)?.toDate(),
@@ -343,24 +351,24 @@ class UserProfile {
       visualAnimationEnabled: json['visualAnimationEnabled'] as bool? ?? true,
       // --- EMOTION VISUALIZATION fromJson ASSIGNMENTS with defaults ---
       enableEmotionalGradient: json['enableEmotionalGradient'] as bool? ?? true,
-      // Level 1
+      // Level 1 (25% of max values)
       enableYearlyGradient: json['enableYearlyGradient'] as bool? ?? true,
-      yearlyGradientIntensity: (json['yearlyGradientIntensity'] as num?)?.toDouble() ?? 0.4,
-      yearlyGradientRadius: (json['yearlyGradientRadius'] as num?)?.toDouble() ?? 200.0,
-      yearlyGradientBlur: (json['yearlyGradientBlur'] as num?)?.toDouble() ?? 150.0,
+      yearlyGradientIntensity: (json['yearlyGradientIntensity'] as num?)?.toDouble() ?? 0.25,
+      yearlyGradientRadius: (json['yearlyGradientRadius'] as num?)?.toDouble() ?? 175.0,
+      yearlyGradientBlur: (json['yearlyGradientBlur'] as num?)?.toDouble() ?? 112.5,
       yearlyGradientSaturation: (json['yearlyGradientSaturation'] as num?)?.toDouble() ?? 1.5,
-      // Level 2
+      // Level 2 (25% of max values)
       enableMonthlyClusters: json['enableMonthlyClusters'] as bool? ?? true,
-      monthlyClusterIntensity: (json['monthlyClusterIntensity'] as num?)?.toDouble() ?? 0.5,
-      monthlyClusterRadius: (json['monthlyClusterRadius'] as num?)?.toDouble() ?? 100.0,
-      monthlyClusterBlur: (json['monthlyClusterBlur'] as num?)?.toDouble() ?? 80.0,
+      monthlyClusterIntensity: (json['monthlyClusterIntensity'] as num?)?.toDouble() ?? 0.25,
+      monthlyClusterRadius: (json['monthlyClusterRadius'] as num?)?.toDouble() ?? 87.5,
+      monthlyClusterBlur: (json['monthlyClusterBlur'] as num?)?.toDouble() ?? 60.0,
       monthlyClusterSaturation: (json['monthlyClusterSaturation'] as num?)?.toDouble() ?? 1.5,
-      // Level 3
+      // Level 3 (25% of max values)
       enableNodeAura: json['enableNodeAura'] as bool? ?? true,
-      nodeAuraIntensity: (json['nodeAuraIntensity'] as num?)?.toDouble() ?? 0.525,
-      nodeAuraRadius: (json['nodeAuraRadius'] as num?)?.toDouble() ?? 3.75,
-      nodeAuraBlur: (json['nodeAuraBlur'] as num?)?.toDouble() ?? 1.0,
-      nodeAuraSaturation: (json['nodeAuraSaturation'] as num?)?.toDouble() ?? 1.0,
+      nodeAuraIntensity: (json['nodeAuraIntensity'] as num?)?.toDouble() ?? 0.25,
+      nodeAuraRadius: (json['nodeAuraRadius'] as num?)?.toDouble() ?? 2.25,
+      nodeAuraBlur: (json['nodeAuraBlur'] as num?)?.toDouble() ?? 0.875,
+      nodeAuraSaturation: (json['nodeAuraSaturation'] as num?)?.toDouble() ?? 0.875,
       // Memory View
       enableMemoryViewGradient: json['enableMemoryViewGradient'] as bool? ?? true,
       enableMemoryViewParticles: json['enableMemoryViewParticles'] as bool? ?? false,

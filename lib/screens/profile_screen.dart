@@ -911,6 +911,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final userProfileAsyncValue = ref.watch(userProfileProvider);
     final currentUser = ref.watch(authStateChangesProvider).asData?.value;
     final isPremium = ref.watch(isPremiumProvider);
+    final currentLocale = ref.watch(localeProvider); // Watch actual app locale
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -1010,8 +1011,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     _buildInfoTile(
                       icon: Icons.language_outlined,
                       title: l10n.profileLanguage,
-                      subtitle: _supportedLanguages[profile.languageCode] ??
-                          _supportedLanguages[Localizations.localeOf(context).languageCode] ??
+                      subtitle: _supportedLanguages[currentLocale?.languageCode] ??
+                          _supportedLanguages[profile.languageCode] ??
                           'English',
                       onTap: () => _showLanguagePickerDialog(profile, l10n),
                     ),
@@ -1243,34 +1244,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return ExpansionTile(
       leading: const Icon(Icons.palette_outlined),
-      title: const Text('🎨 Эмоциональная Визуализация'),
-      subtitle: const Text('Настройте отображение эмоций'),
+      title: Text(l10n.emotionVisualizationTitle),
+      subtitle: Text(l10n.emotionVisualizationSubtitle),
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            'На жизненной линии:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            l10n.emotionVisualizationTimelineSection,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
-        ),
-        SwitchListTile(
-          title: const Text('Аура вокруг узлов'),
-          subtitle: const Text('Свечение в цвете эмоции'),
-          value: profile.enableNodeAura,
-          onChanged: (value) {
-            final updatedProfile = profile.copyWith(enableNodeAura: value);
-            ref.read(userServiceProvider).updateUserProfile(updatedProfile);
-          },
-          secondary: const Icon(Icons.blur_on),
         ),
         // Level 1: Yearly Gradient
         ExpansionTile(
           leading: const Icon(Icons.gradient),
-          title: const Text('Уровень 1: Годовой градиент'),
-          subtitle: const Text('Общее свечение эмоций (зум < 250%)'),
+          title: Text(l10n.emotionVisualizationLevel1Title),
+          subtitle: Text(l10n.emotionVisualizationLevel1Subtitle),
           children: [
             SwitchListTile(
-              title: const Text('Включить'),
+              title: Text(l10n.emotionVisualizationEnable),
               value: profile.enableYearlyGradient,
               onChanged: (value) {
                 final updatedProfile = profile.copyWith(enableYearlyGradient: value);
@@ -1280,7 +1271,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             if (profile.enableYearlyGradient) ...[
               ListTile(
                 leading: const Icon(Icons.opacity),
-                title: const Text('Интенсивность'),
+                title: Text(l10n.emotionVisualizationIntensity),
                 subtitle: Slider(
                   value: profile.yearlyGradientIntensity,
                   min: 0.0,
@@ -1295,7 +1286,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.circle_outlined),
-                title: const Text('Радиус'),
+                title: Text(l10n.emotionVisualizationRadius),
                 subtitle: Slider(
                   value: profile.yearlyGradientRadius,
                   min: 100.0,
@@ -1310,7 +1301,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.blur_circular),
-                title: const Text('Размытие'),
+                title: Text(l10n.emotionVisualizationBlur),
                 subtitle: Slider(
                   value: profile.yearlyGradientBlur,
                   min: 50.0,
@@ -1325,7 +1316,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.palette),
-                title: const Text('Насыщенность'),
+                title: Text(l10n.emotionVisualizationSaturation),
                 subtitle: Slider(
                   value: profile.yearlyGradientSaturation,
                   min: 1.0,
@@ -1345,11 +1336,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         // Level 2: Monthly Clusters
         ExpansionTile(
           leading: const Icon(Icons.view_module),
-          title: const Text('Уровень 2: Месячные кластеры'),
-          subtitle: const Text('Кластеры по месяцам (зум 250%-460%)'),
+          title: Text(l10n.emotionVisualizationLevel2Title),
+          subtitle: Text(l10n.emotionVisualizationLevel2Subtitle),
           children: [
             SwitchListTile(
-              title: const Text('Включить'),
+              title: Text(l10n.emotionVisualizationEnable),
               value: profile.enableMonthlyClusters,
               onChanged: (value) {
                 final updatedProfile = profile.copyWith(enableMonthlyClusters: value);
@@ -1359,7 +1350,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             if (profile.enableMonthlyClusters) ...[
               ListTile(
                 leading: const Icon(Icons.opacity),
-                title: const Text('Интенсивность'),
+                title: Text(l10n.emotionVisualizationIntensity),
                 subtitle: Slider(
                   value: profile.monthlyClusterIntensity,
                   min: 0.0,
@@ -1374,7 +1365,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.circle_outlined),
-                title: const Text('Радиус'),
+                title: Text(l10n.emotionVisualizationRadius),
                 subtitle: Slider(
                   value: profile.monthlyClusterRadius,
                   min: 50.0,
@@ -1389,7 +1380,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.blur_circular),
-                title: const Text('Размытие'),
+                title: Text(l10n.emotionVisualizationBlur),
                 subtitle: Slider(
                   value: profile.monthlyClusterBlur,
                   min: 30.0,
@@ -1404,7 +1395,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.palette),
-                title: const Text('Насыщенность'),
+                title: Text(l10n.emotionVisualizationSaturation),
                 subtitle: Slider(
                   value: profile.monthlyClusterSaturation,
                   min: 1.0,
@@ -1424,11 +1415,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         // Level 3: Node Aura
         ExpansionTile(
           leading: const Icon(Icons.blur_on),
-          title: const Text('Уровень 3: Аура узлов'),
-          subtitle: const Text('Свечение вокруг узлов (зум > 460%)'),
+          title: Text(l10n.emotionVisualizationLevel3Title),
+          subtitle: Text(l10n.emotionVisualizationLevel3Subtitle),
           children: [
             SwitchListTile(
-              title: const Text('Включить'),
+              title: Text(l10n.emotionVisualizationEnable),
               value: profile.enableNodeAura,
               onChanged: (value) {
                 final updatedProfile = profile.copyWith(enableNodeAura: value);
@@ -1438,7 +1429,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             if (profile.enableNodeAura) ...[
               ListTile(
                 leading: const Icon(Icons.opacity),
-                title: const Text('Интенсивность'),
+                title: Text(l10n.emotionVisualizationIntensity),
                 subtitle: Slider(
                   value: profile.nodeAuraIntensity,
                   min: 0.0,
@@ -1453,7 +1444,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.circle_outlined),
-                title: const Text('Радиус (множитель)'),
+                title: Text(l10n.emotionVisualizationRadiusMultiplier),
                 subtitle: Slider(
                   value: profile.nodeAuraRadius,
                   min: 1.0,
@@ -1468,7 +1459,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.blur_circular),
-                title: const Text('Размытие (множитель)'),
+                title: Text(l10n.emotionVisualizationBlurMultiplier),
                 subtitle: Slider(
                   value: profile.nodeAuraBlur,
                   min: 0.5,
@@ -1483,7 +1474,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.palette),
-                title: const Text('Насыщенность'),
+                title: Text(l10n.emotionVisualizationSaturation),
                 subtitle: Slider(
                   value: profile.nodeAuraSaturation,
                   min: 0.5,
@@ -1500,16 +1491,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ],
         ),
         const Divider(),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            'При просмотре воспоминания:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            l10n.emotionVisualizationMemoryViewSection,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
         ),
         SwitchListTile(
-          title: const Text('Эмоциональный фон'),
-          subtitle: const Text('Цветной градиент экрана'),
+          title: Text(l10n.emotionVisualizationMemoryGradientTitle),
+          subtitle: Text(l10n.emotionVisualizationMemoryGradientSubtitle),
           value: profile.enableMemoryViewGradient,
           onChanged: (value) {
             final updatedProfile = profile.copyWith(enableMemoryViewGradient: value);
@@ -1520,7 +1511,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         SwitchListTile(
           title: Row(
             children: [
-              const Text('Анимированный фон'),
+              Text(l10n.emotionVisualizationMemoryParticlesTitle),
               const SizedBox(width: 8),
               if (!isPremium)
                 Container(
@@ -1536,7 +1527,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
             ],
           ),
-          subtitle: const Text('Частицы дождя/снега на экране'),
+          subtitle: Text(l10n.emotionVisualizationMemoryParticlesSubtitle),
           value: profile.enableMemoryViewParticles,
           onChanged: isPremium
             ? (value) {
@@ -1549,7 +1540,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         SwitchListTile(
           title: Row(
             children: [
-              const Text('Цветовая коррекция фото'),
+              Text(l10n.emotionVisualizationPhotoColorGradingTitle),
               const SizedBox(width: 8),
               if (!isPremium)
                 Container(
@@ -1565,7 +1556,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
             ],
           ),
-          subtitle: const Text('Subtle фильтр в цвете эмоции'),
+          subtitle: Text(l10n.emotionVisualizationPhotoColorGradingSubtitle),
           value: profile.enablePhotoColorGrading,
           onChanged: isPremium
             ? (value) {

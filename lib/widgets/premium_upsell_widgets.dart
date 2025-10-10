@@ -79,30 +79,36 @@ class PremiumFeatureLockTile extends StatelessWidget {
 }
 
 /// Shows a dialog prompting the user to upgrade to premium.
-Future<void> showPremiumDialog(BuildContext context, String feature) {
+Future<bool> showPremiumDialog(BuildContext context, String feature) async {
   final l10n = AppLocalizations.of(context)!;
-  return showDialog(
+  final wentToPremium = await showDialog<bool>(
     context: context,
-    builder: (context) {
+    builder: (dialogContext) {
       return AlertDialog(
         title: Text(l10n.premiumDialogTitle),
         content: Text(l10n.premiumDialogContent(feature)),
         actions: [
           TextButton(
             child: Text(l10n.profileCancel),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
           ),
           ElevatedButton(
             child: Text(l10n.premiumDialogGoPremium),
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen()));
-            },
+            onPressed: () => Navigator.of(dialogContext).pop(true),
           ),
         ],
       );
     },
   );
+
+  // If user clicked "Go Premium", open premium screen
+  if (wentToPremium == true) {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PremiumScreen()));
+    // User returned from premium screen - return true to allow retry
+    return true;
+  }
+
+  return false;
 }
 
 /// A card to display the user's current premium status.

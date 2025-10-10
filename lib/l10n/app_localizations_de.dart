@@ -1346,4 +1346,80 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get notificationInsightSubtitle =>
       'Reflexionen über Ihre emotionale Reise';
+
+  @override
+  String get emotionVisualizationTitle => '🎨 Emotions-Visualisierung';
+
+  @override
+  String get emotionVisualizationSubtitle => 'Emotions-Anzeige anpassen';
+
+  @override
+  String get emotionVisualizationTimelineSection => 'Auf der Lebenslinie:';
+
+  @override
+  String get emotionVisualizationLevel1Title => 'Stufe 1: Jährlicher Verlauf';
+
+  @override
+  String get emotionVisualizationLevel1Subtitle =>
+      'Allgemeines Emotions-Leuchten (Zoom < 250%)';
+
+  @override
+  String get emotionVisualizationLevel2Title => 'Stufe 2: Monatliche Cluster';
+
+  @override
+  String get emotionVisualizationLevel2Subtitle =>
+      'Emotionen pro Monat (Zoom 250%-460%)';
+
+  @override
+  String get emotionVisualizationLevel3Title => 'Stufe 3: Knoten-Aura';
+
+  @override
+  String get emotionVisualizationLevel3Subtitle =>
+      'Leuchten um Knoten (Zoom > 460%)';
+
+  @override
+  String get emotionVisualizationEnable => 'Aktivieren';
+
+  @override
+  String get emotionVisualizationIntensity => 'Intensität';
+
+  @override
+  String get emotionVisualizationRadius => 'Radius';
+
+  @override
+  String get emotionVisualizationRadiusMultiplier => 'Radius (Multiplikator)';
+
+  @override
+  String get emotionVisualizationBlur => 'Unschärfe';
+
+  @override
+  String get emotionVisualizationBlurMultiplier => 'Unschärfe (Multiplikator)';
+
+  @override
+  String get emotionVisualizationSaturation => 'Sättigung';
+
+  @override
+  String get emotionVisualizationMemoryViewSection =>
+      'Bei Erinnerungs-Ansicht:';
+
+  @override
+  String get emotionVisualizationMemoryGradientTitle => 'Emotions-Verlauf';
+
+  @override
+  String get emotionVisualizationMemoryGradientSubtitle =>
+      'Farbiger Hintergrund basierend auf Emotionen';
+
+  @override
+  String get emotionVisualizationMemoryParticlesTitle => 'Emotions-Partikel';
+
+  @override
+  String get emotionVisualizationMemoryParticlesSubtitle =>
+      'Animierte Partikel (Premium)';
+
+  @override
+  String get emotionVisualizationPhotoColorGradingTitle => 'Foto-Farbkorrektur';
+
+  @override
+  String get emotionVisualizationPhotoColorGradingSubtitle =>
+      'Fotos an Emotionen anpassen (Premium)';
 }

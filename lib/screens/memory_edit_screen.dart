@@ -457,11 +457,20 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     if (!isPremium &&
         (_mediaItems.length + pickedFiles.length) > _freePhotoLimit) {
       if (mounted) {
-        await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+        final purchased = await showPremiumDialog(context, l10n.premiumFeaturePhotos);
+        // If user went to premium screen and returned, process the picked files
+        if (purchased && mounted) {
+          await _processPickedImages(pickedFiles);
+          return;
+        }
       }
       return;
     }
 
+    await _processPickedImages(pickedFiles);
+  }
+
+  Future<void> _processPickedImages(List<XFile> pickedFiles) async {
     setState(() => _isProcessingImages = true);
 
     try {
@@ -483,8 +492,12 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
               ))
           .toList();
 
+      // Filter out duplicates based on path
+      final existingPaths = _mediaItems.map((item) => item.path).toSet();
+      final uniqueNewItems = newMediaItems.where((item) => !existingPaths.contains(item.path)).toList();
+
       setState(() {
-        _mediaItems.addAll(newMediaItems);
+        _mediaItems.addAll(uniqueNewItems);
       });
 
       await _autoSaveDraft();
@@ -602,7 +615,11 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium && _videoItems.length >= _freeVideoLimit) {
       if (context.mounted) {
-        await showPremiumDialog(context, l10n.premiumFeatureVideos);
+        final purchased = await showPremiumDialog(context, l10n.premiumFeatureVideos);
+        if (purchased && mounted) {
+          _pickVideo(); // Retry with updated isPremium status
+          return;
+        }
       }
       return;
     }
@@ -624,9 +641,13 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
           return;
         }
 
-        setState(() =>
-            _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
-        unawaited(_autoSaveDraft());
+        // Check for duplicates before adding
+        final isDuplicate = _videoItems.any((item) => item.path == pickedFile.path);
+        if (!isDuplicate) {
+          setState(() =>
+              _videoItems.add(VideoMediaItem(path: pickedFile.path, isLocal: true)));
+          unawaited(_autoSaveDraft());
+        }
       }
     } else if (status.isPermanentlyDenied) {
       if (!mounted) return;
@@ -639,7 +660,11 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium && _audioNoteItems.length >= _freeAudioLimit) {
       if (context.mounted) {
-        await showPremiumDialog(context, l10n.premiumFeatureAudio);
+        final purchased = await showPremiumDialog(context, l10n.premiumFeatureAudio);
+        if (purchased && mounted) {
+          _recordAudio(); // Retry with updated isPremium status
+          return;
+        }
       }
       return;
     }
@@ -665,11 +690,17 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
             return;
           }
 
+          // Check for duplicates before adding
+          final isDuplicate = _audioNoteItems.any((item) => item.path == path);
           setState(() {
             _isRecording = false;
-            _audioNoteItems.add(AudioMediaItem(path: path, isLocal: true));
+            if (!isDuplicate) {
+              _audioNoteItems.add(AudioMediaItem(path: path, isLocal: true));
+            }
           });
-          unawaited(_autoSaveDraft());
+          if (!isDuplicate) {
+            unawaited(_autoSaveDraft());
+          }
         }
       } else {
         final dir = await getTemporaryDirectory();
@@ -742,7 +773,11 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (!isPremium && _spotifyTrackIds.length >= _freeSpotifyLimit) {
       if (context.mounted) {
-        await showPremiumDialog(context, l10n.premiumFeatureSpotify);
+        final purchased = await showPremiumDialog(context, l10n.premiumFeatureSpotify);
+        if (purchased && mounted) {
+          _searchAndAttachTrack(); // Retry with updated isPremium status
+          return;
+        }
       }
       return;
     }

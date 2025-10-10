@@ -1339,4 +1339,80 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get notificationInsightSubtitle =>
       'Reflexões sobre sua jornada emocional';
+
+  @override
+  String get emotionVisualizationTitle => '🎨 Emotion Visualization';
+
+  @override
+  String get emotionVisualizationSubtitle => 'Customize emotion display';
+
+  @override
+  String get emotionVisualizationTimelineSection => 'On the lifeline:';
+
+  @override
+  String get emotionVisualizationLevel1Title => 'Level 1: Yearly Gradient';
+
+  @override
+  String get emotionVisualizationLevel1Subtitle =>
+      'Overall emotion glow (zoom < 250%)';
+
+  @override
+  String get emotionVisualizationLevel2Title => 'Level 2: Monthly Clusters';
+
+  @override
+  String get emotionVisualizationLevel2Subtitle =>
+      'Emotions by month (zoom 250%-460%)';
+
+  @override
+  String get emotionVisualizationLevel3Title => 'Level 3: Node Aura';
+
+  @override
+  String get emotionVisualizationLevel3Subtitle =>
+      'Glow around nodes (zoom > 460%)';
+
+  @override
+  String get emotionVisualizationEnable => 'Enable';
+
+  @override
+  String get emotionVisualizationIntensity => 'Intensity';
+
+  @override
+  String get emotionVisualizationRadius => 'Radius';
+
+  @override
+  String get emotionVisualizationRadiusMultiplier => 'Radius (multiplier)';
+
+  @override
+  String get emotionVisualizationBlur => 'Blur';
+
+  @override
+  String get emotionVisualizationBlurMultiplier => 'Blur (multiplier)';
+
+  @override
+  String get emotionVisualizationSaturation => 'Saturation';
+
+  @override
+  String get emotionVisualizationMemoryViewSection => 'When viewing memory:';
+
+  @override
+  String get emotionVisualizationMemoryGradientTitle => 'Emotion gradient';
+
+  @override
+  String get emotionVisualizationMemoryGradientSubtitle =>
+      'Colored background based on emotions';
+
+  @override
+  String get emotionVisualizationMemoryParticlesTitle => 'Emotion particles';
+
+  @override
+  String get emotionVisualizationMemoryParticlesSubtitle =>
+      'Animated particles (Premium)';
+
+  @override
+  String get emotionVisualizationPhotoColorGradingTitle =>
+      'Photo color grading';
+
+  @override
+  String get emotionVisualizationPhotoColorGradingSubtitle =>
+      'Adjust photos to emotions (Premium)';
 }
