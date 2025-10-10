@@ -1800,6 +1800,11 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
               ? CachedNetworkImageProvider(path)
               : FileImage(File(path)) as ImageProvider;
 
+          // Precache the full image to ensure it's loaded from cache on subsequent views
+          if (path.startsWith('http')) {
+            precacheImage(fullImageProvider, context);
+          }
+
           mediaWidget = Image(
             image: fullImageProvider,
             fit: BoxFit.contain,
