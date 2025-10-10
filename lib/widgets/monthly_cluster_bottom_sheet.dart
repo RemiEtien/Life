@@ -178,7 +178,8 @@ class _MonthlyClusterBottomSheetState extends ConsumerState<MonthlyClusterBottom
 
                 return GestureDetector(
                   onTap: () async {
-                    Navigator.pop(context);
+                    // Navigate to memory view without closing the bottom sheet first
+                    // This preserves the navigation stack so back button returns to this sheet
                     await Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => MemoryViewScreen(
                         memory: memory,
