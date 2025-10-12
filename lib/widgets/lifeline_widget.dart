@@ -890,22 +890,31 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     return minScale;
   }
 
-  // Calculate maximum scale based on fixed baseline content width (1200px)
-  // This ensures IDENTICAL zoom depth across all timeline lengths
-  // Calculate maximum scale to ensure UNIVERSAL zoom behavior:
-  // For ALL timelines to have identical visual zoom experience:
-  // - Maximum visual zoom should show nodes at 10px on screen
-  // - This corresponds to: visualSize = (nodeRadius * 2) / scale = 10px
-  // - Therefore: maxScale = (13 * 2) / 10 = 2.6 (FIXED for all timelines)
+  // Calculate maximum scale using RELATIVE ZOOM approach
+  // This ensures UNIVERSAL zoom behavior across all timeline lengths and devices
   //
-  // Exception: If timeline is so short that minScale > 2.6, use minScale
-  // (otherwise user wouldn't be able to zoom out to see full timeline)
+  // Strategy:
+  // 1. maxScale = minScale × MAX_RELATIVE_ZOOM (ensures consistent zoom range)
+  // 2. Also ensure nodes can reach 10px visual size at max zoom
+  // 3. Use max() of both values to satisfy both requirements
   double _calculateMaxScale(double minScale, double screenWidth) {
-    // Fixed target scale for 10px nodes at maximum zoom
-    const double kTargetNodeScale = 2.6;
+    // Maximum relative zoom: user can zoom in 25x from "fit all" view
+    const double kMaxRelativeZoom = 25.0;
 
-    // Ensure maxScale is at least minScale (can't zoom out beyond fitting timeline)
-    return max(kTargetNodeScale, minScale);
+    // Node diameter in canvas coordinates (radius = 13)
+    const double kNodeDiameter = 13.0 * 2;
+
+    // Scale required to make nodes 10px on screen
+    // Formula: visualSize = nodeDiameter / currentScale = 10px
+    // Therefore: requiredScale = nodeDiameter / 10
+    const double kRequiredScaleFor10px = kNodeDiameter / 10.0; // = 2.6
+
+    // Calculate maxScale as the larger of:
+    // - Relative zoom (guarantees zoom range on all timelines)
+    // - Required scale for 10px nodes (guarantees visual target)
+    final relativeMaxScale = minScale * kMaxRelativeZoom;
+
+    return max(relativeMaxScale, kRequiredScaleFor10px);
   }
 
   void _updateStructureCache(
@@ -1022,10 +1031,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     final minScale = _calculateMinScale(totalWidth, screenWidth);
     final maxScale = _calculateMaxScale(minScale, screenWidth);
-    
+
     // Определяем целевой масштаб: если мы уже приближены, то отдаляем, иначе приближаем к максимальному уровню
     final targetScale = (currentScale - minScale).abs() > 0.1 ? minScale : maxScale;
-    
+
     // Анимируем к новому масштабу, центрируясь на точке касания
     _animateZoomToPoint(targetScale, _doubleTapLocalPosition);
   }
@@ -1161,9 +1170,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final List<TappableItem> hits = [];
     final List<String> processedNodeIds = [];
 
+    // Calculate relative zoom for tap detection
+    final totalWidth = _cachedLayoutResult?.totalWidth ?? 1.0;
+    final screenWidth = _lastKnownSize.width;
+    final minScale = _calculateMinScale(totalWidth, screenWidth);
+    final relativeZoom = currentScale / minScale;
+
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    // Месячные кластеры видны только в диапазоне zoom 1.04-1.82 (соответствует LEVEL 2)
-    if (currentScale >= 1.04 && currentScale < 1.82) {
+    // Месячные кластеры видны только в диапазоне zoom 4x-12x (соответствует LEVEL 2)
+    if (relativeZoom >= 4.0 && relativeZoom < 12.0) {
       _monthlyClusterData.forEach((clusterId, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
@@ -1181,9 +1196,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       });
     }
 
-    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 1.82, LEVEL 3)
-    // Using absolute currentScale for universal behavior
-    if (currentScale >= 1.82) {
+    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 12x, LEVEL 3)
+    // Using relative zoom for universal behavior
+    if (relativeZoom >= 12.0) {
       _dailyClusterData.forEach((id, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
