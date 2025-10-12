@@ -898,8 +898,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   // 2. Also ensure nodes can reach 10px visual size at max zoom
   // 3. Use max() of both values to satisfy both requirements
   double _calculateMaxScale(double minScale, double screenWidth) {
-    // Maximum relative zoom: user can zoom in 25x from "fit all" view
-    const double kMaxRelativeZoom = 25.0;
+    // Maximum relative zoom: user can zoom in 13x from "fit all" view
+    // Based on logs: max observed zoom was 1280% = 12.8x
+    const double kMaxRelativeZoom = 13.0;
 
     // Node diameter in canvas coordinates (radius = 13)
     const double kNodeDiameter = 13.0 * 2;
