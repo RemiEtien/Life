@@ -1162,8 +1162,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final List<String> processedNodeIds = [];
 
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    // Месячные кластеры видны только в диапазоне zoom 2.5-4.6 (соответствует LEVEL 2: 250%-460%)
-    if (currentScale >= 2.5 && currentScale < 4.6) {
+    // Месячные кластеры видны только в диапазоне zoom 1.04-1.82 (соответствует LEVEL 2)
+    if (currentScale >= 1.04 && currentScale < 1.82) {
       _monthlyClusterData.forEach((clusterId, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
@@ -1181,9 +1181,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       });
     }
 
-    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 460%)
-    // Using relative zoom (currentScale / minScale) for device-independent behavior
-    if (currentScale >= 4.6) {
+    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 1.82, LEVEL 3)
+    // Using absolute currentScale for universal behavior
+    if (currentScale >= 1.82) {
       _dailyClusterData.forEach((id, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;

@@ -526,30 +526,40 @@ class LifelinePainter extends CustomPainter {
     final placementResults = renderData.placementResults;
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
 
-    // === 3-LEVEL ZOOM SYSTEM ===
-    // Using relative zoom (currentScale / minScale) for device-independent behavior
-    // LEVEL 1: Far zoom - yearly gradient (zoom < 2.5 / < 250%)
-    if (zoomScale < 2.5) {
+    // === 3-LEVEL ZOOM SYSTEM (UNIVERSAL) ===
+    // Using ABSOLUTE currentScale for truly universal zoom behavior
+    // maxScale = 2.6 ensures nodes are 10px at maximum zoom on ALL timelines
+    //
+    // Level boundaries are proportions of maxScale:
+    // - LEVEL 1 (Yearly gradient): minScale to 0.4 * maxScale (minScale → 1.04)
+    // - LEVEL 2 (Monthly clusters): 0.4 * maxScale to 0.7 * maxScale (1.04 → 1.82)
+    // - LEVEL 3 (Individual nodes): 0.7 * maxScale to maxScale (1.82 → 2.6)
+    //
+    // This ensures visual consistency: same element sizes at same zoom levels
+
+    const double kLevelBoundary12 = 1.04; // 40% of maxScale 2.6
+    const double kLevelBoundary23 = 1.82; // 70% of maxScale 2.6
+
+    if (currentScale < kLevelBoundary12) {
       stopwatch.start();
-      _drawYearlyGradient(canvas, mainPath, size, zoomScale);
+      _drawYearlyGradient(canvas, mainPath, size, currentScale);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
-    // LEVEL 2: Medium zoom - monthly clusters (zoom 2.5-4.6 / 250%-460%)
-    else if (zoomScale >= 2.5 && zoomScale < 4.6) {
+    else if (currentScale >= kLevelBoundary12 && currentScale < kLevelBoundary23) {
       stopwatch.start();
-      _drawMonthlyClusters(canvas, mainPath, size, zoomScale, placementResults);
+      _drawMonthlyClusters(canvas, mainPath, size, currentScale, placementResults);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
 
-    // Calculate detailOpacity for Level 3 (zoom >= 4.6 / >= 460%)
-    // Fade in individual nodes as we zoom past 4.6
-    final detailOpacity = (zoomScale < 4.4)
+    // Calculate detailOpacity for Level 3 (currentScale >= 1.82)
+    // Fade in individual nodes as we zoom past 1.82
+    final detailOpacity = (currentScale < kLevelBoundary23 - 0.1)
         ? 0.0
-        : ((zoomScale - 4.4) / 0.6).clamp(0.0, 1.0);
+        : ((currentScale - (kLevelBoundary23 - 0.1)) / 0.1).clamp(0.0, 1.0);
 
     // --- Draw animated branches dynamically ---
     // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
@@ -698,10 +708,10 @@ class LifelinePainter extends CustomPainter {
     if (memories.length < 2) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fade out transition for yearly gradient (LEVEL 1: 100%-250%)
-    // Fully visible from 100% to 220%, then fade out from 220% to 250%
-    final fadeOutOpacity = (zoomScale > 2.2)
-        ? ((2.5 - zoomScale) / 0.3).clamp(0.0, 1.0)
+    // Fade out transition for yearly gradient (LEVEL 1: minScale to 1.04)
+    // Fully visible from minScale to 0.94, then fade out from 0.94 to 1.04
+    final fadeOutOpacity = (currentScale > 0.94)
+        ? ((1.04 - currentScale) / 0.1).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeOutOpacity;
 
@@ -777,14 +787,14 @@ class LifelinePainter extends CustomPainter {
     if (memories.isEmpty) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fade in/out transitions for monthly clusters (LEVEL 2: 250%-460%)
-    // Fade in from 250% to 280%
-    final fadeInOpacity = (zoomScale < 2.8)
-        ? ((zoomScale - 2.5) / 0.3).clamp(0.0, 1.0)
+    // Fade in/out transitions for monthly clusters (LEVEL 2: 1.04 to 1.82)
+    // Fade in from 1.04 to 1.14
+    final fadeInOpacity = (currentScale < 1.14)
+        ? ((currentScale - 1.04) / 0.1).clamp(0.0, 1.0)
         : 1.0;
-    // Fade out from 420% to 460%
-    final fadeOutOpacity = (zoomScale > 4.2)
-        ? ((4.6 - zoomScale) / 0.4).clamp(0.0, 1.0)
+    // Fade out from 1.72 to 1.82
+    final fadeOutOpacity = (currentScale > 1.72)
+        ? ((1.82 - currentScale) / 0.1).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeInOpacity * fadeOutOpacity;
 
@@ -844,32 +854,24 @@ class LifelinePainter extends CustomPainter {
       // Skip if no positions found for this month
       if (positions.isEmpty) continue;
 
-      // Calculate average X from REAL memory positions, but find Y on path
-      // This ensures horizontal position matches actual memories, but stays ON the path vertically
-      final avgX = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
+      // BUGFIX: Calculate average timestamp ONLY from memories that are actually placed on timeline
+      // Filter monthMemories to only include those with positions
+      final placedMemories = monthMemories.where((m) => memoryPositions.containsKey(m.universalId)).toList();
 
-      // Find closest point on path to this X coordinate
+      if (placedMemories.isEmpty) continue; // Safety check
+
+      final avgTimestamp = placedMemories
+          .map((m) => m.date.millisecondsSinceEpoch)
+          .reduce((a, b) => a + b) ~/ placedMemories.length;
+
+      final t = ((avgTimestamp - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
       final pathMetric = path.computeMetrics().first;
-      final pathLength = pathMetric.length;
+      final tangent = pathMetric.getTangentForOffset(t * pathMetric.length);
 
-      Offset? bestPos;
-      double minXDiff = double.infinity;
+      if (tangent == null) continue;
+      final avgPos = tangent.position;
 
-      // Sample path to find point with closest X coordinate
-      for (double t = 0; t <= 1.0; t += 0.01) {
-        final tangent = pathMetric.getTangentForOffset(t * pathLength);
-        if (tangent != null) {
-          final xDiff = (tangent.position.dx - avgX).abs();
-          if (xDiff < minXDiff) {
-            minXDiff = xDiff;
-            bestPos = tangent.position;
-          }
-        }
-      }
-
-      if (bestPos == null) continue;
-
-      clusterPositions.add((key: monthKey, pos: bestPos, memories: monthMemories));
+      clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
     }
 
     // Group nearby monthly clusters (if they're too close, combine them)
@@ -898,7 +900,7 @@ class LifelinePainter extends CustomPainter {
 
           // Find position on path at the middle point between the two clusters
           final avgTimestamp = (() {
-            final firstParts = lastGroup.monthKeys.first.split('-');
+            final firstParts = lastGroup.monthKeys.last.split('-');
             final lastParts = current.key.split('-');
             final firstYear = int.parse(firstParts[0]);
             final firstMonth = int.parse(firstParts[1]);
@@ -1066,8 +1068,8 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
       }
 
-      // Only show count text at high zoom level (>= 460%, LEVEL 3)
-      if (zoomScale >= 4.6) {
+      // Only show count text at high zoom level (>= 1.82, LEVEL 3)
+      if (currentScale >= 1.82) {
         final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
         final textStyle = GoogleFonts.orbitron(
           color: ringColor.withOpacity(finalOpacity),
@@ -1486,8 +1488,8 @@ class LifelinePainter extends CustomPainter {
       _drawLockIcon(canvas, adjustedPos, nodeRadius * 1.5, opacity);
     }
 
-    // Only show count text at high zoom level (>= 460%, LEVEL 3)
-    if (zoomScale >= 4.6) {
+    // Only show count text at high zoom level (>= 1.82, LEVEL 3)
+    if (currentScale >= 1.82) {
       final textStyle = GoogleFonts.orbitron(
           color: ringColor.withValues(alpha: opacity),
           fontSize: 10.0,
@@ -1582,6 +1584,7 @@ class LifelinePainter extends CustomPainter {
         old.pulseValue != pulseValue ||
         !listEquals(old.memories, memories) ||
         old.zoomScale != zoomScale ||
+        old.currentScale != currentScale ||
         !mapEquals(old.images, images) ||
         old.branchIntensity != branchIntensity ||
         old.renderData != renderData;
