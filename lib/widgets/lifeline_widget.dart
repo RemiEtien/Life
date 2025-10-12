@@ -2028,50 +2028,35 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  l10n.lifelineScaleValue(displayScale),
+                                  'Scale: $displayScale%',
                                   style: const TextStyle(
                                       color: Colors.white70, fontSize: 10),
                                 ),
                                 Text(
-                                  'Timeline: ${totalWidth.toStringAsFixed(0)}px',
+                                  'Screen: ${_lastKnownSize.width.toStringAsFixed(0)}x${_lastKnownSize.height.toStringAsFixed(0)}px',
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 10),
+                                ),
+                                Text(
+                                  'Timeline width: ${totalWidth.toStringAsFixed(0)}px',
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 10),
+                                ),
+                                Text(
+                                  'Node size: ${nodeVisualSize.toStringAsFixed(2)}px',
                                   style: const TextStyle(
                                       color: Colors.white70, fontSize: 10),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '=== ZOOM DIAGNOSTICS ===',
-                                  style: const TextStyle(
-                                      color: Colors.yellowAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                                Text(
                                   'Relative Zoom: ${relativeZoom.toStringAsFixed(2)}x',
-                                  style: const TextStyle(
-                                      color: Colors.greenAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Node Visual Size: ${nodeVisualSize.toStringAsFixed(2)}px',
                                   style: TextStyle(
-                                      color: nodeVisualSize <= 10 ? Colors.greenAccent : Colors.orange,
-                                      fontSize: 11,
+                                      color: relativeZoom >= 12.0 ? Colors.greenAccent : Colors.yellowAccent,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'currentScale: ${rawScale.toStringAsFixed(3)}',
-                                  style: const TextStyle(
-                                      color: Colors.white60, fontSize: 9),
-                                ),
-                                Text(
-                                  'minScale: ${minScale.toStringAsFixed(3)}',
-                                  style: const TextStyle(
-                                      color: Colors.white60, fontSize: 9),
-                                ),
-                                Text(
-                                  'maxScale: ${maxScale.toStringAsFixed(3)}',
-                                  style: const TextStyle(
-                                      color: Colors.white60, fontSize: 9),
-                                ),
-                                Text(
-                                  'Zoom Range: 1x → ${(maxScale / minScale).toStringAsFixed(1)}x',
+                                  'Zoom Range: 1.0x → ${(maxScale / minScale).toStringAsFixed(1)}x',
                                   style: const TextStyle(
                                       color: Colors.cyanAccent, fontSize: 10),
                                 ),
