@@ -526,19 +526,30 @@ class LifelinePainter extends CustomPainter {
     final placementResults = renderData.placementResults;
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
 
-    // === 3-LEVEL ZOOM SYSTEM (UNIVERSAL - RELATIVE ZOOM) ===
-    // Using RELATIVE zoom (currentScale / minScale) for truly universal behavior
+    // === 3-LEVEL ZOOM SYSTEM (UNIVERSAL - DYNAMIC BOUNDARIES) ===
+    // Strategy: Fixed absolute maxScale (2.6) for identical visual depth
+    // Dynamic relative boundaries based on actual maxRelativeZoom
     //
-    // Strategy from expert recommendations:
-    // - Level boundaries are RELATIVE to minScale (not absolute currentScale)
-    // - LEVEL 1 (Yearly gradient): relativeZoom 1.0 to 4.0
-    // - LEVEL 2 (Monthly clusters): relativeZoom 4.0 to 12.0
-    // - LEVEL 3 (Individual nodes): relativeZoom >= 12.0
+    // maxScale = 2.6 (fixed) - ensures nodes are 10px at max zoom everywhere
+    // maxRelativeZoom = 2.6 / minScale - different on different timelines
+    // Level boundaries = proportions of maxRelativeZoom
     //
-    // This ensures identical visual experience on ALL devices and timeline lengths
+    // This ensures identical VISUAL experience on ALL devices and timeline lengths
 
-    const double kLevel2Threshold = 4.0;  // Transition to monthly clusters at 4x zoom
-    const double kLevel3Threshold = 12.0; // Transition to individual nodes at 12x zoom
+    // Calculate maxRelativeZoom from absolute scales
+    // currentScale can reach max 2.6, minScale varies
+    const double kFixedMaxScale = 2.6;
+    // Estimate minScale from currentScale and relativeZoom
+    // relativeZoom = currentScale / minScale => minScale = currentScale / relativeZoom
+    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
+    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
+
+    // Dynamic boundaries as proportions of maxRelativeZoom
+    // LEVEL 1: 0% to 33% of max
+    // LEVEL 2: 33% to 66% of max
+    // LEVEL 3: 66% to 100% of max
+    final kLevel2Threshold = maxRelativeZoom * 0.33;
+    final kLevel3Threshold = maxRelativeZoom * 0.66;
 
     // zoomScale parameter is actually relativeZoom (calculated in widget as currentScale / minScale)
     final relativeZoom = zoomScale;
@@ -706,15 +717,22 @@ class LifelinePainter extends CustomPainter {
   }
 
   /// LEVEL 1: Draw yearly gradient - one averaged circle per year
-  void _drawYearlyGradient(Canvas canvas, ui.Path path, Size size, double zoomScale) {
+  void _drawYearlyGradient(Canvas canvas, ui.Path path, Size size, double relativeZoom) {
     if (!userProfile!.enableYearlyGradient) return;
     if (memories.length < 2) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fade out transition for yearly gradient (LEVEL 1: relativeZoom 1.0 to 4.0)
-    // Fully visible from 1.0 to 3.5, then fade out from 3.5 to 4.0
-    final fadeOutOpacity = (zoomScale > 3.5)
-        ? ((4.0 - zoomScale) / 0.5).clamp(0.0, 1.0)
+    // Calculate dynamic boundary (33% of maxRelativeZoom)
+    const double kFixedMaxScale = 2.6;
+    final estimatedMinScale = relativeZoom > 0.1 ? currentScale / relativeZoom : currentScale;
+    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
+    final level2Threshold = maxRelativeZoom * 0.33;
+
+    // Fade out transition for yearly gradient (LEVEL 1)
+    // Fully visible from 1.0 to 90% of level2 threshold, then fade out
+    final fadeStart = level2Threshold * 0.9;
+    final fadeOutOpacity = (relativeZoom > fadeStart)
+        ? ((level2Threshold - relativeZoom) / (level2Threshold - fadeStart)).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeOutOpacity;
 
@@ -790,14 +808,23 @@ class LifelinePainter extends CustomPainter {
     if (memories.isEmpty) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fade in/out transitions for monthly clusters (LEVEL 2: relativeZoom 4.0 to 12.0)
-    // Fade in from 4.0 to 5.0
-    final fadeInOpacity = (zoomScale < 5.0)
-        ? ((zoomScale - 4.0) / 1.0).clamp(0.0, 1.0)
+    // Calculate dynamic boundaries (33% to 66% of maxRelativeZoom)
+    const double kFixedMaxScale = 2.6;
+    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
+    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
+    final level2Threshold = maxRelativeZoom * 0.33;
+    final level3Threshold = maxRelativeZoom * 0.66;
+
+    // Fade in/out transitions for monthly clusters (LEVEL 2)
+    // Fade in from level2Threshold to level2Threshold + 10% of range
+    final fadeInRange = (level3Threshold - level2Threshold) * 0.1;
+    final fadeInOpacity = (zoomScale < level2Threshold + fadeInRange)
+        ? ((zoomScale - level2Threshold) / fadeInRange).clamp(0.0, 1.0)
         : 1.0;
-    // Fade out from 11.0 to 12.0
-    final fadeOutOpacity = (zoomScale > 11.0)
-        ? ((12.0 - zoomScale) / 1.0).clamp(0.0, 1.0)
+    // Fade out from 90% of level3Threshold to level3Threshold
+    final fadeOutStart = level3Threshold * 0.9;
+    final fadeOutOpacity = (zoomScale > fadeOutStart)
+        ? ((level3Threshold - zoomScale) / (level3Threshold - fadeOutStart)).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeInOpacity * fadeOutOpacity;
 
@@ -857,22 +884,12 @@ class LifelinePainter extends CustomPainter {
       // Skip if no positions found for this month
       if (positions.isEmpty) continue;
 
-      // BUGFIX: Calculate average timestamp ONLY from memories that are actually placed on timeline
-      // Filter monthMemories to only include those with positions
-      final placedMemories = monthMemories.where((m) => memoryPositions.containsKey(m.universalId)).toList();
-
-      if (placedMemories.isEmpty) continue; // Safety check
-
-      final avgTimestamp = placedMemories
-          .map((m) => m.date.millisecondsSinceEpoch)
-          .reduce((a, b) => a + b) ~/ placedMemories.length;
-
-      final t = ((avgTimestamp - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
-      final pathMetric = path.computeMetrics().first;
-      final tangent = pathMetric.getTangentForOffset(t * pathMetric.length);
-
-      if (tangent == null) continue;
-      final avgPos = tangent.position;
+      // FIXED: Calculate average position using REAL coordinates from placementResults
+      // This ensures monthly cluster is at the center of mass of its actual nodes,
+      // not at an abstract point on path based on timestamp
+      final avgDx = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
+      final avgDy = positions.map((p) => p.dy).reduce((a, b) => a + b) / positions.length;
+      final avgPos = Offset(avgDx, avgDy);
 
       clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
     }
@@ -901,25 +918,11 @@ class LifelinePainter extends CustomPainter {
           // Merge into last group
           final combinedMemories = [...lastGroup.memories, ...current.memories];
 
-          // Find position on path at the middle point between the two clusters
-          final avgTimestamp = (() {
-            final firstParts = lastGroup.monthKeys.last.split('-');
-            final lastParts = current.key.split('-');
-            final firstYear = int.parse(firstParts[0]);
-            final firstMonth = int.parse(firstParts[1]);
-            final lastYear = int.parse(lastParts[0]);
-            final lastMonth = int.parse(lastParts[1]);
-
-            final firstDate = DateTime(firstYear, firstMonth, 15);
-            final lastDate = DateTime(lastYear, lastMonth, 15);
-
-            return (firstDate.millisecondsSinceEpoch + lastDate.millisecondsSinceEpoch) ~/ 2;
-          })();
-
-          final t = ((avgTimestamp - minDate.millisecondsSinceEpoch) / totalSpan).clamp(0.0, 1.0);
-          final pathMetric = path.computeMetrics().first;
-          final tangent = pathMetric.getTangentForOffset(t * pathMetric.length);
-          final avgPos = tangent?.position ?? Offset((lastGroup.pos.dx + current.pos.dx) / 2, (lastGroup.pos.dy + current.pos.dy) / 2);
+          // FIXED: Use average of REAL positions (center of mass), not timestamp-based calculation
+          final avgPos = Offset(
+            (lastGroup.pos.dx + current.pos.dx) / 2,
+            (lastGroup.pos.dy + current.pos.dy) / 2,
+          );
 
           groupedClusters[groupedClusters.length - 1] = (
             monthKeys: [...lastGroup.monthKeys, current.key],
@@ -1071,8 +1074,9 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
       }
 
-      // Only show count text at high zoom level (>= 12x, LEVEL 3)
-      if (zoomScale >= 12.0) {
+      // Only show count text at high zoom level (LEVEL 3)
+      // Show when zoom reaches level3Threshold
+      if (zoomScale >= level3Threshold) {
         final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
         final textStyle = GoogleFonts.orbitron(
           color: ringColor.withOpacity(finalOpacity),
@@ -1491,8 +1495,14 @@ class LifelinePainter extends CustomPainter {
       _drawLockIcon(canvas, adjustedPos, nodeRadius * 1.5, opacity);
     }
 
-    // Only show count text at high zoom level (>= 12x, LEVEL 3)
-    if (zoomScale >= 12.0) {
+    // Only show count text at high zoom level (LEVEL 3)
+    // Calculate dynamic level3Threshold (66% of maxRelativeZoom)
+    const double kFixedMaxScale = 2.6;
+    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
+    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
+    final level3Threshold = maxRelativeZoom * 0.66;
+
+    if (zoomScale >= level3Threshold) {
       final textStyle = GoogleFonts.orbitron(
           color: ringColor.withValues(alpha: opacity),
           fontSize: 10.0,

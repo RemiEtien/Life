@@ -59,7 +59,8 @@
       "Bash(then echo \"Coverage file generated\")",
       "Bash(else echo \"No coverage file found\")",
       "Bash(python:*)",
-      "Read(//c/Users/gambi/**)"
+      "Read(//c/Users/gambi/**)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []

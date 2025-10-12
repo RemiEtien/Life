@@ -912,32 +912,23 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     return minScale;
   }
 
-  // Calculate maximum scale using RELATIVE ZOOM approach
+  // Calculate maximum scale using ABSOLUTE SCALE approach
   // This ensures UNIVERSAL zoom behavior across all timeline lengths and devices
   //
   // Strategy:
-  // 1. maxScale = minScale × MAX_RELATIVE_ZOOM (ensures consistent zoom range)
-  // 2. Also ensure nodes can reach 10px visual size at max zoom
-  // 3. Use max() of both values to satisfy both requirements
+  // 1. Fix absolute maxScale to achieve 10px nodes at max zoom on ALL timelines
+  // 2. This means relative zoom will be different on different timelines
+  // 3. But visual depth of zoom will be identical
   double _calculateMaxScale(double minScale, double screenWidth) {
-    // Maximum relative zoom: user can zoom in 13x from "fit all" view
-    // Based on logs: max observed zoom was 1280% = 12.8x
-    const double kMaxRelativeZoom = 13.0;
-
-    // Node diameter in canvas coordinates (radius = 13)
-    const double kNodeDiameter = 13.0 * 2;
-
-    // Scale required to make nodes 10px on screen
+    // Target: nodes should be 10px on screen at maximum zoom
     // Formula: visualSize = nodeDiameter / currentScale = 10px
-    // Therefore: requiredScale = nodeDiameter / 10
-    const double kRequiredScaleFor10px = kNodeDiameter / 10.0; // = 2.6
+    // Therefore: targetScale = nodeDiameter / 10
+    const double kNodeDiameter = 13.0 * 2; // = 26
+    const double kTargetScaleFor10px = kNodeDiameter / 10.0; // = 2.6
 
-    // Calculate maxScale as the larger of:
-    // - Relative zoom (guarantees zoom range on all timelines)
-    // - Required scale for 10px nodes (guarantees visual target)
-    final relativeMaxScale = minScale * kMaxRelativeZoom;
-
-    return max(relativeMaxScale, kRequiredScaleFor10px);
+    // FIXED maxScale for all timelines
+    // This guarantees nodes are 10px at max zoom everywhere
+    return kTargetScaleFor10px;
   }
 
   void _updateStructureCache(
@@ -1069,21 +1060,29 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final currentMatrix = _transformationController.value;
     final currentScale = currentMatrix.getMaxScaleOnAxis();
 
+    // CRITICAL: Clamp targetScale to maxScale limit (2.6)
+    // This ensures we never zoom deeper than 10px nodes
+    final totalWidth = _cachedLayoutResult?.totalWidth ?? _lastKnownSize.width;
+    final screenWidth = _lastKnownSize.width;
+    final minScale = _calculateMinScale(totalWidth, screenWidth);
+    final maxScale = _calculateMaxScale(minScale, screenWidth);
+    final clampedTargetScale = targetScale.clamp(minScale, maxScale);
+
     // Избегаем ненужной анимации, если масштаб уже почти целевой
-    if ((targetScale - currentScale).abs() < 0.01) return;
+    if ((clampedTargetScale - currentScale).abs() < 0.01) return;
 
     // Точка в координатах сцены (контента), которая должна остаться под пальцем
     final sceneFocalPoint = _transformationController.toScene(focalPoint);
 
     // Вычисляем новое смещение (translation) для матрицы, чтобы
     // точка sceneFocalPoint после масштабирования оказалась под точкой focalPoint на экране.
-    final double tx = focalPoint.dx - sceneFocalPoint.dx * targetScale;
-    final double ty = focalPoint.dy - sceneFocalPoint.dy * targetScale;
+    final double tx = focalPoint.dx - sceneFocalPoint.dx * clampedTargetScale;
+    final double ty = focalPoint.dy - sceneFocalPoint.dy * clampedTargetScale;
 
     // Создаем новую целевую матрицу "с нуля"
     final targetMatrix = Matrix4.identity()
       ..translate(tx, ty)
-      ..scale(targetScale);
+      ..scale(clampedTargetScale);
 
     // Запускаем анимацию к новой матрице
     _animateToMatrix(targetMatrix);
@@ -1721,6 +1720,24 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                     constrained: false,
                     panEnabled: !isTimelineInteractionDisabled,
                     scaleEnabled: !isTimelineInteractionDisabled,
+                    onInteractionUpdate: (details) {
+                      // CRITICAL: Enforce maxScale limit during pinch zoom
+                      // This prevents zooming beyond 2.6 (10px nodes)
+                      final currentScale = _transformationController.value.getMaxScaleOnAxis();
+                      if (currentScale > maxScale) {
+                        // Clamp the scale to maxScale while preserving translation
+                        final matrix = _transformationController.value.clone();
+                        final currentTranslation = matrix.getTranslation();
+                        final scaleFactor = maxScale / currentScale;
+
+                        // Scale down to maxScale, adjusting translation to keep focal point
+                        matrix.setIdentity();
+                        matrix.translate(currentTranslation.x * scaleFactor, currentTranslation.y * scaleFactor);
+                        matrix.scale(maxScale);
+
+                        _transformationController.value = matrix;
+                      }
+                    },
                     child: SizedBox(
                       width: totalWidth,
                       height: contentHeight,
