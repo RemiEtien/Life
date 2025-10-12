@@ -481,7 +481,8 @@ class LifelinePainter extends CustomPainter {
   final NodePosCallback? onNodePosition;
   final DailyClusterPosCallback? onDailyClusterPosition;
   final MonthlyClusterPosCallback? onMonthlyClusterPosition;
-  final double zoomScale;
+  final double zoomScale; // Relative zoom (for backward compatibility)
+  final double currentScale; // NEW: Absolute zoom scale for universal level boundaries
   final double pulseValue;
   final double branchIntensity; // NEW
 
@@ -504,6 +505,7 @@ class LifelinePainter extends CustomPainter {
     this.onDailyClusterPosition,
     this.onMonthlyClusterPosition,
     this.zoomScale = 1.0,
+    required this.currentScale,
     this.pulseValue = 0.0,
     this.timingsNotifier,
     required this.images,

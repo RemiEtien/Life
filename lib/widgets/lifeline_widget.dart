@@ -892,16 +892,20 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   // Calculate maximum scale based on fixed baseline content width (1200px)
   // This ensures IDENTICAL zoom depth across all timeline lengths
+  // Calculate maximum scale to ensure UNIVERSAL zoom behavior:
+  // For ALL timelines to have identical visual zoom experience:
+  // - Maximum visual zoom should show nodes at 10px on screen
+  // - This corresponds to: visualSize = (nodeRadius * 2) / scale = 10px
+  // - Therefore: maxScale = (13 * 2) / 10 = 2.6 (FIXED for all timelines)
+  //
+  // Exception: If timeline is so short that minScale > 2.6, use minScale
+  // (otherwise user wouldn't be able to zoom out to see full timeline)
   double _calculateMaxScale(double minScale, double screenWidth) {
-    const double kBaseContentWidth = 1200.0;
-    final baseScale = _calculateMinScale(kBaseContentWidth, screenWidth);
-    const zoomFactor = 6.0;
-    final standardMaxScale = baseScale * zoomFactor;
+    // Fixed target scale for 10px nodes at maximum zoom
+    const double kTargetNodeScale = 2.6;
 
-    // For very short timelines, ensure we can reach at least 460% (individual nodes)
-    // Otherwise, use the standard maxScale for consistent zoom depth
-    final minRequiredScale = minScale * 4.6;
-    return max(standardMaxScale, minRequiredScale);
+    // Ensure maxScale is at least minScale (can't zoom out beyond fitting timeline)
+    return max(kTargetNodeScale, minScale);
   }
 
   void _updateStructureCache(
@@ -1724,6 +1728,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                         onMonthlyClusterPosition:
                                             _onMonthlyClusterPosition,
                                         zoomScale: relativeZoom,
+                                        currentScale: currentScale,
                                         pulseValue: _pulseController.value,
                                         renderData: _renderData!,
                                         timingsNotifier:
