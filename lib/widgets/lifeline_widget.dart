@@ -224,7 +224,29 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     _mainController.addListener(() {
       if (mounted && _debugMode && !_isDisposed) {
-        _performanceMonitor.tick();
+        // Calculate zoom snapshot for logging
+        String? zoomSnapshot;
+        if (_performanceMonitor.isRecording && _cachedLayoutResult != null) {
+          final totalWidth = _cachedLayoutResult!.totalWidth;
+          final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
+          final currentScale = _transformationController.value.getMaxScaleOnAxis();
+          final relativeZoom = (minScale > 0.0001) ? currentScale / minScale : 1.0;
+          final nodeSize = (13.0 * 2) / currentScale;
+
+          // Determine zoom level
+          String level;
+          if (relativeZoom < 4.0) {
+            level = 'LVL1';
+          } else if (relativeZoom < 12.0) {
+            level = 'LVL2';
+          } else {
+            level = 'LVL3';
+          }
+
+          zoomSnapshot = 'Zoom:${relativeZoom.toStringAsFixed(2)}x | Node:${nodeSize.toStringAsFixed(1)}px | $level';
+        }
+
+        _performanceMonitor.tick(zoomSnapshot: zoomSnapshot);
       }
     });
 
@@ -2086,7 +2108,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                   if (_performanceMonitor.isRecording) {
                                     _performanceMonitor.stopRecording();
                                   } else {
-                                    _performanceMonitor.startRecording();
+                                    final timelineWidth = _cachedLayoutResult?.totalWidth;
+                                    _performanceMonitor.startRecording(
+                                      screenSize: _lastKnownSize,
+                                      timelineWidth: timelineWidth,
+                                    );
                                   }
                                 });
                               },
@@ -2933,7 +2959,7 @@ class PerformanceMonitor {
   bool get isRecording => _isRecording;
   List<String> get performanceLog => List.unmodifiable(_performanceLog);
 
-  void tick() {
+  void tick({String? zoomSnapshot}) {
     _frameCount++;
     if (_stopwatch.elapsedMilliseconds >= 1000) {
       final elapsedSeconds = _stopwatch.elapsedMilliseconds / 1000.0;
@@ -2949,7 +2975,11 @@ class PerformanceMonitor {
       // Record to log if recording
       if (_isRecording) {
         final timestamp = DateTime.now().difference(_recordingStartTime!).inSeconds;
-        _performanceLog.add('[$timestamp s] FPS: ${currentFps.toStringAsFixed(1)}');
+        if (zoomSnapshot != null) {
+          _performanceLog.add('[$timestamp s] FPS: ${currentFps.toStringAsFixed(1)} | $zoomSnapshot');
+        } else {
+          _performanceLog.add('[$timestamp s] FPS: ${currentFps.toStringAsFixed(1)}');
+        }
       }
 
       _frameCount = 0;
@@ -2958,7 +2988,7 @@ class PerformanceMonitor {
     }
   }
 
-  void startRecording() {
+  void startRecording({Size? screenSize, double? timelineWidth}) {
     _isRecording = true;
     _recordingStartTime = DateTime.now();
     _performanceLog.clear();
@@ -2966,8 +2996,15 @@ class PerformanceMonitor {
     _maxFps = 0;
     _avgFps = 0;
     _fpsCount = 0;
-    _performanceLog.add('=== Performance Recording Started ===');
+    _performanceLog.add('=== ZOOM PERFORMANCE LOG ===');
     _performanceLog.add('Start Time: ${_recordingStartTime!.toIso8601String()}');
+    if (screenSize != null) {
+      _performanceLog.add('Screen: ${screenSize.width.toStringAsFixed(0)}x${screenSize.height.toStringAsFixed(0)}px');
+    }
+    if (timelineWidth != null) {
+      _performanceLog.add('Timeline Width: ${timelineWidth.toStringAsFixed(0)}px');
+    }
+    _performanceLog.add('');
   }
 
   void stopRecording() {
