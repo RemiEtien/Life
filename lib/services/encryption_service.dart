@@ -312,12 +312,12 @@ class EncryptionService extends StateNotifier<EncryptionState> {
           key: _kEncryptedDekKey, aOptions: aOptions);
 
       if (sessionKeyB64 == null || encryptedDekB64 == null) {
-        // FIX as per friend's analysis
+        // Keys missing (likely after app reinstall) - don't disable the feature
+        // Auto-enable will recreate keys when user enters master password
         if (kDebugMode) {
           debugPrint(
-              '[EncryptionService] Quick Unlock keys not found. Disabling feature.');
+              '[EncryptionService] Quick Unlock keys not found (likely after reinstall). Will auto-enable after password entry.');
         }
-        await disableQuickUnlock();
         return false;
       }
 
