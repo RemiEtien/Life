@@ -36,10 +36,28 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   // ✅ FIXED: This function now properly handles biometric authentication with result checking
   Future<void> _attemptQuickUnlockWithBiometrics() async {
+    // FIX: Verify user is actually authenticated before attempting biometric unlock
+    // This prevents showing biometric prompt after sign-out when navigating away
+    final currentUser = ref.read(authStateChangesProvider).asData?.value;
+    if (currentUser == null) {
+      if (kDebugMode) {
+        debugPrint('[UnlockScreen] Skipping biometric unlock - no authenticated user');
+      }
+      return;
+    }
+
     final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
     final profile = ref.read(userProfileProvider).value;
 
-    if (profile?.isQuickUnlockEnabled ?? false) {
+    // Verify profile matches current user
+    if (profile == null || profile.uid != currentUser.uid) {
+      if (kDebugMode) {
+        debugPrint('[UnlockScreen] Skipping biometric unlock - profile mismatch');
+      }
+      return;
+    }
+
+    if (profile.isQuickUnlockEnabled) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       final biometricService = ref.read(biometricServiceProvider);
@@ -131,7 +149,19 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     // BUG FIX: Prevent auto-locking during any async operation related to unlock
     encryptionNotifier.prepareForUnlockAttempt();
     try {
-      await encryptionNotifier.unlockSession(_passwordController.text);
+      final wasQuickUnlockAutoEnabled = await encryptionNotifier.unlockSession(_passwordController.text);
+
+      // Show notification if biometric was automatically re-enabled after reinstall
+      if (wasQuickUnlockAutoEnabled && mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.quickUnlockAutoEnabledMessage),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
       // AuthGate will handle navigation on successful state change.
     } on EncryptionUnlockException catch (e) {
       if (mounted) {

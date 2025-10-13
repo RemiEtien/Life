@@ -1233,6 +1233,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren.';
 
   @override
+  String get quickUnlockAutoEnabledMessage =>
+      '✓ Biometric unlock has been automatically enabled for you!';
+
+  @override
   String lifelineInsightStreakDays(int count) {
     return '🔥 $count Tage Streak';
   }

@@ -227,7 +227,8 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   /// Attempts to unlock the session with the master password.
-  Future<void> unlockSession(String masterPassword) async {
+  /// Returns true if quick unlock was automatically re-enabled after reinstall.
+  Future<bool> unlockSession(String masterPassword) async {
     if (_lockoutEndTime != null && _lockoutEndTime!.isAfter(DateTime.now())) {
       final remainingSeconds =
           _lockoutEndTime!.difference(DateTime.now()).inSeconds;
@@ -250,7 +251,8 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       _lockoutEndTime = null;
 
       // Auto-enable quick unlock if it was enabled but keys are missing (after reinstall)
-      await _autoEnableQuickUnlockIfNeeded(masterPassword, userProfile);
+      final wasAutoEnabled = await _autoEnableQuickUnlockIfNeeded(masterPassword, userProfile);
+      return wasAutoEnabled;
     } catch (e) {
       try {
         final dek = await _unwrapDek(masterPassword, userProfile!.salt!,
@@ -262,7 +264,8 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         _lockoutEndTime = null;
 
         // Auto-enable quick unlock if it was enabled but keys are missing (after reinstall)
-        await _autoEnableQuickUnlockIfNeeded(masterPassword, userProfile);
+        final wasAutoEnabled = await _autoEnableQuickUnlockIfNeeded(masterPassword, userProfile);
+        return wasAutoEnabled;
       } catch (finalError) {
         _handleFailedAttempt();
         final remaining = _maxFailedAttempts - _failedAttempts;
@@ -277,7 +280,8 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   }
 
   /// Auto-enables quick unlock if it was previously enabled but keys are missing
-  Future<void> _autoEnableQuickUnlockIfNeeded(String masterPassword, UserProfile profile) async {
+  /// Returns true if quick unlock was auto-enabled, false otherwise
+  Future<bool> _autoEnableQuickUnlockIfNeeded(String masterPassword, UserProfile profile) async {
     // Check if quick unlock is enabled in profile but keys are missing (after reinstall)
     if (profile.isQuickUnlockEnabled) {
       const aOptions = AndroidOptions(encryptedSharedPreferences: true);
@@ -288,9 +292,14 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         if (kDebugMode) {
           debugPrint('[EncryptionService] Auto-enabling quick unlock after reinstall');
         }
-        await enableQuickUnlock(masterPassword);
+        final success = await enableQuickUnlock(masterPassword);
+        if (kDebugMode) {
+          debugPrint('[EncryptionService] Auto-enable result: $success');
+        }
+        return success;
       }
     }
+    return false;
   }
 
   /// Attempts to unlock using biometrics/PIN.

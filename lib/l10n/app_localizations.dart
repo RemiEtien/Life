@@ -2284,6 +2284,12 @@ abstract class AppLocalizations {
   /// **'Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.'**
   String get biometricUnlockFailedMessage;
 
+  /// No description provided for @quickUnlockAutoEnabledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Biometric unlock has been automatically enabled for you!'**
+  String get quickUnlockAutoEnabledMessage;
+
   /// No description provided for @lifelineInsightStreakDays.
   ///
   /// In en, this message translates to:

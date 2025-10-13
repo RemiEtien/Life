@@ -1213,6 +1213,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Security keys need to be recreated after reinstalling the app. Please enter your master password to continue.';
 
   @override
+  String get quickUnlockAutoEnabledMessage =>
+      '✓ Biometric unlock has been automatically enabled for you!';
+
+  @override
   String lifelineInsightStreakDays(int count) {
     return '🔥 $count day streak';
   }

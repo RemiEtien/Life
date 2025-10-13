@@ -912,23 +912,16 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     return minScale;
   }
 
-  // Calculate maximum scale using ABSOLUTE SCALE approach
-  // This ensures UNIVERSAL zoom behavior across all timeline lengths and devices
+  // Calculate maximum scale using RELATIVE ZOOM approach
+  // This ensures consistent zoom duration across all timeline lengths
   //
   // Strategy:
-  // 1. Fix absolute maxScale to achieve 10px nodes at max zoom on ALL timelines
-  // 2. This means relative zoom will be different on different timelines
-  // 3. But visual depth of zoom will be identical
+  // 1. Fix MaxRelativeZoom to 8.0x (optimal zoom duration)
+  // 2. Node size will be adjusted dynamically in painter to maintain 10-12px in debug
+  // 3. This gives identical zoom experience but visual node size adapts
   double _calculateMaxScale(double minScale, double screenWidth) {
-    // Target: nodes should be 10px on screen at maximum zoom
-    // Formula: visualSize = nodeDiameter / currentScale = 10px
-    // Therefore: targetScale = nodeDiameter / 10
-    const double kNodeDiameter = 13.0 * 2; // = 26
-    const double kTargetScaleFor10px = kNodeDiameter / 10.0; // = 2.6
-
-    // FIXED maxScale for all timelines
-    // This guarantees nodes are 10px at max zoom everywhere
-    return kTargetScaleFor10px;
+    const double kMaxRelativeZoom = 8.0; // 800% - optimal zoom duration
+    return minScale * kMaxRelativeZoom;
   }
 
   void _updateStructureCache(

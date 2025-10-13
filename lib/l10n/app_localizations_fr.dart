@@ -1237,6 +1237,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les clés de sécurité doivent être recréées après la réinstallation de l\'application. Veuillez saisir votre mot de passe principal pour continuer.';
 
   @override
+  String get quickUnlockAutoEnabledMessage =>
+      '✓ Biometric unlock has been automatically enabled for you!';
+
+  @override
   String lifelineInsightStreakDays(int count) {
     return '🔥 Série de $count jours';
   }

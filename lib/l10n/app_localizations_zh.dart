@@ -1164,6 +1164,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get biometricUnlockFailedMessage => '重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。';
 
   @override
+  String get quickUnlockAutoEnabledMessage =>
+      '✓ Biometric unlock has been automatically enabled for you!';
+
+  @override
   String lifelineInsightStreakDays(int count) {
     return '🔥 连续 $count 天';
   }
