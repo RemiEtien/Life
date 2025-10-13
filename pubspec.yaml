@@ -99,6 +99,11 @@ flutter_icons:
   android: true
   ios: true
   image_path: "assets/icon.png"
+  # Android adaptive icon configuration for rounded icons
+  adaptive_icon_background: "#0D0C11"  # Dark background matching app theme
+  adaptive_icon_foreground: "assets/icon.png"
+  # Remove background from icon to make it transparent on adaptive launcher
+  remove_alpha_ios: false
 
 flutter:
   generate: true # This line enables the l10n code generator

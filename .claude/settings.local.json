@@ -60,7 +60,13 @@
       "Bash(else echo \"No coverage file found\")",
       "Bash(python:*)",
       "Read(//c/Users/gambi/**)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(do)",
+      "Bash(if grep -q '\"\"quickUnlockAutoEnabledMessage\"\"' \"$file\")",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(else)",
+      "Bash(identify:*)"
     ],
     "deny": [],
     "ask": []
