@@ -36,9 +36,15 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   // ✅ FIXED: This function now properly handles biometric authentication with result checking
   Future<void> _attemptQuickUnlockWithBiometrics() async {
+    // FIX: Double-check that we're still mounted and user is authenticated
+    // This prevents race conditions during sign-out
+    if (!mounted) return;
+
     // FIX: Verify user is actually authenticated before attempting biometric unlock
     // This prevents showing biometric prompt after sign-out when navigating away
-    final currentUser = ref.read(authStateChangesProvider).asData?.value;
+    final authState = ref.read(authStateChangesProvider);
+    final currentUser = authState.asData?.value;
+
     if (currentUser == null) {
       if (kDebugMode) {
         debugPrint('[UnlockScreen] Skipping biometric unlock - no authenticated user');
@@ -47,12 +53,25 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     }
 
     final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
-    final profile = ref.read(userProfileProvider).value;
+    final profileState = ref.read(userProfileProvider);
+
+    // Wait for profile to load if it's still loading
+    if (profileState.isLoading) {
+      if (kDebugMode) {
+        debugPrint('[UnlockScreen] Profile still loading, waiting...');
+      }
+      // Wait a bit for profile to load, then try again
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!mounted) return;
+      return _attemptQuickUnlockWithBiometrics();
+    }
+
+    final profile = profileState.value;
 
     // Verify profile matches current user
     if (profile == null || profile.uid != currentUser.uid) {
       if (kDebugMode) {
-        debugPrint('[UnlockScreen] Skipping biometric unlock - profile mismatch');
+        debugPrint('[UnlockScreen] Skipping biometric unlock - profile mismatch (profile=${profile?.uid}, user=${currentUser.uid})');
       }
       return;
     }

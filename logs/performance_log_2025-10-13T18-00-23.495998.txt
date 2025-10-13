@@ -1,0 +1,31 @@
+=== NODE SIZE DIAGNOSTIC LOG ===
+Start Time: 2025-10-13T18:00:07.829021
+Screen: 690x750px
+Timeline Width: 800px
+minScale: 0.819714
+kNodeBaseRadius @ 1x zoom: 6.0997
+kNodeBaseRadius @ 8x zoom: 14.6392 (uniform target)
+Expected node size @ 8x zoom: 6.70px (uniform ~13px)
+
+INSTRUCTIONS:
+1. Zoom to 8.00x on this timeline
+2. Check the "Node size" value in debug menu
+3. Check the "Expected @ 8x" value (should be green and ~10px)
+4. Stop recording and export this log
+
+[0 s] FPS: 63.0 | Zoom:1.00x | Node:22.32px | LVL1(Yearly) | minScale:0.8197 | kNodeBase:6.10 | actualRadius:9.15 | Expected@8x:6.70px
+[1 s] FPS: 48.8 | Zoom:2.15x | Node:12.79px | LVL2(Monthly) | minScale:0.8197 | kNodeBase:7.50 | actualRadius:11.25 | Expected@8x:6.70px
+[3 s] FPS: 42.0 | Zoom:2.81x | Node:10.82px | LVL2(Monthly) | minScale:0.8197 | kNodeBase:8.31 | actualRadius:12.46 | Expected@8x:6.70px
+[4 s] FPS: 22.3 | Zoom:6.65x | Node:7.15px | LVL3(Individual) | minScale:0.8197 | kNodeBase:12.99 | actualRadius:19.49 | Expected@8x:6.70px
+[5 s] FPS: 15.7 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+[6 s] FPS: 15.5 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+[7 s] FPS: 15.0 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+[8 s] FPS: 11.8 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+[9 s] FPS: 14.5 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+[10 s] FPS: 14.6 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+[11 s] FPS: 14.5 | Zoom:8.00x | Node:6.70px | LVL3(Individual) | minScale:0.8197 | kNodeBase:14.64 | actualRadius:21.96 | Expected@8x:6.70px
+=== Performance Recording Stopped ===
+Duration: 11 seconds
+Min FPS: 11.8
+Max FPS: 63.0
+Avg FPS: 25.3

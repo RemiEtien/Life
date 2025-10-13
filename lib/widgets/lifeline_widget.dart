@@ -231,19 +231,45 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
           final currentScale = _transformationController.value.getMaxScaleOnAxis();
           final relativeZoom = (minScale > 0.0001) ? currentScale / minScale : 1.0;
-          final nodeSize = (13.0 * 2) / currentScale;
+
+          // Use CORRECT formula (same as painter - interpolated)
+          // Painter: varies at 1x, converges to SAME VISUAL SIZE at 8x
+          const maxRelativeZoom = 8.0;
+          const startRadiusConstant = 4.0;  // Small at 1x (~12px)
+          const targetRadiusConstant = 133.0;  // Larger at 8x (~50px)
+
+          // Calculate starting radius (proportional for uniform visual size)
+          final startRadius = startRadiusConstant * minScale;
+
+          // Calculate target radius (proportional for uniform visual size)
+          final targetRadius = targetRadiusConstant * minScale;
+
+          // Calculate interpolation progress
+          final clampedZoom = relativeZoom.clamp(1.0, maxRelativeZoom);
+          final t = (clampedZoom - 1.0) / (maxRelativeZoom - 1.0);
+
+          // Linear interpolation to get kNodeBaseRadius
+          final kNodeBaseRadius = startRadius + (targetRadius - startRadius) * t;
+
+          const actualMultiplier = 1.5; // From _drawSingleMemoryNode
+          final actualNodeRadius = kNodeBaseRadius * actualMultiplier;
+          final nodeSize = (actualNodeRadius * 2) / currentScale;
+
+          // Calculate what node size SHOULD be at 8x zoom (uniform ~13px)
+          final targetScale8x = minScale * 8.0;
+          final expectedNodeSizeAt8x = (targetRadius * actualMultiplier * 2) / targetScale8x;
 
           // Determine zoom level
           String level;
-          if (relativeZoom < 4.0) {
-            level = 'LVL1';
-          } else if (relativeZoom < 12.0) {
-            level = 'LVL2';
+          if (relativeZoom < 2.0) {
+            level = 'LVL1(Yearly)';
+          } else if (relativeZoom < 4.0) {
+            level = 'LVL2(Monthly)';
           } else {
-            level = 'LVL3';
+            level = 'LVL3(Individual)';
           }
 
-          zoomSnapshot = 'Zoom:${relativeZoom.toStringAsFixed(2)}x | Node:${nodeSize.toStringAsFixed(1)}px | $level';
+          zoomSnapshot = 'Zoom:${relativeZoom.toStringAsFixed(2)}x | Node:${nodeSize.toStringAsFixed(2)}px | $level | minScale:${minScale.toStringAsFixed(4)} | kNodeBase:${kNodeBaseRadius.toStringAsFixed(2)} | actualRadius:${actualNodeRadius.toStringAsFixed(2)} | Expected@8x:${expectedNodeSizeAt8x.toStringAsFixed(2)}px';
         }
 
         _performanceMonitor.tick(zoomSnapshot: zoomSnapshot);
@@ -1777,6 +1803,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                             _onMonthlyClusterPosition,
                                         zoomScale: relativeZoom,
                                         currentScale: currentScale,
+                                        minScale: minScale, // NEW: Base scale for fixed node sizing
                                         pulseValue: _pulseController.value,
                                         renderData: _renderData!,
                                         timingsNotifier:
@@ -2054,7 +2081,33 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                             // Calculate zoom diagnostics
                             final maxScale = _calculateMaxScale(minScale, _lastKnownSize.width);
                             final relativeZoom = (minScale > 0.0001) ? rawScale / minScale : 1.0;
-                            final nodeVisualSize = (13.0 * 2) / rawScale;
+
+                            // Calculate node size using INTERPOLATED formula (same as painter)
+                            // Painter: varies at 1x, converges to SAME VISUAL SIZE at 8x
+                            const maxRelativeZoom = 8.0;
+                            const startRadiusConstant = 4.0;  // Small at 1x (~12px)
+                            const targetRadiusConstant = 133.0;  // Larger at 8x (~50px)
+
+                            // Calculate starting radius (proportional for uniform visual size)
+                            final startRadius = startRadiusConstant * minScale;
+
+                            // Calculate target radius (proportional for uniform visual size)
+                            final targetRadius = targetRadiusConstant * minScale;
+
+                            // Calculate interpolation progress
+                            final clampedZoom = relativeZoom.clamp(1.0, maxRelativeZoom);
+                            final t = (clampedZoom - 1.0) / (maxRelativeZoom - 1.0);
+
+                            // Linear interpolation to get kNodeBaseRadius
+                            final kNodeBaseRadius = startRadius + (targetRadius - startRadius) * t;
+
+                            const actualMultiplier = 1.5;
+                            final actualNodeRadius = kNodeBaseRadius * actualMultiplier;
+                            final nodeVisualSize = (actualNodeRadius * 2) / rawScale;
+
+                            // DIAGNOSTIC: Calculate what SHOULD happen at 8x zoom
+                            final targetScale8x = minScale * 8.0;
+                            final expectedNodeSizeAt8x = (targetRadius * actualMultiplier * 2) / targetScale8x;
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2078,6 +2131,34 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                   'Node size: ${nodeVisualSize.toStringAsFixed(2)}px',
                                   style: const TextStyle(
                                       color: Colors.white70, fontSize: 10),
+                                ),
+                                const SizedBox(height: 4),
+                                // DIAGNOSTIC INFO
+                                Text(
+                                  '🔍 DIAGNOSTICS:',
+                                  style: const TextStyle(
+                                      color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'minScale: ${minScale.toStringAsFixed(4)}',
+                                  style: const TextStyle(
+                                      color: Colors.white60, fontSize: 9),
+                                ),
+                                Text(
+                                  'currentScale: ${rawScale.toStringAsFixed(4)}',
+                                  style: const TextStyle(
+                                      color: Colors.white60, fontSize: 9),
+                                ),
+                                Text(
+                                  'kNodeBase: ${kNodeBaseRadius.toStringAsFixed(2)} → actual: ${actualNodeRadius.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                      color: Colors.white60, fontSize: 9),
+                                ),
+                                Text(
+                                  'Expected @ 8x: ${expectedNodeSizeAt8x.toStringAsFixed(2)}px',
+                                  style: TextStyle(
+                                      color: (expectedNodeSizeAt8x - 10.0).abs() < 0.5 ? Colors.greenAccent : Colors.redAccent,
+                                      fontSize: 9),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -2119,9 +2200,14 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                     _performanceMonitor.stopRecording();
                                   } else {
                                     final timelineWidth = _cachedLayoutResult?.totalWidth;
+                                    final screenWidth = _lastKnownSize.width;
+                                    final minScale = timelineWidth != null && screenWidth > 0
+                                        ? _calculateMinScale(timelineWidth, screenWidth)
+                                        : 0.0;
                                     _performanceMonitor.startRecording(
                                       screenSize: _lastKnownSize,
                                       timelineWidth: timelineWidth,
+                                      minScale: minScale,
                                     );
                                   }
                                 });
@@ -2998,7 +3084,7 @@ class PerformanceMonitor {
     }
   }
 
-  void startRecording({Size? screenSize, double? timelineWidth}) {
+  void startRecording({Size? screenSize, double? timelineWidth, double? minScale}) {
     _isRecording = true;
     _recordingStartTime = DateTime.now();
     _performanceLog.clear();
@@ -3006,7 +3092,7 @@ class PerformanceMonitor {
     _maxFps = 0;
     _avgFps = 0;
     _fpsCount = 0;
-    _performanceLog.add('=== ZOOM PERFORMANCE LOG ===');
+    _performanceLog.add('=== NODE SIZE DIAGNOSTIC LOG ===');
     _performanceLog.add('Start Time: ${_recordingStartTime!.toIso8601String()}');
     if (screenSize != null) {
       _performanceLog.add('Screen: ${screenSize.width.toStringAsFixed(0)}x${screenSize.height.toStringAsFixed(0)}px');
@@ -3014,6 +3100,28 @@ class PerformanceMonitor {
     if (timelineWidth != null) {
       _performanceLog.add('Timeline Width: ${timelineWidth.toStringAsFixed(0)}px');
     }
+    if (minScale != null) {
+      _performanceLog.add('minScale: ${minScale.toStringAsFixed(6)}');
+      const startRadiusConstant = 4.0;
+      const targetRadiusConstant = 133.0;
+      const actualMultiplier = 1.5;
+
+      final startRadius = startRadiusConstant * minScale;
+      final targetRadius = targetRadiusConstant * minScale;
+
+      _performanceLog.add('kNodeBaseRadius @ 1x zoom: ${startRadius.toStringAsFixed(4)}');
+      _performanceLog.add('kNodeBaseRadius @ 8x zoom: ${targetRadius.toStringAsFixed(4)} (uniform target)');
+
+      final targetScale8x = minScale * 8.0;
+      final expectedNodeSizeAt8x = (targetRadius * actualMultiplier * 2) / targetScale8x;
+      _performanceLog.add('Expected node size @ 8x zoom: ${expectedNodeSizeAt8x.toStringAsFixed(2)}px (uniform ~13px)');
+    }
+    _performanceLog.add('');
+    _performanceLog.add('INSTRUCTIONS:');
+    _performanceLog.add('1. Zoom to 8.00x on this timeline');
+    _performanceLog.add('2. Check the "Node size" value in debug menu');
+    _performanceLog.add('3. Check the "Expected @ 8x" value (should be green and ~10px)');
+    _performanceLog.add('4. Stop recording and export this log');
     _performanceLog.add('');
   }
 

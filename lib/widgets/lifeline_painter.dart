@@ -483,6 +483,7 @@ class LifelinePainter extends CustomPainter {
   final MonthlyClusterPosCallback? onMonthlyClusterPosition;
   final double zoomScale; // Relative zoom (for backward compatibility)
   final double currentScale; // NEW: Absolute zoom scale for universal level boundaries
+  final double minScale; // NEW: Base scale for dynamic node sizing
   final double pulseValue;
   final double branchIntensity; // NEW
 
@@ -491,26 +492,37 @@ class LifelinePainter extends CustomPainter {
   final ValueNotifier<PaintTimings?>? timingsNotifier;
   final UserProfile? userProfile; // NEW: для условного рендеринга эффектов
 
-  // DYNAMIC node size based on maxScale to maintain 10-12px in debug at max zoom
-  // With MaxRelativeZoom = 8.0, we want debug to show 10-12px
-  // nodeSize(debug) = nodeDiameter / currentScale
-  // At maxScale = minScale × 8: nodeSize = nodeDiameter / (minScale × 8) = 10
-  // => nodeDiameter = 80 × minScale
-  // => nodeRadius = 40 × minScale
+  // LEVEL-BASED node growth with minScale compensation
+  // Nodes grow ONLY within Level 3 (4x-8x zoom)
+  // COMPENSATES for timeline length: inversely proportional to minScale
+  // This ensures UNIFORM visual size on all timelines
   double get kNodeBaseRadius {
-    // Estimate minScale from currentScale and zoomScale
-    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
-    // Target: 10px in debug at 8x zoom
-    // nodeRadius = (targetDebugSize × maxRelativeZoom) / 2
-    const targetDebugSize = 10.0;
-    const maxRelativeZoom = 8.0;
-    return (targetDebugSize * maxRelativeZoom * estimatedMinScale) / 2;
+    const double kLevel3Start = 4.0;  // Individual nodes start appearing
+    const double kLevel3End = 8.0;     // Maximum zoom
+
+    // CORRECT: Multiply by minScale to achieve uniform visual size
+    // Formula from logs: nodeSize = (actualRadius × 2) / currentScale
+    // At 8x: currentScale = minScale × 8
+    // So: nodeSize = (actualRadius × 2) / (minScale × 8) = (kNodeBaseRadius × 1.5 × 2) / (minScale × 8)
+    // For UNIFORM nodeSize across all timelines: kNodeBaseRadius must be ∝ minScale
+    // This compensates for division by currentScale in the nodeSize formula
+    const startRadiusConstant = 1.0;   // Small at 4x
+    const targetRadiusConstant = 5.5;  // "+" button size at 8x (~60px)
+
+    final startRadius = startRadiusConstant / minScale;
+    final targetRadius = targetRadiusConstant / minScale;
+
+    // Only grow within Level 3 range (4x to 8x)
+    if (zoomScale < kLevel3Start) {
+      return startRadius;  // Small before Level 3
+    }
+
+    // Linear interpolation within Level 3
+    final t = ((zoomScale - kLevel3Start) / (kLevel3End - kLevel3Start)).clamp(0.0, 1.0);
+    return startRadius + (targetRadius - startRadius) * t;
   }
 
-  double get kDailyClusterBaseRadius {
-    // Slightly larger for clusters
-    return kNodeBaseRadius * 1.3;
-  }
+  double get kDailyClusterBaseRadius => kNodeBaseRadius * 1.3;
   static const double kVisibilityBuffer = 100.0;
   static const double kNodeVerticalOffset = 0.0;
 
@@ -524,6 +536,7 @@ class LifelinePainter extends CustomPainter {
     this.onMonthlyClusterPosition,
     this.zoomScale = 1.0,
     required this.currentScale,
+    required this.minScale, // NEW: Base scale for fixed node sizing
     this.pulseValue = 0.0,
     this.timingsNotifier,
     required this.images,
@@ -539,6 +552,11 @@ class LifelinePainter extends CustomPainter {
     int macroViewTime = 0;
 
     if (size.width <= 0 || size.height <= 0 || memories.isEmpty) return;
+
+    // DIAGNOSTIC: Log node sizing parameters once per paint
+    if (kDebugMode) {
+      debugPrint('[LifelinePainter] minScale=$minScale, kNodeBaseRadius=$kNodeBaseRadius, currentScale=$currentScale, relativeZoom=$zoomScale');
+    }
 
     final mainPath = renderData.mainPath;
     final placementResults = renderData.placementResults;
@@ -641,8 +659,12 @@ class LifelinePainter extends CustomPainter {
 
     stopwatch.start();
     // PASS 1: Draw all auras first (background layer)
+    // IMPORTANT: Only draw auras for individual nodes in Level 3 (4x-8x zoom)
       for (final item in placementResults) {
         if (item is PlacementInfo) {
+          // Skip individual node auras outside Level 3
+          if (relativeZoom < kLevel3Threshold) continue;
+
           if (visibleRect
               .inflate(kNodeBaseRadius * 2)
               .contains(item.nodePosition)) {
@@ -678,8 +700,12 @@ class LifelinePainter extends CustomPainter {
       }
 
       // PASS 2: Draw all nodes on top (foreground layer)
+      // IMPORTANT: Only draw individual nodes in Level 3 (4x-8x zoom)
       for (final item in placementResults) {
         if (item is PlacementInfo) {
+          // Skip individual nodes outside Level 3
+          if (relativeZoom < kLevel3Threshold) continue;
+
           if (visibleRect
               .inflate(kNodeBaseRadius * 2)
               .contains(item.nodePosition)) {

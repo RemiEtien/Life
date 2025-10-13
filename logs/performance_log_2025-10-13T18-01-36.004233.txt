@@ -1,0 +1,30 @@
+=== NODE SIZE DIAGNOSTIC LOG ===
+Start Time: 2025-10-13T18:01:25.299927
+Screen: 690x750px
+Timeline Width: 2560px
+minScale: 0.256161
+kNodeBaseRadius @ 1x zoom: 19.5190
+kNodeBaseRadius @ 8x zoom: 46.8456 (uniform target)
+Expected node size @ 8x zoom: 68.58px (uniform ~13px)
+
+INSTRUCTIONS:
+1. Zoom to 8.00x on this timeline
+2. Check the "Node size" value in debug menu
+3. Check the "Expected @ 8x" value (should be green and ~10px)
+4. Stop recording and export this log
+
+[0 s] FPS: 46.0 | Zoom:1.00x | Node:228.59px | LVL1(Yearly) | minScale:0.2562 | kNodeBase:19.52 | actualRadius:29.28 | Expected@8x:68.58px
+[1 s] FPS: 52.7 | Zoom:1.00x | Node:228.59px | LVL1(Yearly) | minScale:0.2562 | kNodeBase:19.52 | actualRadius:29.28 | Expected@8x:68.58px
+[2 s] FPS: 45.0 | Zoom:1.92x | Node:140.72px | LVL1(Yearly) | minScale:0.2562 | kNodeBase:23.13 | actualRadius:34.69 | Expected@8x:68.58px
+[3 s] FPS: 12.7 | Zoom:2.47x | Node:119.78px | LVL2(Monthly) | minScale:0.2562 | kNodeBase:25.26 | actualRadius:37.88 | Expected@8x:68.58px
+[4 s] FPS: 21.4 | Zoom:3.76x | Node:94.30px | LVL2(Monthly) | minScale:0.2562 | kNodeBase:30.31 | actualRadius:45.46 | Expected@8x:68.58px
+[5 s] FPS: 12.3 | Zoom:4.85x | Node:83.39px | LVL3(Individual) | minScale:0.2562 | kNodeBase:34.56 | actualRadius:51.85 | Expected@8x:68.58px
+[6 s] FPS: 32.9 | Zoom:4.88x | Node:83.23px | LVL3(Individual) | minScale:0.2562 | kNodeBase:34.65 | actualRadius:51.97 | Expected@8x:68.58px
+[7 s] FPS: 29.5 | Zoom:8.00x | Node:68.58px | LVL3(Individual) | minScale:0.2562 | kNodeBase:46.85 | actualRadius:70.27 | Expected@8x:68.58px
+[8 s] FPS: 33.0 | Zoom:8.00x | Node:68.58px | LVL3(Individual) | minScale:0.2562 | kNodeBase:46.85 | actualRadius:70.27 | Expected@8x:68.58px
+[9 s] FPS: 33.2 | Zoom:8.00x | Node:68.58px | LVL3(Individual) | minScale:0.2562 | kNodeBase:46.85 | actualRadius:70.27 | Expected@8x:68.58px
+=== Performance Recording Stopped ===
+Duration: 9 seconds
+Min FPS: 12.3
+Max FPS: 52.7
+Avg FPS: 31.9
