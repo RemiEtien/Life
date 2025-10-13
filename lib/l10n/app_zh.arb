@@ -566,6 +566,7 @@
   "fileSizeTooLargeVideo": "视频文件太大。最大大小为 100 MB。",
   "fileSizeTooLargeAudio": "音频文件太大。最大大小为 25 MB。",
   "biometricUnlockFailedMessage": "重新安装应用后需要重新创建安全密钥。请输入您的主密码以继续。",
+  "quickUnlockAutoEnabledMessage": "✓ 生物识别解锁已自动为您启用！",
   "lifelineInsightStreakDays": "🔥 连续 {count} 天",
   "@lifelineInsightStreakDays": {
     "placeholders": {

@@ -566,6 +566,7 @@
   "fileSizeTooLargeVideo": "El archivo de vídeo es demasiado grande. El tamaño máximo es de 100 MB.",
   "fileSizeTooLargeAudio": "El archivo de audio es demasiado grande. El tamaño máximo es de 25 MB.",
   "biometricUnlockFailedMessage": "Las claves de seguridad deben recrearse después de reinstalar la aplicación. Por favor, introduce tu contraseña maestra para continuar.",
+  "quickUnlockAutoEnabledMessage": "✓ ¡El desbloqueo biométrico se ha habilitado automáticamente para ti!",
   "lifelineInsightStreakDays": "🔥 Racha de {count} días",
   "@lifelineInsightStreakDays": {
     "placeholders": {

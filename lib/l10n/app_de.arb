@@ -566,6 +566,7 @@
   "fileSizeTooLargeVideo": "Die Videodatei ist zu groß. Maximale Größe beträgt 100 MB.",
   "fileSizeTooLargeAudio": "Die Audiodatei ist zu groß. Maximale Größe beträgt 25 MB.",
   "biometricUnlockFailedMessage": "Nach der Neuinstallation der App müssen Sicherheitsschlüssel neu erstellt werden. Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren.",
+  "quickUnlockAutoEnabledMessage": "✓ Biometrische Entsperrung wurde automatisch für Sie aktiviert!",
   "lifelineInsightStreakDays": "🔥 {count} Tage Streak",
   "@lifelineInsightStreakDays": {
     "placeholders": {

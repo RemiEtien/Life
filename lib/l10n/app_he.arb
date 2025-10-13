@@ -566,6 +566,7 @@
   "fileSizeTooLargeVideo": "קובץ הווידאו גדול מדי. הגודל המרבי הוא 100 מגה-בייט.",
   "fileSizeTooLargeAudio": "קובץ האודיו גדול מדי. הגודל המרבי הוא 25 מגה-בייט.",
   "biometricUnlockFailedMessage": "יש ליצור מחדש מפתחות אבטחה לאחר התקנה מחדש של האפליקציה. אנא הזן את הסיסמה הראשית שלך כדי להמשיך.",
+  "quickUnlockAutoEnabledMessage": "✓ נעילה ביומטרית הופעלה עבורך באופן אוטומטי!",
   "lifelineInsightStreakDays": "🔥 רצף של {count} ימים",
   "@lifelineInsightStreakDays": {
     "placeholders": {

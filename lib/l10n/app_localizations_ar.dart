@@ -1217,7 +1217,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quickUnlockAutoEnabledMessage =>
-      '✓ Biometric unlock has been automatically enabled for you!';
+      '✓ تم تفعيل فتح القفل بالبيانات الحيوية تلقائياً لك!';
 
   @override
   String lifelineInsightStreakDays(int count) {
