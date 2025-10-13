@@ -491,8 +491,26 @@ class LifelinePainter extends CustomPainter {
   final ValueNotifier<PaintTimings?>? timingsNotifier;
   final UserProfile? userProfile; // NEW: для условного рендеринга эффектов
 
-  static const double kNodeBaseRadius = 10.0;
-  static const double kDailyClusterBaseRadius = 13.0;
+  // DYNAMIC node size based on maxScale to maintain 10-12px in debug at max zoom
+  // With MaxRelativeZoom = 8.0, we want debug to show 10-12px
+  // nodeSize(debug) = nodeDiameter / currentScale
+  // At maxScale = minScale × 8: nodeSize = nodeDiameter / (minScale × 8) = 10
+  // => nodeDiameter = 80 × minScale
+  // => nodeRadius = 40 × minScale
+  double get kNodeBaseRadius {
+    // Estimate minScale from currentScale and zoomScale
+    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
+    // Target: 10px in debug at 8x zoom
+    // nodeRadius = (targetDebugSize × maxRelativeZoom) / 2
+    const targetDebugSize = 10.0;
+    const maxRelativeZoom = 8.0;
+    return (targetDebugSize * maxRelativeZoom * estimatedMinScale) / 2;
+  }
+
+  double get kDailyClusterBaseRadius {
+    // Slightly larger for clusters
+    return kNodeBaseRadius * 1.3;
+  }
   static const double kVisibilityBuffer = 100.0;
   static const double kNodeVerticalOffset = 0.0;
 
@@ -526,30 +544,19 @@ class LifelinePainter extends CustomPainter {
     final placementResults = renderData.placementResults;
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
 
-    // === 3-LEVEL ZOOM SYSTEM (UNIVERSAL - DYNAMIC BOUNDARIES) ===
-    // Strategy: Fixed absolute maxScale (2.6) for identical visual depth
-    // Dynamic relative boundaries based on actual maxRelativeZoom
+    // === 3-LEVEL ZOOM SYSTEM (FIXED BOUNDARIES) ===
+    // Strategy: Fixed MaxRelativeZoom = 8.0 for consistent zoom duration
+    // Fixed boundaries for predictable level transitions
     //
-    // maxScale = 2.6 (fixed) - ensures nodes are 10px at max zoom everywhere
-    // maxRelativeZoom = 2.6 / minScale - different on different timelines
-    // Level boundaries = proportions of maxRelativeZoom
+    // LEVEL 1 (Yearly): 1x - 2x
+    // LEVEL 2 (Monthly): 2x - 4x
+    // LEVEL 3 (Individual): 4x - 8x
     //
-    // This ensures identical VISUAL experience on ALL devices and timeline lengths
+    // This ensures identical zoom experience on ALL timelines
 
-    // Calculate maxRelativeZoom from absolute scales
-    // currentScale can reach max 2.6, minScale varies
-    const double kFixedMaxScale = 2.6;
-    // Estimate minScale from currentScale and relativeZoom
-    // relativeZoom = currentScale / minScale => minScale = currentScale / relativeZoom
-    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
-    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
-
-    // Dynamic boundaries as proportions of maxRelativeZoom
-    // LEVEL 1: 0% to 33% of max
-    // LEVEL 2: 33% to 66% of max
-    // LEVEL 3: 66% to 100% of max
-    final kLevel2Threshold = maxRelativeZoom * 0.33;
-    final kLevel3Threshold = maxRelativeZoom * 0.66;
+    // Fixed boundaries (not proportional, absolute values)
+    const double kLevel2Threshold = 2.0;
+    const double kLevel3Threshold = 4.0;
 
     // zoomScale parameter is actually relativeZoom (calculated in widget as currentScale / minScale)
     final relativeZoom = zoomScale;
@@ -722,17 +729,14 @@ class LifelinePainter extends CustomPainter {
     if (memories.length < 2) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Calculate dynamic boundary (33% of maxRelativeZoom)
-    const double kFixedMaxScale = 2.6;
-    final estimatedMinScale = relativeZoom > 0.1 ? currentScale / relativeZoom : currentScale;
-    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
-    final level2Threshold = maxRelativeZoom * 0.33;
+    // Fixed boundary for LEVEL 2 start
+    const double kLevel2Threshold = 2.0;
 
-    // Fade out transition for yearly gradient (LEVEL 1)
-    // Fully visible from 1.0 to 90% of level2 threshold, then fade out
-    final fadeStart = level2Threshold * 0.9;
+    // Fade out transition for yearly gradient (LEVEL 1: 1x - 2x)
+    // Fully visible from 1.0 to 1.8x, then fade out until 2.0x
+    const fadeStart = 1.8;
     final fadeOutOpacity = (relativeZoom > fadeStart)
-        ? ((level2Threshold - relativeZoom) / (level2Threshold - fadeStart)).clamp(0.0, 1.0)
+        ? ((kLevel2Threshold - relativeZoom) / (kLevel2Threshold - fadeStart)).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeOutOpacity;
 
@@ -808,23 +812,20 @@ class LifelinePainter extends CustomPainter {
     if (memories.isEmpty) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Calculate dynamic boundaries (33% to 66% of maxRelativeZoom)
-    const double kFixedMaxScale = 2.6;
-    final estimatedMinScale = zoomScale > 0.1 ? currentScale / zoomScale : currentScale;
-    final maxRelativeZoom = estimatedMinScale > 0.001 ? kFixedMaxScale / estimatedMinScale : 10.0;
-    final level2Threshold = maxRelativeZoom * 0.33;
-    final level3Threshold = maxRelativeZoom * 0.66;
+    // Fixed boundaries for LEVEL 2 (2x - 4x)
+    const double kLevel2Threshold = 2.0;
+    const double kLevel3Threshold = 4.0;
 
-    // Fade in/out transitions for monthly clusters (LEVEL 2)
-    // Fade in from level2Threshold to level2Threshold + 10% of range
-    final fadeInRange = (level3Threshold - level2Threshold) * 0.1;
-    final fadeInOpacity = (zoomScale < level2Threshold + fadeInRange)
-        ? ((zoomScale - level2Threshold) / fadeInRange).clamp(0.0, 1.0)
+    // Fade in/out transitions for monthly clusters (LEVEL 2: 2x - 4x)
+    // Fade in from 2.0x to 2.2x
+    const fadeInEnd = 2.2;
+    final fadeInOpacity = (zoomScale < fadeInEnd)
+        ? ((zoomScale - kLevel2Threshold) / (fadeInEnd - kLevel2Threshold)).clamp(0.0, 1.0)
         : 1.0;
-    // Fade out from 90% of level3Threshold to level3Threshold
-    final fadeOutStart = level3Threshold * 0.9;
+    // Fade out from 3.6x to 4.0x
+    const fadeOutStart = 3.6;
     final fadeOutOpacity = (zoomScale > fadeOutStart)
-        ? ((level3Threshold - zoomScale) / (level3Threshold - fadeOutStart)).clamp(0.0, 1.0)
+        ? ((kLevel3Threshold - zoomScale) / (kLevel3Threshold - fadeOutStart)).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeInOpacity * fadeOutOpacity;
 
@@ -1075,8 +1076,8 @@ class LifelinePainter extends CustomPainter {
       }
 
       // Only show count text at high zoom level (LEVEL 3)
-      // Show when zoom reaches level3Threshold
-      if (zoomScale >= level3Threshold) {
+      // Show when zoom reaches 4x (kLevel3Threshold)
+      if (zoomScale >= kLevel3Threshold) {
         final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
         final textStyle = GoogleFonts.orbitron(
           color: ringColor.withOpacity(finalOpacity),
