@@ -28,6 +28,7 @@ import 'floating_message_overlay.dart';
 import 'global_audio_player_widget.dart';
 import 'lifeline_painter.dart';
 import 'device_performance_detector.dart';
+import 'fps_overlay.dart';
 import 'monthly_cluster_bottom_sheet.dart';
 import '../services/lifeline_calculator.dart';
 import '../services/onboarding_service.dart';
@@ -1863,6 +1864,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                 syncState, memoriesAsyncValue.asData?.value ?? [], l10n),
             _buildDraftsBanner(l10n),
             const FloatingMessageOverlay(),
+            const FPSOverlay(),
             Positioned(
               right: 16,
               bottom: 16,
