@@ -395,8 +395,11 @@ class Memory {
       ..videoKeysOrder = videoKeysOrder ?? List.from(this.videoKeysOrder)
       ..audioKeysOrder = audioKeysOrder ?? List.from(this.audioKeysOrder)
       // NEW: Эмоции (новая система)
-      ..primaryEmotion = primaryEmotion ?? this.primaryEmotion
-      ..secondaryEmotion = secondaryEmotion ?? this.secondaryEmotion
+      // ИСПРАВЛЕНИЕ: Для nullable полей используем ?? только если хотим сохранить старое значение
+      // Но для primaryEmotion и secondaryEmotion мы хотим ЗАМЕНИТЬ значение, даже если новое = null
+      // Решение: не используем оператор ??
+      ..primaryEmotion = primaryEmotion
+      ..secondaryEmotion = secondaryEmotion
       ..emotionIntensity = emotionIntensity ?? this.emotionIntensity;
 
     // Старая система эмоций (для обратной совместимости)
