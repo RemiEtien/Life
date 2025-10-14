@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../memory.dart';
 import '../models/user_profile.dart';
 import '../utils/emotion_colors.dart';
+import '../utils/performance_profiler.dart';
 import 'device_performance_detector.dart';
 import 'lifeline_widget.dart'; // Import for YearPosition
 
@@ -526,6 +527,12 @@ class LifelinePainter extends CustomPainter {
     int nodesTime = 0;
     int labelsTime = 0;
     int macroViewTime = 0;
+    int branchesTime = 0;
+    int aurasTime = 0;
+
+    // Performance profiler integration
+    final profiler = PerformanceProfiler();
+    final isRecording = profiler.isRecording;
 
     if (size.width <= 0 || size.height <= 0 || memories.isEmpty) return;
 
