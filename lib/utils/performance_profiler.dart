@@ -241,6 +241,9 @@ class PerformanceProfiler {
   final Stopwatch _frameStopwatch = Stopwatch();
   Timer? _benchmarkTimer;
 
+  // Frame timing tracking
+  Duration _lastFrameTimestamp = Duration.zero;
+
   final ValueNotifier<bool> isRecordingNotifier = ValueNotifier(false);
   final ValueNotifier<double> currentFpsNotifier = ValueNotifier(0.0);
   final ValueNotifier<String?> currentStatusNotifier = ValueNotifier(null);
@@ -264,6 +267,7 @@ class PerformanceProfiler {
     _componentMetrics.clear();
     _overallFrameTimes.clear();
     _frameStopwatch.reset();
+    _lastFrameTimestamp = Duration.zero;
 
     isRecordingNotifier.value = true;
     currentStatusNotifier.value = 'Recording: ${config.name}';
@@ -272,10 +276,33 @@ class PerformanceProfiler {
       debugPrint('[PerformanceProfiler] Started benchmark: ${config.name}');
     }
 
+    // Start listening to frame callbacks
+    SchedulerBinding.instance.addPostFrameCallback(_onFrameComplete);
+
     // Auto-stop after duration
     _benchmarkTimer = Timer(Duration(seconds: config.durationSeconds), () {
       stopBenchmark();
     });
+  }
+
+  /// Called after each frame is rendered
+  void _onFrameComplete(Duration timestamp) {
+    if (!_isRecording) return;
+
+    // Calculate frame time
+    if (_lastFrameTimestamp != Duration.zero) {
+      final frameDuration = timestamp - _lastFrameTimestamp;
+      final frameMicros = frameDuration.inMicroseconds.toDouble();
+
+      recordFrame(frameMicros);
+    }
+
+    _lastFrameTimestamp = timestamp;
+
+    // Schedule next frame callback
+    if (_isRecording) {
+      SchedulerBinding.instance.addPostFrameCallback(_onFrameComplete);
+    }
   }
 
   /// Остановить запись и сохранить результат
