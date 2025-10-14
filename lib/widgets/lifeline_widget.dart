@@ -1216,15 +1216,21 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final List<TappableItem> hits = [];
     final List<String> processedNodeIds = [];
 
-    // Calculate relative zoom for tap detection
+    // Calculate level thresholds for tap detection (same as painter)
     final totalWidth = _cachedLayoutResult?.totalWidth ?? 1.0;
     final screenWidth = _lastKnownSize.width;
     final minScale = _calculateMinScale(totalWidth, screenWidth);
-    final relativeZoom = currentScale / minScale;
+
+    // Calculate level thresholds (same as painter)
+    const double kBaseContentWidth = 1200.0;
+    final baseScale = (screenWidth * 0.95) / kBaseContentWidth;
+    final effectiveBase = max(minScale, baseScale);
+    final kLevel2Threshold = effectiveBase * 1.5;
+    final kLevel3Threshold = effectiveBase * 3.0;
 
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    // Месячные кластеры видны только в диапазоне zoom 4x-12x (соответствует LEVEL 2)
-    if (relativeZoom >= 4.0 && relativeZoom < 12.0) {
+    // Месячные кластеры кликабельны только в LEVEL 2 (kLevel2Threshold <= currentScale < kLevel3Threshold)
+    if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
       _monthlyClusterData.forEach((clusterId, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
@@ -1242,9 +1248,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       });
     }
 
-    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 12x, LEVEL 3)
-    // Using relative zoom for universal behavior
-    if (relativeZoom >= 12.0) {
+    // Дневные кластеры и одиночные воспоминания кликабельны только в LEVEL 3 (currentScale >= kLevel3Threshold)
+    if (currentScale >= kLevel3Threshold) {
       _dailyClusterData.forEach((id, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;

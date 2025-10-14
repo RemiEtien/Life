@@ -589,18 +589,20 @@ class LifelinePainter extends CustomPainter {
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
-    else if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
-      // LEVEL 2: Monthly clusters
-      if (kDebugMode) debugPrint('[LifelinePainter] Drawing monthly clusters');
+    else if (currentScale >= kLevel2Threshold) {
+      // LEVEL 2 & 3: Monthly clusters (visible in Level 2, invisible but clickable in Level 3)
+      if (kDebugMode) {
+        if (currentScale < kLevel3Threshold) {
+          debugPrint('[LifelinePainter] Drawing monthly clusters (visible)');
+        } else {
+          debugPrint('[LifelinePainter] Drawing monthly clusters (invisible but clickable)');
+        }
+      }
       stopwatch.start();
       _drawMonthlyClusters(canvas, mainPath, size, currentScale, placementResults, effectiveBase, kLevel2Threshold, kLevel3Threshold);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
-    }
-    else {
-      // LEVEL 3: Individual nodes only
-      if (kDebugMode) debugPrint('[LifelinePainter] Level 3 - NOT drawing monthly clusters');
     }
 
     // Calculate detailOpacity for Level 3
