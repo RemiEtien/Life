@@ -185,6 +185,51 @@ class FirestoreService {
     }
   }
 
+  /// Batch delete multiple memories at once using Firestore batched writes.
+  /// This is more efficient than deleting one-by-one when deleting many memories.
+  /// Firestore batch limit is 500 operations, so we chunk if needed.
+  Future<void> batchDeleteMemories(String userId, List<Memory> memories) async {
+    if (memories.isEmpty) return;
+
+    try {
+      const batchSize = 500; // Firestore batch write limit
+      final memoriesWithFirestoreId = memories.where((m) => m.firestoreId != null).toList();
+
+      // Process in chunks of 500
+      for (int i = 0; i < memoriesWithFirestoreId.length; i += batchSize) {
+        final chunk = memoriesWithFirestoreId.skip(i).take(batchSize).toList();
+        final batch = _db.batch();
+
+        for (final memory in chunk) {
+          final docRef = _db
+              .collection('users')
+              .doc(userId)
+              .collection('memories')
+              .doc(memory.firestoreId!);
+          batch.delete(docRef);
+        }
+
+        await batch.commit();
+
+        if (kDebugMode) {
+          debugPrint('[FirestoreService] Batch deleted ${chunk.length} memories from Firestore');
+        }
+      }
+
+      // Delete associated files from storage
+      for (final memory in memoriesWithFirestoreId) {
+        await _deleteMemoryFilesFromStorage(userId, memory.firestoreId!, memory);
+      }
+
+      if (kDebugMode) {
+        debugPrint('[FirestoreService] Completed batch delete of ${memoriesWithFirestoreId.length} memories');
+      }
+    } catch (e, stackTrace) {
+      unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: batchDeleteMemories failed'));
+      rethrow;
+    }
+  }
+
   Future<void> _deleteMemoryFilesFromStorage(
       String userId, String memoryId, Memory memory) async {
     final List<String> urlsToDelete = [

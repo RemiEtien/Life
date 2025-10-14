@@ -27,7 +27,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/premium_upsell_widgets.dart';
-import '../widgets/emotion_particles.dart';
+import '../widgets/emotion_effects/advanced_emotion_effect.dart';
 
 class MemoryViewScreen extends ConsumerStatefulWidget {
   final Memory memory;
@@ -540,8 +540,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             final file = await DefaultCacheManager().getSingleFile(path);
             localImagePaths.add(file.path);
           } catch (e) {
-            // ignore: avoid_print
-            print('Failed to download image for export: $path');
+            if (kDebugMode) {
+              debugPrint('[MemoryViewScreen] Failed to download image for export: $path');
+            }
           }
         } else {
           localImagePaths.add(path);
@@ -581,8 +582,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       await Share.shareXFiles([XFile(tempFile.path)],
           text: _currentMemory.title);
     } catch (e, stack) {
-      // ignore: avoid_print
-      print('Export failed: $e\n$stack');
+      if (kDebugMode) {
+        debugPrint('[MemoryViewScreen] Export failed: $e\n$stack');
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Export failed: $e')),
@@ -1096,7 +1098,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                   userProfile?.enableMemoryViewParticles == true)
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: EmotionParticlesWidget(
+                    child: AdvancedEmotionEffect(
                       emotion: _currentMemory.primaryEmotion!,
                       intensity: _currentMemory.emotionIntensity,
                     ),

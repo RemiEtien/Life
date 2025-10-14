@@ -1151,13 +1151,13 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       try {
         final data = item.data;
         if (kDebugMode) {
-          print('[MONTHLY CLUSTER TAP] data type: ${data.runtimeType}');
-          print('[MONTHLY CLUSTER TAP] data: $data');
+          debugPrint('[MONTHLY CLUSTER TAP] data type: ${data.runtimeType}');
+          debugPrint('[MONTHLY CLUSTER TAP] data: $data');
         }
 
         if (data is! Map<String, dynamic>) {
           if (kDebugMode) {
-            print('[ERROR] monthlyCluster data is not a Map, it is: ${data.runtimeType}');
+            debugPrint('[ERROR] monthlyCluster data is not a Map, it is: ${data.runtimeType}');
           }
           return;
         }
@@ -1168,14 +1168,14 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
         if (monthKeys == null || monthKeys.isEmpty || month == null || memoriesList == null) {
           if (kDebugMode) {
-            print('[ERROR] Missing required fields in monthlyCluster data');
+            debugPrint('[ERROR] Missing required fields in monthlyCluster data');
           }
           return;
         }
 
         if (memoriesList is! List<Memory>) {
           if (kDebugMode) {
-            print('[ERROR] memories field is not List<Memory>, it is: ${memoriesList.runtimeType}');
+            debugPrint('[ERROR] memories field is not List<Memory>, it is: ${memoriesList.runtimeType}');
           }
           return;
         }
@@ -1188,8 +1188,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         }
       } catch (e, stackTrace) {
         if (kDebugMode) {
-          print('[ERROR] Error handling monthlyCluster tap: $e');
-          print('[STACKTRACE] $stackTrace');
+          debugPrint('[ERROR] Error handling monthlyCluster tap: $e');
+          debugPrint('[STACKTRACE] $stackTrace');
         }
       }
     } else if (item.type == TappableType.monthInCluster) {

@@ -18,13 +18,13 @@ service firebase.storage {
     }
 
     // ========================================
-    // PUBLIC AUDIO ASSETS (On-Demand Loading)
+    // AUDIO ASSETS (On-Demand Loading)
     // ========================================
 
     // Audio assets for ambient sounds and background music
-    // Anyone can download, only admins can upload
+    // Only authenticated users can download, only admins can upload
     match /audio_assets/{allPaths=**} {
-      allow read: if true;  // Public read for all users
+      allow read: if isAuthenticated();  // Require authentication
       allow write: if false;  // Only upload via Firebase Console/Admin SDK
     }
 

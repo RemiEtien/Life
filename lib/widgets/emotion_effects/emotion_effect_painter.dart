@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../utils/emotion_colors.dart';
 
@@ -30,7 +31,9 @@ class EmotionEffectFactory {
     required double intensity,
     required Size screenSize,
   }) {
-    print('🎨 EmotionEffectFactory: Creating painter for emotion="$emotion", intensity=$intensity, progress=$progress');
+    if (kDebugMode) {
+      debugPrint('🎨 EmotionEffectFactory: Creating painter for emotion="$emotion", intensity=$intensity, progress=$progress');
+    }
 
     switch (emotion) {
       case 'joy':
@@ -46,21 +49,27 @@ class EmotionEffectFactory {
           screenSize: screenSize,
         );
       case 'anger':
-        print('🔥 Creating AngerEffectPainter');
+        if (kDebugMode) {
+          debugPrint('🔥 Creating AngerEffectPainter');
+        }
         return AngerEffectPainter(
           progress: progress,
           intensity: intensity,
           screenSize: screenSize,
         );
       case 'fear':
-        print('👻 Creating FearEffectPainter');
+        if (kDebugMode) {
+          debugPrint('👻 Creating FearEffectPainter');
+        }
         return FearEffectPainter(
           progress: progress,
           intensity: intensity,
           screenSize: screenSize,
         );
       case 'disgust':
-        print('🤢 Creating DisgustEffectPainter');
+        if (kDebugMode) {
+          debugPrint('🤢 Creating DisgustEffectPainter');
+        }
         return DisgustEffectPainter(
           progress: progress,
           intensity: intensity,
@@ -79,14 +88,18 @@ class EmotionEffectFactory {
           screenSize: screenSize,
         );
       case 'pride':
-        print('👑 Creating PrideEffectPainter');
+        if (kDebugMode) {
+          debugPrint('👑 Creating PrideEffectPainter');
+        }
         return PrideEffectPainter(
           progress: progress,
           intensity: intensity,
           screenSize: screenSize,
         );
       default:
-        print('⚠️ Unknown emotion "$emotion", using JoyEffectPainter as fallback');
+        if (kDebugMode) {
+          debugPrint('⚠️ Unknown emotion "$emotion", using JoyEffectPainter as fallback');
+        }
         return JoyEffectPainter(
           progress: progress,
           intensity: intensity,

@@ -416,19 +416,15 @@ class EncryptionService extends StateNotifier<EncryptionState> {
             debugPrint('[EncryptionService] Found ${encryptedMemories.length} encrypted memories to delete');
           }
 
-          // Step 2: Delete from Firestore
+          // Step 2: Delete from Firestore using batch delete (more efficient)
           final firestore = _ref.read(firestoreServiceProvider);
-          for (final memory in encryptedMemories) {
-            if (memory.firestoreId != null) {
-              try {
-                await firestore.deleteMemory(userProfile.uid, memory);
-              } catch (e) {
-                if (kDebugMode) {
-                  debugPrint('[EncryptionService] Failed to delete memory ${memory.firestoreId} from Firestore: $e');
-                }
-                // Continue deleting other memories even if one fails
-              }
+          try {
+            await firestore.batchDeleteMemories(userProfile.uid, encryptedMemories);
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint('[EncryptionService] Failed to batch delete memories from Firestore: $e');
             }
+            // Continue with local deletion even if Firestore deletion fails
           }
 
           // Step 3: Delete from local database
