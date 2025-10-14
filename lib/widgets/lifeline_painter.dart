@@ -576,6 +576,10 @@ class LifelinePainter extends CustomPainter {
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
+
+      if (isRecording) {
+        profiler.recordComponent('YearlyGradient (Level 1)', macroViewTime.toDouble(), 0);
+      }
     }
     else if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
       // LEVEL 2: Monthly clusters (visible only in Level 2)
@@ -584,6 +588,10 @@ class LifelinePainter extends CustomPainter {
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
+
+      if (isRecording) {
+        profiler.recordComponent('MonthlyClusters (Level 2)', macroViewTime.toDouble(), 0);
+      }
     }
 
     // Calculate detailOpacity for Level 3
@@ -597,6 +605,7 @@ class LifelinePainter extends CustomPainter {
     // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
     // OPTIMIZATION: Skip branches entirely when zoomed out very far (not visible anyway)
     if (branchIntensity > 0 && zoomScale > 0.8) {
+      stopwatch.start();
       final branches =
           renderData.branches; // These paths are pre-animated from the isolate
       const arteryColor = Color(0xFFFF8A80);
@@ -630,6 +639,13 @@ class LifelinePainter extends CustomPainter {
             pulse: pulse,
             maxLayers: branchLayerCount);
       }
+      stopwatch.stop();
+      branchesTime = stopwatch.elapsedMicroseconds;
+      stopwatch.reset();
+
+      if (isRecording) {
+        profiler.recordComponent('Branches', branchesTime.toDouble(), 0);
+      }
     }
     // --- End of branch drawing ---
 
@@ -648,11 +664,16 @@ class LifelinePainter extends CustomPainter {
       stopwatch.stop();
       labelsTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
+
+      if (isRecording) {
+        profiler.recordComponent('MemoryLabels', labelsTime.toDouble(), 0);
+      }
     }
 
     stopwatch.start();
     // PASS 1: Draw all auras first (background layer)
     // IMPORTANT: Only draw auras for individual nodes in Level 3
+    int aurasDrawn = 0;
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           // Skip individual node auras outside Level 3
@@ -671,6 +692,7 @@ class LifelinePainter extends CustomPainter {
 
             if (item.memory.primaryEmotion != null) {
               _drawEmotionAura(canvas, adjustedPos, nodeRadius, detailOpacity, item.memory);
+              aurasDrawn++;
             }
           }
         } else if (item is DailyClusterPlacementInfo) {
@@ -687,9 +709,18 @@ class LifelinePainter extends CustomPainter {
 
             if (item.memories.first.primaryEmotion != null) {
               _drawEmotionAura(canvas, adjustedPos, nodeRadius, detailOpacity, item.memories.first);
+              aurasDrawn++;
             }
           }
         }
+      }
+
+      stopwatch.stop();
+      aurasTime = stopwatch.elapsedMicroseconds;
+      stopwatch.reset();
+
+      if (isRecording) {
+        profiler.recordComponent('Auras ($aurasDrawn drawn)', aurasTime.toDouble(), 0);
       }
 
       // PASS 2: Draw all nodes on top (foreground layer)
@@ -730,6 +761,10 @@ class LifelinePainter extends CustomPainter {
     stopwatch.stop();
     nodesTime = stopwatch.elapsedMicroseconds;
     stopwatch.reset();
+
+    if (isRecording) {
+      profiler.recordComponent('NodesRendering (Level 3)', nodesTime.toDouble(), 0);
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (timingsNotifier != null) {
