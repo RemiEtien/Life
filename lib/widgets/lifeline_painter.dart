@@ -484,6 +484,7 @@ class LifelinePainter extends CustomPainter {
   final double zoomScale; // Relative zoom (for backward compatibility)
   final double currentScale; // NEW: Absolute zoom scale for universal level boundaries
   final double minScale; // NEW: Base scale for dynamic node sizing
+  final double screenWidth; // NEW: Real screen width for baseScale calculation
   final double pulseValue;
   final double branchIntensity; // NEW
 
@@ -492,37 +493,11 @@ class LifelinePainter extends CustomPainter {
   final ValueNotifier<PaintTimings?>? timingsNotifier;
   final UserProfile? userProfile; // NEW: для условного рендеринга эффектов
 
-  // LEVEL-BASED node growth with minScale compensation
-  // Nodes grow ONLY within Level 3 (4x-8x zoom)
-  // COMPENSATES for timeline length: inversely proportional to minScale
-  // This ensures UNIFORM visual size on all timelines
-  double get kNodeBaseRadius {
-    const double kLevel3Start = 4.0;  // Individual nodes start appearing
-    const double kLevel3End = 8.0;     // Maximum zoom
-
-    // CORRECT: Multiply by minScale to achieve uniform visual size
-    // Formula from logs: nodeSize = (actualRadius × 2) / currentScale
-    // At 8x: currentScale = minScale × 8
-    // So: nodeSize = (actualRadius × 2) / (minScale × 8) = (kNodeBaseRadius × 1.5 × 2) / (minScale × 8)
-    // For UNIFORM nodeSize across all timelines: kNodeBaseRadius must be ∝ minScale
-    // This compensates for division by currentScale in the nodeSize formula
-    const startRadiusConstant = 1.0;   // Small at 4x
-    const targetRadiusConstant = 5.5;  // "+" button size at 8x (~60px)
-
-    final startRadius = startRadiusConstant / minScale;
-    final targetRadius = targetRadiusConstant / minScale;
-
-    // Only grow within Level 3 range (4x to 8x)
-    if (zoomScale < kLevel3Start) {
-      return startRadius;  // Small before Level 3
-    }
-
-    // Linear interpolation within Level 3
-    final t = ((zoomScale - kLevel3Start) / (kLevel3End - kLevel3Start)).clamp(0.0, 1.0);
-    return startRadius + (targetRadius - startRadius) * t;
-  }
-
-  double get kDailyClusterBaseRadius => kNodeBaseRadius * 1.3;
+  // RESTORED from v149: Simple constant node radius
+  // With absolute scale system (1200px visual lock), nodes automatically
+  // appear same size at maxScale on all timelines without dynamic adjustments
+  static const double kNodeBaseRadius = 10.0;
+  static const double kDailyClusterBaseRadius = 13.0;
   static const double kVisibilityBuffer = 100.0;
   static const double kNodeVerticalOffset = 0.0;
 
@@ -537,6 +512,7 @@ class LifelinePainter extends CustomPainter {
     this.zoomScale = 1.0,
     required this.currentScale,
     required this.minScale, // NEW: Base scale for fixed node sizing
+    required this.screenWidth, // NEW: Real screen width for baseScale calculation
     this.pulseValue = 0.0,
     this.timingsNotifier,
     required this.images,
@@ -562,43 +538,77 @@ class LifelinePainter extends CustomPainter {
     final placementResults = renderData.placementResults;
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
 
-    // === 3-LEVEL ZOOM SYSTEM (FIXED BOUNDARIES) ===
-    // Strategy: Fixed MaxRelativeZoom = 8.0 for consistent zoom duration
-    // Fixed boundaries for predictable level transitions
+    // === 3-LEVEL ZOOM SYSTEM (ABSOLUTE SCALE BASED - v149 RESTORED) ===
+    // Strategy: Use absolute currentScale thresholds based on 1200px visual lock
+    // All timelines transition at the SAME absolute scale values
     //
-    // LEVEL 1 (Yearly): 1x - 2x
-    // LEVEL 2 (Monthly): 2x - 4x
-    // LEVEL 3 (Individual): 4x - 8x
+    // Formula: baseScale = screenWidth / 1200.0, maxScale = baseScale × 6.0
+    // Level thresholds are proportional to baseScale:
+    // LEVEL 1 (Yearly): currentScale < baseScale × 2.0
+    // LEVEL 2 (Monthly): baseScale × 2.0 <= currentScale < baseScale × 4.0
+    // LEVEL 3 (Individual): currentScale >= baseScale × 4.0
     //
-    // This ensures identical zoom experience on ALL timelines
+    // This ensures nodes appear same size at maxScale on ALL timelines
 
-    // Fixed boundaries (not proportional, absolute values)
-    const double kLevel2Threshold = 2.0;
-    const double kLevel3Threshold = 4.0;
+    // Calculate baseScale from screen width (visual lock reference)
+    const double kBaseContentWidth = 1200.0;
+    // CRITICAL: Use REAL screen width, not timeline content width!
+    // screenWidth is passed from widget (constraints.maxWidth of viewport)
+    final baseScale = (screenWidth * 0.95) / kBaseContentWidth;
 
-    // zoomScale parameter is actually relativeZoom (calculated in widget as currentScale / minScale)
-    final relativeZoom = zoomScale;
+    // CRITICAL FIX: For long timelines where minScale < baseScale,
+    // we need to adjust thresholds relative to minScale, not baseScale
+    // Otherwise thresholds can be below minScale and levels never trigger!
+    final effectiveBase = max(minScale, baseScale);
 
-    if (relativeZoom < kLevel2Threshold) {
+    // Absolute scale thresholds (adjusted for timeline length)
+    // Use factors that work from effectiveBase to maxScale
+    final kLevel2Threshold = effectiveBase * 1.5;  // Monthly clusters start at 150% of base
+    final kLevel3Threshold = effectiveBase * 3.0;  // Individual nodes start at 300% of base
+
+    // DEBUG: Log level detection at each paint
+    if (kDebugMode) {
+      String currentLevel;
+      if (currentScale < kLevel2Threshold) {
+        currentLevel = 'LEVEL 1 (Yearly)';
+      } else if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
+        currentLevel = 'LEVEL 2 (Monthly)';
+      } else {
+        currentLevel = 'LEVEL 3 (Individual)';
+      }
+      debugPrint('[LifelinePainter] currentScale=$currentScale, Level2Threshold=$kLevel2Threshold, Level3Threshold=$kLevel3Threshold => $currentLevel');
+    }
+
+    // Use ABSOLUTE currentScale for level determination (v149 system)
+    if (currentScale < kLevel2Threshold) {
+      // LEVEL 1: Yearly gradient
+      if (kDebugMode) debugPrint('[LifelinePainter] Drawing yearly gradient');
       stopwatch.start();
-      _drawYearlyGradient(canvas, mainPath, size, relativeZoom);
+      _drawYearlyGradient(canvas, mainPath, size, currentScale, effectiveBase, kLevel2Threshold);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
-    else if (relativeZoom >= kLevel2Threshold && relativeZoom < kLevel3Threshold) {
+    else if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
+      // LEVEL 2: Monthly clusters
+      if (kDebugMode) debugPrint('[LifelinePainter] Drawing monthly clusters');
       stopwatch.start();
-      _drawMonthlyClusters(canvas, mainPath, size, relativeZoom, placementResults);
+      _drawMonthlyClusters(canvas, mainPath, size, currentScale, placementResults, effectiveBase, kLevel2Threshold, kLevel3Threshold);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
+    else {
+      // LEVEL 3: Individual nodes only
+      if (kDebugMode) debugPrint('[LifelinePainter] Level 3 - NOT drawing monthly clusters');
+    }
 
-    // Calculate detailOpacity for Level 3 (relativeZoom >= 12.0)
-    // Fade in individual nodes as we zoom past 12.0
-    final detailOpacity = (relativeZoom < kLevel3Threshold - 1.0)
+    // Calculate detailOpacity for Level 3
+    // Fade in individual nodes as we approach kLevel3Threshold
+    final fadeInStart = kLevel3Threshold - effectiveBase;  // Start fading 1 effectiveBase unit before threshold
+    final detailOpacity = (currentScale < fadeInStart)
         ? 0.0
-        : ((relativeZoom - (kLevel3Threshold - 1.0)) / 1.0).clamp(0.0, 1.0);
+        : ((currentScale - fadeInStart) / effectiveBase).clamp(0.0, 1.0);
 
     // --- Draw animated branches dynamically ---
     // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
@@ -659,11 +669,20 @@ class LifelinePainter extends CustomPainter {
 
     stopwatch.start();
     // PASS 1: Draw all auras first (background layer)
-    // IMPORTANT: Only draw auras for individual nodes in Level 3 (4x-8x zoom)
+    // IMPORTANT: Only draw auras for individual nodes in Level 3
+
+    // DEBUG: Count PlacementInfo items and detailOpacity
+    if (kDebugMode) {
+      final placementInfoCount = placementResults.whereType<PlacementInfo>().length;
+      final dailyClusterCount = placementResults.whereType<DailyClusterPlacementInfo>().length;
+      debugPrint('[LifelinePainter] placementResults: $placementInfoCount PlacementInfo, $dailyClusterCount DailyClusterPlacementInfo');
+      debugPrint('[LifelinePainter] detailOpacity=$detailOpacity (fadeInStart=${kLevel3Threshold - effectiveBase})');
+    }
+
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           // Skip individual node auras outside Level 3
-          if (relativeZoom < kLevel3Threshold) continue;
+          if (currentScale < kLevel3Threshold) continue;
 
           if (visibleRect
               .inflate(kNodeBaseRadius * 2)
@@ -700,11 +719,14 @@ class LifelinePainter extends CustomPainter {
       }
 
       // PASS 2: Draw all nodes on top (foreground layer)
-      // IMPORTANT: Only draw individual nodes in Level 3 (4x-8x zoom)
+      // IMPORTANT: Only draw individual nodes in Level 3
+      int drawnIndividualNodes = 0;
+      int drawnDailyClusters = 0;
+
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           // Skip individual nodes outside Level 3
-          if (relativeZoom < kLevel3Threshold) continue;
+          if (currentScale < kLevel3Threshold) continue;
 
           if (visibleRect
               .inflate(kNodeBaseRadius * 2)
@@ -715,6 +737,7 @@ class LifelinePainter extends CustomPainter {
             _drawSingleMemoryNode(
                 canvas, item.nodePosition, item.memory, index, detailOpacity, image);
             onNodePosition?.call(item.memory.universalId, item.nodePosition);
+            drawnIndividualNodes++;
           }
         } else if (item is DailyClusterPlacementInfo) {
           if (visibleRect
@@ -723,6 +746,7 @@ class LifelinePainter extends CustomPainter {
             final image = images[item.memories.first.coverPath];
             _drawDailyClusterNode(canvas, item.position, item, detailOpacity, image);
             onDailyClusterPosition?.call(item.id, item.position, item.memories);
+            drawnDailyClusters++;
           }
         } else if (item is TimeGapPlacementInfo) {
           // Show time gaps at high zoom levels (300%-500%)
@@ -733,6 +757,12 @@ class LifelinePainter extends CustomPainter {
           }
         }
       }
+
+    // DEBUG: Log drawing statistics
+    if (kDebugMode) {
+      debugPrint('[LifelinePainter] Drew $drawnIndividualNodes individual nodes, $drawnDailyClusters daily clusters');
+    }
+
     stopwatch.stop();
     nodesTime = stopwatch.elapsedMicroseconds;
     stopwatch.reset();
@@ -750,19 +780,16 @@ class LifelinePainter extends CustomPainter {
   }
 
   /// LEVEL 1: Draw yearly gradient - one averaged circle per year
-  void _drawYearlyGradient(Canvas canvas, ui.Path path, Size size, double relativeZoom) {
+  void _drawYearlyGradient(Canvas canvas, ui.Path path, Size size, double currentScale, double baseScale, double kLevel2Threshold) {
     if (!userProfile!.enableYearlyGradient) return;
     if (memories.length < 2) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fixed boundary for LEVEL 2 start
-    const double kLevel2Threshold = 2.0;
-
-    // Fade out transition for yearly gradient (LEVEL 1: 1x - 2x)
-    // Fully visible from 1.0 to 1.8x, then fade out until 2.0x
-    const fadeStart = 1.8;
-    final fadeOutOpacity = (relativeZoom > fadeStart)
-        ? ((kLevel2Threshold - relativeZoom) / (kLevel2Threshold - fadeStart)).clamp(0.0, 1.0)
+    // Fade out transition for yearly gradient (LEVEL 1: currentScale < kLevel2Threshold)
+    // Fully visible from baseScale × 1.0 to baseScale × 1.8, fade out until kLevel2Threshold
+    final fadeStart = baseScale * 1.8;
+    final fadeOutOpacity = (currentScale > fadeStart)
+        ? ((kLevel2Threshold - currentScale) / (kLevel2Threshold - fadeStart)).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeOutOpacity;
 
@@ -832,26 +859,25 @@ class LifelinePainter extends CustomPainter {
     Canvas canvas,
     ui.Path path,
     Size size,
-    double zoomScale,
+    double currentScale,
     List<dynamic> placementResults,
+    double baseScale,
+    double kLevel2Threshold,
+    double kLevel3Threshold,
   ) {
     if (memories.isEmpty) return;
     if (path.computeMetrics().isEmpty) return;
 
-    // Fixed boundaries for LEVEL 2 (2x - 4x)
-    const double kLevel2Threshold = 2.0;
-    const double kLevel3Threshold = 4.0;
-
-    // Fade in/out transitions for monthly clusters (LEVEL 2: 2x - 4x)
-    // Fade in from 2.0x to 2.2x
-    const fadeInEnd = 2.2;
-    final fadeInOpacity = (zoomScale < fadeInEnd)
-        ? ((zoomScale - kLevel2Threshold) / (fadeInEnd - kLevel2Threshold)).clamp(0.0, 1.0)
+    // Fade in/out transitions for monthly clusters (LEVEL 2: kLevel2Threshold to kLevel3Threshold)
+    // Fade in from kLevel2Threshold to kLevel2Threshold + 0.2*baseScale
+    final fadeInEnd = kLevel2Threshold + baseScale * 0.2;
+    final fadeInOpacity = (currentScale < fadeInEnd)
+        ? ((currentScale - kLevel2Threshold) / (fadeInEnd - kLevel2Threshold)).clamp(0.0, 1.0)
         : 1.0;
-    // Fade out from 3.6x to 4.0x
-    const fadeOutStart = 3.6;
-    final fadeOutOpacity = (zoomScale > fadeOutStart)
-        ? ((kLevel3Threshold - zoomScale) / (kLevel3Threshold - fadeOutStart)).clamp(0.0, 1.0)
+    // Fade out from kLevel3Threshold - 0.4*baseScale to kLevel3Threshold
+    final fadeOutStart = kLevel3Threshold - baseScale * 0.4;
+    final fadeOutOpacity = (currentScale > fadeOutStart)
+        ? ((kLevel3Threshold - currentScale) / (kLevel3Threshold - fadeOutStart)).clamp(0.0, 1.0)
         : 1.0;
     final finalOpacity = fadeInOpacity * fadeOutOpacity;
 
@@ -1102,8 +1128,8 @@ class LifelinePainter extends CustomPainter {
       }
 
       // Only show count text at high zoom level (LEVEL 3)
-      // Show when zoom reaches 4x (kLevel3Threshold)
-      if (zoomScale >= kLevel3Threshold) {
+      // Show when currentScale reaches kLevel3Threshold
+      if (currentScale >= kLevel3Threshold) {
         final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
         final textStyle = GoogleFonts.orbitron(
           color: ringColor.withOpacity(finalOpacity),
