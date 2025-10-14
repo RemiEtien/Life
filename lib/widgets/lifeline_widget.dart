@@ -1022,19 +1022,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     final currentScale = _transformationController.value.getMaxScaleOnAxis();
 
-    // Calculate relative zoom for consistent behavior across devices
-    final totalWidth = _cachedLayoutResult?.totalWidth ?? _lastKnownSize.width;
-    final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
-    // If currentScale is close to 1.0, it means initial centering hasn't happened yet
-    final isUninitialized = (currentScale - 1.0).abs() < 0.01;
-    final relativeZoom = isUninitialized || minScale <= 0.0001
-        ? 1.0
-        : currentScale / minScale;
-
     final scenePosition = _transformationController.toScene(d.localPosition);
     final hitRadiusInScene = kTapRadiusOnScreen / currentScale;
     final List<TappableItem> hits =
-        _findTappableItems(scenePosition, hitRadiusInScene, relativeZoom);
+        _findTappableItems(scenePosition, hitRadiusInScene, currentScale);
 
     final userId = ref.read(authStateChangesProvider).asData?.value?.uid;
     if (userId == null) return;
@@ -1220,54 +1211,86 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final totalWidth = _cachedLayoutResult?.totalWidth ?? 1.0;
     final screenWidth = _lastKnownSize.width;
     final minScale = _calculateMinScale(totalWidth, screenWidth);
-    final relativeZoom = currentScale / minScale;
+
+    // Calculate level thresholds (same as painter)
+    const double kBaseContentWidth = 1200.0;
+    final baseScale = (screenWidth * 0.95) / kBaseContentWidth;
+    final effectiveBase = max(minScale, baseScale);
+    final kLevel2Threshold = effectiveBase * 1.5;
+    final kLevel3Threshold = effectiveBase * 3.0;
+
+    // 🔍 DEBUG: Log tap detection info
+    debugPrint('🔍 [TAP] currentScale=$currentScale, Level2Threshold=$kLevel2Threshold, Level3Threshold=$kLevel3Threshold');
+    debugPrint('🔍 [TAP] minScale=$minScale, baseScale=$baseScale, effectiveBase=$effectiveBase');
+    debugPrint('🔍 [TAP] Monthly clusters count: ${_monthlyClusterData.length}, Daily clusters: ${_dailyClusterData.length}, Nodes: ${_nodePositions.length}');
 
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    // Месячные кластеры видны только в диапазоне zoom 4x-12x (соответствует LEVEL 2)
-    if (relativeZoom >= 4.0 && relativeZoom < 12.0) {
+    // Месячные кластеры кликабельны только в LEVEL 2 (kLevel2Threshold <= currentScale < kLevel3Threshold)
+    if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
+      debugPrint('🔍 [TAP] ✅ LEVEL 2 - Checking monthly clusters');
+      int monthlyHits = 0;
       _monthlyClusterData.forEach((clusterId, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
         final month = data.$3;
         final monthKeys = data.$4;
+        final distance = (pos - scenePosition).distance;
         // Увеличенный радиус тапа для месячных кластеров (они крупнее)
-        if ((pos - scenePosition).distance < hitRadius * 2) {
+        if (distance < hitRadius * 2) {
+          debugPrint('🔍 [TAP] ✅ HIT Monthly cluster: $month at $pos, distance=$distance, hitRadius=${hitRadius * 2}');
           hits.add(TappableItem(
               type: TappableType.monthlyCluster,
               data: {'monthKeys': monthKeys, 'memories': memoriesInCluster, 'month': month}));
           for (var mem in memoriesInCluster) {
             processedNodeIds.add(mem.universalId);
           }
+          monthlyHits++;
         }
       });
+      debugPrint('🔍 [TAP] Monthly hits: $monthlyHits');
+    } else {
+      debugPrint('🔍 [TAP] ❌ NOT in LEVEL 2 - Skipping monthly clusters');
     }
 
-    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 12x, LEVEL 3)
-    // Using relative zoom for universal behavior
-    if (relativeZoom >= 12.0) {
+    // Дневные кластеры и одиночные воспоминания кликабельны только в LEVEL 3 (currentScale >= kLevel3Threshold)
+    if (currentScale >= kLevel3Threshold) {
+      debugPrint('🔍 [TAP] ✅ LEVEL 3 - Checking daily clusters and single nodes');
+      int dailyHits = 0;
+      int singleHits = 0;
       _dailyClusterData.forEach((id, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
-        if ((pos - scenePosition).distance < hitRadius) {
+        final distance = (pos - scenePosition).distance;
+        if (distance < hitRadius) {
+          debugPrint('🔍 [TAP] ✅ HIT Daily cluster at $pos, distance=$distance, memories=${memoriesInCluster.length}');
           hits.add(TappableItem(
               type: TappableType.dailyCluster, data: memoriesInCluster));
           for (var mem in memoriesInCluster) {
             processedNodeIds.add(mem.universalId);
           }
+          dailyHits++;
         }
       });
 
       _nodePositions.forEach((id, pos) {
-        if (!processedNodeIds.contains(id) &&
-            (pos - scenePosition).distance < hitRadius) {
-          final memory = memories.firstWhereOrNull((m) => m.universalId == id);
-          if (memory != null) {
-            hits.add(TappableItem(type: TappableType.singleNode, data: memory));
+        if (!processedNodeIds.contains(id)) {
+          final distance = (pos - scenePosition).distance;
+          if (distance < hitRadius) {
+            final memory = memories.firstWhereOrNull((m) => m.universalId == id);
+            if (memory != null) {
+              debugPrint('🔍 [TAP] ✅ HIT Single node: ${memory.title} at $pos, distance=$distance');
+              hits.add(TappableItem(type: TappableType.singleNode, data: memory));
+              singleHits++;
+            }
           }
         }
       });
+      debugPrint('🔍 [TAP] Daily hits: $dailyHits, Single hits: $singleHits');
+    } else {
+      debugPrint('🔍 [TAP] ❌ NOT in LEVEL 3 - Skipping daily clusters and single nodes');
     }
 
+    debugPrint('🔍 [TAP] TOTAL HITS: ${hits.length}');
     return hits;
   }
 
@@ -2088,6 +2111,27 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                             final maxScale = _calculateMaxScale(minScale, _lastKnownSize.width);
                             final relativeZoom = (minScale > 0.0001) ? rawScale / minScale : 1.0;
 
+                            // Calculate level thresholds (same as painter)
+                            const double kBaseContentWidth = 1200.0;
+                            final baseScale = (_lastKnownSize.width * 0.95) / kBaseContentWidth;
+                            final effectiveBase = max(minScale, baseScale);
+                            final kLevel2Threshold = effectiveBase * 1.5;
+                            final kLevel3Threshold = effectiveBase * 3.0;
+
+                            // Determine current level
+                            String currentLevel;
+                            Color levelColor;
+                            if (rawScale < kLevel2Threshold) {
+                              currentLevel = 'LEVEL 1 (Yearly)';
+                              levelColor = Colors.purpleAccent;
+                            } else if (rawScale >= kLevel2Threshold && rawScale < kLevel3Threshold) {
+                              currentLevel = 'LEVEL 2 (Monthly)';
+                              levelColor = Colors.orangeAccent;
+                            } else {
+                              currentLevel = 'LEVEL 3 (Individual)';
+                              levelColor = Colors.greenAccent;
+                            }
+
                             // Calculate node size using INTERPOLATED formula (same as painter)
                             // Painter: varies at 1x, converges to SAME VISUAL SIZE at 8x
                             const maxRelativeZoom = 8.0;
@@ -2178,6 +2222,19 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                   'Zoom Range: 1.0x → ${(maxScale / minScale).toStringAsFixed(1)}x',
                                   style: const TextStyle(
                                       color: Colors.cyanAccent, fontSize: 10),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  currentLevel,
+                                  style: TextStyle(
+                                      color: levelColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'L2: ${kLevel2Threshold.toStringAsFixed(3)} | L3: ${kLevel3Threshold.toStringAsFixed(3)}',
+                                  style: const TextStyle(
+                                      color: Colors.white60, fontSize: 9),
                                 ),
                               ],
                             );

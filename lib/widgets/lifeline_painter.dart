@@ -529,11 +529,6 @@ class LifelinePainter extends CustomPainter {
 
     if (size.width <= 0 || size.height <= 0 || memories.isEmpty) return;
 
-    // DIAGNOSTIC: Log node sizing parameters once per paint
-    if (kDebugMode) {
-      debugPrint('[LifelinePainter] minScale=$minScale, kNodeBaseRadius=$kNodeBaseRadius, currentScale=$currentScale, relativeZoom=$zoomScale');
-    }
-
     final mainPath = renderData.mainPath;
     final placementResults = renderData.placementResults;
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
@@ -566,38 +561,17 @@ class LifelinePainter extends CustomPainter {
     final kLevel2Threshold = effectiveBase * 1.5;  // Monthly clusters start at 150% of base
     final kLevel3Threshold = effectiveBase * 3.0;  // Individual nodes start at 300% of base
 
-    // DEBUG: Log level detection at each paint
-    if (kDebugMode) {
-      String currentLevel;
-      if (currentScale < kLevel2Threshold) {
-        currentLevel = 'LEVEL 1 (Yearly)';
-      } else if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
-        currentLevel = 'LEVEL 2 (Monthly)';
-      } else {
-        currentLevel = 'LEVEL 3 (Individual)';
-      }
-      debugPrint('[LifelinePainter] currentScale=$currentScale, Level2Threshold=$kLevel2Threshold, Level3Threshold=$kLevel3Threshold => $currentLevel');
-    }
-
     // Use ABSOLUTE currentScale for level determination (v149 system)
     if (currentScale < kLevel2Threshold) {
       // LEVEL 1: Yearly gradient
-      if (kDebugMode) debugPrint('[LifelinePainter] Drawing yearly gradient');
       stopwatch.start();
       _drawYearlyGradient(canvas, mainPath, size, currentScale, effectiveBase, kLevel2Threshold);
       stopwatch.stop();
       macroViewTime = stopwatch.elapsedMicroseconds;
       stopwatch.reset();
     }
-    else if (currentScale >= kLevel2Threshold) {
-      // LEVEL 2 & 3: Monthly clusters (visible in Level 2, invisible but clickable in Level 3)
-      if (kDebugMode) {
-        if (currentScale < kLevel3Threshold) {
-          debugPrint('[LifelinePainter] Drawing monthly clusters (visible)');
-        } else {
-          debugPrint('[LifelinePainter] Drawing monthly clusters (invisible but clickable)');
-        }
-      }
+    else if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
+      // LEVEL 2: Monthly clusters (visible only in Level 2)
       stopwatch.start();
       _drawMonthlyClusters(canvas, mainPath, size, currentScale, placementResults, effectiveBase, kLevel2Threshold, kLevel3Threshold);
       stopwatch.stop();
@@ -672,15 +646,6 @@ class LifelinePainter extends CustomPainter {
     stopwatch.start();
     // PASS 1: Draw all auras first (background layer)
     // IMPORTANT: Only draw auras for individual nodes in Level 3
-
-    // DEBUG: Count PlacementInfo items and detailOpacity
-    if (kDebugMode) {
-      final placementInfoCount = placementResults.whereType<PlacementInfo>().length;
-      final dailyClusterCount = placementResults.whereType<DailyClusterPlacementInfo>().length;
-      debugPrint('[LifelinePainter] placementResults: $placementInfoCount PlacementInfo, $dailyClusterCount DailyClusterPlacementInfo');
-      debugPrint('[LifelinePainter] detailOpacity=$detailOpacity (fadeInStart=${kLevel3Threshold - effectiveBase})');
-    }
-
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           // Skip individual node auras outside Level 3
@@ -722,9 +687,6 @@ class LifelinePainter extends CustomPainter {
 
       // PASS 2: Draw all nodes on top (foreground layer)
       // IMPORTANT: Only draw individual nodes in Level 3
-      int drawnIndividualNodes = 0;
-      int drawnDailyClusters = 0;
-
       for (final item in placementResults) {
         if (item is PlacementInfo) {
           // Skip individual nodes outside Level 3
@@ -739,7 +701,6 @@ class LifelinePainter extends CustomPainter {
             _drawSingleMemoryNode(
                 canvas, item.nodePosition, item.memory, index, detailOpacity, image);
             onNodePosition?.call(item.memory.universalId, item.nodePosition);
-            drawnIndividualNodes++;
           }
         } else if (item is DailyClusterPlacementInfo) {
           if (visibleRect
@@ -748,7 +709,6 @@ class LifelinePainter extends CustomPainter {
             final image = images[item.memories.first.coverPath];
             _drawDailyClusterNode(canvas, item.position, item, detailOpacity, image);
             onDailyClusterPosition?.call(item.id, item.position, item.memories);
-            drawnDailyClusters++;
           }
         } else if (item is TimeGapPlacementInfo) {
           // Show time gaps at high zoom levels (300%-500%)
@@ -759,11 +719,6 @@ class LifelinePainter extends CustomPainter {
           }
         }
       }
-
-    // DEBUG: Log drawing statistics
-    if (kDebugMode) {
-      debugPrint('[LifelinePainter] Drew $drawnIndividualNodes individual nodes, $drawnDailyClusters daily clusters');
-    }
 
     stopwatch.stop();
     nodesTime = stopwatch.elapsedMicroseconds;
@@ -939,12 +894,31 @@ class LifelinePainter extends CustomPainter {
       // Skip if no positions found for this month
       if (positions.isEmpty) continue;
 
-      // FIXED: Calculate average position using REAL coordinates from placementResults
-      // This ensures monthly cluster is at the center of mass of its actual nodes,
-      // not at an abstract point on path based on timestamp
+      // FIXED: Calculate cluster position using average X, but Y locked to the path
+      // This ensures monthly cluster stays ON the lifeline even when path curves
       final avgDx = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
-      final avgDy = positions.map((p) => p.dy).reduce((a, b) => a + b) / positions.length;
-      final avgPos = Offset(avgDx, avgDy);
+
+      // Find the closest point on the path with this X coordinate
+      final metrics = path.computeMetrics().first;
+      final totalLen = metrics.length;
+
+      // Search for the point on path closest to avgDx
+      Offset? closestPoint;
+      double minDistance = double.infinity;
+
+      for (double t = 0.0; t <= 1.0; t += 0.01) {
+        final tangent = metrics.getTangentForOffset(t * totalLen);
+        if (tangent != null) {
+          final point = tangent.position;
+          final distance = (point.dx - avgDx).abs();
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestPoint = point;
+          }
+        }
+      }
+
+      final avgPos = closestPoint ?? Offset(avgDx, positions.first.dy);
 
       clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
     }
@@ -973,11 +947,29 @@ class LifelinePainter extends CustomPainter {
           // Merge into last group
           final combinedMemories = [...lastGroup.memories, ...current.memories];
 
-          // FIXED: Use average of REAL positions (center of mass), not timestamp-based calculation
-          final avgPos = Offset(
-            (lastGroup.pos.dx + current.pos.dx) / 2,
-            (lastGroup.pos.dy + current.pos.dy) / 2,
-          );
+          // FIXED: Use average X, but Y locked to the path (same as initial positioning)
+          final avgX = (lastGroup.pos.dx + current.pos.dx) / 2;
+
+          // Find closest point on path for merged cluster
+          final metrics = path.computeMetrics().first;
+          final totalLen = metrics.length;
+
+          Offset? closestPoint;
+          double minDist = double.infinity;
+
+          for (double t = 0.0; t <= 1.0; t += 0.01) {
+            final tangent = metrics.getTangentForOffset(t * totalLen);
+            if (tangent != null) {
+              final point = tangent.position;
+              final dist = (point.dx - avgX).abs();
+              if (dist < minDist) {
+                minDist = dist;
+                closestPoint = point;
+              }
+            }
+          }
+
+          final avgPos = closestPoint ?? Offset(avgX, lastGroup.pos.dy);
 
           groupedClusters[groupedClusters.length - 1] = (
             monthKeys: [...lastGroup.monthKeys, current.key],
