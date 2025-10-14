@@ -1216,21 +1216,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     final List<TappableItem> hits = [];
     final List<String> processedNodeIds = [];
 
-    // Calculate level thresholds for tap detection (same as painter)
+    // Calculate relative zoom for tap detection
     final totalWidth = _cachedLayoutResult?.totalWidth ?? 1.0;
     final screenWidth = _lastKnownSize.width;
     final minScale = _calculateMinScale(totalWidth, screenWidth);
-
-    // Calculate level thresholds (same as painter)
-    const double kBaseContentWidth = 1200.0;
-    final baseScale = (screenWidth * 0.95) / kBaseContentWidth;
-    final effectiveBase = max(minScale, baseScale);
-    final kLevel2Threshold = effectiveBase * 1.5;
-    final kLevel3Threshold = effectiveBase * 3.0;
+    final relativeZoom = currentScale / minScale;
 
     // Проверяем месячные кластеры (приоритет выше чем дневные)
-    // Месячные кластеры кликабельны только в LEVEL 2 (kLevel2Threshold <= currentScale < kLevel3Threshold)
-    if (currentScale >= kLevel2Threshold && currentScale < kLevel3Threshold) {
+    // Месячные кластеры видны только в диапазоне zoom 4x-12x (соответствует LEVEL 2)
+    if (relativeZoom >= 4.0 && relativeZoom < 12.0) {
       _monthlyClusterData.forEach((clusterId, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
@@ -1248,8 +1242,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       });
     }
 
-    // Дневные кластеры и одиночные воспоминания кликабельны только в LEVEL 3 (currentScale >= kLevel3Threshold)
-    if (currentScale >= kLevel3Threshold) {
+    // Дневные кластеры и одиночные воспоминания видны только на максимальном зуме (>= 12x, LEVEL 3)
+    // Using relative zoom for universal behavior
+    if (relativeZoom >= 12.0) {
       _dailyClusterData.forEach((id, data) {
         final pos = data.$1;
         final memoriesInCluster = data.$2;
@@ -1691,11 +1686,6 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       final maxScale = _calculateMaxScale(minScale, screenWidth);
       final contentHeight = constraints.maxHeight;
 
-      // DEBUG: Log maxScale calculation
-      if (kDebugMode) {
-        debugPrint('[LifelineWidget] totalWidth=$totalWidth, screenWidth=$screenWidth, minScale=$minScale, maxScale=$maxScale');
-      }
-
       return Container(
         color: const Color(0xFF0A0A0F),
         child: Stack(
@@ -2125,27 +2115,6 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                             final targetScale8x = minScale * 8.0;
                             final expectedNodeSizeAt8x = (targetRadius * actualMultiplier * 2) / targetScale8x;
 
-                            // DIAGNOSTIC: Calculate level thresholds (same logic as painter)
-                            const double kBaseContentWidth = 1200.0;
-                            final baseScale = (_lastKnownSize.width * 0.95) / kBaseContentWidth;
-                            final effectiveBase = max(minScale, baseScale);
-                            final kLevel2Threshold = effectiveBase * 1.5;
-                            final kLevel3Threshold = effectiveBase * 3.0;
-
-                            // Determine current level
-                            String currentLevel;
-                            Color levelColor;
-                            if (rawScale < kLevel2Threshold) {
-                              currentLevel = 'LEVEL 1 (Yearly)';
-                              levelColor = Colors.purpleAccent;
-                            } else if (rawScale < kLevel3Threshold) {
-                              currentLevel = 'LEVEL 2 (Monthly)';
-                              levelColor = Colors.blueAccent;
-                            } else {
-                              currentLevel = 'LEVEL 3 (Individual)';
-                              levelColor = Colors.greenAccent;
-                            }
-
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -2171,9 +2140,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                 ),
                                 const SizedBox(height: 4),
                                 // DIAGNOSTIC INFO
-                                Text(
+                                const Text(
                                   '🔍 DIAGNOSTICS:',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
@@ -2209,40 +2178,6 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                   'Zoom Range: 1.0x → ${(maxScale / minScale).toStringAsFixed(1)}x',
                                   style: const TextStyle(
                                       color: Colors.cyanAccent, fontSize: 10),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '📊 ZOOM LEVELS:',
-                                  style: const TextStyle(
-                                      color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'baseScale: ${baseScale.toStringAsFixed(4)}',
-                                  style: const TextStyle(
-                                      color: Colors.white60, fontSize: 9),
-                                ),
-                                Text(
-                                  'effectiveBase: ${effectiveBase.toStringAsFixed(4)}',
-                                  style: const TextStyle(
-                                      color: Colors.white60, fontSize: 9),
-                                ),
-                                Text(
-                                  'Level 2 threshold: ${kLevel2Threshold.toStringAsFixed(4)}',
-                                  style: const TextStyle(
-                                      color: Colors.blueAccent, fontSize: 9),
-                                ),
-                                Text(
-                                  'Level 3 threshold: ${kLevel3Threshold.toStringAsFixed(4)}',
-                                  style: const TextStyle(
-                                      color: Colors.greenAccent, fontSize: 9),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  currentLevel,
-                                  style: TextStyle(
-                                      color: levelColor,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             );
