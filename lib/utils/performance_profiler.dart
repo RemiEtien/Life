@@ -253,13 +253,16 @@ class PerformanceProfiler {
   List<BenchmarkResult> get results => List.unmodifiable(_results);
 
   /// Начать запись метрик для конкретного benchmark теста
-  void startBenchmark(BenchmarkConfig config) {
+  Future<void> startBenchmark(BenchmarkConfig config) async {
     if (_isRecording) {
       if (kDebugMode) {
         debugPrint('[PerformanceProfiler] Already recording, stopping previous benchmark');
       }
-      stopBenchmark();
+      await stopBenchmark();
     }
+
+    // CRITICAL: Apply graphics quality settings BEFORE starting benchmark
+    await DevicePerformanceDetector.setGraphicsQuality(config.quality);
 
     _isRecording = true;
     _currentConfig = config;
@@ -270,10 +273,11 @@ class PerformanceProfiler {
     _lastFrameTimestamp = Duration.zero;
 
     isRecordingNotifier.value = true;
-    currentStatusNotifier.value = 'Recording: ${config.name}';
+    currentStatusNotifier.value = 'Recording: ${config.name} (Quality: ${config.quality.name})';
 
     if (kDebugMode) {
       debugPrint('[PerformanceProfiler] Started benchmark: ${config.name}');
+      debugPrint('[PerformanceProfiler] Applied graphics quality: ${config.quality.name}');
     }
 
     // Start listening to frame callbacks
@@ -438,7 +442,7 @@ class PerformanceProfiler {
         debugPrint('[PerformanceProfiler] $status');
       }
 
-      startBenchmark(config);
+      await startBenchmark(config);
 
       // Wait for benchmark to complete
       await Future.delayed(Duration(seconds: config.durationSeconds + 1));

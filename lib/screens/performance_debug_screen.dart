@@ -93,14 +93,16 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
       return;
     }
 
-    _profiler.startBenchmark(config);
+    await _profiler.startBenchmark(config);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Started benchmark: ${config.name}'),
-        duration: Duration(seconds: config.durationSeconds),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Started benchmark: ${config.name} with ${config.quality.name} quality'),
+          duration: Duration(seconds: config.durationSeconds),
+        ),
+      );
+    }
 
     // Navigate back to home screen to see the actual performance
     if (mounted) {
@@ -254,7 +256,7 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Run a 10-second benchmark and return to home screen to see results',
+                  'Run a 30-second benchmark - enough time to test all zoom levels and scroll scenarios',
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
@@ -268,10 +270,10 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
                           : () => _runQuickBenchmark(
                                 const BenchmarkConfig(
                                   quality: GraphicsQuality.low,
-                                  durationSeconds: 10,
+                                  durationSeconds: 30,
                                 ),
                               ),
-                      child: const Text('Low Quality'),
+                      child: const Text('Low Quality (30s)'),
                     ),
                     ElevatedButton(
                       onPressed: _isRunningFullBenchmark
@@ -279,10 +281,10 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
                           : () => _runQuickBenchmark(
                                 const BenchmarkConfig(
                                   quality: GraphicsQuality.medium,
-                                  durationSeconds: 10,
+                                  durationSeconds: 30,
                                 ),
                               ),
-                      child: const Text('Medium Quality'),
+                      child: const Text('Medium Quality (30s)'),
                     ),
                     ElevatedButton(
                       onPressed: _isRunningFullBenchmark
@@ -290,10 +292,10 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
                           : () => _runQuickBenchmark(
                                 const BenchmarkConfig(
                                   quality: GraphicsQuality.high,
-                                  durationSeconds: 10,
+                                  durationSeconds: 30,
                                 ),
                               ),
-                      child: const Text('High Quality'),
+                      child: const Text('High Quality (30s)'),
                     ),
                     ElevatedButton(
                       onPressed: _isRunningFullBenchmark
@@ -304,10 +306,10 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
                                   auraEnabled: false,
                                   emotionEffectsEnabled: false,
                                   weatherEffectsEnabled: false,
-                                  durationSeconds: 10,
+                                  durationSeconds: 30,
                                 ),
                               ),
-                      child: const Text('No Effects'),
+                      child: const Text('No Effects (30s)'),
                     ),
                   ],
                 ),
