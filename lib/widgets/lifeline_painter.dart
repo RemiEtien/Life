@@ -1121,29 +1121,27 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
       }
 
-      // Only show count text at high zoom level (LEVEL 3)
-      // Show when currentScale reaches kLevel3Threshold
-      if (currentScale >= kLevel3Threshold) {
-        final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
-        final textStyle = GoogleFonts.orbitron(
-          color: ringColor.withOpacity(finalOpacity),
-          fontSize: 10.0,
-          fontWeight: FontWeight.bold,
-          shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
-        );
-        final textSpan = TextSpan(text: cluster.memories.length.toString(), style: textStyle);
-        final textPainter = TextPainter(
-          text: textSpan,
-          textAlign: TextAlign.center,
-          textDirection: ui.TextDirection.ltr,
-        );
-        textPainter.layout();
-        final textPos = Offset(
-          adjustedPos.dx - textPainter.width / 2,
-          adjustedPos.dy - textPainter.height / 2,  // Center inside node
-        );
-        textPainter.paint(canvas, textPos);
-      }
+      // Show count text on monthly clusters (LEVEL 2)
+      // Always visible when monthly clusters are visible
+      final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
+      final textStyle = GoogleFonts.orbitron(
+        color: ringColor.withOpacity(finalOpacity),
+        fontSize: 10.0,
+        fontWeight: FontWeight.bold,
+        shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
+      );
+      final textSpan = TextSpan(text: cluster.memories.length.toString(), style: textStyle);
+      final textPainter = TextPainter(
+        text: textSpan,
+        textAlign: TextAlign.center,
+        textDirection: ui.TextDirection.ltr,
+      );
+      textPainter.layout();
+      final textPos = Offset(
+        adjustedPos.dx - textPainter.width / 2,
+        adjustedPos.dy - textPainter.height / 2,  // Center inside node
+      );
+      textPainter.paint(canvas, textPos);
     }
 
     // PASS 3: Draw month labels with connector lines (stems)
