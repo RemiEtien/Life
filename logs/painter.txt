@@ -1,0 +1,1010 @@
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.2561607142857143, relativeZoom=1.0
+I/flutter (16742): [LifelinePainter] currentScale=0.2561607142857143, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.266232618016266, relativeZoom=1.0393186900600138
+I/flutter (16742): [LifelinePainter] currentScale=0.266232618016266, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.28697302378844347, relativeZoom=1.1202850702093297
+I/flutter (16742): [LifelinePainter] currentScale=0.28697302378844347, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.300636012900488, relativeZoom=1.1736226366279072
+I/flutter (16742): [LifelinePainter] currentScale=0.300636012900488, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.31193603623849275, relativeZoom=1.2177356590697521
+I/flutter (16742): [LifelinePainter] currentScale=0.31193603623849275, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.33781802636618824, relativeZoom=1.3187737522834815
+I/flutter (16742): [LifelinePainter] currentScale=0.33781802636618824, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.3615488949868552, relativeZoom=1.4114142990075909
+I/flutter (16742): [LifelinePainter] currentScale=0.3615488949868552, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.380551424269319, relativeZoom=1.485596358248997
+I/flutter (16742): [LifelinePainter] currentScale=0.380551424269319, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.40467250823504014, relativeZoom=1.579760227337905
+I/flutter (16742): [LifelinePainter] currentScale=0.40467250823504014, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.43596328776051047, relativeZoom=1.7019131484551122
+I/flutter (16742): [LifelinePainter] currentScale=0.43596328776051047, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.45596229025758866, relativeZoom=1.779985239067617
+I/flutter (16742): [LifelinePainter] currentScale=0.45596229025758866, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.485240450272436, relativeZoom=1.8942812976825665
+I/flutter (16742): [LifelinePainter] currentScale=0.485240450272436, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.5046455783611754, relativeZoom=1.9700350218351914
+I/flutter (16742): [LifelinePainter] currentScale=0.5046455783611754, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.5294161295686239, relativeZoom=2.0667342806443316
+I/flutter (16742): [LifelinePainter] currentScale=0.5294161295686239, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.5515291920245182, relativeZoom=2.153059236902964
+I/flutter (16742): [LifelinePainter] currentScale=0.5515291920245182, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.5730647404242484, relativeZoom=2.237129694231991
+I/flutter (16742): [LifelinePainter] currentScale=0.5730647404242484, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.5934171418192847, relativeZoom=2.3165813831913518
+I/flutter (16742): [LifelinePainter] currentScale=0.5934171418192847, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.6102645472403077, relativeZoom=2.3823502715550524
+I/flutter (16742): [LifelinePainter] currentScale=0.6102645472403077, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.6347189941138677, relativeZoom=2.477815522507953
+I/flutter (16742): [LifelinePainter] currentScale=0.6347189941138677, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.6494957213479106, relativeZoom=2.5355008989531536
+I/flutter (16742): [LifelinePainter] currentScale=0.6494957213479106, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.6622241336494068, relativeZoom=2.5851900651353628
+I/flutter (16742): [LifelinePainter] currentScale=0.6622241336494068, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.6855685792972066, relativeZoom=2.6763220941543095
+I/flutter (16742): [LifelinePainter] currentScale=0.6855685792972066, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7030947264983823, relativeZoom=2.7447406541588992
+I/flutter (16742): [LifelinePainter] currentScale=0.7030947264983823, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7281601298197822, relativeZoom=2.842590956424385
+I/flutter (16742): [LifelinePainter] currentScale=0.7281601298197822, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7460501511498768, relativeZoom=2.912430007974423
+I/flutter (16742): [LifelinePainter] currentScale=0.7460501511498768, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7561052759463852, relativeZoom=2.9516831964445847
+I/flutter (16742): [LifelinePainter] currentScale=0.7561052759463852, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7699103837743898, relativeZoom=3.0055755657975483
+I/flutter (16742): [LifelinePainter] currentScale=0.7699103837743898, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7816957081941832, relativeZoom=3.0515831062303422
+I/flutter (16742): [LifelinePainter] currentScale=0.7816957081941832, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.7969397940658544, relativeZoom=3.111092956966737
+I/flutter (16742): [LifelinePainter] currentScale=0.7969397940658544, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8126322173860214, relativeZoom=3.172353027090777
+I/flutter (16742): [LifelinePainter] currentScale=0.8126322173860214, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8342694046281098, relativeZoom=3.2568202620546636
+I/flutter (16742): [LifelinePainter] currentScale=0.8342694046281098, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8463031653792731, relativeZoom=3.303797648047354
+I/flutter (16742): [LifelinePainter] currentScale=0.8463031653792731, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8559732263092407, relativeZoom=3.3415476244905875
+I/flutter (16742): [LifelinePainter] currentScale=0.8559732263092407, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8648981245457462, relativeZoom=3.376388635382488
+I/flutter (16742): [LifelinePainter] currentScale=0.8648981245457462, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8820164217705312, relativeZoom=3.4432150309619898
+I/flutter (16742): [LifelinePainter] currentScale=0.8820164217705312, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.8989525266041596, relativeZoom=3.5093301840246034
+I/flutter (16742): [LifelinePainter] currentScale=0.8989525266041596, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9060150503499369, relativeZoom=3.5369008588077007
+I/flutter (16742): [LifelinePainter] currentScale=0.9060150503499369, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9194268532543914, relativeZoom=3.5892578447017023
+I/flutter (16742): [LifelinePainter] currentScale=0.9194268532543914, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.922092519718454, relativeZoom=3.599664071400029
+I/flutter (16742): [LifelinePainter] currentScale=0.922092519718454, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9238161309101802, relativeZoom=3.6063927034485945
+I/flutter (16742): [LifelinePainter] currentScale=0.9238161309101802, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9244670476376248, relativeZoom=3.608933751670058
+I/flutter (16742): [LifelinePainter] currentScale=0.9244670476376248, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9247601097065844, relativeZoom=3.610077807150138
+I/flutter (16742): [LifelinePainter] currentScale=0.9247601097065844, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9264201835660293, relativeZoom=3.6165584022096646
+I/flutter (16742): [LifelinePainter] currentScale=0.9264201835660293, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9285049274441709, relativeZoom=3.624696823762535
+I/flutter (16742): [LifelinePainter] currentScale=0.9285049274441709, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9313101442340253, relativeZoom=3.6356478269156787
+I/flutter (16742): [LifelinePainter] currentScale=0.9313101442340253, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9338270459255589, relativeZoom=3.645473305809083
+I/flutter (16742): [LifelinePainter] currentScale=0.9338270459255589, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9359880392661373, relativeZoom=3.653909389954945
+I/flutter (16742): [LifelinePainter] currentScale=0.9359880392661373, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9373436144908511, relativeZoom=3.659201283477704
+I/flutter (16742): [LifelinePainter] currentScale=0.9373436144908511, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9380506136480714, relativeZoom=3.661961266245521
+I/flutter (16742): [LifelinePainter] currentScale=0.9380506136480714, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9388324034996605, relativeZoom=3.665013216868664
+I/flutter (16742): [LifelinePainter] currentScale=0.9388324034996605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=0.9849649455577425, relativeZoom=3.8451053991797544
+I/flutter (16742): [LifelinePainter] currentScale=0.9849649455577425, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.0571957388789988, relativeZoom=4.127079914759423
+I/flutter (16742): [LifelinePainter] currentScale=1.0571957388789988, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.1093805584432415, relativeZoom=4.33079897335807
+I/flutter (16742): [LifelinePainter] currentScale=1.1093805584432415, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.1633144765412438, relativeZoom=4.541346161471568
+I/flutter (16742): [LifelinePainter] currentScale=1.1633144765412438, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.2129097441268093, relativeZoom=4.73495612904157
+I/flutter (16742): [LifelinePainter] currentScale=1.2129097441268093, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.2607682921557224, relativeZoom=4.921786292138059
+I/flutter (16742): [LifelinePainter] currentScale=1.2607682921557224, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.3147250934963843, relativeZoom=5.132422811836704
+I/flutter (16742): [LifelinePainter] currentScale=1.3147250934963843, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.3721684918118333, relativeZoom=5.356670306131939
+I/flutter (16742): [LifelinePainter] currentScale=1.3721684918118333, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.4296372306903942, relativeZoom=5.581016724898018
+I/flutter (16742): [LifelinePainter] currentScale=1.4296372306903942, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.4853810005923256, relativeZoom=5.798629211095868
+I/flutter (16742): [LifelinePainter] currentScale=1.4853810005923256, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.5385457530237185, relativeZoom=6.006173730869866
+I/flutter (16742): [LifelinePainter] currentScale=1.5385457530237185, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.5872816789014892, relativeZoom=6.196429000939936
+I/flutter (16742): [LifelinePainter] currentScale=1.5872816789014892, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.62470812062941, relativeZoom=6.342534315458136
+I/flutter (16742): [LifelinePainter] currentScale=1.62470812062941, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.664763223734242, relativeZoom=6.4989013962438165
+I/flutter (16742): [LifelinePainter] currentScale=1.664763223734242, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.7066898159388717, relativeZoom=6.6625743947421965
+I/flutter (16742): [LifelinePainter] currentScale=1.7066898159388717, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.7487357019361316, relativeZoom=6.82671309225677
+I/flutter (16742): [LifelinePainter] currentScale=1.7487357019361316, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.7934153056332216, relativeZoom=7.0011332949083585
+I/flutter (16742): [LifelinePainter] currentScale=1.7934153056332216, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.8432768343273702, relativeZoom=7.195782692389873
+I/flutter (16742): [LifelinePainter] currentScale=1.8432768343273702, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.9140262765618348, relativeZoom=7.4719743107328505
+I/flutter (16742): [LifelinePainter] currentScale=1.9140262765618348, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=1.9777923550175622, relativeZoom=7.7209042789113616
+I/flutter (16742): [LifelinePainter] currentScale=1.9777923550175622, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.032877033631769, relativeZoom=7.935943805045595
+I/flutter (16742): [LifelinePainter] currentScale=2.032877033631769, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.0653766311202792, relativeZoom=8.062815708799974
+I/flutter (16742): [LifelinePainter] currentScale=2.0653766311202792, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.090018582137559, relativeZoom=8.159012938285347
+I/flutter (16742): [LifelinePainter] currentScale=2.090018582137559, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.1153781788275587, relativeZoom=8.25801171239758
+I/flutter (16742): [LifelinePainter] currentScale=2.1153781788275587, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.1362865094819234, relativeZoom=8.339633637573211
+I/flutter (16742): [LifelinePainter] currentScale=2.1362865094819234, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.1859237206269087, relativeZoom=8.533407344378311
+I/flutter (16742): [LifelinePainter] currentScale=2.1859237206269087, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.2405196701557037, relativeZoom=8.74653897028368
+I/flutter (16742): [LifelinePainter] currentScale=2.2405196701557037, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.2846800767234074, relativeZoom=8.9189323315797
+I/flutter (16742): [LifelinePainter] currentScale=2.2846800767234074, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.320670914848006, relativeZoom=9.059433337852097
+I/flutter (16742): [LifelinePainter] currentScale=2.320670914848006, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.3354988374355425, relativeZoom=9.117318570679009
+I/flutter (16742): [LifelinePainter] currentScale=2.3354988374355425, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.3442479561851735, relativeZoom=9.151473373744839
+I/flutter (16742): [LifelinePainter] currentScale=2.3442479561851735, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.352128796638161, relativeZoom=9.182238592662044
+I/flutter (16742): [LifelinePainter] currentScale=2.352128796638161, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.360747726173769, relativeZoom=9.215885163174002
+I/flutter (16742): [LifelinePainter] currentScale=2.360747726173769, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.370300428361449, relativeZoom=9.253176994649085
+I/flutter (16742): [LifelinePainter] currentScale=2.370300428361449, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/VRI[MainActivity]@d3742cf(16742): call setFrameRateCategory for touch hint category=no preference, reason=boost timeout, vri=VRI[MainActivity]@d3742cf
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.38265314688967, relativeZoom=9.301399527767272
+I/flutter (16742): [LifelinePainter] currentScale=2.38265314688967, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.4093758424624063, relativeZoom=9.405719566252683
+I/flutter (16742): [LifelinePainter] currentScale=2.4093758424624063, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.4532161378290276, relativeZoom=9.576863277687385
+I/flutter (16742): [LifelinePainter] currentScale=2.4532161378290276, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.4923307018561287, relativeZoom=9.729558682742642
+I/flutter (16742): [LifelinePainter] currentScale=2.4923307018561287, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.5251601657902403, relativeZoom=9.857718318874413
+I/flutter (16742): [LifelinePainter] currentScale=2.5251601657902403, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.55324792319605, relativeZoom=9.967367284697023
+I/flutter (16742): [LifelinePainter] currentScale=2.55324792319605, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.575181954936962, relativeZoom=10.052993340987792
+I/flutter (16742): [LifelinePainter] currentScale=2.575181954936962, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.5954674702818497, relativeZoom=10.132183920235871
+I/flutter (16742): [LifelinePainter] currentScale=2.5954674702818497, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.6148021202451996, relativeZoom=10.207662511936645
+I/flutter (16742): [LifelinePainter] currentScale=2.6148021202451996, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.6361334391586984, relativeZoom=10.290935698353929
+I/flutter (16742): [LifelinePainter] currentScale=2.6361334391586984, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.66312581393166, relativeZoom=10.396308510294384
+I/flutter (16742): [LifelinePainter] currentScale=2.66312581393166, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.692749223010393, relativeZoom=10.511952351940188
+I/flutter (16742): [LifelinePainter] currentScale=2.692749223010393, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.71490301235457, relativeZoom=10.598436297794068
+I/flutter (16742): [LifelinePainter] currentScale=2.71490301235457, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.725135890949309, relativeZoom=10.638383401405457
+I/flutter (16742): [LifelinePainter] currentScale=2.725135890949309, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7290109025235685, relativeZoom=10.653510668617624
+I/flutter (16742): [LifelinePainter] currentScale=2.7290109025235685, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.732996508472243, relativeZoom=10.669069674063827
+I/flutter (16742): [LifelinePainter] currentScale=2.732996508472243, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7395871994431245, relativeZoom=10.694798408422095
+I/flutter (16742): [LifelinePainter] currentScale=2.7395871994431245, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.745538888524425, relativeZoom=10.718032607693816
+I/flutter (16742): [LifelinePainter] currentScale=2.745538888524425, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.756922374078852, relativeZoom=10.76247144987213
+I/flutter (16742): [LifelinePainter] currentScale=2.756922374078852, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7713910167310494, relativeZoom=10.818954125962966
+I/flutter (16742): [LifelinePainter] currentScale=2.7713910167310494, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.778898160696255, relativeZoom=10.848260508817726
+I/flutter (16742): [LifelinePainter] currentScale=2.778898160696255, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7778909957649907, relativeZoom=10.844328739131369
+I/flutter (16742): [LifelinePainter] currentScale=2.7778909957649907, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7764064264525454, relativeZoom=10.838533278587837
+I/flutter (16742): [LifelinePainter] currentScale=2.7764064264525454, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7764064264525454, relativeZoom=10.838533278587837
+I/flutter (16742): [LifelinePainter] currentScale=2.7764064264525454, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)
+I/flutter (16742): [LifelinePainter] Drawing yearly gradient
+I/flutter (16742): [LifelinePainter] placementResults: 37 PlacementInfo, 12 DailyClusterPlacementInfo
+I/flutter (16742): [LifelinePainter] detailOpacity=0.0 (fadeInStart=4.053333333333333)
+I/flutter (16742): [LifelinePainter] Drew 0 individual nodes, 12 daily clusters
+I/flutter (16742): [LifelinePainter] minScale=0.2561607142857143, kNodeBaseRadius=10.0, currentScale=2.7764064264525454, relativeZoom=10.838533278587837
+I/flutter (16742): [LifelinePainter] currentScale=2.7764064264525454, Level2Threshold=3.04, Level3Threshold=6.08 => LEVEL 1 (Yearly)

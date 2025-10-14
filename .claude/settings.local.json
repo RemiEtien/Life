@@ -66,7 +66,10 @@
       "Bash(then)",
       "Bash(echo:*)",
       "Bash(else)",
-      "Bash(identify:*)"
+      "Bash(identify:*)",
+      "Bash(/dev/null)",
+      "Bash(pkill:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

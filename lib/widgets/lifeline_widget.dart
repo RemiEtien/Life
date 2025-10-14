@@ -14,6 +14,8 @@ import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
 import '../utils/error_handler.dart';
+import '../utils/interactive_benchmark_controller.dart';
+import '../utils/performance_profiler.dart';
 import '../providers/application_providers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -132,6 +134,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   final TransformationController _transformationController =
       TransformationController();
+
+  // Interactive benchmark controller for automated zoom/scroll
+  InteractiveBenchmarkController? _benchmarkController;
 
   LayoutResult? _cachedLayoutResult;
   bool _isAdmin = false;
@@ -552,6 +557,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     _transformationController.dispose();
     _structureCache?.dispose();
     _performanceMonitor.dispose();
+    _benchmarkController?.dispose();
     _paintTimingsNotifier.dispose();
 
     super.dispose();
