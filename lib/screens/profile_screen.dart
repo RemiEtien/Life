@@ -14,6 +14,7 @@ import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import '../widgets/device_performance_detector.dart';
+import 'performance_debug_screen.dart';
 import 'package:collection/collection.dart';
 
 // Dialog to create the master password for the first time.
@@ -1037,6 +1038,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         title: const Text('Test Notifications'),
                         subtitle: const Text('Debug: Check notification status'),
                         onTap: () => _showNotificationDiagnostics(context),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.speed, color: Colors.blue),
+                        title: const Text('Performance Profiler'),
+                        subtitle: const Text('Debug: Benchmark FPS and identify bottlenecks'),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const PerformanceDebugScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                     const Divider(height: 40),
