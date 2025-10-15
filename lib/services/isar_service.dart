@@ -30,7 +30,16 @@ class IsarService {
                 "[IsarService] Closing DB for user '${_isar?.name}' to open for '$dbName'.");
           }
           FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Switching DB from ${_isar?.name} to $dbName');
-          await close();
+          // MEMORY LEAK FIX: Force close on error to prevent multiple DB connections
+          try {
+            await close();
+          } catch (e) {
+            _isar = null; // Force close on error to prevent connection leak
+            FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Force closed DB on error: $e');
+            if (kDebugMode) {
+              debugPrint('[IsarService] Force closed DB: $e');
+            }
+          }
         }
       }
 
