@@ -16,6 +16,46 @@ class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  /// TRANSACTION RETRY LOGIC: Executes a Firestore transaction with exponential backoff
+  /// Firestore transactions can fail due to write conflicts, network issues, etc.
+  /// This method retries up to maxAttempts times with exponential backoff
+  Future<T> _runTransactionWithRetry<T>(
+    Future<T> Function(Transaction) transactionHandler, {
+    int maxAttempts = 5,
+    Duration initialDelay = const Duration(milliseconds: 100),
+  }) async {
+    int attempt = 0;
+    Duration delay = initialDelay;
+
+    while (true) {
+      attempt++;
+      try {
+        return await _db.runTransaction(transactionHandler);
+      } catch (e) {
+        final isRetryable = e is FirebaseException &&
+            (e.code == 'aborted' ||
+                e.code == 'unavailable' ||
+                e.code == 'deadline-exceeded' ||
+                e.code == 'resource-exhausted');
+
+        if (attempt >= maxAttempts || !isRetryable) {
+          if (kDebugMode) {
+            debugPrint('[FirestoreService] Transaction failed after $attempt attempts: $e');
+          }
+          rethrow;
+        }
+
+        if (kDebugMode) {
+          debugPrint('[FirestoreService] Transaction attempt $attempt failed: $e. Retrying in ${delay.inMilliseconds}ms...');
+        }
+
+        await Future.delayed(delay);
+        // Exponential backoff: double the delay each time, max 10 seconds
+        delay = Duration(milliseconds: (delay.inMilliseconds * 2).clamp(0, 10000));
+      }
+    }
+  }
+
   /// Fetches all memories once from Firestore.
   /// Returns null on error and logs to Crashlytics.
   Future<List<Memory>?> fetchAllMemoriesOnce(String userId) async {
@@ -74,7 +114,7 @@ class FirestoreService {
         .doc(memory.firestoreId);
 
     try {
-      await _db.runTransaction((transaction) async {
+      await _runTransactionWithRetry((transaction) async {
         final snapshot = await transaction.get(docRef);
 
         if (!snapshot.exists) {
@@ -129,7 +169,7 @@ class FirestoreService {
         .doc(memory.firestoreId);
 
     try {
-      await _db.runTransaction((transaction) async {
+      await _runTransactionWithRetry((transaction) async {
         final snapshot = await transaction.get(docRef);
 
         if (!snapshot.exists) {
