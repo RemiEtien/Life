@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:synchronized/synchronized.dart';
 import '../memory.dart';
 import '../providers/application_providers.dart';
 import 'encryption_service.dart';
@@ -42,23 +43,12 @@ class SyncService {
   bool _isPausedForUnlock = false;
   bool _isReconciling = false;
 
-  // CONCURRENCY PROTECTION: Mutex to protect queue operations
-  bool _queueLocked = false;
+  // RACE CONDITION FIX: Use proper Lock from synchronized package instead of manual mutex
+  // This prevents race conditions in queue operations with proper synchronization primitives
+  final Lock _queueLock = Lock();
 
   SyncService(this._ref) {
     _checkForUnsyncedMemories();
-  }
-
-  // CONCURRENCY PROTECTION: Safe queue operations
-  Future<void> _lockQueue() async {
-    while (_queueLocked) {
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
-    _queueLocked = true;
-  }
-
-  void _unlockQueue() {
-    _queueLocked = false;
   }
 
   Future<void> syncFromCloudToLocal({bool isInitialSync = false}) async {
@@ -159,9 +149,7 @@ class SyncService {
   }
 
   Future<void> resumeSync() async {
-    await _lockQueue();
-    final hasWork = _syncQueue.isNotEmpty;
-    _unlockQueue();
+    final hasWork = await _queueLock.synchronized(() => _syncQueue.isNotEmpty);
 
     if (_isPausedForUnlock && !_isProcessing && hasWork) {
       if (kDebugMode) {
@@ -173,20 +161,17 @@ class SyncService {
   }
 
   Future<void> queueSync(int memoryId) async {
-    await _lockQueue();
-    try {
+    await _queueLock.synchronized(() {
       if (!_syncQueue.contains(memoryId)) {
         _syncQueue.add(memoryId);
         _ref.read(syncNotifierProvider.notifier).updateState(
               pendingJobs: _syncQueue.length,
               currentStatus: 'Queued...',
             );
-        // Don't await _processQueue to avoid deadlock
-        unawaited(_processQueue());
       }
-    } finally {
-      _unlockQueue();
-    }
+    });
+    // Don't await _processQueue to avoid deadlock
+    unawaited(_processQueue());
   }
 
   Future<void> _checkForUnsyncedMemories() async {
@@ -205,14 +190,12 @@ class SyncService {
   }
 
   Future<void> _processQueue() async {
-    // CONCURRENCY: Double-check locking pattern
+    // RACE CONDITION FIX: Double-check locking pattern with proper Lock
     if (_isProcessing || _isPausedForUnlock || _isReconciling) {
       return;
     }
 
-    int? memoryId;
-    await _lockQueue();
-    try {
+    final memoryId = await _queueLock.synchronized(() {
       // Check again after acquiring lock
       if (_isProcessing || _syncQueue.isEmpty || _isPausedForUnlock || _isReconciling) {
         if (_syncQueue.isEmpty) {
@@ -222,11 +205,11 @@ class SyncService {
               currentStatus: 'Idle',
               progress: null);
         }
-        return;
+        return null;
       }
 
       _isProcessing = true;
-      memoryId = _syncQueue.first;
+      final id = _syncQueue.first;
 
       _ref.read(syncNotifierProvider.notifier).updateState(
             isSyncing: true,
@@ -234,30 +217,27 @@ class SyncService {
             currentStatus: 'Syncing memory...',
             progress: 0.0,
           );
-    } finally {
-      _unlockQueue();
-    }
+
+      return id;
+    });
+
+    if (memoryId == null) return;
 
     await _updateLocalStatus(memoryId, 'syncing');
 
     try {
       final success = await _syncMemoryWithRetries(memoryId);
 
-      // CONCURRENCY: Safe removal from queue
-      await _lockQueue();
-      try {
+      // RACE CONDITION FIX: Safe removal from queue
+      await _queueLock.synchronized(() {
         if (_syncQueue.isNotEmpty && _syncQueue.first == memoryId) {
           _syncQueue.removeAt(0);
         }
-      } finally {
-        _unlockQueue();
-      }
+      });
       _isProcessing = false;
 
-      // CONCURRENCY: Safe access to queue length
-      await _lockQueue();
-      final queueLength = _syncQueue.length;
-      _unlockQueue();
+      // RACE CONDITION FIX: Safe access to queue length
+      final queueLength = await _queueLock.synchronized(() => _syncQueue.length);
 
       if (success) {
         _ref.read(syncNotifierProvider.notifier).updateState(
