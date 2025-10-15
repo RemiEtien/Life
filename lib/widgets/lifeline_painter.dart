@@ -604,31 +604,37 @@ class LifelinePainter extends CustomPainter {
         : ((currentScale - fadeInStart) / effectiveBase).clamp(0.0, 1.0);
 
     // --- Draw animated branches dynamically ---
-    // FIXED: Removed "detailOpacity > 0" condition to make branches always visible
-    // OPTIMIZATION: Skip branches entirely when zoomed out very far (not visible anyway)
-    if (branchIntensity > 0 && zoomScale > 0.8) {
+    // PHASE 4 OPTIMIZATION: Use currentScale-based LOD tied to zoom levels
+    // This ensures branches reduce detail at Level 1 (yearly) for better performance
+    if (branchIntensity > 0 && currentScale >= effectiveBase * 0.8) {
       stopwatch.start();
       final branches =
           renderData.branches; // These paths are pre-animated from the isolate
       const arteryColor = Color(0xFFFF8A80);
-      final baseBranchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(4);
+      final baseBranchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(7);
 
-      // LOD OPTIMIZATION: Reduce layers when zoomed out (less detail needed)
-      // At zoom < 2.5 (< 250%), reduce to 70% of layers (more visible at yearly zoom)
-      // At zoom < 1.5 (< 150%), reduce to 50% of layers
-      final branchLayerCount = zoomScale < 1.5
-          ? (baseBranchLayerCount * 0.5).round().clamp(1, baseBranchLayerCount)
-          : zoomScale < 2.5
-              ? (baseBranchLayerCount * 0.7).round().clamp(1, baseBranchLayerCount)
-              : baseBranchLayerCount;
+      // PHASE 4: LOD based on absolute currentScale and zoom levels
+      // LEVEL 1 (Yearly): 2 layers (30% of base) + draw every 3rd branch
+      // LEVEL 2 (Monthly): 4-5 layers (60% of base) + draw all branches
+      // LEVEL 3 (Individual): 7 layers (full quality) + draw all branches
+      int branchLayerCount;
+      int branchStep;
+
+      if (currentScale < kLevel2Threshold) {
+        // LEVEL 1: Minimal detail for yearly zoom
+        branchLayerCount = (baseBranchLayerCount * 0.3).round().clamp(2, baseBranchLayerCount);
+        branchStep = 3; // Draw every 3rd branch
+      } else if (currentScale < kLevel3Threshold) {
+        // LEVEL 2: Medium detail for monthly zoom
+        branchLayerCount = (baseBranchLayerCount * 0.6).round().clamp(4, baseBranchLayerCount);
+        branchStep = 1; // Draw all branches
+      } else {
+        // LEVEL 3: Full detail for individual nodes
+        branchLayerCount = baseBranchLayerCount;
+        branchStep = 1; // Draw all branches
+      }
 
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
-
-      // LOD OPTIMIZATION: Draw more branches at yearly zoom level
-      // At zoom < 1.5, draw every 2nd branch (was: every 4th)
-      // At zoom < 2.5, draw all branches (was: every 2nd at < 2.0)
-      // At zoom >= 2.5, draw all branches
-      final branchStep = zoomScale < 1.5 ? 2 : 1;
 
       for (int i = 0; i < branches.length; i += branchStep) {
         final branchPath = branches[i];
