@@ -242,9 +242,12 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         });
       } else {
         final file = File(path);
-        if (file.existsSync()) {
-          _initializeVideoControllerForFile(path, file);
-        }
+        // FILE I/O FIX: Use async exists() instead of sync existsSync() to avoid blocking UI thread
+        file.exists().then((exists) {
+          if (exists && mounted) {
+            _initializeVideoControllerForFile(path, file);
+          }
+        });
       }
     }
   }
