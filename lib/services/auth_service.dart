@@ -110,7 +110,15 @@ class AuthService {
       await AnalyticsService.logLogin('email');
 
       return userCredential;
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      // Log authentication errors to Crashlytics
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'Sign-in with email/password failed',
+        fatal: false,
+        information: ['Error code: ${e.code}', 'Email: $email'],
+      ));
       rethrow;
     }
   }
@@ -133,7 +141,15 @@ class AuthService {
       await AnalyticsService.logSignUp('email');
 
       return userCredential;
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      // Log authentication errors to Crashlytics
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'User registration with email/password failed',
+        fatal: false,
+        information: ['Error code: ${e.code}', 'Email: $email'],
+      ));
       rethrow;
     }
   }
@@ -369,7 +385,19 @@ class AuthService {
       }
 
       return 'success';
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, stackTrace) {
+      // Log to Crashlytics
+      if (e.code != 'requires-recent-login') {
+        // Don't log requires-recent-login as error - it's expected behavior
+        unawaited(FirebaseCrashlytics.instance.recordError(
+          e,
+          stackTrace,
+          reason: 'Account deletion failed',
+          fatal: false,
+          information: ['Error code: ${e.code}', 'User ID: $uid'],
+        ));
+      }
+
       if (e.code == 'requires-recent-login') {
         return 'requires-recent-login';
       }
