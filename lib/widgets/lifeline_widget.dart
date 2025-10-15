@@ -158,6 +158,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   ui.Picture? _structureCache;
   bool _isCalculating = false;
 
+  // PHASE 3: Background caching
+  ui.Picture? _cachedBackgroundPicture;
+  int _backgroundFrameCounter = 0;
+  static const int _backgroundUpdateInterval = 5; // Update every 5 frames (~12 FPS for background animation)
+
   bool _debugMode = false;
   late bool _animationEnabled;
   late double _geometrySpeed;
@@ -1726,16 +1731,32 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                 animation: _backgroundController,
                 builder: (context, child) {
                   final stopwatch = Stopwatch()..start();
-                  final painter = BackgroundPainter(
-                      progress: _animationEnabled
-                          ? _backgroundController.value
-                          : 0.0);
-                  stopwatch.stop();
-                  final backgroundTime =
-                      (stopwatch.elapsedMicroseconds / 1000).round();
 
-                  final currentTimings =
-                      _paintTimingsNotifier.value ?? PaintTimings();
+                  // PHASE 3 OPTIMIZATION: Cache background and update every N frames
+                  // This reduces expensive radial gradient + blur rendering from 60 FPS to ~12 FPS
+                  _backgroundFrameCounter++;
+                  final shouldUpdateBackground = _cachedBackgroundPicture == null ||
+                                                 _backgroundFrameCounter >= _backgroundUpdateInterval;
+
+                  if (shouldUpdateBackground) {
+                    _backgroundFrameCounter = 0;
+
+                    // Regenerate background Picture
+                    final recorder = ui.PictureRecorder();
+                    final canvas = Canvas(recorder);
+                    final size = MediaQuery.of(context).size;
+
+                    final backgroundPainter = BackgroundPainter(
+                        progress: _animationEnabled ? _backgroundController.value : 0.0);
+                    backgroundPainter.paint(canvas, size);
+
+                    _cachedBackgroundPicture = recorder.endRecording();
+                  }
+
+                  stopwatch.stop();
+                  final backgroundTime = (stopwatch.elapsedMicroseconds / 1000).round();
+
+                  final currentTimings = _paintTimingsNotifier.value ?? PaintTimings();
                   if (currentTimings.background != backgroundTime) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (mounted && !_isDisposed) {
@@ -1749,9 +1770,13 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                       }
                     });
                   }
+
+                  // Draw cached background
                   return CustomPaint(
                     size: Size.infinite,
-                    painter: painter,
+                    painter: _CachedBackgroundPainter(
+                      cachedPicture: _cachedBackgroundPicture,
+                    ),
                   );
                 },
               ),
@@ -3387,6 +3412,27 @@ class DraftsListDialog extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+/// PHASE 3 OPTIMIZATION: Lightweight painter that just draws a cached Picture
+/// This avoids re-rendering expensive gradients and blur effects every frame
+class _CachedBackgroundPainter extends CustomPainter {
+  final ui.Picture? cachedPicture;
+
+  _CachedBackgroundPainter({this.cachedPicture});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (cachedPicture != null) {
+      canvas.drawPicture(cachedPicture!);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CachedBackgroundPainter oldDelegate) {
+    // Repaint only when the cached picture changes (every N frames)
+    return oldDelegate.cachedPicture != cachedPicture;
   }
 }
 
