@@ -1486,37 +1486,54 @@ class LifelinePainter extends CustomPainter {
     // AURA is now drawn in separate pass before nodes (see paint() method)
 
     if (image != null) {
-      final imageRect = Rect.fromCircle(center: adjustedPos, radius: nodeRadius);
-      final imagePath = Path()..addOval(imageRect);
+      // PERFORMANCE OPTIMIZATION: Use cached circular cover for individual nodes
+      // This eliminates expensive drawImageRect + clip operations every frame
+      final cachedCover = _getCachedCircularCover(
+        memory.coverPath!,
+        image,
+        nodeRadius,
+        opacity,
+      );
 
-      final borderPaint = Paint()
-        ..color = Colors.white.withAlpha((200 * opacity).round())
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5 * combinedPulse;
-
-      canvas.save();
-      canvas.clipPath(imagePath);
-
-      final double imgWidth = image.width.toDouble();
-      final double imgHeight = image.height.toDouble();
-      final double aspectRatio = imgWidth / imgHeight;
-
-      Rect srcRect;
-      if (aspectRatio > 1.0) {
-        final croppedWidth = imgHeight;
-        srcRect = Rect.fromLTWH(
-            (imgWidth - croppedWidth) / 2, 0, croppedWidth, imgHeight);
+      if (cachedCover != null) {
+        canvas.save();
+        canvas.translate(adjustedPos.dx - nodeRadius, adjustedPos.dy - nodeRadius);
+        canvas.drawPicture(cachedCover);
+        canvas.restore();
       } else {
-        final croppedHeight = imgWidth;
-        srcRect =
-            Rect.fromLTWH(0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
+        // Fallback to old method if cache creation failed
+        final imageRect = Rect.fromCircle(center: adjustedPos, radius: nodeRadius);
+        final imagePath = Path()..addOval(imageRect);
+
+        final borderPaint = Paint()
+          ..color = Colors.white.withAlpha((200 * opacity).round())
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5 * combinedPulse;
+
+        canvas.save();
+        canvas.clipPath(imagePath);
+
+        final double imgWidth = image.width.toDouble();
+        final double imgHeight = image.height.toDouble();
+        final double aspectRatio = imgWidth / imgHeight;
+
+        Rect srcRect;
+        if (aspectRatio > 1.0) {
+          final croppedWidth = imgHeight;
+          srcRect = Rect.fromLTWH(
+              (imgWidth - croppedWidth) / 2, 0, croppedWidth, imgHeight);
+        } else {
+          final croppedHeight = imgWidth;
+          srcRect =
+              Rect.fromLTWH(0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
+        }
+
+        final imagePaint = Paint()..color = Colors.white.withOpacity(opacity);
+        canvas.drawImageRect(image, srcRect, imageRect, imagePaint);
+        canvas.restore();
+
+        canvas.drawPath(imagePath, borderPaint);
       }
-
-      final imagePaint = Paint()..color = Colors.white.withOpacity(opacity);
-      canvas.drawImageRect(image, srcRect, imageRect, imagePaint);
-      canvas.restore();
-
-      canvas.drawPath(imagePath, borderPaint);
     } else {
       _drawDefaultNode(canvas, adjustedPos, nodeRadius, opacity, index, memory);
     }
