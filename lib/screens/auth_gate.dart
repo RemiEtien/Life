@@ -54,7 +54,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   void initState() {
     super.initState();
     unawaited(FirebaseCrashlytics.instance.log('AuthGate: initState'));
-    _notificationSubscription = onNotificationTap.stream.listen((payload) {
+    _notificationSubscription = NotificationService().onNotificationTap.listen((payload) {
       if (mounted) {
         _handleNotificationTap(payload);
       }

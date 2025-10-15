@@ -5,13 +5,27 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
-// Поток для передачи события нажатия на уведомление
-final StreamController<String?> onNotificationTap = StreamController.broadcast();
-
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
+
+  // MEMORY LEAK FIX: Move StreamController inside class and make it lazily initialized
+  // This allows proper disposal when needed
+  StreamController<String?>? _onNotificationTapController;
+
+  /// Stream for notification tap events
+  /// Creates the controller lazily on first access
+  Stream<String?> get onNotificationTap {
+    _onNotificationTapController ??= StreamController<String?>.broadcast();
+    return _onNotificationTapController!.stream;
+  }
+
+  /// Add notification tap event to stream
+  void _addNotificationTap(String? payload) {
+    _onNotificationTapController ??= StreamController<String?>.broadcast();
+    _onNotificationTapController!.add(payload);
+  }
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -41,7 +55,7 @@ class NotificationService {
       onDidReceiveNotificationResponse: (response) async {
         if (response.payload != null) {
           // Отправляем payload (ID воспоминания) в поток
-          onNotificationTap.add(response.payload);
+          _addNotificationTap(response.payload);
         }
       },
     );
