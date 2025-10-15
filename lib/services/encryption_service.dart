@@ -101,27 +101,16 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     _unlockedMemoryIdsInSession.clear();
     _failedAttempts = 0;
     _lockoutEndTime = null;
-    if (kDebugMode) {
-      debugPrint('[EncryptionService] Service state has been completely reset for sign-out.');
-    }
   }
 
   /// Signals the start of an unlock attempt to prevent auto-locking.
   void prepareForUnlockAttempt() {
     _isAttemptingUnlock = true;
-    if (kDebugMode) {
-      debugPrint(
-          '[EncryptionService] Preparing for unlock attempt. Auto-lock disabled.');
-    }
   }
 
   /// Signals the end of an unlock attempt to re-enable auto-locking.
   void finishUnlockAttempt() {
     _isAttemptingUnlock = false;
-    if (kDebugMode) {
-      debugPrint(
-          '[EncryptionService] Finished unlock attempt. Auto-lock re-enabled.');
-    }
   }
 
   /// Checks if a specific memory has been unlocked during this session.
@@ -150,9 +139,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final currentUser = _ref.read(authStateChangesProvider).asData?.value;
     if (currentUser == null || currentUser.uid != newProfile.uid) {
       // Profile data doesn't match current auth state - ignore it
-      if (kDebugMode) {
-        debugPrint('[EncryptionService] Profile data for ${newProfile.uid} ignored - no matching authenticated user');
-      }
       return;
     }
 
@@ -187,15 +173,11 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   /// Sets up encryption for the first time.
   Future<void> setupEncryption(String masterPassword) async {
-    debugPrint('[EncryptionService] setupEncryption started');
     final userProfile = _ref.read(userProfileProvider).value;
     if (userProfile == null) {
-      debugPrint('[EncryptionService] ERROR: User profile not found');
       throw Exception('User profile not found.');
     }
-    debugPrint('[EncryptionService] User profile loaded: ${userProfile.uid}');
 
-    debugPrint('[EncryptionService] Generating encryption keys');
     final newDEK = Key.fromSecureRandom(32);
     final salt = _generateRandomBytes(16);
     final kek = await _deriveKey(masterPassword, salt, useIsolate: true);
@@ -203,7 +185,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final encrypter = Encrypter(AES(kek, mode: AESMode.gcm));
     final encryptedDEK = encrypter.encrypt(newDEK.base64, iv: iv);
     final wrappedDEK = '${iv.base64}:${encryptedDEK.base64}';
-    debugPrint('[EncryptionService] Keys generated successfully');
 
     final updatedProfile = userProfile.copyWith(
       isEncryptionEnabled: true,
@@ -211,19 +192,9 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       wrappedDEK: wrappedDEK,
     );
 
-    // Update internal state first (no rebuild)
-    debugPrint('[EncryptionService] Updating internal DEK state');
     _unlockedDEK = newDEK;
-
-    // Update Firestore (may take time, no rebuild yet)
-    debugPrint('[EncryptionService] Updating Firestore profile');
     await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
-    debugPrint('[EncryptionService] Firestore profile updated');
-
-    // Finally update state (triggers rebuild after Firestore update completes)
-    debugPrint('[EncryptionService] Setting state to unlocked');
     state = EncryptionState.unlocked;
-    debugPrint('[EncryptionService] setupEncryption completed successfully');
   }
 
   /// Attempts to unlock the session with the master password.
@@ -289,13 +260,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
       // If profile says quick unlock is enabled but keys are missing, re-enable it
       if (sessionKeyB64 == null) {
-        if (kDebugMode) {
-          debugPrint('[EncryptionService] Auto-enabling quick unlock after reinstall');
-        }
         final success = await enableQuickUnlock(masterPassword);
-        if (kDebugMode) {
-          debugPrint('[EncryptionService] Auto-enable result: $success');
-        }
         return success;
       }
     }
@@ -314,10 +279,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       if (sessionKeyB64 == null || encryptedDekB64 == null) {
         // Keys missing (likely after app reinstall) - don't disable the feature
         // Auto-enable will recreate keys when user enters master password
-        if (kDebugMode) {
-          debugPrint(
-              '[EncryptionService] Quick Unlock keys not found (likely after reinstall). Will auto-enable after password entry.');
-        }
         return false;
       }
 
@@ -333,9 +294,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       state = EncryptionState.unlocked;
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[EncryptionService] Error during quick unlock, disabling: $e');
-      }
       await disableQuickUnlock();
       return false;
     }
@@ -412,18 +370,12 @@ class EncryptionService extends StateNotifier<EncryptionState> {
         final encryptedMemories = allMemories.where((m) => m.isEncrypted).toList();
 
         if (encryptedMemories.isNotEmpty) {
-          if (kDebugMode) {
-            debugPrint('[EncryptionService] Found ${encryptedMemories.length} encrypted memories to delete');
-          }
 
           // Step 2: Delete from Firestore using batch delete (more efficient)
           final firestore = _ref.read(firestoreServiceProvider);
           try {
             await firestore.batchDeleteMemories(userProfile.uid, encryptedMemories);
           } catch (e) {
-            if (kDebugMode) {
-              debugPrint('[EncryptionService] Failed to batch delete memories from Firestore: $e');
-            }
             // Continue with local deletion even if Firestore deletion fails
           }
 
@@ -431,9 +383,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
           final encryptedIds = encryptedMemories.map((m) => m.id).toList();
           await repo.deleteAllByIds(encryptedIds);
 
-          if (kDebugMode) {
-            debugPrint('[EncryptionService] Deleted ${encryptedIds.length} encrypted memories from local database');
-          }
         }
       }
 
@@ -459,13 +408,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       // Step 7: Set state to notConfigured (unlocked since encryption is disabled)
       state = EncryptionState.notConfigured;
 
-      if (kDebugMode) {
-        debugPrint('[EncryptionService] Encryption reset completed successfully');
-      }
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[EncryptionService] Error during encryption reset: $e');
-      }
       rethrow;
     }
   }
@@ -514,9 +457,6 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       wrappedDEK: newWrappedDEK,
     );
     await _ref.read(userServiceProvider).updateUserProfile(updatedProfile);
-    if (kDebugMode) {
-      debugPrint('[EncryptionService] User key migrated to stronger parameters.');
-    }
   }
 
   /// Changes the user's master password.
@@ -555,18 +495,12 @@ class EncryptionService extends StateNotifier<EncryptionState> {
   /// Locks the session by clearing the cached DEK.
   Future<void> lockSession() async {
     if (_isAttemptingUnlock) {
-      if (kDebugMode) {
-        debugPrint('[EncryptionService] Ignoring auto-lock during unlock attempt.');
-      }
       return;
     }
     if (state == EncryptionState.unlocked) {
       _unlockedDEK = null;
       _unlockedMemoryIdsInSession.clear(); // NEW: Clear the set on lock
       state = EncryptionState.locked;
-      if (kDebugMode) {
-        debugPrint('[EncryptionService] Session locked.');
-      }
     }
   }
 
@@ -625,8 +559,8 @@ class EncryptionService extends StateNotifier<EncryptionState> {
       }
       throw const DecryptionFailedException('Unsupported encrypted payload format');
     } catch (e) {
-      if (kDebugMode) debugPrint('Decryption failed: $e');
-      // Re-throw as DecryptionFailedException if it's not already
+      // SECURITY: No debug logging for encryption errors - they contain sensitive info
+      // Errors are properly typed and will be logged by Crashlytics if needed
       if (e is DecryptionFailedException) {
         rethrow;
       }
