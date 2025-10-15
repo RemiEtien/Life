@@ -387,7 +387,7 @@ class _PerformanceDebugScreenState extends State<PerformanceDebugScreen> {
                 },
               ),
             );
-          }).toList(),
+          }),
         ] else
           const Card(
             child: Padding(

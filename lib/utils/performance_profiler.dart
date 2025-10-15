@@ -179,7 +179,7 @@ class BenchmarkResult {
     buffer.writeln('  Weather Effects: ${config.weatherEffectsEnabled}');
     buffer.writeln('  Duration: ${config.durationSeconds}s');
 
-    buffer.writeln('\n' + '-' * 80);
+    buffer.writeln('\n${'-' * 80}');
     buffer.writeln('OVERALL PERFORMANCE');
     buffer.writeln('-' * 80);
     buffer.writeln('Average FPS: ${avgFps.toStringAsFixed(2)}');
@@ -190,7 +190,7 @@ class BenchmarkResult {
     buffer.writeln('Jank Frames (< 30 FPS): $jankFrames (${(jankFrames / totalFrames * 100).toStringAsFixed(1)}%)');
     buffer.writeln('Frame Consistency: ${frameConsistency.toStringAsFixed(2)}%');
 
-    buffer.writeln('\n' + '-' * 80);
+    buffer.writeln('\n${'-' * 80}');
     buffer.writeln('TOP BOTTLENECKS (by avg frame time)');
     buffer.writeln('-' * 80);
     final bottlenecks = getBottlenecks(topN: 10);
@@ -203,7 +203,7 @@ class BenchmarkResult {
       buffer.writeln('   Frames: ${entry.value.frameCount}');
     }
 
-    buffer.writeln('\n' + '-' * 80);
+    buffer.writeln('\n${'-' * 80}');
     buffer.writeln('ALL COMPONENTS (sorted by avg frame time)');
     buffer.writeln('-' * 80);
     final allComponents = componentMetrics.entries.toList()
@@ -219,7 +219,7 @@ class BenchmarkResult {
       buffer.writeln('  Frames: ${entry.value.frameCount}');
     }
 
-    buffer.writeln('\n' + '=' * 80);
+    buffer.writeln('\n${'=' * 80}');
     return buffer.toString();
   }
 }

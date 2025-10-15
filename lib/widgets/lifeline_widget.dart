@@ -809,15 +809,17 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   void _requestFullRecalculation(List<Memory> memories) {
     if (_isCalculating || !mounted || _lastKnownSize.isEmpty || _isDisposed) {
-      // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Если расчет уже идет, ставим в очередь новый ---
-      if (_isCalculating) {
+      // --- ИСПРАВЛЕНИЕ БАГА ГЕОМЕТРИИ: Сохраняем воспоминания в очередь для любого блокирующего условия ---
+      if (_isCalculating || _lastKnownSize.isEmpty) {
         _recalculationNeeded = true;
         _pendingMemoriesForRecalculation = memories;
+        debugPrint('[LIFELINE] Recalculation postponed: ${memories.length} memories queued. Reason: ${_isCalculating ? "calculating" : "size unknown"}');
       }
       // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
       return;
     }
 
+    debugPrint('[LIFELINE] Starting full recalculation with ${memories.length} memories');
     final layoutResult = _calculateLayout(_lastKnownSize, memories);
 
     if (mounted && !_isDisposed) {
@@ -1702,7 +1704,16 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         _lastKnownSize = newSize;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted && !_isDisposed) {
-            _requestFullRecalculation(_currentMemories);
+            // FIX: Use pending memories if available (handles case when memories arrived before size was known)
+            final memoriesToUse = _pendingMemoriesForRecalculation ?? _currentMemories;
+            if (_pendingMemoriesForRecalculation != null) {
+              debugPrint('[LIFELINE] Size became available! Processing ${memoriesToUse.length} pending memories');
+              _recalculationNeeded = false;
+              _pendingMemoriesForRecalculation = null;
+            } else {
+              debugPrint('[LIFELINE] Size became available, using current ${memoriesToUse.length} memories');
+            }
+            _requestFullRecalculation(memoriesToUse);
           }
         });
       }

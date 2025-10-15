@@ -69,7 +69,8 @@
       "Bash(identify:*)",
       "Bash(/dev/null)",
       "Bash(pkill:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

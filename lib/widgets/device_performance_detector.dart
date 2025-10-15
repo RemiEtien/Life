@@ -83,12 +83,12 @@ class DeviceCapabilities {
 
   static const low = DeviceCapabilities(
     performance: DevicePerformance.low,
-    canHandleBlur: false,
+    canHandleBlur: true,  // Changed: enable minimal blur for auras even on low
     canHandleComplexGradients: false,
     canHandleManyParticles: false,
     maxParticleCount: 25,
     maxBlurRadius: 15,
-    effectsQuality: 0.4,
+    effectsQuality: 0.3,  // Reduced from 0.4 to keep auras subtle but visible
   );
 }
 
@@ -291,6 +291,68 @@ class DevicePerformanceDetector {
       case DevicePerformance.low:
         return max(1, (baseLayerCount * 0.3).round());
     }
+  }
+
+  /// SMART LOD-BASED LAYER COUNT
+  /// Returns optimal layer count based on zoom level and component type
+  /// This prevents GPU overload by reducing blur layers where they're less visible
+  ///
+  /// Parameters:
+  /// - baseLayerCount: baseline layer count (e.g., 7 for main line)
+  /// - zoomLevel: 1 = Yearly gradient, 2 = Monthly clusters, 3 = Individual nodes
+  /// - componentType: 'mainLine', 'branches', 'aura'
+  static int getSmartLayerCount(int baseLayerCount, int zoomLevel, String componentType) {
+    final perf = capabilities.performance;
+
+    // LOW quality: always minimal layers regardless of zoom
+    if (perf == DevicePerformance.low) {
+      return max(1, (baseLayerCount * 0.3).round());
+    }
+
+    // MEDIUM quality: slightly adaptive, but conservative
+    if (perf == DevicePerformance.medium) {
+      return (baseLayerCount * 0.6).round().clamp(1, baseLayerCount);
+    }
+
+    // HIGH quality: SMART LOD system
+    // Strategy: Allocate GPU budget where visual impact is highest
+    if (perf == DevicePerformance.high) {
+      switch (componentType) {
+        case 'mainLine':
+          // Main line gets most detail at Level 1-2 (far away, big impact)
+          // At Level 3, reduce layers since focus shifts to nodes
+          if (zoomLevel == 1 || zoomLevel == 2) {
+            return (baseLayerCount * 1.2).round();  // 7 → 8 layers (beautiful, not overkill)
+          } else { // zoomLevel == 3
+            return (baseLayerCount * 0.7).round();  // 7 → 5 layers (save GPU for nodes)
+          }
+
+        case 'branches':
+          // Branches less important at all zoom levels on high
+          if (zoomLevel == 1) {
+            return (baseLayerCount * 0.4).round();  // 7 → 3 layers (distant, low detail)
+          } else if (zoomLevel == 2) {
+            return (baseLayerCount * 0.6).round();  // 7 → 4 layers (medium detail)
+          } else { // zoomLevel == 3
+            return (baseLayerCount * 0.5).round();  // 7 → 4 layers (nodes are focus)
+          }
+
+        case 'aura':
+          // Auras only visible at Level 3, give them good quality
+          if (zoomLevel == 3) {
+            return (baseLayerCount * 0.8).round();  // 7 → 6 layers (beautiful auras!)
+          } else {
+            return 0;  // No auras at Level 1-2
+          }
+
+        default:
+          // Fallback to standard high quality
+          return (baseLayerCount * 1.2).round();
+      }
+    }
+
+    // Fallback
+    return baseLayerCount;
   }
 }
 
