@@ -491,6 +491,7 @@ class LifelinePainter extends CustomPainter {
 
   final RenderData renderData;
   final Map<String, ui.Image> images;
+  final Map<String, ui.Picture> cachedCircularCovers; // NEW: Cached circular cropped covers
   final ValueNotifier<PaintTimings?>? timingsNotifier;
   final UserProfile? userProfile; // NEW: для условного рендеринга эффектов
 
@@ -517,6 +518,7 @@ class LifelinePainter extends CustomPainter {
     this.pulseValue = 0.0,
     this.timingsNotifier,
     required this.images,
+    required this.cachedCircularCovers, // NEW: Cached circular covers
     required this.branchIntensity,
     this.userProfile, // NEW: может быть null
   });
@@ -1030,8 +1032,8 @@ class LifelinePainter extends CustomPainter {
       ));
     }
 
-    // SIMPLIFIED MONTHLY CLUSTERS (like daily clusters)
-    // Draw simple colored nodes with rings - NO auras, NO photos, NO complex labels
+    // OPTIMIZED MONTHLY CLUSTERS with CACHED PHOTOS
+    // NO auras, NO complex labels - just cached photos + simple ring + count text
     const nodeRadius = 20.0;  // Slightly larger than daily clusters
 
     for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
@@ -1045,39 +1047,68 @@ class LifelinePainter extends CustomPainter {
 
       final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
 
-      // Get dominant emotion for coloring
-      final emotionCounts = <String, int>{};
+      // Pick first memory with a photo, or first memory if none have photos
+      Memory? selectedMemory;
       for (final memory in cluster.memories) {
-        if (memory.primaryEmotion != null) {
-          emotionCounts[memory.primaryEmotion!] =
-              (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+        if (memory.coverPath != null && images[memory.coverPath] != null) {
+          selectedMemory = memory;
+          break;
         }
       }
+      selectedMemory ??= cluster.memories.first;
+      final image = images[selectedMemory.coverPath];
 
-      String? dominantEmotion;
-      int maxCount = 0;
-      emotionCounts.forEach((emotion, count) {
-        if (count > maxCount) {
-          maxCount = count;
-          dominantEmotion = emotion;
+      // Draw photo or default colored node
+      if (image != null) {
+        // OPTIMIZATION: Use cached circular cover instead of drawImageRect + clip every frame
+        final cachedCover = _getCachedCircularCover(
+          selectedMemory.coverPath!,
+          image,
+          animatedRadius,
+          finalOpacity,
+        );
+
+        if (cachedCover != null) {
+          canvas.save();
+          canvas.translate(adjustedPos.dx - animatedRadius, adjustedPos.dy - animatedRadius);
+          canvas.drawPicture(cachedCover);
+          canvas.restore();
         }
-      });
+      } else {
+        // Fallback: Draw colored node if no photo
+        final emotionCounts = <String, int>{};
+        for (final memory in cluster.memories) {
+          if (memory.primaryEmotion != null) {
+            emotionCounts[memory.primaryEmotion!] =
+                (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+          }
+        }
 
-      final emotionColor = EmotionColors.getColor(dominantEmotion);
+        String? dominantEmotion;
+        int maxCount = 0;
+        emotionCounts.forEach((emotion, count) {
+          if (count > maxCount) {
+            maxCount = count;
+            dominantEmotion = emotion;
+          }
+        });
 
-      // Draw simple colored node (NO photo rendering!)
-      final nodePaint = Paint()..color = emotionColor.withOpacity(finalOpacity * 0.8);
-      canvas.drawCircle(adjustedPos, animatedRadius, nodePaint);
+        final emotionColor = EmotionColors.getColor(dominantEmotion);
 
-      // Draw white border
-      final borderPaint = Paint()
-        ..color = Colors.white.withOpacity(finalOpacity)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
-      canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
+        // Draw simple colored node
+        final nodePaint = Paint()..color = emotionColor.withOpacity(finalOpacity * 0.8);
+        canvas.drawCircle(adjustedPos, animatedRadius, nodePaint);
 
-      // Draw outer ring (visual distinction from daily clusters - slightly different color)
-      final ringColor = Color.lerp(const Color(0xFF6BFF6B), Colors.white, 0.7)!;  // Green tint instead of red
+        // Draw white border
+        final borderPaint = Paint()
+          ..color = Colors.white.withOpacity(finalOpacity)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0;
+        canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
+      }
+
+      // Draw outer ring (visual distinction from daily clusters - green tint)
+      final ringColor = Color.lerp(const Color(0xFF6BFF6B), Colors.white, 0.7)!;
 
       final ringPaint = Paint()
         ..color = ringColor.withOpacity(finalOpacity * 0.7 * combinedPulse)
@@ -1096,7 +1127,7 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringGlow);
       }
 
-      // Show count text (always visible - same as before)
+      // Show count text (always visible)
       final textStyle = GoogleFonts.orbitron(
         color: Colors.white.withOpacity(finalOpacity),
         fontSize: 12.0,
@@ -1151,6 +1182,52 @@ class LifelinePainter extends CustomPainter {
     return hslColor
         .withSaturation((hslColor.saturation * multiplier).clamp(0.0, 1.0))
         .toColor();
+  }
+
+  /// Helper: Get or create cached circular cover for a memory
+  /// This significantly improves performance by avoiding drawImageRect + clip every frame
+  ui.Picture? _getCachedCircularCover(String coverPath, ui.Image image, double radius, double opacity) {
+    final key = '$coverPath-${radius.toStringAsFixed(1)}';
+
+    if (!cachedCircularCovers.containsKey(key)) {
+      // Create circular cover picture ONCE
+      final recorder = ui.PictureRecorder();
+      final tempCanvas = Canvas(recorder);
+
+      final imageRect = Rect.fromCircle(center: Offset(radius, radius), radius: radius);
+      final imagePath = Path()..addOval(imageRect);
+
+      tempCanvas.save();
+      tempCanvas.clipPath(imagePath);
+
+      // Crop to square (same logic as _drawSingleMemoryNode)
+      final double imgWidth = image.width.toDouble();
+      final double imgHeight = image.height.toDouble();
+      final double aspectRatio = imgWidth / imgHeight;
+
+      Rect srcRect;
+      if (aspectRatio > 1.0) {
+        final croppedWidth = imgHeight;
+        srcRect = Rect.fromLTWH((imgWidth - croppedWidth) / 2, 0, croppedWidth, imgHeight);
+      } else {
+        final croppedHeight = imgWidth;
+        srcRect = Rect.fromLTWH(0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
+      }
+
+      tempCanvas.drawImageRect(image, srcRect, imageRect, Paint());
+      tempCanvas.restore();
+
+      // Draw border
+      final borderPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+      tempCanvas.drawPath(imagePath, borderPaint);
+
+      cachedCircularCovers[key] = recorder.endRecording();
+    }
+
+    return cachedCircularCovers[key];
   }
 
   void _drawMacroView(Canvas canvas, ui.Path path, Size size, double opacity) {

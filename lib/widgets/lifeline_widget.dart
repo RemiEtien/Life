@@ -148,6 +148,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   final Map<String, ui.Paragraph> _cachedParagraphs = {};
   final Map<String, ui.Image> _cachedImages = {};
+  final Map<String, ui.Picture> _cachedCircularCovers = {};  // NEW: Cache for circular cropped covers
   Size _lastKnownSize = Size.zero;
   final Map<String, Offset> _nodePositions = {};
   final Map<String, (Offset, List<Memory>)> _dailyClusterData = {};
@@ -1845,6 +1846,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                         timingsNotifier:
                                             _paintTimingsNotifier,
                                         images: _cachedImages,
+                                        cachedCircularCovers: _cachedCircularCovers, // NEW: Cached covers
                                         branchIntensity: _branchIntensity,
                                         userProfile: userProfile, // NEW: для условного рендеринга
                                       ),
