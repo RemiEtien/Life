@@ -35,6 +35,54 @@ import '../services/onboarding_service.dart';
 import '../services/sync_service.dart';
 import 'onboarding_overlay.dart';
 
+/// MEMORY LEAK FIX: LRU Cache for ui.Picture objects
+/// Prevents unbounded memory growth by limiting cache size to maxEntries
+/// Implements Map-like interface for compatibility with existing code
+class LRUCache<K, V> {
+  final int maxEntries;
+  final Map<K, V> _cache = {};
+  final List<K> _accessOrder = [];
+
+  LRUCache(this.maxEntries);
+
+  V? operator [](K key) => get(key);
+
+  void operator []=(K key, V value) => put(key, value);
+
+  bool containsKey(K key) => _cache.containsKey(key);
+
+  V? get(K key) {
+    if (_cache.containsKey(key)) {
+      // Move to end (most recently used)
+      _accessOrder.remove(key);
+      _accessOrder.add(key);
+      return _cache[key];
+    }
+    return null;
+  }
+
+  void put(K key, V value) {
+    if (_cache.containsKey(key)) {
+      // Update existing - move to end
+      _accessOrder.remove(key);
+    } else if (_cache.length >= maxEntries) {
+      // Evict least recently used
+      final lru = _accessOrder.removeAt(0);
+      _cache.remove(lru);
+    }
+
+    _cache[key] = value;
+    _accessOrder.add(key);
+  }
+
+  void clear() {
+    _cache.clear();
+    _accessOrder.clear();
+  }
+
+  int get length => _cache.length;
+}
+
 enum TappableType { singleNode, dailyCluster, monthlyCluster, monthInCluster }
 
 class TappableItem {
@@ -148,7 +196,9 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   final Map<String, ui.Paragraph> _cachedParagraphs = {};
   final Map<String, ui.Image> _cachedImages = {};
-  final Map<String, ui.Picture> _cachedCircularCovers = {};  // NEW: Cache for circular cropped covers
+  // MEMORY LEAK FIX: Use LRU cache instead of unbounded Map
+  // Limits circular cover cache to 100 entries (old entries automatically evicted)
+  final LRUCache<String, ui.Picture> _cachedCircularCovers = LRUCache(100);
   Size _lastKnownSize = Size.zero;
   final Map<String, Offset> _nodePositions = {};
   final Map<String, (Offset, List<Memory>)> _dailyClusterData = {};

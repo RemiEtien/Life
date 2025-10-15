@@ -493,7 +493,7 @@ class LifelinePainter extends CustomPainter {
 
   final RenderData renderData;
   final Map<String, ui.Image> images;
-  final Map<String, ui.Picture> cachedCircularCovers; // NEW: Cached circular cropped covers
+  final dynamic cachedCircularCovers; // MEMORY LEAK FIX: Now accepts LRUCache or Map
   final ValueNotifier<PaintTimings?>? timingsNotifier;
   final UserProfile? userProfile; // NEW: для условного рендеринга эффектов
 
