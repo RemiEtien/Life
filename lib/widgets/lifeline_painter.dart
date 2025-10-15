@@ -1030,145 +1030,76 @@ class LifelinePainter extends CustomPainter {
       ));
     }
 
-    // Node radius for drawing - clusters stay ON the lifeline, no displacement
-    const nodeRadius = 30.0;
+    // SIMPLIFIED MONTHLY CLUSTERS (like daily clusters)
+    // Draw simple colored nodes with rings - NO auras, NO photos, NO complex labels
+    const nodeRadius = 20.0;  // Slightly larger than daily clusters
 
-    // PASS 1: Draw auras (only if enabled in settings)
-    if (userProfile!.enableMonthlyClusters) {
-      final intensity = userProfile!.monthlyClusterIntensity;
-      final auraRadius = userProfile!.monthlyClusterRadius;
-      final blur = userProfile!.monthlyClusterBlur;
-      final saturation = userProfile!.monthlyClusterSaturation;
-
-      for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
-        final cluster = groupedClusters[clusterIndex];
-
-        // Calculate breathing animation (same as daily clusters)
-        final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
-        final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
-        final combinedPulse = individualPulse * breathPulse;
-
-        // Get dominant emotion
-        final emotionCounts = <String, int>{};
-        for (final memory in cluster.memories) {
-          if (memory.primaryEmotion != null) {
-            emotionCounts[memory.primaryEmotion!] =
-                (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
-          }
-        }
-
-        String? dominantEmotion;
-        int maxCount = 0;
-        emotionCounts.forEach((emotion, count) {
-          if (count > maxCount) {
-            maxCount = count;
-            dominantEmotion = emotion;
-          }
-        });
-
-        final emotionColor = EmotionColors.getColor(dominantEmotion);
-        final saturatedColor = _boostSaturation(emotionColor, saturation);
-
-        // Draw aura (background glow) with breathing animation
-        final auraPaint = Paint()
-          ..color = saturatedColor.withOpacity(intensity * finalOpacity)
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
-
-        final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
-        canvas.drawCircle(adjustedPos, auraRadius * intensity * combinedPulse, auraPaint);
-      }
-    }
-
-    // PASS 2: Draw nodes with photos
     for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
       final cluster = groupedClusters[clusterIndex];
+
       // Calculate breathing animation (same as daily clusters)
       final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
       final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
       final combinedPulse = individualPulse * breathPulse;
       final animatedRadius = nodeRadius * combinedPulse;
 
-      // Pick first memory with a photo, or first memory if none have photos
-      Memory? selectedMemory;
-      for (final memory in cluster.memories) {
-        if (memory.coverPath != null && images[memory.coverPath] != null) {
-          selectedMemory = memory;
-          break;
-        }
-      }
-      selectedMemory ??= cluster.memories.first;
-      final image = images[selectedMemory.coverPath];
-
       final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
 
-      // Draw photo or default node
-      if (image != null) {
-        final imageRect = Rect.fromCircle(center: adjustedPos, radius: animatedRadius);
-        final imagePath = Path()..addOval(imageRect);
-
-        canvas.save();
-        canvas.clipPath(imagePath);
-
-        final double imgWidth = image.width.toDouble();
-        final double imgHeight = image.height.toDouble();
-        final double aspectRatio = imgWidth / imgHeight;
-
-        Rect srcRect;
-        if (aspectRatio > 1.0) {
-          final croppedWidth = imgHeight;
-          srcRect = Rect.fromLTWH(
-              (imgWidth - croppedWidth) / 2, 0, croppedWidth, imgHeight);
-        } else {
-          final croppedHeight = imgWidth;
-          srcRect = Rect.fromLTWH(
-              0, (imgHeight - croppedHeight) / 2, imgWidth, croppedHeight);
+      // Get dominant emotion for coloring
+      final emotionCounts = <String, int>{};
+      for (final memory in cluster.memories) {
+        if (memory.primaryEmotion != null) {
+          emotionCounts[memory.primaryEmotion!] =
+              (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
         }
-
-        canvas.drawImageRect(image, srcRect, imageRect, Paint());
-        canvas.restore();
-
-        // Draw border
-        final borderPaint = Paint()
-          ..color = Colors.white.withOpacity(finalOpacity)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0;
-        canvas.drawPath(imagePath, borderPaint);
-      } else {
-        // Draw default colored node
-        final emotionCounts = <String, int>{};
-        for (final memory in cluster.memories) {
-          if (memory.primaryEmotion != null) {
-            emotionCounts[memory.primaryEmotion!] =
-                (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
-          }
-        }
-
-        String? dominantEmotion;
-        int maxCount = 0;
-        emotionCounts.forEach((emotion, count) {
-          if (count > maxCount) {
-            maxCount = count;
-            dominantEmotion = emotion;
-          }
-        });
-
-        final emotionColor = EmotionColors.getColor(dominantEmotion);
-        final nodePaint = Paint()..color = emotionColor.withOpacity(finalOpacity);
-        canvas.drawCircle(adjustedPos, animatedRadius, nodePaint);
-
-        final borderPaint = Paint()
-          ..color = Colors.white.withOpacity(finalOpacity)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0;
-        canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
       }
 
-      // Show count text on monthly clusters (LEVEL 2)
-      // Always visible when monthly clusters are visible
-      final ringColor = Color.lerp(const Color(0xFFFF6B6B), Colors.white, 0.7)!;
+      String? dominantEmotion;
+      int maxCount = 0;
+      emotionCounts.forEach((emotion, count) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantEmotion = emotion;
+        }
+      });
+
+      final emotionColor = EmotionColors.getColor(dominantEmotion);
+
+      // Draw simple colored node (NO photo rendering!)
+      final nodePaint = Paint()..color = emotionColor.withOpacity(finalOpacity * 0.8);
+      canvas.drawCircle(adjustedPos, animatedRadius, nodePaint);
+
+      // Draw white border
+      final borderPaint = Paint()
+        ..color = Colors.white.withOpacity(finalOpacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+      canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
+
+      // Draw outer ring (visual distinction from daily clusters - slightly different color)
+      final ringColor = Color.lerp(const Color(0xFF6BFF6B), Colors.white, 0.7)!;  // Green tint instead of red
+
+      final ringPaint = Paint()
+        ..color = ringColor.withOpacity(finalOpacity * 0.7 * combinedPulse)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5 * combinedPulse;
+      canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringPaint);
+
+      // Optional ring glow (adaptive - skipped on low-end devices)
+      final ringBlur = DevicePerformanceDetector.getAdaptiveBlurRadius(12 * combinedPulse);
+      if (ringBlur > 0) {
+        final ringGlow = Paint()
+          ..color = ringColor.withOpacity(finalOpacity * 0.3 * combinedPulse)
+          ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, ringBlur)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4.0;
+        canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringGlow);
+      }
+
+      // Show count text (always visible - same as before)
       final textStyle = GoogleFonts.orbitron(
-        color: ringColor.withOpacity(finalOpacity),
-        fontSize: 10.0,
+        color: Colors.white.withOpacity(finalOpacity),
+        fontSize: 12.0,
         fontWeight: FontWeight.bold,
         shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
       );
@@ -1181,93 +1112,17 @@ class LifelinePainter extends CustomPainter {
       textPainter.layout();
       final textPos = Offset(
         adjustedPos.dx - textPainter.width / 2,
-        adjustedPos.dy - textPainter.height / 2,  // Center inside node
+        adjustedPos.dy - textPainter.height / 2,
       );
       textPainter.paint(canvas, textPos);
-    }
 
-    // PASS 3: Draw month labels with connector lines (stems)
-    const verticalOffset = 40.0;
-    bool wasLastAbove = false;
+      // Report position for tap detection (simplified - use first month date)
+      final firstMonthKey = cluster.monthKeys.first;
+      final parts = firstMonthKey.split('-');
+      final year = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final monthDate = DateTime(year, month);
 
-    for (int i = 0; i < groupedClusters.length; i++) {
-      final cluster = groupedClusters[i];
-
-      // Generate label text based on number of months in cluster
-      final String monthName;
-      final DateTime monthDate;
-      if (cluster.monthKeys.length == 1) {
-        final parts = cluster.monthKeys.first.split('-');
-        final year = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        monthDate = DateTime(year, month);
-        monthName = DateFormat.yMMM().format(monthDate); // "Jan 2025"
-      } else {
-        // Multiple months - show range
-        final firstParts = cluster.monthKeys.first.split('-');
-        final lastParts = cluster.monthKeys.last.split('-');
-        final firstYear = int.parse(firstParts[0]);
-        final firstMonth = int.parse(firstParts[1]);
-        final lastYear = int.parse(lastParts[0]);
-        final lastMonth = int.parse(lastParts[1]);
-
-        final firstDate = DateTime(firstYear, firstMonth);
-        final lastDate = DateTime(lastYear, lastMonth);
-        monthDate = firstDate;
-
-        if (firstYear == lastYear) {
-          // Same year: "Jan-Mar 2025"
-          monthName = '${DateFormat.MMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
-        } else {
-          // Different years: "Dec 2024-Feb 2025"
-          monthName = '${DateFormat.yMMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
-        }
-      }
-
-      final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
-
-      // Create label paragraph
-      final labelStyle = TextStyle(
-        color: Colors.white.withOpacity(finalOpacity),
-        fontSize: 14.0,
-        fontWeight: FontWeight.bold,
-        shadows: const [
-          ui.Shadow(color: Colors.black, blurRadius: 12.0),
-          ui.Shadow(color: Colors.black, blurRadius: 8.0),
-          ui.Shadow(color: Colors.black, blurRadius: 4.0),
-        ],
-      );
-      final labelSpan = TextSpan(text: monthName, style: labelStyle);
-      final labelPainter = TextPainter(
-        text: labelSpan,
-        textAlign: TextAlign.center,
-        textDirection: ui.TextDirection.ltr,
-      );
-      labelPainter.layout();
-
-      // Alternate label position (above/below) like memory labels
-      final placeAbove = !wasLastAbove;
-      wasLastAbove = placeAbove;
-
-      final labelX = adjustedPos.dx - labelPainter.width / 2;
-      final labelY = placeAbove
-          ? adjustedPos.dy - verticalOffset - labelPainter.height
-          : adjustedPos.dy + verticalOffset;
-
-      final textRect = Rect.fromLTWH(labelX, labelY, labelPainter.width, labelPainter.height);
-
-      // Draw connector line (stem)
-      _drawConnectorLine(canvas, cluster.pos, textRect, placeAbove, finalOpacity);
-
-      // Draw label with full opacity (like daily clusters)
-      canvas.saveLayer(
-        textRect.inflate(2),
-        Paint()..color = Colors.white.withAlpha((255 * finalOpacity).round())
-      );
-      labelPainter.paint(canvas, Offset(labelX, labelY));
-      canvas.restore();
-
-      // Report position for tap detection
       onMonthlyClusterPosition?.call(cluster.monthKeys, cluster.pos, cluster.memories, monthDate);
     }
   }
