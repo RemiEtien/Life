@@ -244,7 +244,9 @@ class StructurePainter extends CustomPainter {
     const pulse = 1.0;
     const arteryColor = Color(0xFFFF8A80);
 
-    final mainLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(7);
+    // SMART HIGH QUALITY: 8 layers (not 12) for good balance
+    // This is cached, so it doesn't change per frame
+    final mainLayerCount = DevicePerformanceDetector.getSmartLayerCount(7, 2, 'mainLine');
     _drawSingleArtery(canvas, mainPath,
         baseColor: arteryColor,
         intensity: 1.0,
@@ -611,27 +613,25 @@ class LifelinePainter extends CustomPainter {
       final branches =
           renderData.branches; // These paths are pre-animated from the isolate
       const arteryColor = Color(0xFFFF8A80);
-      final baseBranchLayerCount = DevicePerformanceDetector.getAdaptiveLayerCount(7);
 
-      // PHASE 4: LOD based on absolute currentScale and zoom levels
-      // LEVEL 1 (Yearly): 2 layers (30% of base) + draw every 3rd branch
-      // LEVEL 2 (Monthly): 4-5 layers (60% of base) + draw all branches
-      // LEVEL 3 (Individual): 7 layers (full quality) + draw all branches
-      int branchLayerCount;
-      int branchStep;
-
+      // SMART LOD: Determine zoom level and get appropriate layer count
+      int zoomLevel;
       if (currentScale < kLevel2Threshold) {
-        // LEVEL 1: Minimal detail for yearly zoom
-        branchLayerCount = (baseBranchLayerCount * 0.3).round().clamp(2, baseBranchLayerCount);
-        branchStep = 3; // Draw every 3rd branch
+        zoomLevel = 1; // Yearly
       } else if (currentScale < kLevel3Threshold) {
-        // LEVEL 2: Medium detail for monthly zoom
-        branchLayerCount = (baseBranchLayerCount * 0.6).round().clamp(4, baseBranchLayerCount);
-        branchStep = 1; // Draw all branches
+        zoomLevel = 2; // Monthly
       } else {
-        // LEVEL 3: Full detail for individual nodes
-        branchLayerCount = baseBranchLayerCount;
-        branchStep = 1; // Draw all branches
+        zoomLevel = 3; // Individual nodes
+      }
+
+      final branchLayerCount = DevicePerformanceDetector.getSmartLayerCount(7, zoomLevel, 'branches');
+
+      // Determine branch drawing step based on zoom level
+      int branchStep;
+      if (zoomLevel == 1) {
+        branchStep = 3; // Draw every 3rd branch at yearly zoom
+      } else {
+        branchStep = 1; // Draw all branches at monthly/individual zoom
       }
 
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
@@ -933,6 +933,20 @@ class LifelinePainter extends CustomPainter {
     final sortedMonthKeys = monthlyGroups.keys.toList()
       ..sort((a, b) => a.compareTo(b));
 
+    // PERFORMANCE OPTIMIZATION: Build path lookup table ONCE instead of searching 100 times per cluster
+    final metrics = path.computeMetrics().first;
+    final totalLen = metrics.length;
+    final List<({double x, Offset point})> pathLookup = [];
+
+    for (double t = 0.0; t <= 1.0; t += 0.01) {
+      final tangent = metrics.getTangentForOffset(t * totalLen);
+      if (tangent != null) {
+        pathLookup.add((x: tangent.position.dx, point: tangent.position));
+      }
+    }
+    // Sort by X coordinate for binary search
+    pathLookup.sort((a, b) => a.x.compareTo(b.x));
+
     // Calculate cluster positions using REAL positions from placementResults
     final List<({String key, Offset pos, List<Memory> memories})> clusterPositions = [];
 
@@ -948,29 +962,35 @@ class LifelinePainter extends CustomPainter {
       // This ensures monthly cluster stays ON the lifeline even when path curves
       final avgDx = positions.map((p) => p.dx).reduce((a, b) => a + b) / positions.length;
 
-      // Find the closest point on the path with this X coordinate
-      final metrics = path.computeMetrics().first;
-      final totalLen = metrics.length;
+      // Find the closest point on the path with this X coordinate using binary search
+      Offset closestPoint = positions.first;
+      if (pathLookup.isNotEmpty) {
+        int left = 0;
+        int right = pathLookup.length - 1;
+        int closest = 0;
+        double minDistance = double.infinity;
 
-      // Search for the point on path closest to avgDx
-      Offset? closestPoint;
-      double minDistance = double.infinity;
+        // Binary search for closest X
+        while (left <= right) {
+          final mid = (left + right) ~/ 2;
+          final distance = (pathLookup[mid].x - avgDx).abs();
 
-      for (double t = 0.0; t <= 1.0; t += 0.01) {
-        final tangent = metrics.getTangentForOffset(t * totalLen);
-        if (tangent != null) {
-          final point = tangent.position;
-          final distance = (point.dx - avgDx).abs();
           if (distance < minDistance) {
             minDistance = distance;
-            closestPoint = point;
+            closest = mid;
+          }
+
+          if (pathLookup[mid].x < avgDx) {
+            left = mid + 1;
+          } else {
+            right = mid - 1;
           }
         }
+
+        closestPoint = pathLookup[closest].point;
       }
 
-      final avgPos = closestPoint ?? Offset(avgDx, positions.first.dy);
-
-      clusterPositions.add((key: monthKey, pos: avgPos, memories: monthMemories));
+      clusterPositions.add((key: monthKey, pos: closestPoint, memories: monthMemories));
     }
 
     // Group nearby monthly clusters (if they're too close, combine them)
@@ -1000,26 +1020,32 @@ class LifelinePainter extends CustomPainter {
           // FIXED: Use average X, but Y locked to the path (same as initial positioning)
           final avgX = (lastGroup.pos.dx + current.pos.dx) / 2;
 
-          // Find closest point on path for merged cluster
-          final metrics = path.computeMetrics().first;
-          final totalLen = metrics.length;
+          // PERFORMANCE: Reuse pathLookup table with binary search instead of 100 iterations
+          Offset avgPos = Offset(avgX, lastGroup.pos.dy);
+          if (pathLookup.isNotEmpty) {
+            int left = 0;
+            int right = pathLookup.length - 1;
+            int closest = 0;
+            double minDist = double.infinity;
 
-          Offset? closestPoint;
-          double minDist = double.infinity;
+            while (left <= right) {
+              final mid = (left + right) ~/ 2;
+              final dist = (pathLookup[mid].x - avgX).abs();
 
-          for (double t = 0.0; t <= 1.0; t += 0.01) {
-            final tangent = metrics.getTangentForOffset(t * totalLen);
-            if (tangent != null) {
-              final point = tangent.position;
-              final dist = (point.dx - avgX).abs();
               if (dist < minDist) {
                 minDist = dist;
-                closestPoint = point;
+                closest = mid;
+              }
+
+              if (pathLookup[mid].x < avgX) {
+                left = mid + 1;
+              } else {
+                right = mid - 1;
               }
             }
-          }
 
-          final avgPos = closestPoint ?? Offset(avgX, lastGroup.pos.dy);
+            avgPos = pathLookup[closest].point;
+          }
 
           groupedClusters[groupedClusters.length - 1] = (
             monthKeys: [...lastGroup.monthKeys, current.key],
@@ -1161,6 +1187,88 @@ class LifelinePainter extends CustomPainter {
       final monthDate = DateTime(year, month);
 
       onMonthlyClusterPosition?.call(cluster.monthKeys, cluster.pos, cluster.memories, monthDate);
+    }
+
+    // PASS 3: Draw month labels with connector lines (stems)
+    const verticalOffset = 40.0;
+    bool wasLastAbove = false;
+
+    for (int i = 0; i < groupedClusters.length; i++) {
+      final cluster = groupedClusters[i];
+
+      // Generate label text based on number of months in cluster
+      final String monthName;
+      final DateTime monthDate;
+      if (cluster.monthKeys.length == 1) {
+        final parts = cluster.monthKeys.first.split('-');
+        final year = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        monthDate = DateTime(year, month);
+        monthName = DateFormat.yMMM().format(monthDate); // "Jan 2025"
+      } else {
+        // Multiple months - show range
+        final firstParts = cluster.monthKeys.first.split('-');
+        final lastParts = cluster.monthKeys.last.split('-');
+        final firstYear = int.parse(firstParts[0]);
+        final firstMonth = int.parse(firstParts[1]);
+        final lastYear = int.parse(lastParts[0]);
+        final lastMonth = int.parse(lastParts[1]);
+
+        final firstDate = DateTime(firstYear, firstMonth);
+        final lastDate = DateTime(lastYear, lastMonth);
+        monthDate = firstDate;
+
+        if (firstYear == lastYear) {
+          // Same year: "Jan-Mar 2025"
+          monthName = '${DateFormat.MMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+        } else {
+          // Different years: "Dec 2024-Feb 2025"
+          monthName = '${DateFormat.yMMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+        }
+      }
+
+      final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
+
+      // Create label paragraph
+      final labelStyle = TextStyle(
+        color: Colors.white.withOpacity(finalOpacity),
+        fontSize: 14.0,
+        fontWeight: FontWeight.bold,
+        shadows: const [
+          ui.Shadow(color: Colors.black, blurRadius: 12.0),
+          ui.Shadow(color: Colors.black, blurRadius: 8.0),
+          ui.Shadow(color: Colors.black, blurRadius: 4.0),
+        ],
+      );
+      final labelSpan = TextSpan(text: monthName, style: labelStyle);
+      final labelPainter = TextPainter(
+        text: labelSpan,
+        textAlign: TextAlign.center,
+        textDirection: ui.TextDirection.ltr,
+      );
+      labelPainter.layout();
+
+      // Alternate label position (above/below) like memory labels
+      final placeAbove = !wasLastAbove;
+      wasLastAbove = placeAbove;
+
+      final labelX = adjustedPos.dx - labelPainter.width / 2;
+      final labelY = placeAbove
+          ? adjustedPos.dy - verticalOffset - labelPainter.height
+          : adjustedPos.dy + verticalOffset;
+
+      final textRect = Rect.fromLTWH(labelX, labelY, labelPainter.width, labelPainter.height);
+
+      // Draw connector line (stem)
+      _drawConnectorLine(canvas, cluster.pos, textRect, placeAbove, finalOpacity);
+
+      // Draw label with full opacity (like daily clusters)
+      canvas.saveLayer(
+        textRect.inflate(2),
+        Paint()..color = Colors.white.withAlpha((255 * finalOpacity).round())
+      );
+      labelPainter.paint(canvas, Offset(labelX, labelY));
+      canvas.restore();
     }
   }
 

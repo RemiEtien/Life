@@ -1579,17 +1579,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             : null,
           secondary: const Icon(Icons.photo_filter_outlined),
         ),
-        const Divider(),
-        SwitchListTile(
-          title: const Text('Высокое качество эффектов'),
-          subtitle: const Text('Может снизить производительность'),
-          value: profile.enableHighQualityEffects,
-          onChanged: (value) {
-            final updatedProfile = profile.copyWith(enableHighQualityEffects: value);
-            ref.read(userServiceProvider).updateUserProfile(updatedProfile);
-          },
-          secondary: const Icon(Icons.high_quality_outlined),
-        ),
       ],
     );
   }
