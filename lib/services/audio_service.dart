@@ -61,6 +61,11 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
 
   @override
   AudioPlayerState build() {
+    // CRITICAL: Register dispose callback to prevent memory leaks
+    ref.onDispose(() {
+      _player.dispose();
+    });
+
     _player.onPlayerComplete.listen((event) {
       if (state.isGlobalPlayerActive && state.isPlaying) {
         playNext();

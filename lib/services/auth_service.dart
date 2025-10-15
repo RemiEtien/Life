@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -28,6 +31,20 @@ class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   UserService get _userService => _ref.read(userServiceProvider);
+
+  /// Generates a cryptographically secure random nonce for Apple Sign-In
+  String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  /// Returns the SHA256 hash of the given input string
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
@@ -261,16 +278,21 @@ class AuthService {
     }
 
     try {
+      // Generate cryptographically secure nonce for replay attack prevention
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName
         ],
+        nonce: nonce,
       );
 
       final oAuthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
+        rawNonce: rawNonce,
       );
 
       final userCredential =
@@ -419,15 +441,20 @@ class AuthService {
     final user = _firebaseAuth.currentUser;
     if (user == null) throw Exception('No user to reauthenticate.');
 
+    // Generate cryptographically secure nonce for replay attack prevention
+    final rawNonce = _generateNonce();
+    final nonce = _sha256ofString(rawNonce);
+
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
         AppleIDAuthorizationScopes.email,
         AppleIDAuthorizationScopes.fullName
       ],
+      nonce: nonce,
     );
     final credential = OAuthProvider('apple.com').credential(
       idToken: appleCredential.identityToken,
-      accessToken: appleCredential.authorizationCode,
+      rawNonce: rawNonce,
     );
     await user.reauthenticateWithCredential(credential);
   }

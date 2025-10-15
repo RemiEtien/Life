@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +21,10 @@ void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
       debugPrint('[BackgroundWorker] Task started: $task');
+
+      // CRITICAL: Initialize Flutter bindings in background isolate
+      // Without this, plugins will throw MissingPluginException
+      WidgetsFlutterBinding.ensureInitialized();
 
       // Initialize Firebase (required for background tasks)
       await Firebase.initializeApp();
