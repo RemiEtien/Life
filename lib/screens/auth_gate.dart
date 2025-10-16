@@ -19,7 +19,7 @@ import '../services/notification_service.dart';
 import '../widgets/lifeline_widget.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 
 class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
@@ -612,11 +612,17 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             if (profile.uid == user.uid &&
                 profile.isEncryptionEnabled &&
                 encryptionState == EncryptionState.locked) {
+              if (kDebugMode) {
+                debugPrint('[AuthGate] Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}, profile.isEncryptionEnabled: true, encryptionState: locked');
+              }
               unawaited(FirebaseCrashlytics.instance.log(
                 'AuthGate: Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}, profile.isEncryptionEnabled: true, encryptionState: locked'));
               return const UnlockScreen();
             } else if (profile.isEncryptionEnabled && encryptionState == EncryptionState.locked) {
               // Profile doesn't match current user - log and don't show UnlockScreen
+              if (kDebugMode) {
+                debugPrint('[AuthGate] Skipping UnlockScreen - profile mismatch (profile.uid: ${profile.uid}, user.uid: ${user.uid})');
+              }
               unawaited(FirebaseCrashlytics.instance.log(
                 'AuthGate: Skipping UnlockScreen - profile mismatch (profile.uid: ${profile.uid}, user.uid: ${user.uid})'));
             }
