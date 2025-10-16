@@ -505,6 +505,11 @@ class LifelinePainter extends CustomPainter {
   static const double kVisibilityBuffer = 100.0;
   static const double kNodeVerticalOffset = 0.0;
 
+  // PERFORMANCE OPTIMIZATION: Cache pathLookup table for monthly clusters
+  // Keyed by path hashCode to detect when path changes
+  static int? _cachedPathHash;
+  static List<({double x, Offset point})>? _cachedPathLookup;
+
   LifelinePainter({
     required this.progress,
     required this.renderData,
@@ -626,12 +631,14 @@ class LifelinePainter extends CustomPainter {
 
       final branchLayerCount = DevicePerformanceDetector.getSmartLayerCount(7, zoomLevel, 'branches');
 
-      // Determine branch drawing step based on zoom level
+      // OPTIMIZATION: More aggressive branch culling based on zoom level
       int branchStep;
       if (zoomLevel == 1) {
-        branchStep = 3; // Draw every 3rd branch at yearly zoom
+        branchStep = 5; // Draw every 5th branch at yearly zoom (was 3)
+      } else if (zoomLevel == 2) {
+        branchStep = 2; // Draw every 2nd branch at monthly zoom (NEW!)
       } else {
-        branchStep = 1; // Draw all branches at monthly/individual zoom
+        branchStep = 1; // Draw all branches only at individual zoom
       }
 
       final pulse = sin(pulseValue * pi * 2) * 0.1 + 0.95;
@@ -933,19 +940,32 @@ class LifelinePainter extends CustomPainter {
     final sortedMonthKeys = monthlyGroups.keys.toList()
       ..sort((a, b) => a.compareTo(b));
 
-    // PERFORMANCE OPTIMIZATION: Build path lookup table ONCE instead of searching 100 times per cluster
+    // PERFORMANCE OPTIMIZATION: Build path lookup table ONCE and cache it
+    // Only rebuild if path changes (detected via hashCode)
     final metrics = path.computeMetrics().first;
     final totalLen = metrics.length;
-    final List<({double x, Offset point})> pathLookup = [];
+    final pathHash = path.hashCode;
 
-    for (double t = 0.0; t <= 1.0; t += 0.01) {
-      final tangent = metrics.getTangentForOffset(t * totalLen);
-      if (tangent != null) {
-        pathLookup.add((x: tangent.position.dx, point: tangent.position));
+    List<({double x, Offset point})> pathLookup;
+    if (_cachedPathHash == pathHash && _cachedPathLookup != null) {
+      // Reuse cached lookup table
+      pathLookup = _cachedPathLookup!;
+    } else {
+      // Build new lookup table and cache it
+      pathLookup = [];
+      for (double t = 0.0; t <= 1.0; t += 0.01) {
+        final tangent = metrics.getTangentForOffset(t * totalLen);
+        if (tangent != null) {
+          pathLookup.add((x: tangent.position.dx, point: tangent.position));
+        }
       }
+      // Sort by X coordinate for binary search
+      pathLookup.sort((a, b) => a.x.compareTo(b.x));
+
+      // Cache for next frame
+      _cachedPathHash = pathHash;
+      _cachedPathLookup = pathLookup;
     }
-    // Sort by X coordinate for binary search
-    pathLookup.sort((a, b) => a.x.compareTo(b.x));
 
     // Calculate cluster positions using REAL positions from placementResults
     final List<({String key, Offset pos, List<Memory> memories})> clusterPositions = [];
@@ -1068,8 +1088,14 @@ class LifelinePainter extends CustomPainter {
     // NO auras, NO complex labels - just cached photos + simple ring + count text
     const nodeRadius = 20.0;  // Slightly larger than daily clusters
 
+    // PERFORMANCE: Get visible rect for culling off-screen clusters
+    final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
+
     for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
       final cluster = groupedClusters[clusterIndex];
+
+      // PERFORMANCE: Skip clusters outside visible area
+      if (!visibleRect.contains(cluster.pos)) continue;
 
       // Calculate breathing animation (same as daily clusters)
       final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
@@ -1159,25 +1185,28 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringGlow);
       }
 
-      // Show count text (always visible)
-      final textStyle = GoogleFonts.orbitron(
-        color: Colors.white.withOpacity(finalOpacity),
+      // PERFORMANCE: Show count text with simplified rendering
+      // Use ParagraphBuilder for better performance than TextPainter
+      final countText = cluster.memories.length.toString();
+      final paragraphStyle = ui.ParagraphStyle(
+        textAlign: TextAlign.center,
         fontSize: 12.0,
         fontWeight: FontWeight.bold,
-        shadows: const [ui.Shadow(color: Colors.black, blurRadius: 4.0)],
       );
-      final textSpan = TextSpan(text: cluster.memories.length.toString(), style: textStyle);
-      final textPainter = TextPainter(
-        text: textSpan,
-        textAlign: TextAlign.center,
-        textDirection: ui.TextDirection.ltr,
-      );
-      textPainter.layout();
+      final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+        ..pushStyle(ui.TextStyle(
+          color: Colors.white.withOpacity(finalOpacity),
+          shadows: [const ui.Shadow(color: Colors.black, blurRadius: 4.0)],
+        ))
+        ..addText(countText);
+      final paragraph = paragraphBuilder.build()
+        ..layout(const ui.ParagraphConstraints(width: 50));
+
       final textPos = Offset(
-        adjustedPos.dx - textPainter.width / 2,
-        adjustedPos.dy - textPainter.height / 2,
+        adjustedPos.dx - paragraph.width / 2,
+        adjustedPos.dy - paragraph.height / 2,
       );
-      textPainter.paint(canvas, textPos);
+      canvas.drawParagraph(paragraph, textPos);
 
       // Report position for tap detection (simplified - use first month date)
       final firstMonthKey = cluster.monthKeys.first;
@@ -1190,11 +1219,15 @@ class LifelinePainter extends CustomPainter {
     }
 
     // PASS 3: Draw month labels with connector lines (stems)
+    // PERFORMANCE: Only draw labels for visible clusters
     const verticalOffset = 40.0;
     bool wasLastAbove = false;
 
     for (int i = 0; i < groupedClusters.length; i++) {
       final cluster = groupedClusters[i];
+
+      // PERFORMANCE: Skip labels for off-screen clusters
+      if (!visibleRect.inflate(100).contains(cluster.pos)) continue;
 
       // Generate label text based on number of months in cluster
       final String monthName;
@@ -1229,35 +1262,35 @@ class LifelinePainter extends CustomPainter {
 
       final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
 
-      // Create label paragraph
-      final labelStyle = TextStyle(
-        color: Colors.white.withOpacity(finalOpacity),
+      // PERFORMANCE: Create label paragraph with ParagraphBuilder (faster than TextPainter)
+      final labelParagraphStyle = ui.ParagraphStyle(
+        textAlign: TextAlign.center,
         fontSize: 14.0,
         fontWeight: FontWeight.bold,
-        shadows: const [
-          ui.Shadow(color: Colors.black, blurRadius: 12.0),
-          ui.Shadow(color: Colors.black, blurRadius: 8.0),
-          ui.Shadow(color: Colors.black, blurRadius: 4.0),
-        ],
       );
-      final labelSpan = TextSpan(text: monthName, style: labelStyle);
-      final labelPainter = TextPainter(
-        text: labelSpan,
-        textAlign: TextAlign.center,
-        textDirection: ui.TextDirection.ltr,
-      );
-      labelPainter.layout();
+      final labelBuilder = ui.ParagraphBuilder(labelParagraphStyle)
+        ..pushStyle(ui.TextStyle(
+          color: Colors.white.withOpacity(finalOpacity),
+          shadows: const [
+            ui.Shadow(color: Colors.black, blurRadius: 12.0),
+            ui.Shadow(color: Colors.black, blurRadius: 8.0),
+            ui.Shadow(color: Colors.black, blurRadius: 4.0),
+          ],
+        ))
+        ..addText(monthName);
+      final labelParagraph = labelBuilder.build()
+        ..layout(const ui.ParagraphConstraints(width: 200));
 
       // Alternate label position (above/below) like memory labels
       final placeAbove = !wasLastAbove;
       wasLastAbove = placeAbove;
 
-      final labelX = adjustedPos.dx - labelPainter.width / 2;
+      final labelX = adjustedPos.dx - labelParagraph.width / 2;
       final labelY = placeAbove
-          ? adjustedPos.dy - verticalOffset - labelPainter.height
+          ? adjustedPos.dy - verticalOffset - labelParagraph.height
           : adjustedPos.dy + verticalOffset;
 
-      final textRect = Rect.fromLTWH(labelX, labelY, labelPainter.width, labelPainter.height);
+      final textRect = Rect.fromLTWH(labelX, labelY, labelParagraph.width, labelParagraph.height);
 
       // Draw connector line (stem)
       _drawConnectorLine(canvas, cluster.pos, textRect, placeAbove, finalOpacity);
@@ -1267,7 +1300,7 @@ class LifelinePainter extends CustomPainter {
         textRect.inflate(2),
         Paint()..color = Colors.white.withAlpha((255 * finalOpacity).round())
       );
-      labelPainter.paint(canvas, Offset(labelX, labelY));
+      canvas.drawParagraph(labelParagraph, Offset(labelX, labelY));
       canvas.restore();
     }
   }
