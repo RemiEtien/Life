@@ -6,6 +6,7 @@ import 'engagement_notification_service.dart';
 import 'insight_notification_service.dart';
 import '../models/user_profile.dart';
 import 'notification_service.dart';
+import '../utils/safe_logger.dart';
 
 /// Central scheduler for managing all notification types
 /// Enforces global rules: max 1 notification per week, respects user preferences
@@ -54,17 +55,17 @@ class NotificationScheduler {
   /// Called daily by WorkManager at 20:00 local time
   Future<void> checkAndScheduleNotifications(UserProfile profile) async {
     try {
-      debugPrint('[NotificationScheduler] Checking notifications for user ${profile.uid}');
+      SafeLogger.debug('Checking notifications for user ${profile.uid}', tag: 'NotificationScheduler');
 
       // Master switch off? Exit early
       if (!profile.notificationsEnabled) {
-        debugPrint('[NotificationScheduler] Notifications disabled globally');
+        SafeLogger.debug('Notifications disabled globally', tag: 'NotificationScheduler');
         return;
       }
 
       // Can we send any notification? (respects 1 per week limit)
       if (!await _canSendNotification()) {
-        debugPrint('[NotificationScheduler] Too soon since last notification');
+        SafeLogger.debug('Too soon since last notification', tag: 'NotificationScheduler');
         return;
       }
 
@@ -75,7 +76,7 @@ class NotificationScheduler {
       if (profile.anniversaryNotifications) {
         final anniversaryNotification = await _anniversaryService.checkForAnniversaries(profile.uid);
         if (anniversaryNotification != null) {
-          debugPrint('[NotificationScheduler] Sending anniversary notification');
+          SafeLogger.debug('Sending anniversary notification', tag: 'NotificationScheduler');
           await _notificationService.showLocalNotification(
             title: anniversaryNotification.title,
             body: anniversaryNotification.body,
@@ -90,7 +91,7 @@ class NotificationScheduler {
       if (profile.motivationalNotifications) {
         final engagementNotification = await _engagementService.checkForEngagement(profile.uid);
         if (engagementNotification != null) {
-          debugPrint('[NotificationScheduler] Sending engagement notification');
+          SafeLogger.debug('Sending engagement notification', tag: 'NotificationScheduler');
           await _notificationService.showLocalNotification(
             title: engagementNotification.title,
             body: engagementNotification.body,
@@ -105,7 +106,7 @@ class NotificationScheduler {
       if (profile.insightNotifications) {
         final insightNotification = await _insightService.checkForInsight(profile.uid);
         if (insightNotification != null) {
-          debugPrint('[NotificationScheduler] Sending insight notification');
+          SafeLogger.debug('Sending insight notification', tag: 'NotificationScheduler');
           await _notificationService.showLocalNotification(
             title: insightNotification.title,
             body: insightNotification.body,
@@ -116,17 +117,16 @@ class NotificationScheduler {
         }
       }
 
-      debugPrint('[NotificationScheduler] No notifications to send today');
+      SafeLogger.debug('No notifications to send today', tag: 'NotificationScheduler');
     } catch (e, stack) {
-      debugPrint('[NotificationScheduler] Error: $e');
-      debugPrint('[NotificationScheduler] Stack: $stack');
+      SafeLogger.error('Error checking notifications', error: e, stackTrace: stack, tag: 'NotificationScheduler');
     }
   }
 
   /// Schedule daily check at 20:00 local time
   /// This will be called by WorkManager (implemented next)
   static Future<void> scheduleDailyCheck() async {
-    debugPrint('[NotificationScheduler] Scheduling daily check at 20:00');
+    SafeLogger.debug('Scheduling daily check at 20:00', tag: 'NotificationScheduler');
     // Implementation will use WorkManager/AlarmManager
     // to trigger checkAndScheduleNotifications() daily at 20:00
   }
