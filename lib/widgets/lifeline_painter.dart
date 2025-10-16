@@ -1071,9 +1071,13 @@ class LifelinePainter extends CustomPainter {
       ));
     }
 
-    // OPTIMIZED MONTHLY CLUSTERS with CACHED PHOTOS
-    // NO auras, NO complex labels - just cached photos + simple ring + count text
-    const nodeRadius = 20.0;  // Slightly larger than daily clusters
+    // ADAPTIVE MONTHLY CLUSTERS - High quality with animations or optimized for performance
+    // HIGH: Breathing animation + ring glow + shadows
+    // MEDIUM/LOW: Static radius + simple rendering
+    final capabilities = DevicePerformanceDetector.capabilities;
+    final isHighPerformance = capabilities.performance == DevicePerformance.high;
+
+    const nodeRadius = 18.0;  // Base radius
 
     // PERFORMANCE: Get visible rect for culling off-screen clusters
     final visibleRect = canvas.getDestinationClipBounds().inflate(kVisibilityBuffer);
@@ -1084,13 +1088,17 @@ class LifelinePainter extends CustomPainter {
       // PERFORMANCE: Skip clusters outside visible area
       if (!visibleRect.contains(cluster.pos)) continue;
 
-      // Calculate breathing animation (same as daily clusters)
-      final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
-      final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
-      final combinedPulse = individualPulse * breathPulse;
-      final animatedRadius = nodeRadius * combinedPulse;
-
       final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
+
+      // HIGH PERFORMANCE: Breathing animation
+      // MEDIUM/LOW: Static radius
+      double animatedRadius = nodeRadius;
+      if (isHighPerformance) {
+        final individualPulse = sin(pulseValue * pi * 2 + clusterIndex * 0.8) * 0.3 + 0.7;
+        final breathPulse = sin(progress * pi * 0.5 + clusterIndex * 0.5) * 0.2 + 0.8;
+        final combinedPulse = individualPulse * breathPulse;
+        animatedRadius = nodeRadius * combinedPulse;
+      }
 
       // Pick first memory with a photo, or first memory if none have photos
       Memory? selectedMemory;
@@ -1105,7 +1113,7 @@ class LifelinePainter extends CustomPainter {
 
       // Draw photo or default colored node
       if (image != null) {
-        // OPTIMIZATION: Use cached circular cover instead of drawImageRect + clip every frame
+        // Use cached circular cover (HIGH: animated radius, MEDIUM/LOW: static)
         final cachedCover = _getCachedCircularCover(
           selectedMemory.coverPath!,
           image,
@@ -1152,49 +1160,51 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius, borderPaint);
       }
 
-      // Draw outer ring (visual distinction from daily clusters - green tint)
+      // Draw outer ring for visual distinction
       final ringColor = Color.lerp(const Color(0xFF6BFF6B), Colors.white, 0.7)!;
-
       final ringPaint = Paint()
-        ..color = ringColor.withOpacity(finalOpacity * 0.7 * combinedPulse)
+        ..color = ringColor.withOpacity(finalOpacity * (isHighPerformance ? 0.7 : 0.6))
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5 * combinedPulse;
+        ..strokeWidth = isHighPerformance ? 2.5 : 2.0;
       canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringPaint);
 
-      // Optional ring glow (adaptive - skipped on low-end devices)
-      final ringBlur = DevicePerformanceDetector.getAdaptiveBlurRadius(12 * combinedPulse);
-      if (ringBlur > 0) {
-        final ringGlow = Paint()
-          ..color = ringColor.withOpacity(finalOpacity * 0.3 * combinedPulse)
-          ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, ringBlur)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 4.0;
-        canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringGlow);
+      // HIGH PERFORMANCE: Ring glow with blur
+      if (isHighPerformance) {
+        final ringBlur = DevicePerformanceDetector.getAdaptiveBlurRadius(12);
+        if (ringBlur > 0) {
+          final ringGlow = Paint()
+            ..color = ringColor.withOpacity(finalOpacity * 0.3)
+            ..maskFilter = ui.MaskFilter.blur(ui.BlurStyle.normal, ringBlur)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 4.0;
+          canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringGlow);
+        }
       }
 
-      // PERFORMANCE OPTIMIZATION #2: Cache count text paragraphs
-      // Reuse paragraphs for the same count number
+      // Draw count - HIGH: with shadows, MEDIUM/LOW: no shadows
       final count = cluster.memories.length;
 
-      if (!_cachedCountParagraphs.containsKey(count)) {
+      // Create cache key based on performance mode
+      final cacheKey = isHighPerformance ? count : -count;
+
+      if (!_cachedCountParagraphs.containsKey(cacheKey)) {
         final paragraphStyle = ui.ParagraphStyle(
           textAlign: TextAlign.center,
-          fontSize: 12.0,
+          fontSize: 11.0,
           fontWeight: FontWeight.bold,
         );
         final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
           ..pushStyle(ui.TextStyle(
             color: Colors.white,
-            shadows: [const ui.Shadow(color: Colors.black, blurRadius: 4.0)],
+            shadows: isHighPerformance ? [const ui.Shadow(color: Colors.black, blurRadius: 3.0)] : null,
           ))
           ..addText(count.toString());
-        _cachedCountParagraphs[count] = paragraphBuilder.build()
+        _cachedCountParagraphs[cacheKey] = paragraphBuilder.build()
           ..layout(const ui.ParagraphConstraints(width: 50));
       }
 
-      final paragraph = _cachedCountParagraphs[count]!;
+      final paragraph = _cachedCountParagraphs[cacheKey]!;
 
-      // Apply opacity through canvas layer instead of text color
       canvas.saveLayer(
         Rect.fromCenter(
           center: adjustedPos,
@@ -1221,105 +1231,79 @@ class LifelinePainter extends CustomPainter {
       onMonthlyClusterPosition?.call(cluster.monthKeys, cluster.pos, cluster.memories, monthDate);
     }
 
-    // PASS 3: Draw month labels with connector lines (stems)
-    // PERFORMANCE: Only draw labels for visible clusters
-    const verticalOffset = 40.0;
+    // PASS 3: Draw month labels with OPTIMIZED caching
+    // Cache formatted labels to avoid DateFormat overhead
     bool wasLastAbove = false;
+    const verticalOffset = 35.0;
 
-    for (int i = 0; i < groupedClusters.length; i++) {
-      final cluster = groupedClusters[i];
+    for (var clusterIndex = 0; clusterIndex < groupedClusters.length; clusterIndex++) {
+      final cluster = groupedClusters[clusterIndex];
 
-      // PERFORMANCE: Skip labels for off-screen clusters
-      if (!visibleRect.inflate(100).contains(cluster.pos)) continue;
-
-      // PERFORMANCE OPTIMIZATION #3: Cache formatted month labels
-      // Generate label text based on number of months in cluster
-      final String monthName;
-      final DateTime monthDate;
-
-      // Create cache key from month keys
-      final cacheKey = cluster.monthKeys.join(',');
-
-      if (_cachedMonthLabels.containsKey(cacheKey)) {
-        monthName = _cachedMonthLabels[cacheKey]!;
-        // Still need to parse monthDate for tap detection
-        final parts = cluster.monthKeys.first.split('-');
-        monthDate = DateTime(int.parse(parts[0]), int.parse(parts[1]));
-      } else {
-        if (cluster.monthKeys.length == 1) {
-          final parts = cluster.monthKeys.first.split('-');
-          final year = int.parse(parts[0]);
-          final month = int.parse(parts[1]);
-          monthDate = DateTime(year, month);
-          monthName = DateFormat.yMMM().format(monthDate); // "Jan 2025"
-        } else {
-          // Multiple months - show range
-          final firstParts = cluster.monthKeys.first.split('-');
-          final lastParts = cluster.monthKeys.last.split('-');
-          final firstYear = int.parse(firstParts[0]);
-          final firstMonth = int.parse(firstParts[1]);
-          final lastYear = int.parse(lastParts[0]);
-          final lastMonth = int.parse(lastParts[1]);
-
-          final firstDate = DateTime(firstYear, firstMonth);
-          final lastDate = DateTime(lastYear, lastMonth);
-          monthDate = firstDate;
-
-          if (firstYear == lastYear) {
-            // Same year: "Jan-Mar 2025"
-            monthName = '${DateFormat.MMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
-          } else {
-            // Different years: "Dec 2024-Feb 2025"
-            monthName = '${DateFormat.yMMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
-          }
-        }
-
-        // Cache the formatted label
-        _cachedMonthLabels[cacheKey] = monthName;
-      }
+      // PERFORMANCE: Skip labels outside visible area
+      if (!visibleRect.contains(cluster.pos)) continue;
 
       final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
 
-      // PERFORMANCE: Create label paragraph with ParagraphBuilder (faster than TextPainter)
-      final labelParagraphStyle = ui.ParagraphStyle(
-        textAlign: TextAlign.center,
-        fontSize: 14.0,
-        fontWeight: FontWeight.bold,
+      // Format month label (cache formatted strings)
+      final monthKey = cluster.monthKeys.first;
+      if (!_cachedMonthLabels.containsKey(monthKey)) {
+        final parts = monthKey.split('-');
+        final year = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final date = DateTime(year, month);
+        _cachedMonthLabels[monthKey] = DateFormat('MMM yyyy').format(date);
+      }
+      final labelText = _cachedMonthLabels[monthKey]!;
+
+      // ADAPTIVE: Use TextPainter (HIGH: with shadows, MEDIUM/LOW: no shadows)
+      final textStyle = GoogleFonts.orbitron(
+        color: Colors.white.withOpacity(finalOpacity * 0.8),
+        fontSize: 11.0,
+        fontWeight: FontWeight.w500,
+        shadows: isHighPerformance ? const [
+          Shadow(color: Colors.black, blurRadius: 3.0, offset: Offset(0, 1)),
+        ] : null,
       );
-      final labelBuilder = ui.ParagraphBuilder(labelParagraphStyle)
-        ..pushStyle(ui.TextStyle(
-          color: Colors.white.withOpacity(finalOpacity),
-          shadows: const [
-            ui.Shadow(color: Colors.black, blurRadius: 12.0),
-            ui.Shadow(color: Colors.black, blurRadius: 8.0),
-            ui.Shadow(color: Colors.black, blurRadius: 4.0),
-          ],
-        ))
-        ..addText(monthName);
-      final labelParagraph = labelBuilder.build()
-        ..layout(const ui.ParagraphConstraints(width: 200));
 
-      // Alternate label position (above/below) like memory labels
+      final textSpan = TextSpan(text: labelText, style: textStyle);
+      final textPainter = TextPainter(
+        text: textSpan,
+        textAlign: TextAlign.center,
+        textDirection: ui.TextDirection.ltr,
+      );
+      textPainter.layout();
+
+      // Alternate label position (above/below) for better readability
       final placeAbove = !wasLastAbove;
-      wasLastAbove = placeAbove;
-
-      final labelX = adjustedPos.dx - labelParagraph.width / 2;
       final labelY = placeAbove
-          ? adjustedPos.dy - verticalOffset - labelParagraph.height
+          ? adjustedPos.dy - verticalOffset - textPainter.height
           : adjustedPos.dy + verticalOffset;
 
-      final textRect = Rect.fromLTWH(labelX, labelY, labelParagraph.width, labelParagraph.height);
-
-      // Draw connector line (stem)
-      _drawConnectorLine(canvas, cluster.pos, textRect, placeAbove, finalOpacity);
-
-      // Draw label with full opacity (like daily clusters)
-      canvas.saveLayer(
-        textRect.inflate(2),
-        Paint()..color = Colors.white.withAlpha((255 * finalOpacity).round())
+      final labelPos = Offset(
+        adjustedPos.dx - textPainter.width / 2,
+        labelY,
       );
-      canvas.drawParagraph(labelParagraph, Offset(labelX, labelY));
-      canvas.restore();
+
+      // Draw simple connector line
+      final lineStart = Offset(
+        adjustedPos.dx,
+        adjustedPos.dy + (placeAbove ? -nodeRadius * 1.5 - 5 : nodeRadius * 1.5 + 5),
+      );
+      final lineEnd = Offset(
+        adjustedPos.dx,
+        placeAbove ? labelPos.dy + textPainter.height : labelPos.dy,
+      );
+
+      final linePaint = Paint()
+        ..color = Colors.white.withOpacity(finalOpacity * 0.3)
+        ..strokeWidth = 1.0
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(lineStart, lineEnd, linePaint);
+
+      // Draw label
+      textPainter.paint(canvas, labelPos);
+
+      wasLastAbove = placeAbove;
     }
   }
 
