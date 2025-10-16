@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import '../models/anchors/anchor_models.dart';
+import '../utils/safe_logger.dart';
 
 class SpotifyService {
   final FirebaseFunctions _functions;
@@ -36,9 +37,7 @@ class SpotifyService {
   Future<List<SpotifyTrackDetails>> searchTracks(String query) async {
     // Check authentication before calling Cloud Function
     if (_auth.currentUser == null) {
-      if (kDebugMode) {
-        debugPrint('SpotifyService: User not authenticated, cannot search tracks');
-      }
+      SafeLogger.warning('User not authenticated, cannot search tracks', tag: 'SpotifyService');
       return [];
     }
 
@@ -61,15 +60,11 @@ class SpotifyService {
 
       return tracks;
     } on FirebaseFunctionsException catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('FirebaseFunctionsException searching tracks: ${e.code} - ${e.message}');
-      }
+      SafeLogger.error('Cloud function error searching tracks: ${e.code} - ${e.message}', error: e, stackTrace: stackTrace, tag: 'SpotifyService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Cloud Function)'));
       return [];
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Unexpected error during track search: $e');
-      }
+      SafeLogger.error('Unexpected error during track search', error: e, stackTrace: stackTrace, tag: 'SpotifyService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify Search Failed (Client-side)'));
       return [];
     }
@@ -79,9 +74,7 @@ class SpotifyService {
   Future<SpotifyTrackDetails?> getTrackDetails(String trackId) async {
     // Check authentication before calling Cloud Function
     if (_auth.currentUser == null) {
-      if (kDebugMode) {
-        debugPrint('SpotifyService: User not authenticated, cannot get track details');
-      }
+      SafeLogger.warning('User not authenticated, cannot get track details', tag: 'SpotifyService');
       return null;
     }
 
@@ -99,15 +92,11 @@ class SpotifyService {
       return _mapToTrackDetails(detailsMap);
 
     } on FirebaseFunctionsException catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('FirebaseFunctionsException getting track details: ${e.code} - ${e.message}');
-      }
+      SafeLogger.error('Cloud function error getting track details: ${e.code} - ${e.message}', error: e, stackTrace: stackTrace, tag: 'SpotifyService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Cloud Function)'));
       return null;
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Unexpected error getting track details: $e');
-      }
+      SafeLogger.error('Unexpected error getting track details', error: e, stackTrace: stackTrace, tag: 'SpotifyService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Spotify GetDetails Failed (Client-side)'));
       return null;
     }
@@ -124,9 +113,7 @@ class SpotifyService {
       }
       return null;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error finding best match on Spotify: $e');
-      }
+      SafeLogger.error('Error finding best match on Spotify', error: e, tag: 'SpotifyService');
       return null;
     }
   }
