@@ -17,6 +17,7 @@ import 'providers/application_providers.dart';
 import 'screens/splash_screen.dart';
 import 'services/notification_service.dart';
 import 'services/analytics_service.dart';
+import 'utils/safe_logger.dart';
 import 'widgets/device_performance_detector.dart';
 import 'l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,9 +54,9 @@ void main() async {
     );
 
     if (kDebugMode) {
-      debugPrint('✅ App Check is using DEBUG provider');
+      SafeLogger.debug('App Check is using DEBUG provider', tag: 'AppInit');
     } else {
-      debugPrint('✅ App Check activated with Play Integrity / App Attest');
+      SafeLogger.debug('App Check activated with Play Integrity / App Attest', tag: 'AppInit');
     }
 
     // Initialize critical date formatting for default locale only
@@ -68,11 +69,10 @@ void main() async {
       };
     } else if (kDebugMode) {
       FlutterError.onError = (details) {
-        debugPrint('Flutter error: $details');
+        SafeLogger.error('Flutter error', error: details.exception, stackTrace: details.stack, tag: 'AppInit');
       };
       PlatformDispatcher.instance.onError = (error, stack) {
-        debugPrint('Platform error: $error');
-        debugPrint('Stack: $stack');
+        SafeLogger.error('Platform error', error: error, stackTrace: stack, tag: 'AppInit');
         return true;
       };
     } else {
@@ -90,7 +90,7 @@ void main() async {
             fatal: false,
             reason: 'Network error (non-fatal)',
           );
-          debugPrint('Network error (handled): ${details.exception}');
+          SafeLogger.warning('Network error (handled): ${details.exception}', tag: 'AppInit');
         } else {
           // All other errors are fatal
           FirebaseCrashlytics.instance.recordFlutterFatalError(details);
@@ -110,7 +110,7 @@ void main() async {
             fatal: false,
             reason: 'Network error (non-fatal)',
           );
-          debugPrint('Network error (handled): $error');
+          SafeLogger.warning('Network error (handled): $error', tag: 'AppInit');
         } else {
           // All other errors are fatal
           FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -132,8 +132,7 @@ void main() async {
     if (!kDebugMode) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     } else {
-      debugPrint('Caught async error in Zone: $error');
-      debugPrint('Stack: $stack');
+      SafeLogger.error('Caught async error in Zone', error: error, stackTrace: stack, tag: 'AppInit');
     }
   });
 }
@@ -170,14 +169,9 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
         _initializeAllLocaleDateFormats(),
       ]);
 
-      if (kDebugMode) {
-        debugPrint('✅ Heavy services initialized successfully');
-      }
+      SafeLogger.debug('Heavy services initialized successfully', tag: 'AppInit');
     } catch (e, stack) {
-      if (kDebugMode) {
-        debugPrint('❌ Error initializing heavy services: $e');
-        debugPrint('Stack: $stack');
-      }
+      SafeLogger.error('Error initializing heavy services', error: e, stackTrace: stack, tag: 'AppInit');
       // Log to Crashlytics in production
       if (!kDebugMode) {
         unawaited(FirebaseCrashlytics.instance.recordError(
@@ -227,19 +221,13 @@ class _LifelineAppState extends ConsumerState<LifelineApp>
       try {
         final audioNotifier = ref.read(audioPlayerProvider.notifier);
         audioNotifier.pauseAllAudio();
-        if (kDebugMode) {
-          debugPrint('[AppLifecycle] Audio paused - app in background');
-        }
+        SafeLogger.debug('Audio paused - app in background', tag: 'AppLifecycle');
       } catch (e) {
-        if (kDebugMode) {
-          debugPrint('[AppLifecycle] Error pausing audio: $e');
-        }
+        SafeLogger.warning('Error pausing audio: $e', tag: 'AppLifecycle');
       }
     }
 
-    if (kDebugMode) {
-      debugPrint('[AppLifecycle] State changed to: $state');
-    }
+    SafeLogger.debug('State changed to: $state', tag: 'AppLifecycle');
   }
 
   @override

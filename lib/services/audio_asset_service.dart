@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import '../utils/safe_logger.dart';
 import 'analytics_service.dart';
 
 /// Service for managing audio assets (music and sounds) with on-demand download.
@@ -52,23 +53,17 @@ class AudioAssetService {
         // FIX: Verify file is not empty/corrupted before using it
         final fileSize = await cachedFile.length();
         if (fileSize > 0) {
-          if (kDebugMode) {
-            debugPrint('[AudioAsset] Using cached: $fileName (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)');
-          }
+          SafeLogger.debug('Using cached: $fileName (${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)', tag: 'AudioAsset');
           return cachedFile;
         } else {
           // File exists but is empty - delete and re-download
-          if (kDebugMode) {
-            debugPrint('[AudioAsset] Cached file is empty, re-downloading: $fileName');
-          }
+          SafeLogger.warning('Cached file is empty, re-downloading: $fileName', tag: 'AudioAsset');
           await cachedFile.delete();
         }
       }
 
       // Download from Firebase Storage
-      if (kDebugMode) {
-        debugPrint('[AudioAsset] Downloading: $fileName');
-      }
+      SafeLogger.debug('Downloading: $fileName', tag: 'AudioAsset');
 
       await _downloadFile(fileName, cachedFile, category);
 
@@ -89,7 +84,7 @@ class AudioAssetService {
 
       return cachedFile;
     } catch (e) {
-      debugPrint('[AudioAsset] Error getting file $fileName: $e');
+      SafeLogger.error('Error getting file $fileName', error: e, tag: 'AudioAsset');
       rethrow;
     }
   }
@@ -99,9 +94,7 @@ class AudioAssetService {
   /// Downloads only small, frequently-used sounds
   /// Total: ~2 MB instead of 76 MB
   static Future<void> preloadEssentials() async {
-    if (kDebugMode) {
-      debugPrint('[AudioAsset] Preloading ${_essentialSounds.length} essential sounds...');
-    }
+    SafeLogger.debug('Preloading ${_essentialSounds.length} essential sounds', tag: 'AudioAsset');
 
     try {
       await Future.wait(
@@ -110,12 +103,10 @@ class AudioAssetService {
         ),
       );
 
-      if (kDebugMode) {
-        debugPrint('[AudioAsset] ✅ Essential sounds preloaded');
-      }
+      SafeLogger.debug('Essential sounds preloaded successfully', tag: 'AudioAsset');
     } catch (e) {
       // Don't fail app startup if preload fails
-      debugPrint('[AudioAsset] ⚠️ Preload failed (non-critical): $e');
+      SafeLogger.warning('Preload failed (non-critical): $e', tag: 'AudioAsset');
     }
   }
 
@@ -167,13 +158,11 @@ class AudioAssetService {
 
       final mbFreed = totalSize / (1024 * 1024);
 
-      if (kDebugMode) {
-        debugPrint('[AudioAsset] Cache cleared: ${mbFreed.toStringAsFixed(2)} MB freed');
-      }
+      SafeLogger.debug('Cache cleared: ${mbFreed.toStringAsFixed(2)} MB freed', tag: 'AudioAsset');
 
       return mbFreed;
     } catch (e) {
-      debugPrint('[AudioAsset] Error clearing cache: $e');
+      SafeLogger.error('Error clearing cache', error: e, tag: 'AudioAsset');
       return 0.0;
     }
   }
@@ -197,7 +186,7 @@ class AudioAssetService {
 
       return totalSize / (1024 * 1024);
     } catch (e) {
-      debugPrint('[AudioAsset] Error getting cache size: $e');
+      SafeLogger.error('Error getting cache size', error: e, tag: 'AudioAsset');
       return 0.0;
     }
   }
@@ -247,16 +236,14 @@ class AudioAssetService {
       // Download file
       await storageRef.writeToFile(destinationFile);
 
-      if (kDebugMode) {
-        final fileSize = await destinationFile.length();
-        final sizeMB = fileSize / (1024 * 1024);
-        debugPrint('[AudioAsset] Downloaded: $fileName (${sizeMB.toStringAsFixed(2)} MB)');
-      }
+      final fileSize = await destinationFile.length();
+      final sizeMB = fileSize / (1024 * 1024);
+      SafeLogger.debug('Downloaded: $fileName (${sizeMB.toStringAsFixed(2)} MB)', tag: 'AudioAsset');
     } on FirebaseException catch (e) {
-      debugPrint('[AudioAsset] Firebase error downloading $fileName: ${e.code} - ${e.message}');
+      SafeLogger.error('Firebase error downloading $fileName: ${e.code} - ${e.message}', error: e, tag: 'AudioAsset');
       throw Exception('Failed to download audio: ${e.message}');
     } catch (e) {
-      debugPrint('[AudioAsset] Error downloading $fileName: $e');
+      SafeLogger.error('Error downloading $fileName', error: e, tag: 'AudioAsset');
       throw Exception('Failed to download audio: $e');
     }
   }

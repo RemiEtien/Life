@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'safe_logger.dart';
 
 /// Secure error handling utility to prevent information disclosure
 class ErrorHandler {
@@ -10,32 +11,16 @@ class ErrorHandler {
     String? reason,
     Map<String, dynamic>? context,
   }) {
-    // Log to console only in debug mode
-    if (kDebugMode) {
-      debugPrint('Error: $error');
-      if (stackTrace != null) {
-        debugPrint('Stack trace: $stackTrace');
-      }
-      if (context != null) {
-        debugPrint('Context: $context');
-      }
-    }
+    // Use SafeLogger for consistent error logging
+    final message = reason ?? 'Error occurred';
+    final contextStr = context != null ? ' Context: $context' : '';
 
-    // Always report to Crashlytics in production for monitoring
-    try {
-      FirebaseCrashlytics.instance.recordError(
-        error,
-        stackTrace,
-        reason: reason,
-        information: context?.entries.map((e) => '${e.key}: ${e.value}').toList() ?? [],
-        fatal: false,
-      );
-    } catch (e) {
-      // Fail silently if crashlytics fails
-      if (kDebugMode) {
-        debugPrint('Failed to report to Crashlytics: $e');
-      }
-    }
+    SafeLogger.error(
+      '$message$contextStr',
+      error: error,
+      stackTrace: stackTrace,
+      tag: 'ErrorHandler',
+    );
   }
 
   /// Returns user-friendly error message without exposing internal details

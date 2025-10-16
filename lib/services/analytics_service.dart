@@ -28,9 +28,7 @@ class AnalyticsService {
   ///
   /// [method]: Authentication method (google, apple, email)
   static Future<void> logSignUp(String method) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Sign Up: method=$method');
-    }
+    SafeLogger.debug('Sign Up: method=$method', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'sign_up',
@@ -46,9 +44,7 @@ class AnalyticsService {
   /// [method]: Authentication method (google, apple, email)
   /// [biometricEnabled]: Whether biometric unlock is enabled
   static Future<void> logLogin(String method, {bool biometricEnabled = false}) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Login: method=$method, biometric=$biometricEnabled');
-    }
+    SafeLogger.debug('Login: method=$method, biometric=$biometricEnabled', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'login',
@@ -61,9 +57,7 @@ class AnalyticsService {
 
   /// Log user logout event
   static Future<void> logLogout() async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Logout');
-    }
+    SafeLogger.debug('Logout', tag: 'Analytics');
 
     await _analytics.logEvent(name: 'logout');
   }
@@ -89,9 +83,7 @@ class AnalyticsService {
     required int wordCount,
     bool isEncrypted = false,
   }) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Memory Created: media=$mediaCount, emotions=$hasEmotions, encrypted=$isEncrypted');
-    }
+    SafeLogger.debug('Memory Created: media=$mediaCount, emotions=$hasEmotions, encrypted=$isEncrypted', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'memory_created',
@@ -111,9 +103,7 @@ class AnalyticsService {
     required bool contentChanged,
     required bool mediaChanged,
   }) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Memory Edited: content=$contentChanged, media=$mediaChanged');
-    }
+    SafeLogger.debug('Memory Edited: content=$contentChanged, media=$mediaChanged', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'memory_edited',
@@ -126,9 +116,7 @@ class AnalyticsService {
 
   /// Log memory deletion event
   static Future<void> logMemoryDeleted({required bool wasEncrypted}) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Memory Deleted: encrypted=$wasEncrypted');
-    }
+    SafeLogger.debug('Memory Deleted: encrypted=$wasEncrypted', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'memory_deleted',
@@ -161,9 +149,7 @@ class AnalyticsService {
   /// [mediaType]: Type of media (photo, video, audio)
   /// [count]: Number of items added
   static Future<void> logMediaAdded(String mediaType, {int count = 1}) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Media Added: type=$mediaType, count=$count');
-    }
+    SafeLogger.debug('Media Added: type=$mediaType, count=$count', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'media_added',
@@ -202,9 +188,7 @@ class AnalyticsService {
     double? price,
     String currency = 'USD',
   }) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Purchase Initiated: $productId, $price $currency');
-    }
+    SafeLogger.debug('Purchase Initiated: $productId, $price $currency', tag: 'Analytics');
 
     final params = <String, Object>{
       'product_id': productId,
@@ -233,9 +217,7 @@ class AnalyticsService {
     double revenue, {
     String currency = 'USD',
   }) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Purchase Completed: $productId, $revenue $currency');
-    }
+    SafeLogger.debug('Purchase Completed: $productId, $revenue $currency', tag: 'Analytics');
 
     // Use Firebase's standard purchase event
     await _analytics.logPurchase(
@@ -250,9 +232,7 @@ class AnalyticsService {
 
   /// Log purchase cancellation or failure
   static Future<void> logPurchaseFailed(String productId, {String? reason}) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Purchase Failed: $productId, reason=$reason');
-    }
+    SafeLogger.debug('Purchase Failed: $productId, reason=$reason', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'purchase_failed',
@@ -308,18 +288,14 @@ class AnalyticsService {
 
   /// Log when encryption feature is used
   static Future<void> logEncryptionEnabled() async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Encryption Enabled');
-    }
+    SafeLogger.debug('Encryption Enabled', tag: 'Analytics');
 
     await _analytics.logEvent(name: 'encryption_enabled');
   }
 
   /// Log Spotify integration
   static Future<void> logSpotifyLinked() async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Spotify Linked');
-    }
+    SafeLogger.debug('Spotify Linked', tag: 'Analytics');
 
     await _analytics.logEvent(name: 'spotify_linked');
   }
@@ -328,9 +304,7 @@ class AnalyticsService {
   ///
   /// [featureName]: Name of discovered feature
   static Future<void> logFeatureDiscovered(String featureName) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Feature Discovered: $featureName');
-    }
+    SafeLogger.debug('Feature Discovered: $featureName', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'feature_discovered',
@@ -348,9 +322,7 @@ class AnalyticsService {
   ///
   /// [appVersion]: Current app version
   static Future<void> logSessionStart(String appVersion) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Session Start: v$appVersion');
-    }
+    SafeLogger.debug('Session Start: v$appVersion', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'session_start',
@@ -386,9 +358,7 @@ class AnalyticsService {
     required bool encryptionEnabled,
     String? platform,
   }) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Set User Properties: premium=$isPremium, lang=$language, encryption=$encryptionEnabled');
-    }
+    SafeLogger.debug('Set User Properties: premium=$isPremium, lang=$language, encryption=$encryptionEnabled', tag: 'Analytics');
 
     await _analytics.setUserProperty(
       name: 'premium_status',
@@ -415,9 +385,7 @@ class AnalyticsService {
 
   /// Update premium status (convenience method)
   static Future<void> setPremiumStatus(bool isPremium) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Premium Status: $isPremium');
-    }
+    SafeLogger.debug('Premium Status: $isPremium', tag: 'Analytics');
 
     await _analytics.setUserProperty(
       name: 'premium_status',
@@ -439,9 +407,7 @@ class AnalyticsService {
     required String category,
     required double sizeMB,
   }) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Audio Downloaded: $assetName ($sizeMB MB)');
-    }
+    SafeLogger.debug('Audio Downloaded: $assetName ($sizeMB MB)', tag: 'Analytics');
 
     await _analytics.logEvent(
       name: 'audio_asset_downloaded',
@@ -481,9 +447,7 @@ class AnalyticsService {
   ///
   /// Respects user privacy preferences
   static Future<void> setAnalyticsEnabled(bool enabled) async {
-    if (kDebugMode) {
-      debugPrint('[Analytics] Analytics ${enabled ? 'enabled' : 'disabled'}');
-    }
+    SafeLogger.debug('Analytics ${enabled ? 'enabled' : 'disabled'}', tag: 'Analytics');
 
     await _analytics.setAnalyticsCollectionEnabled(enabled);
   }

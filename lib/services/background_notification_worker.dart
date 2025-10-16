@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:isar_community/isar.dart';
 import '../memory.dart';
 import '../models/user_profile.dart';
+import '../utils/safe_logger.dart';
 import 'notification_scheduler.dart';
 import 'notification_service.dart';
 import 'anniversary_notification_service.dart';
@@ -20,7 +21,7 @@ import 'isar_service.dart';
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
-      debugPrint('[BackgroundWorker] Task started: $task');
+      SafeLogger.debug('Task started: $task', tag: 'BackgroundWorker');
 
       // CRITICAL: Initialize Flutter bindings in background isolate
       // Without this, plugins will throw MissingPluginException
@@ -32,7 +33,7 @@ void callbackDispatcher() {
       // Check if user is authenticated
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        debugPrint('[BackgroundWorker] No authenticated user, skipping');
+        SafeLogger.debug('No authenticated user, skipping', tag: 'BackgroundWorker');
         return Future.value(true);
       }
 
@@ -43,7 +44,7 @@ void callbackDispatcher() {
           .get();
 
       if (!profileDoc.exists) {
-        debugPrint('[BackgroundWorker] User profile not found');
+        SafeLogger.warning('User profile not found', tag: 'BackgroundWorker');
         return Future.value(true);
       }
 
@@ -70,11 +71,10 @@ void callbackDispatcher() {
       // Check and schedule notifications
       await scheduler.checkAndScheduleNotifications(profile);
 
-      debugPrint('[BackgroundWorker] Task completed successfully');
+      SafeLogger.debug('Task completed successfully', tag: 'BackgroundWorker');
       return Future.value(true);
     } catch (e, stack) {
-      debugPrint('[BackgroundWorker] Error: $e');
-      debugPrint('[BackgroundWorker] Stack: $stack');
+      SafeLogger.error('Task execution failed', error: e, stackTrace: stack, tag: 'BackgroundWorker');
       return Future.value(false);
     }
   });
@@ -105,10 +105,9 @@ class BackgroundNotificationWorker {
         existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
       );
 
-      debugPrint('[BackgroundWorker] Initialized successfully');
+      SafeLogger.debug('Initialized successfully', tag: 'BackgroundWorker');
     } catch (e, stack) {
-      debugPrint('[BackgroundWorker] Initialization error: $e');
-      debugPrint('[BackgroundWorker] Stack: $stack');
+      SafeLogger.error('Initialization failed', error: e, stackTrace: stack, tag: 'BackgroundWorker');
     }
   }
 
@@ -123,7 +122,7 @@ class BackgroundNotificationWorker {
     }
 
     final delay = targetTime.difference(now);
-    debugPrint('[BackgroundWorker] Initial delay: ${delay.inHours}h ${delay.inMinutes % 60}m');
+    SafeLogger.debug('Initial delay: ${delay.inHours}h ${delay.inMinutes % 60}m', tag: 'BackgroundWorker');
 
     return delay;
   }
@@ -132,9 +131,9 @@ class BackgroundNotificationWorker {
   static Future<void> cancel() async {
     try {
       await Workmanager().cancelByUniqueName(_taskName);
-      debugPrint('[BackgroundWorker] Cancelled successfully');
+      SafeLogger.debug('Cancelled successfully', tag: 'BackgroundWorker');
     } catch (e) {
-      debugPrint('[BackgroundWorker] Cancel error: $e');
+      SafeLogger.error('Cancel failed: $e', tag: 'BackgroundWorker');
     }
   }
 
@@ -146,9 +145,9 @@ class BackgroundNotificationWorker {
         _taskName,
         initialDelay: const Duration(seconds: 5),
       );
-      debugPrint('[BackgroundWorker] Triggered test run');
+      SafeLogger.debug('Triggered test run', tag: 'BackgroundWorker');
     } catch (e) {
-      debugPrint('[BackgroundWorker] Trigger error: $e');
+      SafeLogger.error('Trigger failed: $e', tag: 'BackgroundWorker');
     }
   }
 }
