@@ -244,9 +244,9 @@ class StructurePainter extends CustomPainter {
     const pulse = 1.0;
     const arteryColor = Color(0xFFFF8A80);
 
-    // SMART HIGH QUALITY: 8 layers (not 12) for good balance
+    // PERFORMANCE: Reduced from 7 to 5 layers (now capped at 5 in _drawSingleArtery)
     // This is cached, so it doesn't change per frame
-    final mainLayerCount = DevicePerformanceDetector.getSmartLayerCount(7, 2, 'mainLine');
+    final mainLayerCount = DevicePerformanceDetector.getSmartLayerCount(5, 2, 'mainLine');
     _drawSingleArtery(canvas, mainPath,
         baseColor: arteryColor,
         intensity: 1.0,
@@ -333,109 +333,54 @@ class StructurePainter extends CustomPainter {
     required double pulse,
     int maxLayers = 7,
   }) {
+    // PERFORMANCE OPTIMIZATION: Simplified artery rendering with fewer layers
+    // Reduced from 12 layers to maximum 5 layers for better performance
+    // This still provides good visual quality while being much faster
+
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    // УЛУЧШЕНИЕ: Более плавный и натуральный градиент свечения
-    // Каждый слой с blur для мягкого перехода
-    // 12 слоев для high quality = профессиональное свечение
+    // Cap maxLayers at 5 for performance (was 12)
+    final effectiveLayers = maxLayers.clamp(1, 5);
 
-    // Слой 12: Максимально широкое, почти невидимое свечение (ultra high quality)
-    if (maxLayers > 11) {
-      paint.strokeWidth = (160.0 * pulse * width * intensity).clamp(1.0, 350.0);
-      paint.color = baseColor.withValues(alpha: 0.02 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 50.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 11: Очень широкое внешнее свечение
-    if (maxLayers > 10) {
-      paint.strokeWidth = (140.0 * pulse * width * intensity).clamp(1.0, 320.0);
-      paint.color = baseColor.withValues(alpha: 0.025 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 45.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 10: Очень широкое, едва заметное свечение
-    if (maxLayers > 9) {
-      paint.strokeWidth = (120.0 * pulse * width * intensity).clamp(1.0, 300.0);
-      paint.color = baseColor.withValues(alpha: 0.03 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 40.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 9: Широкое внешнее свечение
-    if (maxLayers > 8) {
-      paint.strokeWidth = (90.0 * pulse * width * intensity).clamp(1.0, 250.0);
-      paint.color = baseColor.withValues(alpha: 0.05 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 30.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 8: Среднее свечение
-    if (maxLayers > 7) {
-      paint.strokeWidth = (70.0 * pulse * width * intensity).clamp(1.0, 200.0);
+    // Layer 5: Outer glow (only if maxLayers >= 5)
+    if (effectiveLayers >= 5) {
+      paint.strokeWidth = (50.0 * pulse * width * intensity).clamp(1.0, 120.0);
       paint.color = baseColor.withValues(alpha: 0.08 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 25.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 7: Переходное свечение
-    if (maxLayers > 6) {
-      paint.strokeWidth = (55.0 * pulse * width * intensity).clamp(1.0, 180.0);
-      paint.color = baseColor.withValues(alpha: 0.12 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 20.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 6: Заметное свечение
-    if (maxLayers > 5) {
-      paint.strokeWidth = (40.0 * pulse * width * intensity).clamp(1.0, 150.0);
-      paint.color = baseColor.withValues(alpha: 0.15 * intensity);
       paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 15.0);
       canvas.drawPath(path, paint);
     }
 
-    // Слой 5: Яркое свечение
-    if (maxLayers > 4) {
-      paint.strokeWidth = (28.0 * pulse * width * intensity).clamp(1.0, 120.0);
-      paint.color = baseColor.withValues(alpha: 0.25 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 12.0);
+    // Layer 4: Mid glow (only if maxLayers >= 4)
+    if (effectiveLayers >= 4) {
+      paint.strokeWidth = (30.0 * pulse * width * intensity).clamp(1.0, 80.0);
+      paint.color = baseColor.withValues(alpha: 0.15 * intensity);
+      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 10.0);
       canvas.drawPath(path, paint);
     }
 
-    // Слой 4: Внутреннее свечение
-    if (maxLayers > 3) {
-      paint.strokeWidth = (18.0 * pulse * width * intensity).clamp(1.0, 90.0);
+    // Layer 3: Inner glow (only if maxLayers >= 3)
+    if (effectiveLayers >= 3) {
+      paint.strokeWidth = (15.0 * pulse * width * intensity).clamp(1.0, 50.0);
       paint.color = baseColor.withValues(alpha: 0.35 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 8.0);
+      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 6.0);
       canvas.drawPath(path, paint);
     }
 
-    // Слой 3: Переход к ядру
-    if (maxLayers > 2) {
-      paint.strokeWidth = (10.0 * pulse * width * intensity).clamp(1.0, 60.0);
-      paint.color = baseColor.withValues(alpha: 0.5 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 5.0);
-      canvas.drawPath(path, paint);
-    }
-
-    // Слой 2: Яркое ядро
-    if (maxLayers > 1) {
-      paint.strokeWidth = (5.0 * pulse * width * intensity).clamp(1.0, 40.0);
-      paint.color = Color.lerp(baseColor, Colors.white, 0.3)!.withValues(alpha: 0.75 * intensity);
+    // Layer 2: Bright core (only if maxLayers >= 2)
+    if (effectiveLayers >= 2) {
+      paint.strokeWidth = (6.0 * pulse * width * intensity).clamp(1.0, 25.0);
+      paint.color = Color.lerp(baseColor, Colors.white, 0.3)!.withValues(alpha: 0.6 * intensity);
       paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 3.0);
       canvas.drawPath(path, paint);
     }
 
-    // Слой 1: Центральная светящаяся линия
-    if (maxLayers > 0) {
-      paint.strokeWidth = (2.5 * pulse * width).clamp(1.0, 15.0);
-      paint.color = Color.lerp(baseColor, Colors.white, 0.7)!.withValues(alpha: 0.95 * intensity);
-      paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 1.5);
-      canvas.drawPath(path, paint);
-    }
+    // Layer 1: Center line (always drawn)
+    paint.strokeWidth = (2.5 * pulse * width).clamp(1.0, 12.0);
+    paint.color = Color.lerp(baseColor, Colors.white, 0.6)!.withValues(alpha: 0.9 * intensity);
+    paint.maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 1.5);
+    canvas.drawPath(path, paint);
   }
 
   static void _drawYearLine(Canvas canvas, ui.Path path) {
@@ -629,7 +574,9 @@ class LifelinePainter extends CustomPainter {
         zoomLevel = 3; // Individual nodes
       }
 
-      final branchLayerCount = DevicePerformanceDetector.getSmartLayerCount(7, zoomLevel, 'branches');
+      // PERFORMANCE: Reduce layer count for branches (now capped at 5 max in _drawSingleArtery)
+      // Level 1 (yearly): 2 layers, Level 2 (monthly): 3 layers, Level 3 (individual): 4 layers
+      final branchLayerCount = DevicePerformanceDetector.getSmartLayerCount(4, zoomLevel, 'branches');
 
       // OPTIMIZATION: More aggressive branch culling based on zoom level
       int branchStep;
