@@ -958,7 +958,8 @@ class PrideEffectPainter extends EmotionEffectPainter {
   }
 
   void _drawFountainParticles(Canvas canvas, Size size) {
-    const particleCount = 60;
+    // PERFORMANCE: Reduced from 60 to 30 particles (-50% draw calls)
+    const particleCount = 30;
     final centerX = size.width * 0.5;
     final bottomY = size.height;
 
@@ -1003,7 +1004,8 @@ class PrideEffectPainter extends EmotionEffectPainter {
   }
 
   void _drawGlitter(Canvas canvas, Size size) {
-    const glitterCount = 60;
+    // PERFORMANCE: Reduced from 60 to 30 particles (-50% draw calls)
+    const glitterCount = 30;
 
     for (int i = 0; i < glitterCount; i++) {
       final glitterRandom = Random(i + 1600);
@@ -1031,29 +1033,8 @@ class PrideEffectPainter extends EmotionEffectPainter {
 
       canvas.drawCircle(Offset(x, y), glitterSize * 3, glitterPaint);
 
-      _drawStar(canvas, Offset(x, y), glitterSize * 3, Colors.white.withOpacity(twinkle * 0.9 * intensity));
+      // PERFORMANCE: Removed _drawStar - 30 Path operations saved
+      // Stars were barely visible and very expensive (4 lines + close + fill each)
     }
-  }
-
-  void _drawStar(Canvas canvas, Offset center, double size, Color color) {
-    final path = Path();
-    for (int i = 0; i < 4; i++) {
-      final angle = (pi / 2) * i;
-      final x = center.dx + cos(angle) * size;
-      final y = center.dy + sin(angle) * size;
-
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-
-    final starPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    canvas.drawPath(path, starPaint);
   }
 }
