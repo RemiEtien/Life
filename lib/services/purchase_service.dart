@@ -151,11 +151,11 @@ class PurchaseService extends StateNotifier<PurchaseState> {
           );
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
-          _verifyAndGrantPremium(purchaseDetails);
+          unawaited(_verifyAndGrantPremium(purchaseDetails));
         }
 
         if (purchaseDetails.pendingCompletePurchase) {
-          _inAppPurchase.completePurchase(purchaseDetails);
+          unawaited(_inAppPurchase.completePurchase(purchaseDetails));
         }
       }
     }
@@ -178,7 +178,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
 
       SafeLogger.debug('Calling verifyPurchase cloud function', tag: 'PurchaseService');
 
-      final result = await callable.call({
+      await callable.call({
         'platform': platform,
         'receipt': receipt,
         'productId': purchaseDetails.productID,
