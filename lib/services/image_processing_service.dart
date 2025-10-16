@@ -3,6 +3,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
+import '../utils/safe_logger.dart';
 
 /// Результат обработки изображения.
 class ProcessedImageResult {
@@ -49,9 +50,7 @@ class ImageProcessingService {
       );
 
       if (compressedFile == null || thumbnailFile == null) {
-        if (kDebugMode) {
-          debugPrint('[ImageProcessingService] Failed to compress one or both images.');
-        }
+        SafeLogger.warning('Failed to compress one or both images', tag: 'ImageProcessingService');
         return null;
       }
 
@@ -60,9 +59,7 @@ class ImageProcessingService {
         thumbnailPath: thumbnailFile.path,
       );
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ImageProcessingService] Error processing image: $e');
-      }
+      SafeLogger.error('Error processing image', error: e, tag: 'ImageProcessingService');
       return null;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
+import '../utils/safe_logger.dart';
 
 /// Centralized analytics service for tracking user behavior and app events.
 ///
