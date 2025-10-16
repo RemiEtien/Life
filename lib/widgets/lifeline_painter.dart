@@ -658,6 +658,9 @@ class LifelinePainter extends CustomPainter {
             }
           }
         } else if (item is DailyClusterPlacementInfo) {
+          // Skip daily cluster auras outside Level 3 (same as individual nodes)
+          if (currentScale < kLevel3Threshold) continue;
+
           if (visibleRect
               .inflate(kDailyClusterBaseRadius * 2)
               .contains(item.position)) {
@@ -703,6 +706,9 @@ class LifelinePainter extends CustomPainter {
             onNodePosition?.call(item.memory.universalId, item.nodePosition);
           }
         } else if (item is DailyClusterPlacementInfo) {
+          // Skip daily clusters outside Level 3 (same as individual nodes)
+          if (currentScale < kLevel3Threshold) continue;
+
           if (visibleRect
               .inflate(kDailyClusterBaseRadius * 2)
               .contains(item.position)) {

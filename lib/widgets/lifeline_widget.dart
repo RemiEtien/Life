@@ -1882,7 +1882,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                     child: SizedBox(
                       width: totalWidth,
                       height: contentHeight,
-                      child: (_renderData == null || userId == null)
+                      child: _renderData == null
                           ? const Center(child: CircularProgressIndicator())
                           : Stack(
                               alignment: Alignment.center,
