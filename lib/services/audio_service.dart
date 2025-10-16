@@ -38,6 +38,7 @@ class GlobalTrackDetails {
 // Notifier
 class AudioNotifier extends Notifier<AudioPlayerState> {
   final AudioPlayer _player = AudioPlayer();
+  StreamSubscription? _playerCompleteSubscription;
   // НОВОЕ ПОЛЕ: для запоминания состояния
   bool _wasGlobalPlayerActiveBeforeAmbient = false;
 
@@ -63,10 +64,11 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
   AudioPlayerState build() {
     // CRITICAL: Register dispose callback to prevent memory leaks
     ref.onDispose(() {
+      _playerCompleteSubscription?.cancel();
       _player.dispose();
     });
 
-    _player.onPlayerComplete.listen((event) {
+    _playerCompleteSubscription = _player.onPlayerComplete.listen((event) {
       if (state.isGlobalPlayerActive && state.isPlaying) {
         playNext();
       }
@@ -143,25 +145,25 @@ class AudioNotifier extends Notifier<AudioPlayerState> {
     );
   }
 
-  void playNext() {
+  Future<void> playNext() async {
     if (_playlist.isEmpty) return;
     _currentIndex = (_currentIndex + 1) % _playlist.length;
-    _playCurrentGlobalTrack();
+    await _playCurrentGlobalTrack();
   }
 
-  void playPrevious() {
+  Future<void> playPrevious() async {
     if (_playlist.isEmpty) return;
     _currentIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
-    _playCurrentGlobalTrack();
+    await _playCurrentGlobalTrack();
   }
 
-  void toggleGlobalPlayer() {
+  Future<void> toggleGlobalPlayer() async {
     if (state.isPlaying && state.isGlobalPlayerActive) {
-      pauseGlobalPlayer();
+      await pauseGlobalPlayer();
     } else {
       // ИСПРАВЛЕНИЕ: При возобновлении плеера, останавливаем любой другой звук (например, эмбиент)
-      _player.stop();
-      _playCurrentGlobalTrack();
+      await _player.stop();
+      await _playCurrentGlobalTrack();
     }
   }
 

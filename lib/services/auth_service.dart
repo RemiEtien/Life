@@ -188,14 +188,28 @@ class AuthService {
     // open while the previous user's DB is still closing, causing data conflicts.
     try {
       await IsarService.close();
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (kDebugMode) debugPrint('IsarService close error (ignored): $e');
+      // Log to Crashlytics to track DB cleanup issues
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'IsarService close failed during sign-out',
+        fatal: false,
+      ));
     }
 
     try {
       await Future.wait(futures, eagerError: false);
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (kDebugMode) debugPrint('SignOut cleanup error (continuing): $e');
+      // Log to Crashlytics to track sign-out cleanup issues
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'Sign-out cleanup failed (Google/Firebase)',
+        fatal: false,
+      ));
     }
   }
 

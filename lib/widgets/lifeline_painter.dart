@@ -97,7 +97,7 @@ class DailyClusterPlacementInfo {
     required this.memories,
     required this.position,
     required this.id,
-  });
+  }) : assert(memories.isNotEmpty, 'DailyClusterPlacementInfo memories cannot be empty');
 }
 
 class TimeGapPlacementInfo {
