@@ -1590,10 +1590,17 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           // ИСПРАВЛЕНИЕ: Данные еще не готовы, но запрашиваем пересчет
           // Флаг _centerOnNextLayout остается true и центрирование произойдет
           // после готовности данных в _requestGeometryUpdate
-          if (kDebugMode) {
-            debugPrint('[LifelineWidget] Data not ready for centering, requesting recalculation');
+          // FIX: Only recalculate if we have memories, otherwise wait for data
+          if (_currentMemories.isNotEmpty) {
+            if (kDebugMode) {
+              debugPrint('[LifelineWidget] Data not ready for centering, requesting recalculation with ${_currentMemories.length} memories');
+            }
+            _requestFullRecalculation(_currentMemories);
+          } else {
+            if (kDebugMode) {
+              debugPrint('[LifelineWidget] Data not ready for centering and no memories available, waiting...');
+            }
           }
-          _requestFullRecalculation(_currentMemories);
         }
       }
     });
