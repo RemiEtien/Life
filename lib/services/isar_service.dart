@@ -3,6 +3,7 @@ import 'package:isar_community/isar.dart';
 import '../memory.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import '../utils/safe_logger.dart';
 
 class IsarService {
   static Isar? _isar;
@@ -25,10 +26,7 @@ class IsarService {
           return _isar!;
         } else {
           // Если открыта БД другого пользователя, сначала закрываем ее.
-          if (kDebugMode) {
-            debugPrint(
-                "[IsarService] Closing DB for user '${_isar?.name}' to open for '$dbName'.");
-          }
+          SafeLogger.debug("Closing DB for user '${_isar?.name}' to open for '$dbName'", tag: 'IsarService');
           FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Switching DB from ${_isar?.name} to $dbName');
           // MEMORY LEAK FIX: Force close on error to prevent multiple DB connections
           try {
@@ -36,17 +34,12 @@ class IsarService {
           } catch (e) {
             _isar = null; // Force close on error to prevent connection leak
             FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Force closed DB on error: $e');
-            if (kDebugMode) {
-              debugPrint('[IsarService] Force closed DB: $e');
-            }
+            SafeLogger.error('Force closed DB on error', error: e, tag: 'IsarService');
           }
         }
       }
 
-      if (kDebugMode) {
-        debugPrint("[IsarService] Opening DB for user '$dbName'.");
-      }
-
+      SafeLogger.debug("Opening DB for user '$dbName'", tag: 'IsarService');
       FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Opening new DB instance: $dbName');
       final dir = await getApplicationDocumentsDirectory();
 
@@ -79,9 +72,7 @@ class IsarService {
   static Future<void> close() async {
     try {
       if (_isar != null && _isar!.isOpen) {
-        if (kDebugMode) {
-          debugPrint("[IsarService] Closing DB instance for user '${_isar?.name}'.");
-        }
+        SafeLogger.debug("Closing DB instance for user '${_isar?.name}'", tag: 'IsarService');
         FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Closing DB instance: ${_isar?.name}');
         await _isar!.close();
         _isar = null;

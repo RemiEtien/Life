@@ -126,8 +126,9 @@ Future<Uint8List> _generatePdf(
           }
         }
       } catch (e) {
+        // Note: Running in isolate, cannot use SafeLogger
         // ignore: avoid_print
-        debugPrint('Could not download spotify artwork: ${details.albumArtUrl}');
+        print('[ExportService] Could not download spotify artwork: ${details.albumArtUrl}');
       }
     }
   }
