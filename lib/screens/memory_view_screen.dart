@@ -658,6 +658,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
   // MODIFIED: This function now handles both session and per-memory unlock flows.
   Future<bool> _handleUnlockRequest() async {
+    debugPrint('[MemoryViewScreen] _handleUnlockRequest() called');
+
     final l10n = AppLocalizations.of(context)!;
     final encryptionNotifier = ref.read(encryptionServiceProvider.notifier);
     final encryptionState = ref.read(encryptionServiceProvider);
@@ -666,10 +668,10 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
 
     // FIX: Don't attempt unlock if user is not authenticated (e.g., after sign out)
     final currentUser = ref.read(authStateChangesProvider).value;
+    debugPrint('[MemoryViewScreen] currentUser: ${currentUser?.uid}, encryptionState: $encryptionState');
+
     if (currentUser == null) {
-      if (kDebugMode) {
-        debugPrint('[MemoryViewScreen] Skipping unlock - no authenticated user');
-      }
+      debugPrint('[MemoryViewScreen] Skipping unlock - no authenticated user');
       return false;
     }
 

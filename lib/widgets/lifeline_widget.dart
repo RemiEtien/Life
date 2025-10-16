@@ -488,6 +488,8 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         // Mark that memories have been loaded at least once
         _hasLoadedMemoriesOnce = true;
 
+        debugPrint('[LIFELINE] _onMemoriesChanged: ${memories.length} memories, _currentMemories: ${_currentMemories.length}');
+
         // FIX: Load images and paragraphs immediately, even if size not known yet
         // This prevents "empty lifeline on fresh install" issue
         _loadMemoryImages(memories);
@@ -496,9 +498,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         // FIX: Don't render empty lifeline if we had memories before
         // This prevents clearing the lifeline when database stream emits temporary empty result
         if (memories.isEmpty && _currentMemories.isNotEmpty) {
-          if (kDebugMode) {
-            debugPrint('[LIFELINE] Ignoring empty memory list - had ${_currentMemories.length} before');
-          }
+          debugPrint('[LIFELINE] Ignoring empty memory list - had ${_currentMemories.length} before');
           return;
         }
 
