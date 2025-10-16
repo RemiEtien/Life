@@ -837,6 +837,15 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
     final biometricService = ref.read(biometricServiceProvider);
     final profile = ref.read(userProfileProvider).value;
 
+    // FIX: Don't attempt unlock if user is not authenticated (e.g., after sign out)
+    final currentUser = ref.read(authStateChangesProvider).value;
+    if (currentUser == null) {
+      if (kDebugMode) {
+        debugPrint('[MemoryEditScreen] Skipping unlock - no authenticated user');
+      }
+      return false;
+    }
+
     final memoryId = _draftMemory?.id;
     if (memoryId == null) return false;
 

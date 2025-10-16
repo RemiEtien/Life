@@ -664,6 +664,15 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
     final biometricService = ref.read(biometricServiceProvider);
     final profile = ref.read(userProfileProvider).value;
 
+    // FIX: Don't attempt unlock if user is not authenticated (e.g., after sign out)
+    final currentUser = ref.read(authStateChangesProvider).value;
+    if (currentUser == null) {
+      if (kDebugMode) {
+        debugPrint('[MemoryViewScreen] Skipping unlock - no authenticated user');
+      }
+      return false;
+    }
+
     final bool needsBiometrics = _currentMemory.isEncrypted &&
         (profile?.requireBiometricForMemory ?? false) &&
         !encryptionNotifier.isMemoryUnlocked(_currentMemory.id);
