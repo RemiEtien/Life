@@ -493,6 +493,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         _loadMemoryImages(memories);
         _updateParagraphs(memories);
 
+        // FIX: Don't render empty lifeline if we had memories before
+        // This prevents clearing the lifeline when database stream emits temporary empty result
+        if (memories.isEmpty && _currentMemories.isNotEmpty) {
+          if (kDebugMode) {
+            debugPrint('[LIFELINE] Ignoring empty memory list - had ${_currentMemories.length} before');
+          }
+          return;
+        }
+
         // Recalculation will be skipped if size is not known (handled inside _requestFullRecalculation)
         // but will trigger automatically when size becomes available in build()
         _requestFullRecalculation(memories);
