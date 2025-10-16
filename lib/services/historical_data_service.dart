@@ -7,6 +7,7 @@ import 'package:html/parser.dart' as parser;
 import 'package:intl/intl.dart';
 import '../models/anchors/anchor_models.dart';
 import 'spotify_service.dart';
+import '../utils/safe_logger.dart';
 
 class HistoricalDataService {
   final SpotifyService _spotifyService;
@@ -75,9 +76,7 @@ class HistoricalDataService {
         }
       }
     } catch (e, stackTrace) {
-       if (kDebugMode) {
-         debugPrint('Error in _fetchArticleForSpecificDate: $e');
-       }
+       SafeLogger.error('Error fetching Wikipedia article', error: e, stackTrace: stackTrace, tag: 'HistoricalDataService');
        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia article fetch failed'));
     }
     return [];
@@ -97,9 +96,7 @@ class HistoricalDataService {
             .toList();
       }
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Error in _fetchOnThisDayEvents: $e');
-      }
+      SafeLogger.error('Error fetching OnThisDay events', error: e, stackTrace: stackTrace, tag: 'HistoricalDataService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Wikipedia OnThisDay fetch failed'));
     }
     return [];
@@ -123,29 +120,21 @@ class HistoricalDataService {
     for (int i = 0; i < maxWeeksBack; i++) {
       final tryDate = chartDate.subtract(Duration(days: 7 * i));
       final formattedDate = DateFormat('yyyy-MM-dd').format(tryDate);
-      
-      if (kDebugMode) {
-        debugPrint('Attempting to fetch Billboard chart for week of $formattedDate...');
-      }
-      
+
+      SafeLogger.debug('Attempting to fetch Billboard chart for week of $formattedDate', tag: 'HistoricalDataService');
+
       try {
         final entries = await _fetchAndParseBillboardPage(tryDate);
         
         if (entries.isNotEmpty) {
-           if (kDebugMode) {
-             debugPrint('Successfully parsed ${entries.length} entries from Billboard for $formattedDate.');
-           }
+           SafeLogger.debug('Successfully parsed ${entries.length} entries from Billboard for $formattedDate', tag: 'HistoricalDataService');
           final spotifyMatches = await _mapEntriesToSpotify(entries);
-          
+
           if (spotifyMatches.isNotEmpty) {
-             if (kDebugMode) {
-               debugPrint('Successfully matched ${spotifyMatches.length} tracks on Spotify.');
-             }
+             SafeLogger.debug('Successfully matched ${spotifyMatches.length} tracks on Spotify', tag: 'HistoricalDataService');
              return spotifyMatches;
           } else {
-             if (kDebugMode) {
-               debugPrint('Parsed Billboard entries, but found no matches on Spotify. Trying previous week...');
-             }
+             SafeLogger.debug('Parsed Billboard entries, but found no matches on Spotify. Trying previous week', tag: 'HistoricalDataService');
           }
         }
       } catch (e, stackTrace) {
@@ -154,16 +143,12 @@ class HistoricalDataService {
           stackTrace,
           reason: 'Billboard week fetch failed for $formattedDate'
         ));
-        if (kDebugMode) {
-          debugPrint('Error fetching week $formattedDate, trying previous week. Error: $e');
-        }
+        SafeLogger.error('Error fetching week $formattedDate, trying previous week', error: e, stackTrace: stackTrace, tag: 'HistoricalDataService');
         // Не пробрасываем ошибку, а просто переходим к следующей неделе
       }
     }
-    
-    if (kDebugMode) {
-      debugPrint('Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date.');
-    }
+
+    SafeLogger.warning('Could not find any valid Billboard chart with Spotify matches within $maxWeeksBack weeks of $date', tag: 'HistoricalDataService');
     return []; // Возвращаем пустой список вместо исключения
   }
 
@@ -180,9 +165,7 @@ class HistoricalDataService {
       ).timeout(const Duration(seconds: 15));
 
       if (resp.statusCode != 200) {
-        if (kDebugMode) {
-          debugPrint('Billboard HTTP Info: Status ${resp.statusCode} for date $ymd (chart may not exist)');
-        }
+        SafeLogger.debug('Billboard HTTP Status ${resp.statusCode} for date $ymd (chart may not exist)', tag: 'HistoricalDataService');
         return [];
       }
 
@@ -190,9 +173,7 @@ class HistoricalDataService {
       final items = doc.querySelectorAll('div.o-chart-results-list-row-container, .chart-list__element');
       
       if (items.isEmpty) {
-        if (kDebugMode) {
-          debugPrint('Could not find chart items on Billboard page for $ymd. The page structure might have changed.');
-        }
+        SafeLogger.warning('Could not find chart items on Billboard page for $ymd. The page structure might have changed', tag: 'HistoricalDataService');
         unawaited(FirebaseCrashlytics.instance.recordError(
           Exception('Billboard parsing failed: No chart items found'),
           null,
@@ -218,15 +199,11 @@ class HistoricalDataService {
       return results;
 
     } on TimeoutException catch(e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Timeout during Billboard fetch for $ymd: $e');
-      }
+      SafeLogger.error('Timeout during Billboard fetch for $ymd', error: e, stackTrace: stackTrace, tag: 'HistoricalDataService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Timeout for $ymd'));
       rethrow;
     } catch(e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Exception during Billboard fetch/parse for $ymd: $e');
-      }
+      SafeLogger.error('Exception during Billboard fetch/parse for $ymd', error: e, stackTrace: stackTrace, tag: 'HistoricalDataService');
        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Billboard Fetch/Parse Exception for $ymd'));
       rethrow;
     }
