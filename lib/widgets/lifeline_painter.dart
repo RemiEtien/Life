@@ -1382,12 +1382,9 @@ class LifelinePainter extends CustomPainter {
       tempCanvas.drawImageRect(image, srcRect, imageRect, Paint());
       tempCanvas.restore();
 
-      // Draw border
-      final borderPaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
-      tempCanvas.drawPath(imagePath, borderPaint);
+      // REMOVED: White border (unwanted thick white outline on nodes)
+      // Users reported thick white border appearing on single memories
+      // The border is drawn in fallback code if needed (lines 1559-1562)
 
       cachedCircularCovers[key] = recorder.endRecording();
     }
