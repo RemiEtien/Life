@@ -3,6 +3,7 @@ import 'package:isar_community/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../memory.dart';
 import 'notification_scheduler.dart';
+import '../utils/safe_logger.dart';
 
 /// Service for sending emotional insight notifications
 /// Analyzes emotional patterns and sends reflective notifications
@@ -27,7 +28,7 @@ class InsightNotificationService {
         final timeSinceLastInsight = DateTime.now().difference(lastInsight);
 
         if (timeSinceLastInsight < _minTimeBetweenInsights) {
-          debugPrint('[Insight] Too soon since last insight notification');
+          SafeLogger.debug('Too soon since last insight notification', tag: 'Insight');
           return null;
         }
       }
@@ -40,7 +41,7 @@ class InsightNotificationService {
 
       // Need at least 10 memories for meaningful insights
       if (memories.length < 10) {
-        debugPrint('[Insight] Not enough memories for insight analysis');
+        SafeLogger.debug('Not enough memories for insight analysis', tag: 'Insight');
         return null;
       }
 
@@ -49,7 +50,7 @@ class InsightNotificationService {
       final recentMemories = memories.where((m) => m.lastModified.isAfter(threeMonthsAgo)).toList();
 
       if (recentMemories.length < 5) {
-        debugPrint('[Insight] Not enough recent memories for insight');
+        SafeLogger.debug('Not enough recent memories for insight', tag: 'Insight');
         return null;
       }
 
@@ -73,7 +74,7 @@ class InsightNotificationService {
       final totalEmotions = emotionCounts.values.reduce((a, b) => a + b);
       final dominantPercentage = (emotionCounts[dominantEmotion]! / totalEmotions * 100).round();
 
-      debugPrint('[Insight] Dominant emotion: $dominantEmotion ($dominantPercentage%)');
+      SafeLogger.debug('Dominant emotion: $dominantEmotion ($dominantPercentage%)', tag: 'Insight');
 
       // Record that we sent this insight notification
       await prefs.setInt(_lastInsightKey, DateTime.now().millisecondsSinceEpoch);
@@ -83,8 +84,7 @@ class InsightNotificationService {
         body: _getInsightBody(dominantEmotion, recentMemories.length, dominantPercentage),
       );
     } catch (e, stack) {
-      debugPrint('[Insight] Error: $e');
-      debugPrint('[Insight] Stack: $stack');
+      SafeLogger.error('Error generating insight', error: e, stackTrace: stack, tag: 'Insight');
       return null;
     }
   }

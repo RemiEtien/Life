@@ -3,6 +3,7 @@ import 'package:isar_community/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../memory.dart';
 import 'notification_scheduler.dart';
+import '../utils/safe_logger.dart';
 
 /// Service for sending occasional motivational notifications
 /// Uses smart logic based on user's activity patterns
@@ -27,7 +28,7 @@ class EngagementNotificationService {
         final timeSinceLastEngagement = DateTime.now().difference(lastEngagement);
 
         if (timeSinceLastEngagement < _minTimeBetweenEngagement) {
-          debugPrint('[Engagement] Too soon since last engagement notification');
+          SafeLogger.debug('Too soon since last engagement notification', tag: 'Engagement');
           return null;
         }
       }
@@ -40,7 +41,7 @@ class EngagementNotificationService {
 
       // Need at least 3 memories to establish a pattern
       if (memories.length < 3) {
-        debugPrint('[Engagement] Not enough memories for pattern analysis');
+        SafeLogger.debug('Not enough memories for pattern analysis', tag: 'Engagement');
         return null;
       }
 
@@ -63,15 +64,14 @@ class EngagementNotificationService {
       final count = (sortedMemories.length - 1).clamp(1, 10);
       final avgDaysBetween = (totalDaysBetween / count).ceil();
 
-      debugPrint('[Engagement] Avg days between memories: $avgDaysBetween');
-      debugPrint('[Engagement] Days since last memory: $daysSinceLastMemory');
+      SafeLogger.debug('Avg days between memories: $avgDaysBetween, Days since last: $daysSinceLastMemory', tag: 'Engagement');
 
       // Send notification if user is inactive for 3x their average frequency
       // but only if at least 21 days have passed
       final inactivityThreshold = (avgDaysBetween * 3).clamp(21, 90);
 
       if (daysSinceLastMemory >= inactivityThreshold) {
-        debugPrint('[Engagement] User inactive for $daysSinceLastMemory days (threshold: $inactivityThreshold)');
+        SafeLogger.debug('User inactive for $daysSinceLastMemory days (threshold: $inactivityThreshold)', tag: 'Engagement');
 
         // Record that we sent this engagement notification
         await prefs.setInt(_lastEngagementKey, now.millisecondsSinceEpoch);
@@ -84,8 +84,7 @@ class EngagementNotificationService {
 
       return null;
     } catch (e, stack) {
-      debugPrint('[Engagement] Error: $e');
-      debugPrint('[Engagement] Stack: $stack');
+      SafeLogger.error('Error checking engagement', error: e, stackTrace: stack, tag: 'Engagement');
       return null;
     }
   }

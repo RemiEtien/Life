@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:isar_community/isar.dart';
 import '../memory.dart';
 import 'notification_scheduler.dart';
+import '../utils/safe_logger.dart';
 
 /// Service for checking and creating anniversary notifications
 /// Notifies users of significant past moments (1 year, 2 years, 5 years, etc.)
@@ -45,7 +46,7 @@ class AnniversaryNotificationService {
         // Check if it's a significant anniversary
         final yearsDifference = today.year - memoryDate.year;
         if (significantYears.contains(yearsDifference)) {
-          debugPrint('[Anniversary] Found ${yearsDifference}y anniversary: ${memory.id}');
+          SafeLogger.debug('Found ${yearsDifference}y anniversary: ${memory.id}', tag: 'Anniversary');
 
           // Create notification content
           final title = _getAnniversaryTitle(yearsDifference);
@@ -61,8 +62,7 @@ class AnniversaryNotificationService {
 
       return null;
     } catch (e, stack) {
-      debugPrint('[Anniversary] Error: $e');
-      debugPrint('[Anniversary] Stack: $stack');
+      SafeLogger.error('Error checking anniversaries', error: e, stackTrace: stack, tag: 'Anniversary');
       return null;
     }
   }
