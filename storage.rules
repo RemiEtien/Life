@@ -17,6 +17,39 @@ service firebase.storage {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // File size validation helpers
+    function isValidImageSize() {
+      return request.resource.size <= 10 * 1024 * 1024; // 10 MB
+    }
+
+    function isValidVideoSize() {
+      return request.resource.size <= 100 * 1024 * 1024; // 100 MB
+    }
+
+    function isValidAudioSize() {
+      return request.resource.size <= 25 * 1024 * 1024; // 25 MB
+    }
+
+    // Check file type based on content type
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isVideo() {
+      return request.resource.contentType.matches('video/.*');
+    }
+
+    function isAudio() {
+      return request.resource.contentType.matches('audio/.*');
+    }
+
+    // Validate file size based on type
+    function isValidFileSize() {
+      return (isImage() && isValidImageSize()) ||
+             (isVideo() && isValidVideoSize()) ||
+             (isAudio() && isValidAudioSize());
+    }
+
     // ========================================
     // AUDIO ASSETS (On-Demand Loading)
     // ========================================
@@ -35,8 +68,12 @@ service firebase.storage {
     // All files under users/{userId}/**
     // Includes: avatars, memory media (images, videos, audio), thumbnails, exports, temp files
     match /users/{userId}/{allPaths=**} {
-      // Owner can read, write and delete their own files
-      allow read, write, delete: if isOwner(userId);
+      // Owner can read and delete their own files without restrictions
+      allow read, delete: if isOwner(userId);
+
+      // Write operations require valid file size based on content type
+      // Images: max 10MB, Videos: max 100MB, Audio: max 25MB
+      allow write: if isOwner(userId) && isValidFileSize();
     }
 
     // ========================================
