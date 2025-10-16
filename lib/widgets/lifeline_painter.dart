@@ -455,6 +455,16 @@ class LifelinePainter extends CustomPainter {
   static int? _cachedPathHash;
   static List<({double x, Offset point})>? _cachedPathLookup;
 
+  // PERFORMANCE OPTIMIZATION: Cache monthly groups calculation
+  static List<Memory>? _cachedMemoriesForGrouping;
+  static Map<String, ({List<Memory> memories, List<Offset> positions})>? _cachedMonthlyGroups;
+
+  // PERFORMANCE OPTIMIZATION: Cache count text paragraphs
+  static final Map<int, ui.Paragraph> _cachedCountParagraphs = {};
+
+  // PERFORMANCE OPTIMIZATION: Cache formatted month labels
+  static final Map<String, String> _cachedMonthLabels = {};
+
   LifelinePainter({
     required this.progress,
     required this.renderData,
@@ -871,22 +881,46 @@ class LifelinePainter extends CustomPainter {
       }
     }
 
-    final Map<String, ({List<Memory> memories, List<Offset> positions})> monthlyGroups = {};
+    // PERFORMANCE OPTIMIZATION #1: Cache monthly groups calculation
+    // Only recalculate if memories list changes
+    Map<String, ({List<Memory> memories, List<Offset> positions})> monthlyGroups;
 
-    // Group ALL memories, not just those in placementResults
-    for (final memory in memories) {
-      final monthKey = '${memory.date.year}-${memory.date.month.toString().padLeft(2, '0')}';
-
-      if (!monthlyGroups.containsKey(monthKey)) {
-        monthlyGroups[monthKey] = (memories: [], positions: []);
+    if (_cachedMemoriesForGrouping == memories && _cachedMonthlyGroups != null) {
+      // Reuse cached groups, but update positions (they may change with path animation)
+      monthlyGroups = {};
+      for (final entry in _cachedMonthlyGroups!.entries) {
+        final positions = <Offset>[];
+        for (final memory in entry.value.memories) {
+          final position = memoryPositions[memory.universalId];
+          if (position != null) {
+            positions.add(position);
+          }
+        }
+        monthlyGroups[entry.key] = (memories: entry.value.memories, positions: positions);
       }
-      monthlyGroups[monthKey]!.memories.add(memory);
+    } else {
+      // Build new groups and cache them
+      monthlyGroups = {};
 
-      // Try to find position in placementResults
-      final position = memoryPositions[memory.universalId];
-      if (position != null) {
-        monthlyGroups[monthKey]!.positions.add(position);
+      // Group ALL memories, not just those in placementResults
+      for (final memory in memories) {
+        final monthKey = '${memory.date.year}-${memory.date.month.toString().padLeft(2, '0')}';
+
+        if (!monthlyGroups.containsKey(monthKey)) {
+          monthlyGroups[monthKey] = (memories: [], positions: []);
+        }
+        monthlyGroups[monthKey]!.memories.add(memory);
+
+        // Try to find position in placementResults
+        final position = memoryPositions[memory.universalId];
+        if (position != null) {
+          monthlyGroups[monthKey]!.positions.add(position);
+        }
       }
+
+      // Cache the groups
+      _cachedMemoriesForGrouping = memories;
+      _cachedMonthlyGroups = monthlyGroups;
     }
 
     // Sort month keys chronologically
@@ -1138,28 +1172,44 @@ class LifelinePainter extends CustomPainter {
         canvas.drawCircle(adjustedPos, animatedRadius * 1.5, ringGlow);
       }
 
-      // PERFORMANCE: Show count text with simplified rendering
-      // Use ParagraphBuilder for better performance than TextPainter
-      final countText = cluster.memories.length.toString();
-      final paragraphStyle = ui.ParagraphStyle(
-        textAlign: TextAlign.center,
-        fontSize: 12.0,
-        fontWeight: FontWeight.bold,
+      // PERFORMANCE OPTIMIZATION #2: Cache count text paragraphs
+      // Reuse paragraphs for the same count number
+      final count = cluster.memories.length;
+
+      if (!_cachedCountParagraphs.containsKey(count)) {
+        final paragraphStyle = ui.ParagraphStyle(
+          textAlign: TextAlign.center,
+          fontSize: 12.0,
+          fontWeight: FontWeight.bold,
+        );
+        final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+          ..pushStyle(ui.TextStyle(
+            color: Colors.white,
+            shadows: [const ui.Shadow(color: Colors.black, blurRadius: 4.0)],
+          ))
+          ..addText(count.toString());
+        _cachedCountParagraphs[count] = paragraphBuilder.build()
+          ..layout(const ui.ParagraphConstraints(width: 50));
+      }
+
+      final paragraph = _cachedCountParagraphs[count]!;
+
+      // Apply opacity through canvas layer instead of text color
+      canvas.saveLayer(
+        Rect.fromCenter(
+          center: adjustedPos,
+          width: paragraph.width + 10,
+          height: paragraph.height + 10,
+        ),
+        Paint()..color = Colors.white.withAlpha((255 * finalOpacity).round()),
       );
-      final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
-        ..pushStyle(ui.TextStyle(
-          color: Colors.white.withOpacity(finalOpacity),
-          shadows: [const ui.Shadow(color: Colors.black, blurRadius: 4.0)],
-        ))
-        ..addText(countText);
-      final paragraph = paragraphBuilder.build()
-        ..layout(const ui.ParagraphConstraints(width: 50));
 
       final textPos = Offset(
         adjustedPos.dx - paragraph.width / 2,
         adjustedPos.dy - paragraph.height / 2,
       );
       canvas.drawParagraph(paragraph, textPos);
+      canvas.restore();
 
       // Report position for tap detection (simplified - use first month date)
       final firstMonthKey = cluster.monthKeys.first;
@@ -1182,35 +1232,50 @@ class LifelinePainter extends CustomPainter {
       // PERFORMANCE: Skip labels for off-screen clusters
       if (!visibleRect.inflate(100).contains(cluster.pos)) continue;
 
+      // PERFORMANCE OPTIMIZATION #3: Cache formatted month labels
       // Generate label text based on number of months in cluster
       final String monthName;
       final DateTime monthDate;
-      if (cluster.monthKeys.length == 1) {
+
+      // Create cache key from month keys
+      final cacheKey = cluster.monthKeys.join(',');
+
+      if (_cachedMonthLabels.containsKey(cacheKey)) {
+        monthName = _cachedMonthLabels[cacheKey]!;
+        // Still need to parse monthDate for tap detection
         final parts = cluster.monthKeys.first.split('-');
-        final year = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        monthDate = DateTime(year, month);
-        monthName = DateFormat.yMMM().format(monthDate); // "Jan 2025"
+        monthDate = DateTime(int.parse(parts[0]), int.parse(parts[1]));
       } else {
-        // Multiple months - show range
-        final firstParts = cluster.monthKeys.first.split('-');
-        final lastParts = cluster.monthKeys.last.split('-');
-        final firstYear = int.parse(firstParts[0]);
-        final firstMonth = int.parse(firstParts[1]);
-        final lastYear = int.parse(lastParts[0]);
-        final lastMonth = int.parse(lastParts[1]);
-
-        final firstDate = DateTime(firstYear, firstMonth);
-        final lastDate = DateTime(lastYear, lastMonth);
-        monthDate = firstDate;
-
-        if (firstYear == lastYear) {
-          // Same year: "Jan-Mar 2025"
-          monthName = '${DateFormat.MMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+        if (cluster.monthKeys.length == 1) {
+          final parts = cluster.monthKeys.first.split('-');
+          final year = int.parse(parts[0]);
+          final month = int.parse(parts[1]);
+          monthDate = DateTime(year, month);
+          monthName = DateFormat.yMMM().format(monthDate); // "Jan 2025"
         } else {
-          // Different years: "Dec 2024-Feb 2025"
-          monthName = '${DateFormat.yMMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+          // Multiple months - show range
+          final firstParts = cluster.monthKeys.first.split('-');
+          final lastParts = cluster.monthKeys.last.split('-');
+          final firstYear = int.parse(firstParts[0]);
+          final firstMonth = int.parse(firstParts[1]);
+          final lastYear = int.parse(lastParts[0]);
+          final lastMonth = int.parse(lastParts[1]);
+
+          final firstDate = DateTime(firstYear, firstMonth);
+          final lastDate = DateTime(lastYear, lastMonth);
+          monthDate = firstDate;
+
+          if (firstYear == lastYear) {
+            // Same year: "Jan-Mar 2025"
+            monthName = '${DateFormat.MMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+          } else {
+            // Different years: "Dec 2024-Feb 2025"
+            monthName = '${DateFormat.yMMM().format(firstDate)}-${DateFormat.yMMM().format(lastDate)}';
+          }
         }
+
+        // Cache the formatted label
+        _cachedMonthLabels[cacheKey] = monthName;
       }
 
       final adjustedPos = cluster.pos.translate(0, kNodeVerticalOffset);
