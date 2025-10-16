@@ -19,7 +19,7 @@ import '../services/notification_service.dart';
 import '../widgets/lifeline_widget.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
@@ -608,27 +608,28 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             }
 
             // **CRITICAL LOGIC**: Show UnlockScreen if encryption is enabled and state is locked.
-            // FIX: Verify profile matches current user to prevent showing UnlockScreen with stale profile data after sign out
-            if (profile.uid == user.uid &&
+            // But first check memoriesState to avoid showing during sign out
+            final memoriesState = ref.watch(memoriesStreamProvider);
+
+            // FIX: Don't show UnlockScreen during sign out (when memories are loading/empty)
+            // During signOut, memoriesState transitions through loading/empty before LoginScreen
+            final shouldShowUnlock = profile.uid == user.uid &&
                 profile.isEncryptionEnabled &&
-                encryptionState == EncryptionState.locked) {
-              if (kDebugMode) {
-                debugPrint('[AuthGate] Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}, profile.isEncryptionEnabled: true, encryptionState: locked');
-              }
+                encryptionState == EncryptionState.locked &&
+                memoriesState.hasValue && // Don't show during loading
+                (memoriesState.value?.isNotEmpty ?? false); // Don't show if memories are empty (sign out in progress)
+
+            if (shouldShowUnlock) {
+              debugPrint('[AuthGate] Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}');
               unawaited(FirebaseCrashlytics.instance.log(
-                'AuthGate: Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}, profile.isEncryptionEnabled: true, encryptionState: locked'));
+                'AuthGate: Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}'));
               return const UnlockScreen();
             } else if (profile.isEncryptionEnabled && encryptionState == EncryptionState.locked) {
-              // Profile doesn't match current user - log and don't show UnlockScreen
-              if (kDebugMode) {
-                debugPrint('[AuthGate] Skipping UnlockScreen - profile mismatch (profile.uid: ${profile.uid}, user.uid: ${user.uid})');
-              }
-              unawaited(FirebaseCrashlytics.instance.log(
-                'AuthGate: Skipping UnlockScreen - profile mismatch (profile.uid: ${profile.uid}, user.uid: ${user.uid})'));
+              // Locked but not showing UnlockScreen - log reason
+              debugPrint('[AuthGate] Skipping UnlockScreen - hasValue: ${memoriesState.hasValue}, isEmpty: ${memoriesState.value?.isEmpty}, profile.uid: ${profile.uid}, user.uid: ${user.uid}');
             }
 
             // If not locked, proceed to show the main app content.
-            final memoriesState = ref.watch(memoriesStreamProvider);
             return memoriesState.when(
               loading: () =>
                   _LoadingScreen(message: l10n.authGateLoadingMemories),

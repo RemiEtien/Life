@@ -495,10 +495,11 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         _loadMemoryImages(memories);
         _updateParagraphs(memories);
 
-        // FIX: Don't render empty lifeline if we had memories before
-        // This prevents clearing the lifeline when database stream emits temporary empty result
-        if (memories.isEmpty && _currentMemories.isNotEmpty) {
-          debugPrint('[LIFELINE] Ignoring empty memory list - had ${_currentMemories.length} before');
+        // FIX: Don't render empty lifeline
+        // Database stream emits 0 -> 11 -> 67 during loading. Skip empty emissions.
+        if (memories.isEmpty) {
+          debugPrint('[LIFELINE] Ignoring empty memory list - waiting for data (_currentMemories: ${_currentMemories.length})');
+          // Don't clear current rendering if we had data before
           return;
         }
 
@@ -892,7 +893,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
   void _requestGeometryUpdate(
       LayoutResult layoutResult, List<Memory> memories) {
-    if (!mounted || _isDisposed) return; // Убрали проверку _isCalculating отсюда
+    if (!mounted || _isDisposed || _isCalculating) return; // FIX: Prevent multiple simultaneous calculations
 
     if (mounted && !_isDisposed) setState(() => _isCalculating = true);
 
@@ -1824,8 +1825,15 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     return LayoutBuilder(builder: (context, constraints) {
       final newSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+      // FIX: Only recalculate if size changed significantly (> 1px)
+      // Prevents infinite recalculation loop during animations/transitions
+      final sizeChangedSignificantly = _lastKnownSize.isEmpty ||
+          (newSize.width - _lastKnownSize.width).abs() > 1.0 ||
+          (newSize.height - _lastKnownSize.height).abs() > 1.0;
+
       if (newSize.isFinite &&
-          newSize != _lastKnownSize &&
+          sizeChangedSignificantly &&
           newSize.width > 0 &&
           !_isDisposed) {
         _lastKnownSize = newSize;
