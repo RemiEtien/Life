@@ -6,6 +6,7 @@ import 'encryption_service.dart';
 import 'isar_service.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'analytics_service.dart';
+import '../utils/safe_logger.dart';
 
 class MemoryRepository {
   final String userId;
@@ -88,9 +89,7 @@ class MemoryRepository {
     } on PerMemoryAuthenticationRequiredException {
       // FIX: Don't auto-decrypt if per-memory authentication is required
       // Return encrypted memory - UI will handle authentication when user opens it
-      if (kDebugMode) {
-        debugPrint('[MemoryRepository] Memory ${m.id} requires per-memory auth, returning encrypted');
-      }
+      SafeLogger.debug('Memory ${m.id} requires per-memory auth, returning encrypted', tag: 'MemoryRepository');
       return m; // Return encrypted memory as-is
     } catch (e) {
       // For other decryption errors, rethrow to let caller handle
@@ -278,9 +277,7 @@ class MemoryRepository {
 
   Stream<List<Memory>> watchAllSortedByDate() async* {
     try {
-      if (kDebugMode) {
-        debugPrint('[DIAGNOSTIC] Subscribing to memories for userId: $userId');
-      }
+      SafeLogger.debug('Subscribing to memories for userId: $userId', tag: 'MemoryRepository');
       FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] watchAllSortedByDate: Starting stream for userId: $userId');
 
       final isar = await _db;
@@ -293,18 +290,12 @@ class MemoryRepository {
           .syncStatusEqualTo('draft')
           .sortByDateDesc();
 
-      if (kDebugMode) {
-        final initialResults = await query.findAll();
-        debugPrint(
-            '[DIAGNOSTIC] Initial fetch for userId: $userId found ${initialResults.length} memories.');
-        FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Initial fetch found ${initialResults.length} memories');
-      }
+      final initialResults = await query.findAll();
+      SafeLogger.debug('Initial fetch for userId: $userId found ${initialResults.length} memories', tag: 'MemoryRepository');
+      FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Initial fetch found ${initialResults.length} memories');
 
       yield* query.watch(fireImmediately: true).map((results) {
-        if (kDebugMode) {
-          debugPrint(
-              '[DIAGNOSTIC] Stream update for userId: $userId delivered ${results.length} memories.');
-        }
+        SafeLogger.debug('Stream update for userId: $userId delivered ${results.length} memories', tag: 'MemoryRepository');
         FirebaseCrashlytics.instance.log('[ISAR_COMMUNITY] Stream update delivered ${results.length} memories');
         return results;
       });

@@ -682,5 +682,20 @@
   "emotionVisualizationMemoryParticlesTitle": "Emotion particles",
   "emotionVisualizationMemoryParticlesSubtitle": "Animated particles (Premium)",
   "emotionVisualizationPhotoColorGradingTitle": "Photo color grading",
-  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)"
+  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)",
+  "profileCreationErrorTitle": "Error al crear el perfil",
+  "profileCreationErrorAttemptsMessage": "Lo intentamos {attempts} veces pero no pudimos crear tu perfil.",
+  "@profileCreationErrorAttemptsMessage": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "profileCreationErrorReasons": "Esto puede deberse a:",
+  "profileCreationErrorReasonsList": "• Problemas de conectividad de red\n• Problemas del servidor\n• Errores de permisos",
+  "profileCreationErrorTryAgain": "Intentar de nuevo",
+  "profileCreationErrorLogout": "Cerrar sesión",
+  "profileCreationErrorContactSupport": "Contactar al soporte",
+  "shareDialogErrorLoadingProfile": "Error al cargar el perfil"
 }

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../memory.dart';
 import '../providers/application_providers.dart';
 import 'package:path/path.dart' as p;
+import '../utils/safe_logger.dart';
 
 class FirestoreService {
   final Ref _ref;
@@ -39,15 +40,11 @@ class FirestoreService {
                 e.code == 'resource-exhausted');
 
         if (attempt >= maxAttempts || !isRetryable) {
-          if (kDebugMode) {
-            debugPrint('[FirestoreService] Transaction failed after $attempt attempts: $e');
-          }
+          SafeLogger.error('Transaction failed after $attempt attempts', error: e, tag: 'FirestoreService');
           rethrow;
         }
 
-        if (kDebugMode) {
-          debugPrint('[FirestoreService] Transaction attempt $attempt failed: $e. Retrying in ${delay.inMilliseconds}ms...');
-        }
+        SafeLogger.warning('Transaction attempt $attempt failed, retrying in ${delay.inMilliseconds}ms', tag: 'FirestoreService');
 
         await Future.delayed(delay);
         // Exponential backoff: double the delay each time, max 10 seconds
@@ -82,18 +79,13 @@ class FirestoreService {
         final repo = _ref.read(memoryRepositoryProvider);
         if (repo != null) {
           await repo.upsertMemories(memoriesToUpdateLocally);
-          if (kDebugMode) {
-            debugPrint(
-                '[FirestoreService] Persisted ${memoriesToUpdateLocally.length} migrated memories back to local Isar DB.');
-          }
+          SafeLogger.debug('Persisted ${memoriesToUpdateLocally.length} migrated memories to local DB', tag: 'FirestoreService');
         }
       }
 
       return memoriesFromCloud;
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Error fetching from Firestore: $e');
-      }
+      SafeLogger.error('fetchAllMemoriesOnce failed', error: e, stackTrace: stackTrace, tag: 'FirestoreService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
           reason: 'Firestore: fetchAllMemoriesOnce failed'));
       return null;
@@ -120,9 +112,7 @@ class FirestoreService {
         if (!snapshot.exists) {
           // Document doesn't exist, so we can safely create it.
           transaction.set(docRef, memory.toFirestore());
-          if (kDebugMode) {
-            debugPrint('[Sync Conflict] Remote doc ${memory.firestoreId} does not exist. Creating.');
-          }
+          SafeLogger.debug('Remote doc ${memory.firestoreId} does not exist, creating', tag: 'FirestoreService');
         } else {
           // Document exists, we must check timestamps to resolve conflict.
           final remoteData = snapshot.data();
@@ -138,15 +128,11 @@ class FirestoreService {
           if (memory.lastModified.isAfter(remoteLastModified)) {
             // Local version is newer, so we overwrite the remote document.
             transaction.set(docRef, memory.toFirestore());
-            if (kDebugMode) {
-              debugPrint('[Sync Conflict] Local is newer for ${memory.firestoreId}. Overwriting remote.');
-            }
+            SafeLogger.debug('Local is newer for ${memory.firestoreId}, overwriting remote', tag: 'FirestoreService');
           } else {
             // Remote version is newer or the same. Do nothing.
             // The outdated local version will be corrected on the next sync from cloud.
-            if (kDebugMode) {
-              debugPrint('[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping upload.');
-            }
+            SafeLogger.debug('Remote is newer for ${memory.firestoreId}, skipping upload', tag: 'FirestoreService');
           }
         }
       });
@@ -175,9 +161,7 @@ class FirestoreService {
         if (!snapshot.exists) {
           // If we are trying to update a doc that doesn't exist, create it.
           transaction.set(docRef, memory.toFirestore());
-           if (kDebugMode) {
-            debugPrint('[Sync Conflict] Trying to update non-existent doc ${memory.firestoreId}. Creating instead.');
-          }
+          SafeLogger.debug('Trying to update non-existent doc ${memory.firestoreId}, creating instead', tag: 'FirestoreService');
         } else {
           final remoteData = snapshot.data();
            if (remoteData == null) {
@@ -190,14 +174,10 @@ class FirestoreService {
           if (memory.lastModified.isAfter(remoteLastModified)) {
             // Local changes are newer, so apply the update.
             transaction.update(docRef, memory.toFirestore());
-             if (kDebugMode) {
-              debugPrint('[Sync Conflict] Local is newer for ${memory.firestoreId}. Updating remote.');
-            }
+            SafeLogger.debug('Local is newer for ${memory.firestoreId}, updating remote', tag: 'FirestoreService');
           } else {
             // Remote is newer, discard local changes by doing nothing.
-             if (kDebugMode) {
-              debugPrint('[Sync Conflict] Remote is newer for ${memory.firestoreId}. Skipping update.');
-            }
+            SafeLogger.debug('Remote is newer for ${memory.firestoreId}, skipping update', tag: 'FirestoreService');
           }
         }
       });
@@ -251,9 +231,7 @@ class FirestoreService {
 
         await batch.commit();
 
-        if (kDebugMode) {
-          debugPrint('[FirestoreService] Batch deleted ${chunk.length} memories from Firestore');
-        }
+        SafeLogger.debug('Batch deleted ${chunk.length} memories from Firestore', tag: 'FirestoreService');
       }
 
       // Delete associated files from storage
@@ -261,9 +239,7 @@ class FirestoreService {
         await _deleteMemoryFilesFromStorage(userId, memory.firestoreId!, memory);
       }
 
-      if (kDebugMode) {
-        debugPrint('[FirestoreService] Completed batch delete of ${memoriesWithFirestoreId.length} memories');
-      }
+      SafeLogger.debug('Completed batch delete of ${memoriesWithFirestoreId.length} memories', tag: 'FirestoreService');
     } catch (e, stackTrace) {
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Firestore: batchDeleteMemories failed'));
       rethrow;
@@ -285,9 +261,7 @@ class FirestoreService {
           final ref = _storage.refFromURL(url);
           await ref.delete();
         } catch (e, stackTrace) {
-          if (kDebugMode) {
-            debugPrint('Could not delete file from Storage: $e');
-          }
+          SafeLogger.warning('Could not delete file from Storage', tag: 'FirestoreService');
           // Log non-fatal error to Crashlytics, as the main memory doc might be deleted already
           unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
               reason: 'Storage: Failed to delete file at $url'));
@@ -326,15 +300,11 @@ class FirestoreService {
             final url = await ref.getDownloadURL();
             uploadedUrls.add(url);
           } on FirebaseException catch(e, stackTrace) {
-            if (kDebugMode) {
-              debugPrint('Firebase Storage upload failed for $type: ${e.code} - ${e.message}');
-            }
+            SafeLogger.error('Firebase Storage upload failed for $type', error: e, stackTrace: stackTrace, tag: 'FirestoreService');
             unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles failed for type $type'));
             rethrow;
           } catch(e, stackTrace) {
-            if (kDebugMode) {
-              debugPrint('Unknown error uploading $type: $e');
-            }
+            SafeLogger.error('Unknown error uploading $type', error: e, stackTrace: stackTrace, tag: 'FirestoreService');
             unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'Storage: uploadFiles unknown error for type $type'));
             rethrow;
           }

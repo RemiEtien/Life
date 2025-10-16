@@ -4,6 +4,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import '../utils/safe_logger.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -68,13 +69,9 @@ class NotificationService {
       // Set the local location for tz.local to use device timezone
       tz.setLocalLocation(tz.getLocation(timezoneName));
 
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Set local timezone to: $timezoneName');
-      }
+      SafeLogger.debug('Set local timezone to: $timezoneName', tag: 'NotificationService');
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Failed to set local timezone: $e. Using UTC.');
-      }
+      SafeLogger.error('Failed to set local timezone, using UTC', error: e, tag: 'NotificationService');
       // Fallback to UTC if timezone detection fails
       tz.setLocalLocation(tz.UTC);
     }
@@ -88,10 +85,7 @@ class NotificationService {
         _lastPermissionCheck != null) {
       final timeSinceLastCheck = DateTime.now().difference(_lastPermissionCheck!);
       if (timeSinceLastCheck.inHours < 24) {
-        if (kDebugMode) {
-          debugPrint(
-              '[NotificationService] Using cached permission status: $_permissionsGranted');
-        }
+        SafeLogger.debug('Using cached permission status: $_permissionsGranted', tag: 'NotificationService');
         return _permissionsGranted!;
       }
     }
@@ -124,10 +118,7 @@ class NotificationService {
       _permissionsGranted = result;
       _lastPermissionCheck = DateTime.now();
 
-      if (kDebugMode) {
-        debugPrint(
-            '[NotificationService] Permission check result: $result (cached)');
-      }
+      SafeLogger.debug('Permission check result: $result (cached)', tag: 'NotificationService');
 
       return result;
     }
@@ -147,9 +138,7 @@ class NotificationService {
     final bool permissionsGranted = await _requestPermissions();
 
     if (!permissionsGranted) {
-      if (kDebugMode) {
-        debugPrint('Notification permissions not granted. Aborting schedule.');
-      }
+      SafeLogger.warning('Notification permissions not granted. Aborting schedule.', tag: 'NotificationService');
       return false;
     }
 
@@ -157,20 +146,12 @@ class NotificationService {
       // Convert to timezone-aware datetime
       final tzScheduledDate = tz.TZDateTime.from(scheduledDate, tz.local);
 
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Scheduling notification:');
-        debugPrint('  - Original date: $scheduledDate');
-        debugPrint('  - Timezone date: $tzScheduledDate');
-        debugPrint('  - Local timezone: ${tz.local.name}');
-        debugPrint('  - Current time: ${tz.TZDateTime.now(tz.local)}');
-      }
+      SafeLogger.debug('Scheduling notification:\n  - Original date: $scheduledDate\n  - Timezone date: $tzScheduledDate\n  - Local timezone: ${tz.local.name}\n  - Current time: ${tz.TZDateTime.now(tz.local)}', tag: 'NotificationService');
 
       // Ensure we're not scheduling in the past
       final now = tz.TZDateTime.now(tz.local);
       if (tzScheduledDate.isBefore(now)) {
-        if (kDebugMode) {
-          debugPrint('[NotificationService] Warning: Trying to schedule notification in the past. Scheduling for 1 minute from now.');
-        }
+        SafeLogger.warning('Trying to schedule notification in the past. Scheduling for 1 minute from now.', tag: 'NotificationService');
         // Schedule for 1 minute from now if date is in the past
         final adjustedDate = now.add(const Duration(minutes: 1));
         await _flutterLocalNotificationsPlugin.zonedSchedule(
@@ -216,9 +197,7 @@ class NotificationService {
       );
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error scheduling notification: $e');
-      }
+      SafeLogger.error('Error scheduling notification', error: e, tag: 'NotificationService');
       return false;
     }
   }
@@ -237,9 +216,7 @@ class NotificationService {
     final bool permissionsGranted = await _requestPermissions();
 
     if (!permissionsGranted) {
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Permissions not granted for local notification');
-      }
+      SafeLogger.warning('Permissions not granted for local notification', tag: 'NotificationService');
       return;
     }
 
@@ -262,13 +239,9 @@ class NotificationService {
         payload: payload,
       );
 
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Showed local notification: $title');
-      }
+      SafeLogger.debug('Showed local notification: $title', tag: 'NotificationService');
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Error showing local notification: $e');
-      }
+      SafeLogger.error('Error showing local notification', error: e, tag: 'NotificationService');
     }
   }
 
@@ -318,17 +291,10 @@ class NotificationService {
       diagnostics['currentTimezone'] = tz.local.name;
       diagnostics['currentTime'] = tz.TZDateTime.now(tz.local).toIso8601String();
 
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Diagnostic Info:');
-        diagnostics.forEach((key, value) {
-          debugPrint('  $key: $value');
-        });
-      }
+      SafeLogger.debug('Diagnostic Info: ${diagnostics.entries.map((e) => '${e.key}: ${e.value}').join(', ')}', tag: 'NotificationService');
     } catch (e) {
       diagnostics['error'] = e.toString();
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Error getting diagnostic info: $e');
-      }
+      SafeLogger.error('Error getting diagnostic info', error: e, tag: 'NotificationService');
     }
 
     return diagnostics;
@@ -345,9 +311,7 @@ class NotificationService {
       );
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[NotificationService] Test notification failed: $e');
-      }
+      SafeLogger.error('Test notification failed', error: e, tag: 'NotificationService');
       return false;
     }
   }

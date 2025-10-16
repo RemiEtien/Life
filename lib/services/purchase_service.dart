@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import '../providers/application_providers.dart';
+import '../utils/safe_logger.dart';
 
 // Идентификаторы ваших подписок в Google Play и App Store
 const String _monthlySubscriptionId = 'lifeline_premium_monthly';
@@ -58,7 +59,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     }, onDone: () {
       _subscription.cancel();
     }, onError: (error) {
-      debugPrint('[PurchaseService] Purchase stream error: $error');
+      SafeLogger.error('Purchase stream error', error: error, tag: 'PurchaseService');
     });
     initialize();
   }
@@ -67,7 +68,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     final isAvailable = await _inAppPurchase.isAvailable();
     if (!isAvailable) {
       state = state.copyWith(isAvailable: false, isLoading: false);
-      debugPrint('[PurchaseService] In-app purchases not available.');
+      SafeLogger.warning('In-app purchases not available on this device', tag: 'PurchaseService');
       return;
     }
     state = state.copyWith(isAvailable: true);
@@ -79,7 +80,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
     final ProductDetailsResponse response =
         await _inAppPurchase.queryProductDetails(_productIds);
     if (response.notFoundIDs.isNotEmpty) {
-      debugPrint('[PurchaseService] Not found IDs: ${response.notFoundIDs}');
+      SafeLogger.warning('Product IDs not found: ${response.notFoundIDs}', tag: 'PurchaseService');
     }
     final products = response.productDetails;
     // Сортируем, чтобы годовая подписка всегда была второй
@@ -98,13 +99,12 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       final bool success = await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
 
       if (!success) {
-        debugPrint('[PurchaseService] Failed to initiate purchase for ${productDetails.id}');
+        SafeLogger.warning('Failed to initiate purchase for product', tag: 'PurchaseService');
       }
 
       return success;
     } catch (e, stackTrace) {
-      debugPrint('[PurchaseService] Exception during buyProduct: $e');
-      debugPrint('[PurchaseService] Stack trace: $stackTrace');
+      SafeLogger.error('Exception during buyProduct', error: e, stackTrace: stackTrace, tag: 'PurchaseService');
 
       // Log to Crashlytics as non-fatal
       if (!kDebugMode) {
@@ -118,10 +118,9 @@ class PurchaseService extends StateNotifier<PurchaseState> {
   Future<void> restorePurchases() async {
     try {
       await _inAppPurchase.restorePurchases();
-      debugPrint('[PurchaseService] Purchases restored successfully');
+      SafeLogger.debug('Purchases restored successfully', tag: 'PurchaseService');
     } catch (e, stackTrace) {
-      debugPrint('[PurchaseService] Error restoring purchases: $e');
-      debugPrint('[PurchaseService] Stack trace: $stackTrace');
+      SafeLogger.error('Error restoring purchases', error: e, stackTrace: stackTrace, tag: 'PurchaseService');
 
       // Log to Crashlytics as non-fatal
       if (!kDebugMode) {
@@ -137,7 +136,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
         state = state.copyWith(isLoading: true, purchaseSuccess: false, errorMessage: null);
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
-          debugPrint('[PurchaseService] Purchase error: ${purchaseDetails.error}');
+          SafeLogger.warning('Purchase error: ${purchaseDetails.error?.message ?? "Unknown"}', tag: 'PurchaseService');
 
           // Log analytics - purchase failed
           unawaited(AnalyticsService.logPurchaseFailed(
@@ -177,7 +176,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
           defaultTargetPlatform == TargetPlatform.android ? 'android' : 'ios';
       final receipt = purchaseDetails.verificationData.serverVerificationData;
 
-      debugPrint('[PurchaseService] Calling verifyPurchase function with receipt for product ${purchaseDetails.productID}...');
+      SafeLogger.debug('Calling verifyPurchase cloud function', tag: 'PurchaseService');
 
       final result = await callable.call({
         'platform': platform,
@@ -185,7 +184,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
         'productId': purchaseDetails.productID,
       });
 
-      debugPrint('[PurchaseService] Cloud function call successful. Result: ${result.data}');
+      SafeLogger.debug('Purchase verification successful', tag: 'PurchaseService');
 
       // Extract price from ProductDetails (we'll need to get it from state.products)
       final product = state.products.firstWhere(
@@ -206,7 +205,7 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       // ИЗМЕНЕНИЕ: Принудительно обновляем профиль пользователя после успешной покупки
       // Это заставит isPremiumProvider пересчитаться
       _ref.invalidate(userProfileProvider);
-      debugPrint('[PurchaseService] User profile invalidated to refresh premium status');
+      SafeLogger.debug('User profile invalidated to refresh premium status', tag: 'PurchaseService');
 
       // Notify UI of successful purchase
       state = state.copyWith(
@@ -217,9 +216,10 @@ class PurchaseService extends StateNotifier<PurchaseState> {
 
     } catch (e) {
       // ИЗМЕНЕНИЕ: Более детальное логирование ошибок
-      debugPrint('[PurchaseService] Error verifying purchase with cloud function: $e');
       if (e is FirebaseFunctionsException) {
-          debugPrint('[PurchaseService] Cloud function error details: code=${e.code}, message=${e.message}, details=${e.details}');
+        SafeLogger.error('Cloud function error: ${e.code} - ${e.message}', error: e, tag: 'PurchaseService');
+      } else {
+        SafeLogger.error('Error verifying purchase', error: e, tag: 'PurchaseService');
       }
     }
   }

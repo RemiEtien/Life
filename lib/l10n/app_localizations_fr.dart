@@ -1432,4 +1432,32 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get emotionVisualizationPhotoColorGradingSubtitle =>
       'Adjust photos to emotions (Premium)';
+
+  @override
+  String get profileCreationErrorTitle => 'Échec de création du profil';
+
+  @override
+  String profileCreationErrorAttemptsMessage(int attempts) {
+    return 'Nous avons essayé $attempts fois mais nous n\'avons pas pu créer votre profil.';
+  }
+
+  @override
+  String get profileCreationErrorReasons => 'Cela peut être dû à :';
+
+  @override
+  String get profileCreationErrorReasonsList =>
+      '• Problèmes de connectivité réseau\n• Problèmes de serveur\n• Erreurs de permissions';
+
+  @override
+  String get profileCreationErrorTryAgain => 'Réessayer';
+
+  @override
+  String get profileCreationErrorLogout => 'Se déconnecter';
+
+  @override
+  String get profileCreationErrorContactSupport => 'Contacter le support';
+
+  @override
+  String get shareDialogErrorLoadingProfile =>
+      'Erreur lors du chargement du profil';
 }

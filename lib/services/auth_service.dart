@@ -7,7 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kDebugMode, TargetPlatform;
+    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,6 +18,7 @@ import 'user_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'analytics_service.dart';
+import '../utils/safe_logger.dart';
 
 class AuthService {
   final Ref _ref;
@@ -77,9 +78,7 @@ class AuthService {
 
         // Обрабатываем ошибки отдельно
         _authEventSubscription!.onError((error) {
-          if (kDebugMode) {
-            debugPrint('Google Sign-In error: $error');
-          }
+          SafeLogger.error('Google Sign-In error', error: error, tag: 'AuthService');
           // Завершаем Completer с ошибкой
           if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
             _signInCompleter!.completeError(error);
@@ -177,7 +176,7 @@ class AuthService {
 
     if (_isInitialized) {
       futures.add(GoogleSignIn.instance.signOut().catchError((e) {
-        if (kDebugMode) debugPrint('Google signOut error (ignored): $e');
+        SafeLogger.warning('Google signOut error (ignored)', tag: 'AuthService');
       }));
     }
 
@@ -189,7 +188,7 @@ class AuthService {
     try {
       await IsarService.close();
     } catch (e, stackTrace) {
-      if (kDebugMode) debugPrint('IsarService close error (ignored): $e');
+      SafeLogger.warning('IsarService close error during sign-out (ignored)', tag: 'AuthService');
       // Log to Crashlytics to track DB cleanup issues
       unawaited(FirebaseCrashlytics.instance.recordError(
         e,
@@ -202,7 +201,7 @@ class AuthService {
     try {
       await Future.wait(futures, eagerError: false);
     } catch (e, stackTrace) {
-      if (kDebugMode) debugPrint('SignOut cleanup error (continuing): $e');
+      SafeLogger.warning('SignOut cleanup error (continuing)', tag: 'AuthService');
       // Log to Crashlytics to track sign-out cleanup issues
       unawaited(FirebaseCrashlytics.instance.recordError(
         e,
@@ -233,9 +232,7 @@ class AuthService {
           await _signInCompleter!.future.timeout(
         const Duration(seconds: 30),
         onTimeout: () {
-          if (kDebugMode) {
-            debugPrint('Google Sign-In timeout');
-          }
+          SafeLogger.warning('Google Sign-In timeout', tag: 'AuthService');
           return null;
         },
       );
@@ -282,15 +279,15 @@ class AuthService {
       return userCredential;
     } catch (e, stackTrace) {
       _signInCompleter = null;
-      if (kDebugMode) {
-        debugPrint('Error during Google sign-in: $e');
-      }
 
       // Don't log user cancellation as an error
       final errorString = e.toString();
-      if (!errorString.contains('canceled') &&
-          !errorString.contains('Cancelled by user') &&
-          !errorString.contains('SIGN_IN_CANCELLED')) {
+      if (errorString.contains('canceled') ||
+          errorString.contains('Cancelled by user') ||
+          errorString.contains('SIGN_IN_CANCELLED')) {
+        SafeLogger.debug('Google sign-in cancelled by user', tag: 'AuthService');
+      } else {
+        SafeLogger.error('Google sign-in failed', error: e, stackTrace: stackTrace, tag: 'AuthService');
         unawaited(FirebaseCrashlytics.instance
             .recordError(e, stackTrace, reason: 'Google Sign-In Failed'));
       }
@@ -343,15 +340,14 @@ class AuthService {
 
       return userCredential;
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Apple sign-in failed: $e');
-      }
-
       // Don't log user cancellation as an error
       final errorString = e.toString();
-      if (!errorString.contains('canceled') &&
-          !errorString.contains('operation') &&
-          !errorString.contains('1001')) {  // Apple Sign-In cancellation code
+      if (errorString.contains('canceled') ||
+          errorString.contains('operation') ||
+          errorString.contains('1001')) {  // Apple Sign-In cancellation code
+        SafeLogger.debug('Apple sign-in cancelled by user', tag: 'AuthService');
+      } else {
+        SafeLogger.error('Apple sign-in failed', error: e, stackTrace: stackTrace, tag: 'AuthService');
         unawaited(FirebaseCrashlytics.instance
             .recordError(e, stackTrace, reason: 'Apple Sign-In Failed'));
       }
@@ -393,9 +389,7 @@ class AuthService {
       final dbFile = File('${dir.path}/lifeline_$uid.isar');
       if (await dbFile.exists()) {
         await dbFile.delete();
-        if (kDebugMode) {
-          debugPrint('[AuthService] Deleted local database file for user $uid.');
-        }
+        SafeLogger.debug('Deleted local database file after account deletion', tag: 'AuthService');
       }
 
       return 'success';

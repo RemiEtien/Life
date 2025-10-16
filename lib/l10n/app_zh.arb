@@ -682,5 +682,20 @@
   "emotionVisualizationMemoryParticlesTitle": "Emotion particles",
   "emotionVisualizationMemoryParticlesSubtitle": "Animated particles (Premium)",
   "emotionVisualizationPhotoColorGradingTitle": "Photo color grading",
-  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)"
+  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)",
+  "profileCreationErrorTitle": "无法创建个人资料",
+  "profileCreationErrorAttemptsMessage": "我们尝试了 {attempts} 次，但无法创建您的个人资料。",
+  "@profileCreationErrorAttemptsMessage": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "profileCreationErrorReasons": "这可能是由于：",
+  "profileCreationErrorReasonsList": "• 网络连接问题\n• 服务器问题\n• 权限错误",
+  "profileCreationErrorTryAgain": "重试",
+  "profileCreationErrorLogout": "退出登录",
+  "profileCreationErrorContactSupport": "联系支持",
+  "shareDialogErrorLoadingProfile": "加载个人资料时出错"
 }

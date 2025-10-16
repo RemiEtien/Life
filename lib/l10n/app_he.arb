@@ -682,5 +682,20 @@
   "emotionVisualizationMemoryParticlesTitle": "Emotion particles",
   "emotionVisualizationMemoryParticlesSubtitle": "Animated particles (Premium)",
   "emotionVisualizationPhotoColorGradingTitle": "Photo color grading",
-  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)"
+  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)",
+  "profileCreationErrorTitle": "נכשל ביצירת פרופיל",
+  "profileCreationErrorAttemptsMessage": "ניסינו {attempts} פעמים אך לא הצלחנו ליצור את הפרופיל שלך.",
+  "@profileCreationErrorAttemptsMessage": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "profileCreationErrorReasons": "זה עשוי לנבוע מ:",
+  "profileCreationErrorReasonsList": "• בעיות קישוריות רשת\n• בעיות שרת\n• שגיאות הרשאה",
+  "profileCreationErrorTryAgain": "נסה שוב",
+  "profileCreationErrorLogout": "התנתק",
+  "profileCreationErrorContactSupport": "צור קשר עם התמיכה",
+  "shareDialogErrorLoadingProfile": "שגיאה בטעינת הפרופיל"
 }

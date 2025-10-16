@@ -682,5 +682,20 @@
   "emotionVisualizationMemoryParticlesTitle": "Emotion particles",
   "emotionVisualizationMemoryParticlesSubtitle": "Animated particles (Premium)",
   "emotionVisualizationPhotoColorGradingTitle": "Photo color grading",
-  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)"
+  "emotionVisualizationPhotoColorGradingSubtitle": "Adjust photos to emotions (Premium)",
+  "profileCreationErrorTitle": "فشل في إنشاء الملف الشخصي",
+  "profileCreationErrorAttemptsMessage": "حاولنا {attempts} مرات لكن لم نتمكن من إنشاء ملفك الشخصي.",
+  "@profileCreationErrorAttemptsMessage": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "profileCreationErrorReasons": "قد يكون هذا بسبب:",
+  "profileCreationErrorReasonsList": "• مشاكل في الاتصال بالشبكة\n• مشاكل في الخادم\n• أخطاء في الأذونات",
+  "profileCreationErrorTryAgain": "حاول مرة أخرى",
+  "profileCreationErrorLogout": "تسجيل الخروج",
+  "profileCreationErrorContactSupport": "اتصل بالدعم",
+  "shareDialogErrorLoadingProfile": "خطأ في تحميل الملف الشخصي"
 }

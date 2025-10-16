@@ -682,5 +682,20 @@
   "emotionVisualizationMemoryParticlesTitle": "Эмоциональные частицы",
   "emotionVisualizationMemoryParticlesSubtitle": "Анимированные частицы (Premium)",
   "emotionVisualizationPhotoColorGradingTitle": "Цветокоррекция фото",
-  "emotionVisualizationPhotoColorGradingSubtitle": "Подстройка фото под эмоции (Premium)"
+  "emotionVisualizationPhotoColorGradingSubtitle": "Подстройка фото под эмоции (Premium)",
+  "profileCreationErrorTitle": "Не удалось создать профиль",
+  "profileCreationErrorAttemptsMessage": "Мы попробовали {attempts} раз, но не смогли создать ваш профиль.",
+  "@profileCreationErrorAttemptsMessage": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "profileCreationErrorReasons": "Это может быть связано с:",
+  "profileCreationErrorReasonsList": "• Проблемами с подключением к Интернету\n• Проблемами на сервере\n• Ошибками прав доступа",
+  "profileCreationErrorTryAgain": "Попробовать снова",
+  "profileCreationErrorLogout": "Выйти",
+  "profileCreationErrorContactSupport": "Связаться со службой поддержки",
+  "shareDialogErrorLoadingProfile": "Ошибка загрузки профиля"
 }

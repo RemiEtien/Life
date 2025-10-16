@@ -6,6 +6,7 @@ import 'package:synchronized/synchronized.dart';
 import '../memory.dart';
 import '../providers/application_providers.dart';
 import 'encryption_service.dart';
+import '../utils/safe_logger.dart';
 
 @immutable
 class SyncState {
@@ -92,10 +93,7 @@ class SyncService {
 
       if (idsToDelete.isNotEmpty) {
         final deletedCount = await repo.deleteAllByIds(idsToDelete);
-        if (kDebugMode) {
-          debugPrint(
-              '[SyncService] Deleted $deletedCount ghost memories from local DB.');
-        }
+        SafeLogger.debug('Deleted $deletedCount ghost memories from local DB', tag: 'SyncService');
       }
 
       // ИСПРАВЛЕНИЕ 2: Оптимизация. Создаем карту из уже загруженных данных.
@@ -119,10 +117,7 @@ class SyncService {
       }
 
       if (memoriesToUpsert.isNotEmpty) {
-        if (kDebugMode) {
-          debugPrint(
-              '[SyncService] Upserting ${memoriesToUpsert.length} memories from cloud.');
-        }
+        SafeLogger.debug('Upserting ${memoriesToUpsert.length} memories from cloud', tag: 'SyncService');
         await repo.upsertMemories(memoriesToUpsert);
       }
       
@@ -155,9 +150,7 @@ class SyncService {
     final hasWork = await _queueLock.synchronized(() => _syncQueue.isNotEmpty);
 
     if (_isPausedForUnlock && !_isProcessing && hasWork) {
-      if (kDebugMode) {
-        debugPrint('[SyncService] Resuming sync queue processing after unlock.');
-      }
+      SafeLogger.debug('Resuming sync queue processing after unlock', tag: 'SyncService');
       _isPausedForUnlock = false;
       unawaited(_processQueue());
     }
@@ -183,9 +176,7 @@ class SyncService {
 
     final toSync = await repo.getMemoriesToSync();
     if (toSync.isNotEmpty) {
-      if (kDebugMode) {
-        debugPrint('[SyncService] Found ${toSync.length} memories to sync.');
-      }
+      SafeLogger.debug('Found ${toSync.length} memories to sync', tag: 'SyncService');
       for (final memory in toSync) {
         unawaited(queueSync(memory.id).catchError((e, stackTrace) {
           FirebaseCrashlytics.instance.recordError(e, stackTrace,
@@ -260,9 +251,7 @@ class SyncService {
       await Future.delayed(const Duration(seconds: 1));
       unawaited(_processQueue());
     } on EncryptionLockedException {
-      if (kDebugMode) {
-        debugPrint('[SyncService] Queue processing paused. Waiting for unlock.');
-      }
+      SafeLogger.debug('Queue processing paused, waiting for unlock', tag: 'SyncService');
       _isProcessing = false;
       _isPausedForUnlock = true;
       _ref.read(syncNotifierProvider.notifier).updateState(
@@ -350,10 +339,7 @@ class SyncService {
           rethrow;
         }
 
-        if (kDebugMode) {
-          debugPrint(
-              '[SyncService] Attempt $attempt failed for memory $memoryId: $e');
-        }
+        SafeLogger.warning('Attempt $attempt failed for memory $memoryId, retrying', tag: 'SyncService');
         unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace,
             reason:
                 'SyncService: _syncMemoryWithRetries failed on attempt $attempt'));

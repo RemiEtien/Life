@@ -70,7 +70,8 @@
       "Bash(/dev/null)",
       "Bash(pkill:*)",
       "Bash(git rm:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(do sed -i '/\"\"\"\"emotionVisualizationPhotoColorGradingSubtitle\"\"\"\": \"\"\"\"Adjust photos to emotions (Premium)\"\"\"\"$/a\\  ,\"\"profileCreationErrorTitle\"\": \"\"Failed to Create Profile\"\",\\n  \"\"profileCreationErrorAttemptsMessage\"\": \"\"We tried {attempts} times but couldn''''t create your profile.\"\",\\n  \"\"@profileCreationErrorAttemptsMessage\"\": {\\n    \"\"placeholders\"\": {\\n      \"\"attempts\"\": {\\n        \"\"type\"\": \"\"int\"\"\\n      }\\n    }\\n  },\\n  \"\"profileCreationErrorReasons\"\": \"\"This might be due to:\"\",\\n  \"\"profileCreationErrorReasonsList\"\": \"\"• Network connectivity issues\\\\n• Server problems\\\\n• Permission errors\"\",\\n  \"\"profileCreationErrorTryAgain\"\": \"\"Try Again\"\",\\n  \"\"profileCreationErrorLogout\"\": \"\"Logout\"\",\\n  \"\"profileCreationErrorContactSupport\"\": \"\"Contact Support\"\",\\n  \"\"shareDialogErrorLoadingProfile\"\": \"\"Error loading profile\"\"' \"$file\")"
     ],
     "deny": [],
     "ask": []

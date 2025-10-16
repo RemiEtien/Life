@@ -134,13 +134,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
                   ),
                 ),
               ),
-              error: (error, stack) => const SafeArea(
+              error: (error, stack) => SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Center(
                     child: Text(
-                      'Error loading profile',
-                      style: TextStyle(color: Colors.red),
+                      l10n.shareDialogErrorLoadingProfile,
+                      style: const TextStyle(color: Colors.red),
                     ),
                   ),
                 ),
@@ -766,7 +766,7 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                     color: Colors.redAccent.shade100, size: 80),
                 const SizedBox(height: 24),
                 Text(
-                  'Failed to Create Profile',
+                  l10n.profileCreationErrorTitle,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
@@ -775,7 +775,7 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'We tried $attempts times but couldn\'t create your profile.',
+                  l10n.profileCreationErrorAttemptsMessage(attempts),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withAlpha((255 * 0.8).round()),
@@ -801,7 +801,7 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'This might be due to:',
+                  l10n.profileCreationErrorReasons,
                   style: TextStyle(
                     color: Colors.white.withAlpha((255 * 0.7).round()),
                     fontSize: 14,
@@ -809,7 +809,7 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '• Network connectivity issues\n• Server problems\n• Permission errors',
+                  l10n.profileCreationErrorReasonsList,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withAlpha((255 * 0.6).round()),
@@ -821,7 +821,7 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Try Again'),
+                    label: Text(l10n.profileCreationErrorTryAgain),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -833,7 +833,7 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.logout),
-                    label: const Text('Logout'),
+                    label: Text(l10n.profileCreationErrorLogout),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: Colors.white24),
@@ -844,9 +844,9 @@ class _ProfileCreationErrorScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 TextButton.icon(
                   icon: const Icon(Icons.email_outlined, size: 16),
-                  label: const Text(
-                    'Contact Support',
-                    style: TextStyle(fontSize: 12),
+                  label: Text(
+                    l10n.profileCreationErrorContactSupport,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   onPressed: () {
                     // TODO: Open email or support page

@@ -1418,4 +1418,32 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get emotionVisualizationPhotoColorGradingSubtitle =>
       'Подстройка фото под эмоции (Premium)';
+
+  @override
+  String get profileCreationErrorTitle => 'Не удалось создать профиль';
+
+  @override
+  String profileCreationErrorAttemptsMessage(int attempts) {
+    return 'Мы попробовали $attempts раз, но не смогли создать ваш профиль.';
+  }
+
+  @override
+  String get profileCreationErrorReasons => 'Это может быть связано с:';
+
+  @override
+  String get profileCreationErrorReasonsList =>
+      '• Проблемами с подключением к Интернету\n• Проблемами на сервере\n• Ошибками прав доступа';
+
+  @override
+  String get profileCreationErrorTryAgain => 'Попробовать снова';
+
+  @override
+  String get profileCreationErrorLogout => 'Выйти';
+
+  @override
+  String get profileCreationErrorContactSupport =>
+      'Связаться со службой поддержки';
+
+  @override
+  String get shareDialogErrorLoadingProfile => 'Ошибка загрузки профиля';
 }

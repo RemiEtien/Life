@@ -1405,4 +1405,31 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get emotionVisualizationPhotoColorGradingSubtitle =>
       'Adjust photos to emotions (Premium)';
+
+  @override
+  String get profileCreationErrorTitle => 'فشل في إنشاء الملف الشخصي';
+
+  @override
+  String profileCreationErrorAttemptsMessage(int attempts) {
+    return 'حاولنا $attempts مرات لكن لم نتمكن من إنشاء ملفك الشخصي.';
+  }
+
+  @override
+  String get profileCreationErrorReasons => 'قد يكون هذا بسبب:';
+
+  @override
+  String get profileCreationErrorReasonsList =>
+      '• مشاكل في الاتصال بالشبكة\n• مشاكل في الخادم\n• أخطاء في الأذونات';
+
+  @override
+  String get profileCreationErrorTryAgain => 'حاول مرة أخرى';
+
+  @override
+  String get profileCreationErrorLogout => 'تسجيل الخروج';
+
+  @override
+  String get profileCreationErrorContactSupport => 'اتصل بالدعم';
+
+  @override
+  String get shareDialogErrorLoadingProfile => 'خطأ في تحميل الملف الشخصي';
 }

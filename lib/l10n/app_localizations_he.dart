@@ -1394,4 +1394,31 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get emotionVisualizationPhotoColorGradingSubtitle =>
       'Adjust photos to emotions (Premium)';
+
+  @override
+  String get profileCreationErrorTitle => 'נכשל ביצירת פרופיל';
+
+  @override
+  String profileCreationErrorAttemptsMessage(int attempts) {
+    return 'ניסינו $attempts פעמים אך לא הצלחנו ליצור את הפרופיל שלך.';
+  }
+
+  @override
+  String get profileCreationErrorReasons => 'זה עשוי לנבוע מ:';
+
+  @override
+  String get profileCreationErrorReasonsList =>
+      '• בעיות קישוריות רשת\n• בעיות שרת\n• שגיאות הרשאה';
+
+  @override
+  String get profileCreationErrorTryAgain => 'נסה שוב';
+
+  @override
+  String get profileCreationErrorLogout => 'התנתק';
+
+  @override
+  String get profileCreationErrorContactSupport => 'צור קשר עם התמיכה';
+
+  @override
+  String get shareDialogErrorLoadingProfile => 'שגיאה בטעינת הפרופיל';
 }

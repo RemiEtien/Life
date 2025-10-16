@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_profile.dart';
 import 'package:path_provider/path_provider.dart';
+import '../utils/safe_logger.dart';
 
 class UserService {
   UserService(Ref ref);
@@ -84,9 +85,7 @@ class UserService {
     try {
       final currentLocale = Localizations.localeOf(context);
 
-      if (kDebugMode) {
-        debugPrint('[UserService] Creating profile with locale from context: ${currentLocale.languageCode}');
-      }
+      SafeLogger.debug('Creating profile with locale: ${currentLocale.languageCode}', tag: 'UserService');
       unawaited(FirebaseCrashlytics.instance.setCustomKey('user_language_on_creation', currentLocale.languageCode));
 
       final userEmail = user.email;
@@ -152,20 +151,16 @@ class UserService {
 
   Future<void> updateUserProfile(UserProfile profile) async {
     try {
-      debugPrint('[UserService] updateUserProfile started for uid: ${profile.uid}');
+      SafeLogger.debug('updateUserProfile started for uid: ${profile.uid}', tag: 'UserService');
       // Convert to JSON and remove premium fields that are blocked by Firestore Rules
       final data = profile.toJson();
-      debugPrint('[UserService] Profile data keys: ${data.keys.toList()}');
       data.remove('isPremium');
       data.remove('premiumUntil');
-      debugPrint('[UserService] Removed premium fields, remaining keys: ${data.keys.toList()}');
 
-      debugPrint('[UserService] Calling Firestore update');
       await _usersCollection.doc(profile.uid).update(data);
-      debugPrint('[UserService] Firestore update completed successfully');
+      SafeLogger.debug('Firestore update completed successfully', tag: 'UserService');
     } catch (e, stackTrace) {
-       debugPrint('[UserService] ERROR in updateUserProfile: $e');
-       debugPrint('[UserService] Stack trace: $stackTrace');
+       SafeLogger.error('updateUserProfile failed', error: e, stackTrace: stackTrace, tag: 'UserService');
        unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: updateUserProfile failed'));
        rethrow;
     }
@@ -175,13 +170,13 @@ class UserService {
     try {
       final currentUser = _auth.currentUser;
       if (currentUser == null) {
-        debugPrint('[UserService] uploadAvatar: Current user is null. Aborting.');
+        SafeLogger.warning('uploadAvatar: Current user is null, aborting', tag: 'UserService');
         return null;
       }
-      
-      debugPrint('[UserService] uploadAvatar: Forcing token refresh...');
+
+      SafeLogger.debug('uploadAvatar: Forcing token refresh', tag: 'UserService');
       await currentUser.getIdToken(true);
-      debugPrint('[UserService] uploadAvatar: Token refreshed. Proceeding with upload.');
+      SafeLogger.debug('uploadAvatar: Token refreshed, proceeding with upload', tag: 'UserService');
 
       final ref = _storage.ref().child('users').child(uid).child('avatar.jpg');
 
@@ -189,9 +184,7 @@ class UserService {
       final downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
     } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('Error uploading avatar: $e');
-      }
+      SafeLogger.error('uploadAvatar failed', error: e, stackTrace: stackTrace, tag: 'UserService');
       unawaited(FirebaseCrashlytics.instance.recordError(e, stackTrace, reason: 'UserService: uploadAvatar failed'));
       return null;
     }

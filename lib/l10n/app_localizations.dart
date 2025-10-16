@@ -2607,6 +2607,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Adjust photos to emotions (Premium)'**
   String get emotionVisualizationPhotoColorGradingSubtitle;
+
+  /// No description provided for @profileCreationErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Create Profile'**
+  String get profileCreationErrorTitle;
+
+  /// No description provided for @profileCreationErrorAttemptsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We tried {attempts} times but couldn\'t create your profile.'**
+  String profileCreationErrorAttemptsMessage(int attempts);
+
+  /// No description provided for @profileCreationErrorReasons.
+  ///
+  /// In en, this message translates to:
+  /// **'This might be due to:'**
+  String get profileCreationErrorReasons;
+
+  /// No description provided for @profileCreationErrorReasonsList.
+  ///
+  /// In en, this message translates to:
+  /// **'• Network connectivity issues\n• Server problems\n• Permission errors'**
+  String get profileCreationErrorReasonsList;
+
+  /// No description provided for @profileCreationErrorTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get profileCreationErrorTryAgain;
+
+  /// No description provided for @profileCreationErrorLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get profileCreationErrorLogout;
+
+  /// No description provided for @profileCreationErrorContactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Support'**
+  String get profileCreationErrorContactSupport;
+
+  /// No description provided for @shareDialogErrorLoadingProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading profile'**
+  String get shareDialogErrorLoadingProfile;
 }
 
 class _AppLocalizationsDelegate

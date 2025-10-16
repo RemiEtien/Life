@@ -1349,4 +1349,30 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get emotionVisualizationPhotoColorGradingSubtitle =>
       'Adjust photos to emotions (Premium)';
+
+  @override
+  String get profileCreationErrorTitle => '无法创建个人资料';
+
+  @override
+  String profileCreationErrorAttemptsMessage(int attempts) {
+    return '我们尝试了 $attempts 次，但无法创建您的个人资料。';
+  }
+
+  @override
+  String get profileCreationErrorReasons => '这可能是由于：';
+
+  @override
+  String get profileCreationErrorReasonsList => '• 网络连接问题\n• 服务器问题\n• 权限错误';
+
+  @override
+  String get profileCreationErrorTryAgain => '重试';
+
+  @override
+  String get profileCreationErrorLogout => '退出登录';
+
+  @override
+  String get profileCreationErrorContactSupport => '联系支持';
+
+  @override
+  String get shareDialogErrorLoadingProfile => '加载个人资料时出错';
 }
