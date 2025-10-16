@@ -143,7 +143,10 @@ class SyncService {
     } finally {
       _isReconciling = false;
       if (!isInitialSync) {
-        unawaited(_checkForUnsyncedMemories());
+        unawaited(_checkForUnsyncedMemories().catchError((e, stackTrace) {
+          FirebaseCrashlytics.instance.recordError(e, stackTrace,
+              reason: 'SyncService: _checkForUnsyncedMemories failed');
+        }));
       }
     }
   }
@@ -184,7 +187,10 @@ class SyncService {
         debugPrint('[SyncService] Found ${toSync.length} memories to sync.');
       }
       for (final memory in toSync) {
-        unawaited(queueSync(memory.id));
+        unawaited(queueSync(memory.id).catchError((e, stackTrace) {
+          FirebaseCrashlytics.instance.recordError(e, stackTrace,
+              reason: 'SyncService: queueSync failed for memory ${memory.id}');
+        }));
       }
     }
   }

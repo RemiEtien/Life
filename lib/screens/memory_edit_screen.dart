@@ -1015,6 +1015,10 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         );
       },
     );
+
+    // MEMORY LEAK FIX: Dispose controller after dialog closes
+    passwordController.dispose();
+
     return result ?? false;
   }
 

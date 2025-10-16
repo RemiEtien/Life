@@ -649,7 +649,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           );
         });
       },
-    );
+    ).then((result) {
+      // MEMORY LEAK FIX: Dispose controller after dialog closes
+      passwordController.dispose();
+      return result;
+    });
   }
 
   Future<bool?> _showSocialReauthDialog(

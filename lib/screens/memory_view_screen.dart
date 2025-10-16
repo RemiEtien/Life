@@ -802,6 +802,9 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
       },
     );
 
+    // MEMORY LEAK FIX: Dispose controller after dialog closes
+    passwordController.dispose();
+
     if (unlocked == true && mounted) {
       unawaited(ref.read(syncServiceProvider).resumeSync());
     }
