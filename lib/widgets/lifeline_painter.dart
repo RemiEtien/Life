@@ -244,15 +244,15 @@ class StructurePainter extends CustomPainter {
     const pulse = 1.0;
     const arteryColor = Color(0xFFFF8A80);
 
-    // PERFORMANCE: Reduced from 7 to 5 layers (now capped at 5 in _drawSingleArtery)
-    // This is cached, so it doesn't change per frame
+    // NOTE: This is CACHED (drawn once), so we can use max layers for quality
+    // Only branches (drawn every frame) are optimized to fewer layers
     final mainLayerCount = DevicePerformanceDetector.getSmartLayerCount(5, 2, 'mainLine');
     _drawSingleArtery(canvas, mainPath,
         baseColor: arteryColor,
         intensity: 1.0,
         width: 1.0,
         pulse: pulse,
-        maxLayers: mainLayerCount);
+        maxLayers: mainLayerCount); // Always 5 layers (max quality)
   }
 
   // Новый метод: линия с градиентом на основе эмоций
