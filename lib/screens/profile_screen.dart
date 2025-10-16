@@ -1545,7 +1545,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
           ),
           subtitle: Text(l10n.emotionVisualizationMemoryParticlesSubtitle),
-          value: profile.enableMemoryViewParticles,
+          value: isPremium ? profile.enableMemoryViewParticles : false,
           onChanged: isPremium
             ? (value) {
                 final updatedProfile = profile.copyWith(enableMemoryViewParticles: value);
@@ -1574,7 +1574,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
           ),
           subtitle: Text(l10n.emotionVisualizationPhotoColorGradingSubtitle),
-          value: profile.enablePhotoColorGrading,
+          value: isPremium ? profile.enablePhotoColorGrading : false,
           onChanged: isPremium
             ? (value) {
                 final updatedProfile = profile.copyWith(enablePhotoColorGrading: value);

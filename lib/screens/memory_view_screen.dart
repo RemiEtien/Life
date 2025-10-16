@@ -1041,7 +1041,8 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
             );
 
       // Применяем color grading если включено (PREMIUM)
-      if (userProfile?.enablePhotoColorGrading == true &&
+      if (userProfile?.isPremium == true &&
+          userProfile?.enablePhotoColorGrading == true &&
           _currentMemory.primaryEmotion != null) {
         final colorFilter = _getColorGradingFilter(
           _currentMemory.primaryEmotion,
@@ -1101,6 +1102,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                 ),
               // Анимированные частицы (PREMIUM)
               if (_currentMemory.primaryEmotion != null &&
+                  userProfile?.isPremium == true &&
                   userProfile?.enableMemoryViewParticles == true)
                 Positioned.fill(
                   child: IgnorePointer(
