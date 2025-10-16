@@ -154,6 +154,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    SafeLogger.debug('AuthService: signOut() called - Starting sign out process');
+
     // Log analytics
     await AnalyticsService.logLogout();
 
@@ -161,9 +163,13 @@ class AuthService {
     // Это гарантирует, что при следующем запуске приложение не будет считать
     // себя заблокированным, а перейдет в состояние "notConfigured".
     // CRITICAL: Clear secure storage to prevent key leakage between users
+    final currentEncryptionState = _ref.read(encryptionServiceProvider);
     final encryptionService = _ref.read(encryptionServiceProvider.notifier);
+    SafeLogger.debug('AuthService: Calling encryptionService.resetOnSignOut() - Current encryption state: $currentEncryptionState');
     // Note: resetOnSignOut() is synchronous on StateNotifier but should trigger async cleanup
     encryptionService.resetOnSignOut();
+    final newEncryptionState = _ref.read(encryptionServiceProvider);
+    SafeLogger.debug('AuthService: After resetOnSignOut() - Encryption state: $newEncryptionState');
 
     _currentUser = null;
     if (_signInCompleter != null && !_signInCompleter!.isCompleted) {

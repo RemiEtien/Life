@@ -53,15 +53,24 @@ class SyncService {
   }
 
   Future<void> syncFromCloudToLocal({bool isInitialSync = false}) async {
+    SafeLogger.debug('SyncService: syncFromCloudToLocal() called - isInitialSync: $isInitialSync', tag: 'SyncService');
+
     final notifier = _ref.read(syncNotifierProvider.notifier);
-    if (_isReconciling || (!isInitialSync && _ref.read(syncNotifierProvider).isSyncing)) return;
+    if (_isReconciling || (!isInitialSync && _ref.read(syncNotifierProvider).isSyncing)) {
+      SafeLogger.debug('SyncService: Skipping sync - already reconciling or syncing', tag: 'SyncService');
+      return;
+    }
 
     final repo = _ref.read(memoryRepositoryProvider);
     final firestore = _ref.read(firestoreServiceProvider);
     final userId = repo?.userId;
 
-    if (userId == null || repo == null) return;
+    if (userId == null || repo == null) {
+      SafeLogger.debug('SyncService: Skipping sync - userId or repo is null', tag: 'SyncService');
+      return;
+    }
 
+    SafeLogger.debug('SyncService: Starting sync for user: $userId', tag: 'SyncService');
     _isReconciling = true;
 
     if (!isInitialSync) {
@@ -74,10 +83,13 @@ class SyncService {
       if (cloudMemories == null) {
         throw Exception('Could not fetch memories from cloud.');
       }
+      SafeLogger.debug('SyncService: Fetched ${cloudMemories.length} memories from cloud', tag: 'SyncService');
+
       final cloudIds =
           cloudMemories.map((m) => m.firestoreId).nonNulls.toSet();
 
       final allLocalMemories = await repo.getAllMemories();
+      SafeLogger.debug('SyncService: Found ${allLocalMemories.length} memories in local DB', tag: 'SyncService');
       
       // ИСПРАВЛЕНИЕ 1: Исключаем все несинхронизированные статусы из сверки
       final Set<String> unsyncedStatuses = {'pending', 'draft', 'syncing', 'failed'};
@@ -118,10 +130,19 @@ class SyncService {
 
       if (memoriesToUpsert.isNotEmpty) {
         SafeLogger.debug('Upserting ${memoriesToUpsert.length} memories from cloud', tag: 'SyncService');
+        for (final mem in memoriesToUpsert) {
+          SafeLogger.debug('  - Memory ${mem.id} (firestoreId: ${mem.firestoreId}, lastModified: ${mem.lastModified})', tag: 'SyncService');
+        }
         await repo.upsertMemories(memoriesToUpsert);
+        SafeLogger.debug('Successfully upserted ${memoriesToUpsert.length} memories', tag: 'SyncService');
+      } else {
+        SafeLogger.debug('No memories to upsert from cloud', tag: 'SyncService');
       }
-      
+
       await repo.repairOrphanedUserIds();
+
+      final finalLocalCount = await repo.getAllMemories().then((m) => m.length);
+      SafeLogger.debug('SyncService: Sync complete! Final local memory count: $finalLocalCount', tag: 'SyncService');
 
       if (!isInitialSync) {
         notifier.updateState(isSyncing: false, currentStatus: 'Sync complete!');

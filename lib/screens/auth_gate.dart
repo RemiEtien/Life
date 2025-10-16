@@ -610,6 +610,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             // **CRITICAL LOGIC**: Show UnlockScreen if encryption is enabled and state is locked.
             if (profile.isEncryptionEnabled &&
                 encryptionState == EncryptionState.locked) {
+              unawaited(FirebaseCrashlytics.instance.log(
+                'AuthGate: Showing UnlockScreen - profile.isEncryptionEnabled: true, encryptionState: locked, user: ${user.uid}'));
               return const UnlockScreen();
             }
 

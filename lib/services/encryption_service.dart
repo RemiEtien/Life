@@ -14,6 +14,7 @@ import 'package:pointycastle/macs/hmac.dart';
 import '../memory.dart';
 import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
+import '../utils/safe_logger.dart';
 import 'crypto_isolate.dart';
 
 // --- NEW KEYS FOR SECURE STORAGE ---
@@ -126,6 +127,7 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     // Condition 1: User logged out. Reset everything.
     if (newProfile == null) {
       if (state != EncryptionState.notConfigured) {
+        SafeLogger.debug('EncryptionService: _initializeState - User logged out, resetting to notConfigured. Previous state: $state');
         _unlockedDEK = null;
         _currentUserId = null;
         _isAttemptingUnlock = false;
@@ -139,17 +141,20 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     final currentUser = _ref.read(authStateChangesProvider).asData?.value;
     if (currentUser == null || currentUser.uid != newProfile.uid) {
       // Profile data doesn't match current auth state - ignore it
+      SafeLogger.debug('EncryptionService: _initializeState - Profile mismatch detected! currentUser: ${currentUser?.uid}, newProfile.uid: ${newProfile.uid}. Ignoring stale profile data.');
       return;
     }
 
     // Condition 2: User has changed. Reset everything for the new user.
     if (_currentUserId != newProfile.uid) {
+      SafeLogger.debug('EncryptionService: _initializeState - User changed from $_currentUserId to ${newProfile.uid}. isEncryptionEnabled: ${newProfile.isEncryptionEnabled}');
       _unlockedDEK = null;
       _currentUserId = newProfile.uid;
       _isAttemptingUnlock = false;
       state = newProfile.isEncryptionEnabled
           ? EncryptionState.locked
           : EncryptionState.notConfigured;
+      SafeLogger.debug('EncryptionService: _initializeState - New state after user change: $state');
       return;
     }
 
