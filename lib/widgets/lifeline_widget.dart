@@ -16,6 +16,7 @@ import '../models/user_profile.dart';
 import '../utils/error_handler.dart';
 import '../utils/interactive_benchmark_controller.dart';
 import '../utils/performance_profiler.dart';
+import '../utils/safe_logger.dart';
 import '../providers/application_providers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -899,7 +900,33 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
       branchAnimationValue: _branchController.value,
     );
 
+    // FIX: Add timeout to prevent infinite calculating state if isolate hangs
+    bool hasReceivedResponse = false;
+    final timeout = Timer(const Duration(seconds: 10), () {
+      if (!hasReceivedResponse && mounted && !_isDisposed) {
+        SafeLogger.warning('[LIFELINE] Geometry calculation timed out after 10 seconds', tag: 'LifelineWidget');
+        receivePort.close();
+        if (mounted && !_isDisposed) {
+          setState(() => _isCalculating = false);
+        }
+        // Retry calculation
+        if (_recalculationNeeded && _pendingMemoriesForRecalculation != null) {
+          final pendingMemories = _pendingMemoriesForRecalculation;
+          _recalculationNeeded = false;
+          _pendingMemoriesForRecalculation = null;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && !_isDisposed) {
+              _requestFullRecalculation(pendingMemories!);
+            }
+          });
+        }
+      }
+    });
+
     receivePort.listen((message) {
+      hasReceivedResponse = true;
+      timeout.cancel();
+
       if (_isDisposed || !mounted) {
         receivePort.close();
         return;
@@ -983,9 +1010,34 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
         }
       }
       receivePort.close();
+    }, onError: (error, stackTrace) {
+      // FIX: Handle isolate errors to prevent stuck calculating state
+      hasReceivedResponse = true;
+      timeout.cancel();
+      SafeLogger.error('[LIFELINE] Geometry calculation isolate error',
+          error: error, stackTrace: stackTrace, tag: 'LifelineWidget');
+      receivePort.close();
+      if (mounted && !_isDisposed) {
+        setState(() => _isCalculating = false);
+      }
     });
 
-    Isolate.spawn(lifelineIsolateEntry, input);
+    // FIX: Handle Isolate.spawn errors
+    Isolate.spawn(lifelineIsolateEntry, input).then(
+      (isolate) {
+        // Successfully spawned isolate
+      },
+      onError: (error, stackTrace) {
+        hasReceivedResponse = true;
+        timeout.cancel();
+        SafeLogger.error('[LIFELINE] Failed to spawn geometry calculation isolate',
+            error: error, stackTrace: stackTrace, tag: 'LifelineWidget');
+        receivePort.close();
+        if (mounted && !_isDisposed) {
+          setState(() => _isCalculating = false);
+        }
+      },
+    );
   }
 
   ui.Path _createFlatYearLine(double width, double height) {

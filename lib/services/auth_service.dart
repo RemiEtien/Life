@@ -163,13 +163,25 @@ class AuthService {
     // Это гарантирует, что при следующем запуске приложение не будет считать
     // себя заблокированным, а перейдет в состояние "notConfigured".
     // CRITICAL: Clear secure storage to prevent key leakage between users
-    final currentEncryptionState = _ref.read(encryptionServiceProvider);
-    final encryptionService = _ref.read(encryptionServiceProvider.notifier);
-    SafeLogger.debug('AuthService: Calling encryptionService.resetOnSignOut() - Current encryption state: $currentEncryptionState');
-    // Note: resetOnSignOut() is synchronous on StateNotifier but should trigger async cleanup
-    encryptionService.resetOnSignOut();
-    final newEncryptionState = _ref.read(encryptionServiceProvider);
-    SafeLogger.debug('AuthService: After resetOnSignOut() - Encryption state: $newEncryptionState');
+    //
+    // FIX: Don't read encryptionServiceProvider during signOut to avoid CircularDependencyError.
+    // The provider is being torn down during sign out, so reading it causes circular dependency.
+    // Just call resetOnSignOut() directly on the notifier.
+    try {
+      final encryptionService = _ref.read(encryptionServiceProvider.notifier);
+      SafeLogger.debug('AuthService: Calling encryptionService.resetOnSignOut()');
+      encryptionService.resetOnSignOut();
+      SafeLogger.debug('AuthService: resetOnSignOut() completed successfully');
+    } catch (e, stackTrace) {
+      // Log but don't block sign out if encryption reset fails
+      SafeLogger.warning('Failed to reset encryption state during sign out', tag: 'AuthService');
+      unawaited(FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'Encryption state reset failed during sign-out',
+        fatal: false,
+      ));
+    }
 
     _currentUser = null;
     if (_signInCompleter != null && !_signInCompleter!.isCompleted) {
