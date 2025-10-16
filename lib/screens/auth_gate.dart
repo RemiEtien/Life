@@ -608,11 +608,17 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             }
 
             // **CRITICAL LOGIC**: Show UnlockScreen if encryption is enabled and state is locked.
-            if (profile.isEncryptionEnabled &&
+            // FIX: Verify profile matches current user to prevent showing UnlockScreen with stale profile data after sign out
+            if (profile.uid == user.uid &&
+                profile.isEncryptionEnabled &&
                 encryptionState == EncryptionState.locked) {
               unawaited(FirebaseCrashlytics.instance.log(
-                'AuthGate: Showing UnlockScreen - profile.isEncryptionEnabled: true, encryptionState: locked, user: ${user.uid}'));
+                'AuthGate: Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}, profile.isEncryptionEnabled: true, encryptionState: locked'));
               return const UnlockScreen();
+            } else if (profile.isEncryptionEnabled && encryptionState == EncryptionState.locked) {
+              // Profile doesn't match current user - log and don't show UnlockScreen
+              unawaited(FirebaseCrashlytics.instance.log(
+                'AuthGate: Skipping UnlockScreen - profile mismatch (profile.uid: ${profile.uid}, user.uid: ${user.uid})'));
             }
 
             // If not locked, proceed to show the main app content.

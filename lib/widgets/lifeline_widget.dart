@@ -902,9 +902,13 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
 
     // FIX: Add timeout to prevent infinite calculating state if isolate hangs
     bool hasReceivedResponse = false;
+    SafeLogger.debug('[LIFELINE] Starting geometry calculation with 10-second timeout', tag: 'LifelineWidget');
+
     final timeout = Timer(const Duration(seconds: 10), () {
+      SafeLogger.debug('[LIFELINE] Timeout callback fired! hasReceivedResponse=$hasReceivedResponse, mounted=$mounted, _isDisposed=$_isDisposed', tag: 'LifelineWidget');
+
       if (!hasReceivedResponse && mounted && !_isDisposed) {
-        SafeLogger.warning('[LIFELINE] Geometry calculation timed out after 10 seconds', tag: 'LifelineWidget');
+        SafeLogger.warning('[LIFELINE] Geometry calculation timed out after 10 seconds - isolate appears to be stuck!', tag: 'LifelineWidget');
         receivePort.close();
         if (mounted && !_isDisposed) {
           setState(() => _isCalculating = false);
@@ -914,20 +918,25 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
           final pendingMemories = _pendingMemoriesForRecalculation;
           _recalculationNeeded = false;
           _pendingMemoriesForRecalculation = null;
+          SafeLogger.debug('[LIFELINE] Retrying calculation after timeout with ${pendingMemories?.length ?? 0} memories', tag: 'LifelineWidget');
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && !_isDisposed) {
-              _requestFullRecalculation(pendingMemories!);
+            if (mounted && !_isDisposed && pendingMemories != null) {
+              _requestFullRecalculation(pendingMemories);
             }
           });
         }
+      } else {
+        SafeLogger.debug('[LIFELINE] Timeout fired but hasReceivedResponse=$hasReceivedResponse (no action needed)', tag: 'LifelineWidget');
       }
     });
 
     receivePort.listen((message) {
       hasReceivedResponse = true;
       timeout.cancel();
+      SafeLogger.debug('[LIFELINE] Received response from isolate, cancelling timeout', tag: 'LifelineWidget');
 
       if (_isDisposed || !mounted) {
+        SafeLogger.debug('[LIFELINE] Widget disposed or unmounted, ignoring response', tag: 'LifelineWidget');
         receivePort.close();
         return;
       }
@@ -1025,7 +1034,7 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     // FIX: Handle Isolate.spawn errors
     Isolate.spawn(lifelineIsolateEntry, input).then(
       (isolate) {
-        // Successfully spawned isolate
+        SafeLogger.debug('[LIFELINE] Successfully spawned geometry calculation isolate', tag: 'LifelineWidget');
       },
       onError: (error, stackTrace) {
         hasReceivedResponse = true;
