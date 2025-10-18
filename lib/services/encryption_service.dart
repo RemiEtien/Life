@@ -306,6 +306,23 @@ class EncryptionService extends StateNotifier<EncryptionState> {
 
   /// Enables Quick Unlock after verifying master password.
   Future<bool> enableQuickUnlock(String masterPassword) async {
+    // SECURITY FIX: ALWAYS verify the master password, even if session is already unlocked
+    // This prevents enabling quick unlock with any password when already unlocked
+    final userProfile = _ref.read(userProfileProvider).value;
+    if (userProfile?.wrappedDEK == null || userProfile?.salt == null) {
+      return false;
+    }
+
+    // Verify password by attempting to unwrap DEK
+    try {
+      await _unwrapDek(masterPassword, userProfile!.salt!, userProfile.wrappedDEK!, true);
+    } catch (e) {
+      // Password is incorrect
+      return false;
+    }
+
+    // If we got here, password is correct
+    // Now ensure session is unlocked
     if (_unlockedDEK == null) {
       try {
         await unlockSession(masterPassword);
@@ -328,12 +345,10 @@ class EncryptionService extends StateNotifier<EncryptionState> {
     await _secureStorage.write(
         key: _kEncryptedDekKey, value: encryptedDEKB64, aOptions: aOptions);
 
-    final userProfile = _ref.read(userProfileProvider).value;
-    if (userProfile != null) {
-      await _ref
-          .read(userServiceProvider)
-          .updateUserProfile(userProfile.copyWith(isQuickUnlockEnabled: true));
-    }
+    // Update user profile to enable quick unlock (userProfile already fetched at start)
+    await _ref
+        .read(userServiceProvider)
+        .updateUserProfile(userProfile.copyWith(isQuickUnlockEnabled: true));
     return true;
   }
 
