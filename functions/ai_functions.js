@@ -410,7 +410,7 @@ Keep response concise (max 100 words) and empathetic.
 Return ONLY plain text, no JSON.
 `;
 
-        const prediction = await callGeminiAPI(prompt, "gemini-2.5-flash-lite", apiKey);
+        const prediction = await callGeminiAPI(prompt, "gemini-2.5-flash-lite", GEMINI_API_KEY.value());
 
         // Save predictive insight
         await admin.firestore().collection(`users/${userId}/insights`).add({
