@@ -433,6 +433,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get emotionAnger => 'כעס';
 
   @override
+  String get emotionSurprise => 'הפתעה';
+
+  @override
+  String get emotionDisgust => 'גועל';
+
+  @override
   String get memoryEditCbtHelperTitle => 'עוזר רפלקציה';
 
   @override

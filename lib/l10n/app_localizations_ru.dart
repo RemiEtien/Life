@@ -438,6 +438,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get emotionAnger => 'Злость';
 
   @override
+  String get emotionSurprise => 'Удивление';
+
+  @override
+  String get emotionDisgust => 'Отвращение';
+
+  @override
   String get memoryEditCbtHelperTitle => 'Помощник по рефлексии';
 
   @override

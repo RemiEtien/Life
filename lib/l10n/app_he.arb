@@ -143,6 +143,8 @@
   "emotionLove": "אהבה",
   "emotionFear": "פחד",
   "emotionAnger": "כעס",
+  "emotionSurprise": "הפתעה",
+  "emotionDisgust": "גועל",
   "memoryEditCbtHelperTitle": "עוזר רפלקציה",
   "memoryEditCbtStep1Title": "מה הייתה המחשבה או האמונה הראשונה?",
   "memoryEditCbtStep1Subtitle": "לדוגמה, 'אני אכשל' או 'עשיתי הכל נכון'.",

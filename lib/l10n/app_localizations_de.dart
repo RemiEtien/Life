@@ -443,6 +443,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get emotionAnger => 'Wut';
 
   @override
+  String get emotionSurprise => 'Überraschung';
+
+  @override
+  String get emotionDisgust => 'Ekel';
+
+  @override
   String get memoryEditCbtHelperTitle => 'Reflexionshelfer';
 
   @override

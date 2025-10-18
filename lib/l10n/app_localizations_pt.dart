@@ -437,6 +437,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get emotionAnger => 'Raiva';
 
   @override
+  String get emotionSurprise => 'Surpresa';
+
+  @override
+  String get emotionDisgust => 'Nojo';
+
+  @override
   String get memoryEditCbtHelperTitle => 'Assistente de Reflexão';
 
   @override

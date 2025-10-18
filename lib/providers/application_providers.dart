@@ -361,3 +361,9 @@ final localeProvider = StateNotifierProvider<LocaleNotifier, Locale?>((ref) {
 // prompt is shown, which temporarily puts the app in the background.
 final isUnlockScreenVisibleProvider = StateProvider<bool>((ref) => false);
 
+// FIX: Provider to track if signOut is in progress
+// This prevents UnlockScreen from appearing during the race condition when
+// AuthGate rebuilds DURING signOut before it completes
+// Using StateProvider to avoid CircularDependencyError
+final isSigningOutProvider = StateProvider<bool>((ref) => false);
+

@@ -143,6 +143,8 @@
   "emotionLove": "Amour",
   "emotionFear": "Peur",
   "emotionAnger": "Colère",
+  "emotionSurprise": "Surprise",
+  "emotionDisgust": "Dégoût",
   "memoryEditCbtHelperTitle": "Aide à la réflexion",
   "memoryEditCbtStep1Title": "Quelle a été la première pensée ou croyance ?",
   "memoryEditCbtStep1Subtitle": "par exemple, 'Je vais échouer' ou 'J'ai tout fait correctement'.",

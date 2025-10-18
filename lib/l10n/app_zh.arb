@@ -143,6 +143,8 @@
   "emotionLove": "爱",
   "emotionFear": "恐惧",
   "emotionAnger": "愤怒",
+  "emotionSurprise": "惊讶",
+  "emotionDisgust": "厌恶",
   "memoryEditCbtHelperTitle": "反思助手",
   "memoryEditCbtStep1Title": "最初的想法或信念是什么？",
   "memoryEditCbtStep1Subtitle": "例如，“我会失败”或“我做的一切都对”。",

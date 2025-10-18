@@ -143,6 +143,8 @@
   "emotionLove": "Amor",
   "emotionFear": "Miedo",
   "emotionAnger": "Ira",
+  "emotionSurprise": "Sorpresa",
+  "emotionDisgust": "Asco",
   "memoryEditCbtHelperTitle": "Ayudante de reflexión",
   "memoryEditCbtStep1Title": "¿Cuál fue el primer pensamiento o creencia?",
   "memoryEditCbtStep1Subtitle": "p. ej., 'Voy a fracasar' o 'Hice todo bien'.",

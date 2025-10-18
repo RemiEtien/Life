@@ -143,6 +143,8 @@
   "emotionLove": "Liebe",
   "emotionFear": "Angst",
   "emotionAnger": "Wut",
+  "emotionSurprise": "Überraschung",
+  "emotionDisgust": "Ekel",
   "memoryEditCbtHelperTitle": "Reflexionshelfer",
   "memoryEditCbtStep1Title": "Was war der erste Gedanke oder Glaube?",
   "memoryEditCbtStep1Subtitle": "z.B. 'Ich werde versagen' oder 'Ich habe alles richtig gemacht'.",

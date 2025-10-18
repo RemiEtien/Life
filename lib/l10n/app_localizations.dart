@@ -928,6 +928,18 @@ abstract class AppLocalizations {
   /// **'Anger'**
   String get emotionAnger;
 
+  /// No description provided for @emotionSurprise.
+  ///
+  /// In en, this message translates to:
+  /// **'Surprise'**
+  String get emotionSurprise;
+
+  /// No description provided for @emotionDisgust.
+  ///
+  /// In en, this message translates to:
+  /// **'Disgust'**
+  String get emotionDisgust;
+
   /// No description provided for @memoryEditCbtHelperTitle.
   ///
   /// In en, this message translates to:

@@ -143,6 +143,8 @@
   "emotionLove": "Love",
   "emotionFear": "Fear",
   "emotionAnger": "Anger",
+  "emotionSurprise": "Surprise",
+  "emotionDisgust": "Disgust",
   "memoryEditCbtHelperTitle": "Reflection Helper",
   "memoryEditCbtStep1Title": "What was the first thought or belief?",
   "memoryEditCbtStep1Subtitle": "e.g., 'I will fail' or 'I did everything right'.",

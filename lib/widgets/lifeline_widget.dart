@@ -182,8 +182,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
   AnimationController? _zoomAnimationController;
   Animation<Matrix4>? _zoomAnimation;
 
+  // FIX: Initialize with zoomed-out scale to prevent monthly clusters flash on first frame
+  // The actual minScale will be calculated and set after geometry is ready
   final TransformationController _transformationController =
-      TransformationController();
+      TransformationController(Matrix4.identity()..scale(0.5));
 
   // Interactive benchmark controller for automated zoom/scroll
   InteractiveBenchmarkController? _benchmarkController;
@@ -996,27 +998,41 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
               }
             } else if (_centerOnNextLayout) {
               // Центрируем только если нет ожидающего перерасчета
+              debugPrint('🟢🟢🟢 [LIFELINE] _centerOnNextLayout=true, processing initial scale setup');
               _centerOnNextLayout = false; // Сбрасываем флаг
 
-              // FIX: Set initial scale immediately (without animation) to prevent showing wrong zoom level on first frame
+              // FIX: Set initial scale IMMEDIATELY to prevent Level 2 flash on first frame
+              // We're in setState callback (NOT build), so direct controller update is safe
               final currentScale = _transformationController.value.getMaxScaleOnAxis();
               final isFirstInitialization = (currentScale - 1.0).abs() < 0.01;
+              debugPrint('🟢 [LIFELINE] currentScale=$currentScale, isFirstInit=$isFirstInitialization, totalWidth=$totalWidth');
 
               if (isFirstInitialization && totalWidth > 0 && _lastKnownSize.width > 0) {
-                // First initialization - set scale immediately without animation
+                // First initialization - set scale IMMEDIATELY (not postFrameCallback)
+                // This prevents the first frame from rendering at scale=1.0 (Level 2)
                 final minScale = _calculateMinScale(totalWidth, _lastKnownSize.width);
                 final screenCenter = _lastKnownSize.center(Offset.zero);
                 final contentCenterY = _lastKnownSize.height / 2;
                 final contentCenter = Offset(totalWidth / 2, contentCenterY);
+
+                // Calculate level thresholds for logging
+                const double kBaseContentWidth = 1200.0;
+                final baseScale = (_lastKnownSize.width * 0.95) / kBaseContentWidth;
+                final effectiveBase = max(minScale, baseScale);
+                final kLevel2Threshold = effectiveBase * 1.5;
 
                 final targetMatrix = Matrix4.identity();
                 targetMatrix.translate(screenCenter.dx, screenCenter.dy);
                 targetMatrix.scale(minScale, minScale);
                 targetMatrix.translate(-contentCenter.dx, -contentCenter.dy);
 
+                // Set IMMEDIATELY - we're already in setState, safe to modify controller
                 _transformationController.value = targetMatrix;
+                debugPrint('🔵🔵🔵 [LIFELINE FIX v3] INITIAL SCALE SET IMMEDIATELY: minScale=$minScale, totalWidth=$totalWidth, screenWidth=${_lastKnownSize.width}');
+                debugPrint('[LIFELINE] Level thresholds: L2=$kLevel2Threshold (${minScale < kLevel2Threshold ? "LEVEL 1 ✓" : "ERROR: LEVEL 2!"})');
               } else {
                 // Subsequent calls - use animation
+                debugPrint('[LIFELINE] NOT first initialization (currentScale=$currentScale), using animation');
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (mounted && !_isDisposed) {
                     _animateToFullTimeline();
@@ -1810,7 +1826,31 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
     _dailyClusterData.clear();
 
     final memoriesAsyncValue = ref.watch(memoriesStreamProvider);
-    _currentMemories = memoriesAsyncValue.asData?.value ?? [];
+    // FIX: Don't clear _currentMemories if provider is loading or returns empty when we had data
+    // This prevents "empty lifeline after returning from settings" bug
+    final newMemories = memoriesAsyncValue.asData?.value;
+
+    if (newMemories != null) {
+      // Provider has data (even if empty list)
+      if (newMemories.isNotEmpty) {
+        // Got non-empty data - always update
+        if (_currentMemories.length != newMemories.length) {
+          debugPrint('[LIFELINE BUILD] Updating _currentMemories: ${_currentMemories.length} -> ${newMemories.length}');
+        }
+        _currentMemories = newMemories;
+      } else if (_currentMemories.isEmpty) {
+        // Both empty - ok to update
+        _currentMemories = newMemories;
+      } else {
+        // Provider has empty list but we had data before - PRESERVE old data
+        debugPrint('[LIFELINE BUILD] 🔴 Preserving ${_currentMemories.length} memories (provider returned empty list)');
+      }
+    } else {
+      // Provider is loading (null) - preserve current memories
+      if (_currentMemories.isNotEmpty) {
+        debugPrint('[LIFELINE BUILD] 🟡 Preserving ${_currentMemories.length} memories (provider is loading)');
+      }
+    }
     final syncState = ref.watch(syncNotifierProvider);
     final userId = ref.watch(authStateChangesProvider).asData?.value?.uid;
     final onboardingState = ref.watch(onboardingServiceProvider);
@@ -1991,9 +2031,10 @@ class _LifelineWidgetState extends ConsumerState<LifelineWidget>
                                         _transformationController.value
                                             .getMaxScaleOnAxis();
                                     final minScale = _calculateMinScale(totalWidth, screenWidth);
-                                    // If currentScale is close to 1.0, it means initial centering hasn't happened yet
-                                    // Use minScale as fallback to prevent showing wrong zoom level on first frame
-                                    final isUninitialized = (currentScale - 1.0).abs() < 0.01;
+                                    // FIX: If currentScale is close to 0.5 (initial) or 1.0 (old default),
+                                    // use minScale directly to prevent showing wrong zoom level on first frame
+                                    final isUninitialized = (currentScale - 1.0).abs() < 0.01 ||
+                                                             (currentScale - 0.5).abs() < 0.01;
                                     final relativeZoom = isUninitialized || minScale <= 0.0001
                                         ? 1.0
                                         : currentScale / minScale;

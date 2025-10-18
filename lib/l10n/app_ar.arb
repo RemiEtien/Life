@@ -143,6 +143,8 @@
   "emotionLove": "حب",
   "emotionFear": "خوف",
   "emotionAnger": "غضب",
+  "emotionSurprise": "مفاجأة",
+  "emotionDisgust": "اشمئزاز",
   "memoryEditCbtHelperTitle": "مساعد التأمل",
   "memoryEditCbtStep1Title": "ما هو أول فكرة أو اعتقاد؟",
   "memoryEditCbtStep1Subtitle": "مثال: 'سأفشل' أو 'فعلت كل شيء بشكل صحيح'.",

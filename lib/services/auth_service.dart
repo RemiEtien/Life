@@ -156,6 +156,12 @@ class AuthService {
   Future<void> signOut() async {
     SafeLogger.debug('AuthService: signOut() called - Starting sign out process');
 
+    // FIX: Set flag IMMEDIATELY and SYNCHRONOUSLY to prevent UnlockScreen from appearing during signOut
+    // Using StateProvider to avoid CircularDependencyError
+    // CRITICAL: This MUST be before any await to prevent race condition
+    _ref.read(isSigningOutProvider.notifier).state = true;
+    SafeLogger.debug('🔴🔴🔴 [AUTH FIX v2] isSigningOut = TRUE (NEW CODE EXECUTING!) 🔴🔴🔴');
+
     // Log analytics
     await AnalyticsService.logLogout();
 
@@ -227,6 +233,10 @@ class AuthService {
         reason: 'Sign-out cleanup failed (Google/Firebase)',
         fatal: false,
       ));
+    } finally {
+      // FIX: Always clear the flag, even if signOut had errors
+      _ref.read(isSigningOutProvider.notifier).state = false;
+      SafeLogger.debug('AuthService: signOut() completed, isSigningOut = false');
     }
   }
 

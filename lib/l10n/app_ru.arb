@@ -143,6 +143,8 @@
   "emotionLove": "Любовь",
   "emotionFear": "Страх",
   "emotionAnger": "Злость",
+  "emotionSurprise": "Удивление",
+  "emotionDisgust": "Отвращение",
   "memoryEditCbtHelperTitle": "Помощник по рефлексии",
   "memoryEditCbtStep1Title": "Какой была первая мысль или убеждение?",
   "memoryEditCbtStep1Subtitle": "например, 'У меня ничего не получится' или 'Я все сделал(а) правильно'.",

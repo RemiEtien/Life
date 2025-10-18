@@ -439,6 +439,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emotionAnger => 'غضب';
 
   @override
+  String get emotionSurprise => 'مفاجأة';
+
+  @override
+  String get emotionDisgust => 'اشمئزاز';
+
+  @override
   String get memoryEditCbtHelperTitle => 'مساعد التأمل';
 
   @override

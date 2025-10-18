@@ -532,8 +532,14 @@ class LifelinePainter extends CustomPainter {
     final kLevel2Threshold = effectiveBase * 1.5;  // Monthly clusters start at 150% of base
     final kLevel3Threshold = effectiveBase * 3.0;  // Individual nodes start at 300% of base
 
-    // Use ABSOLUTE currentScale for level determination (v149 system)
-    if (currentScale < kLevel2Threshold) {
+    // FIX: If currentScale is uninitialized (1.0 or 0.5), use minScale as fallback
+    // This prevents monthly clusters from showing during initial frames before scale is set
+    final isUninitialized = (currentScale - 1.0).abs() < 0.01 ||
+                             (currentScale - 0.5).abs() < 0.01;
+    final effectiveScale = isUninitialized ? minScale : currentScale;
+
+    // Use ABSOLUTE effectiveScale for level determination (v149 system)
+    if (effectiveScale < kLevel2Threshold) {
       // LEVEL 1: Yearly gradient
       stopwatch.start();
       _drawYearlyGradient(canvas, mainPath, size, currentScale, effectiveBase, kLevel2Threshold);

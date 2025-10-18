@@ -19,6 +19,7 @@ import '../services/audio_service.dart';
 import '../services/encryption_service.dart';
 import '../services/image_processing_service.dart';
 import '../services/message_service.dart';
+import '../utils/safe_logger.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -244,6 +245,10 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         return l10n.emotionFear;
       case 'anger':
         return l10n.emotionAnger;
+      case 'surprise':
+        return l10n.emotionSurprise;
+      case 'disgust':
+        return l10n.emotionDisgust;
       default:
         return key;
     }
@@ -812,6 +817,13 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   Future<void> _handleReflectionReminder(Memory memory, String? plaintextAction) async {
     final notificationService = ref.read(notificationServiceProvider);
     await notificationService.cancelNotification(memory.id);
+
+    // FIX: Check if notifications are enabled in user profile
+    final profile = ref.read(userProfileProvider).value;
+    if (profile == null || !profile.notificationsEnabled) {
+      SafeLogger.debug('Notifications disabled in profile, skipping reminder for memory ${memory.id}', tag: 'MemoryEditScreen');
+      return;
+    }
 
     // FIX: Only schedule notification if action is not completed
     // This prevents re-triggering after memory date change when marked as done

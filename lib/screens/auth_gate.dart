@@ -608,25 +608,27 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             }
 
             // **CRITICAL LOGIC**: Show UnlockScreen if encryption is enabled and state is locked.
-            // But first check memoriesState to avoid showing during sign out
+            // FIX: Check isSigningOut flag to prevent showing UnlockScreen during signOut race condition
+            final isSigningOut = ref.watch(isSigningOutProvider);
             final memoriesState = ref.watch(memoriesStreamProvider);
 
-            // FIX: Don't show UnlockScreen during sign out (when memories are loading/empty)
-            // During signOut, memoriesState transitions through loading/empty before LoginScreen
-            final shouldShowUnlock = profile.uid == user.uid &&
+            // FIX: If encryption is enabled and locked, ALWAYS show UnlockScreen immediately
+            // Don't wait for memories - this prevents main widget from flashing before unlock
+            final shouldShowUnlock = !isSigningOut && // Don't show during signOut
+                profile.uid == user.uid &&
                 profile.isEncryptionEnabled &&
-                encryptionState == EncryptionState.locked &&
-                memoriesState.hasValue && // Don't show during loading
-                (memoriesState.value?.isNotEmpty ?? false); // Don't show if memories are empty (sign out in progress)
+                encryptionState == EncryptionState.locked;
+
+            debugPrint('🟣🟣🟣 [AuthGate] Unlock check: isSigningOut=$isSigningOut, encEnabled=${profile.isEncryptionEnabled}, encState=$encryptionState, memHasValue=${memoriesState.hasValue}, memCount=${memoriesState.value?.length}, shouldUnlock=$shouldShowUnlock');
 
             if (shouldShowUnlock) {
-              debugPrint('[AuthGate] Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}');
+              debugPrint('[AuthGate] ✅ Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}');
               unawaited(FirebaseCrashlytics.instance.log(
                 'AuthGate: Showing UnlockScreen - profile.uid: ${profile.uid}, user.uid: ${user.uid}'));
               return const UnlockScreen();
             } else if (profile.isEncryptionEnabled && encryptionState == EncryptionState.locked) {
               // Locked but not showing UnlockScreen - log reason
-              debugPrint('[AuthGate] Skipping UnlockScreen - hasValue: ${memoriesState.hasValue}, isEmpty: ${memoriesState.value?.isEmpty}, profile.uid: ${profile.uid}, user.uid: ${user.uid}');
+              debugPrint('[AuthGate] ❌ Skipping UnlockScreen - isSigningOut: $isSigningOut, hasValue: ${memoriesState.hasValue}, isEmpty: ${memoriesState.value?.isEmpty}, profile.uid: ${profile.uid}, user.uid: ${user.uid}');
             }
 
             // If not locked, proceed to show the main app content.

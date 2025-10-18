@@ -420,6 +420,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get emotionAnger => '愤怒';
 
   @override
+  String get emotionSurprise => '惊讶';
+
+  @override
+  String get emotionDisgust => '厌恶';
+
+  @override
   String get memoryEditCbtHelperTitle => '反思助手';
 
   @override

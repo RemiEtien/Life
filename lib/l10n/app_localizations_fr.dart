@@ -446,6 +446,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get emotionAnger => 'Colère';
 
   @override
+  String get emotionSurprise => 'Surprise';
+
+  @override
+  String get emotionDisgust => 'Dégoût';
+
+  @override
   String get memoryEditCbtHelperTitle => 'Aide à la réflexion';
 
   @override
