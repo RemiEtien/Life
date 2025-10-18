@@ -676,6 +676,8 @@ class LifelinePainter extends CustomPainter {
         } else if (item is DailyClusterPlacementInfo) {
           // Skip daily cluster auras outside Level 3 (same as individual nodes)
           if (currentScale < kLevel3Threshold) continue;
+          // Safety check: skip empty clusters
+          if (item.memories.isEmpty) continue;
 
           if (visibleRect
               .inflate(kDailyClusterBaseRadius * 2)
@@ -724,6 +726,8 @@ class LifelinePainter extends CustomPainter {
         } else if (item is DailyClusterPlacementInfo) {
           // Skip daily clusters outside Level 3 (same as individual nodes)
           if (currentScale < kLevel3Threshold) continue;
+          // Safety check: skip empty clusters
+          if (item.memories.isEmpty) continue;
 
           if (visibleRect
               .inflate(kDailyClusterBaseRadius * 2)
@@ -1107,6 +1111,9 @@ class LifelinePainter extends CustomPainter {
       }
 
       // Pick first memory with a photo, or first memory if none have photos
+      // Skip empty clusters (safety check after isar_community migration)
+      if (cluster.memories.isEmpty) continue;
+
       Memory? selectedMemory;
       for (final memory in cluster.memories) {
         if (memory.coverPath != null && images[memory.coverPath] != null) {
@@ -1647,6 +1654,9 @@ class LifelinePainter extends CustomPainter {
 
   void _drawDailyClusterNode(Canvas canvas, Offset pos,
       DailyClusterPlacementInfo clusterInfo, double opacity, ui.Image? image) {
+    // Safety check: skip empty clusters
+    if (clusterInfo.memories.isEmpty) return;
+
     final index = memories
         .indexWhere((m) => m.universalId == clusterInfo.memories.first.universalId);
     final individualPulse = sin(pulseValue * pi * 2 + index * 0.8) * 0.3 + 0.7;

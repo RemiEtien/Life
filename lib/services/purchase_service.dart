@@ -96,6 +96,10 @@ class PurchaseService extends StateNotifier<PurchaseState> {
       final PurchaseParam purchaseParam =
           PurchaseParam(productDetails: productDetails);
 
+      // NOTE: Known issue in com.android.billingclient:billing@7.1.1
+      // Sometimes ProxyBillingActivity crashes with NullPointerException on PendingIntent.getIntentSender()
+      // This is a Google Play Billing SDK bug, not our fault. Error is non-fatal and purchase still works.
+      // See: https://issuetracker.google.com/issues/264882610
       final bool success = await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
 
       if (!success) {

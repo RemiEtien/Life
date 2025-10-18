@@ -306,16 +306,17 @@ class Memory {
     String? secondaryEmotion, // NEW
     double? emotionIntensity, // NEW
   }) {
-    // Validate title if provided
-    if (title != null) {
+    // Validate title if provided and not empty
+    // Empty string means "keep existing title" in copyWith
+    if (title != null && title.trim().isNotEmpty) {
       final titleValidation = InputValidator.validateMemoryTitle(title);
       if (!titleValidation.isValid) {
         throw ArgumentError('Invalid memory title: ${titleValidation.error}');
       }
     }
 
-    // Validate content if provided
-    if (content != null) {
+    // Validate content if provided and not empty
+    if (content != null && content.trim().isNotEmpty) {
       final contentValidation = InputValidator.validateMemoryContent(content);
       if (!contentValidation.isValid) {
         throw ArgumentError('Invalid memory content: ${contentValidation.error}');
