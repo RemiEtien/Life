@@ -43,7 +43,7 @@ exports.generateSmartPrompts = onDocumentCreated(
     {
       document: "users/{userId}/memories/{memoryId}",
       secrets: [GEMINI_API_KEY],
-      region: "europe-west1",
+      region: "us-central1",
     },
     async (event) => {
       const userId = event.params.userId;
@@ -147,7 +147,7 @@ exports.weeklyPatternAnalysis = onSchedule(
       schedule: "every sunday 00:00",
       timeZone: "UTC",
       secrets: [GEMINI_API_KEY],
-      region: "europe-west1",
+      region: "us-central1",
     },
     async (context) => {
       console.log("Weekly Pattern Analysis started");
@@ -323,7 +323,7 @@ exports.generatePredictiveInsight = onDocumentCreated(
     {
       document: "users/{userId}/memories/{memoryId}",
       secrets: [GEMINI_API_KEY],
-      region: "europe-west1",
+      region: "us-central1",
     },
     async (event) => {
       const userId = event.params.userId;
