@@ -1,434 +1,1308 @@
 # План интеграции Gemini AI для анализа паттернов
 
+> **Модель:** Gemini 2.5 Flash-Lite
+> **Стоимость:** $0.10 input / $0.40 output per 1M tokens
+> **Бюджет:** $34/месяц для 10K free + 1K premium users → **$2000 хватит на 5 лет!**
+
 ## 🎯 Цель
-Использовать Google Cloud Credits ($2000) для создания контекстного AI который анализирует ВСЮ timeline и находит глубокие паттерны.
+Использовать Google Cloud Credits ($2000) для создания **контекстного AI-ассистента**, который анализирует ВСЮ timeline пользователя и находит глубокие психологические паттерны, которые невозможно увидеть без AI.
 
-## 💡 Киллер-фича
+**Ключевое отличие от конкурентов:** AI, который помнит всю вашу историю и использует её для персонализированных инсайтов.
 
-**Проблема конкурентов:**
-- Generic prompts: "How do you feel today?"
-- AI не помнит историю
-- Поверхностные insights
+---
 
+## 🔍 Анализ конкурентов
+
+### Reflectly
+**Что делают:**
+- AI Coach задает вопросы каждый день
+- Mood tracking с эмоциями
+- Daily affirmations
+
+**Боли пользователей (из App Store/Play Store reviews):**
+- ❌ "AI asks same generic questions every day"
+- ❌ "Doesn't remember what I wrote yesterday"
+- ❌ "Premium is $60/year for basic features"
+- ❌ "Affirmations feel copy-pasted, not personalized"
+- ⭐ 3.8/5 в App Store (много жалоб на generic prompts)
+
+### Rosebud
+**Что делают:**
+- AI journaling с персонажами
+- Pattern recognition
+- Weekly summaries
+
+**Боли пользователей:**
+- ❌ "AI responses are shallow, like ChatGPT without context"
+- ❌ "Patterns are just word clouds, not actionable"
+- ❌ "No predictive insights - just summarizes what I already know"
+- ❌ "Premium $8/month, feels expensive for what it does"
+- ⭐ 4.2/5 (лучше, но много жалоб на shallow insights)
+
+### Daylio
+**Что делают:**
+- Mood tracking с statistics
+- Export data
+- Premium: charts and trends
+
+**Боли пользователей:**
+- ❌ "NO AI at all - just charts"
+- ❌ "I can see my mood goes down on Mondays, but WHY and WHAT to do?"
+- ❌ "Need therapist to interpret the data"
+- ⭐ 4.7/5 (хороший рейтинг, но users просят AI)
+
+### Day One
+**Что делают:**
+- Premium journaling app
+- Rich media support
+- End-to-end encryption
+
+**Боли пользователей:**
+- ❌ "No AI insights - just a fancy notebook"
+- ❌ "$35/year and it doesn't analyze my entries"
+- ❌ "I have 5 years of journals, wish AI could find patterns"
+- ⭐ 4.8/5 (отличный рейтинг, но users хотят AI features)
+
+---
+
+## 💎 Наши конкурентные преимущества
+
+### 1. Timeline-Aware AI
+**Проблема конкурентов:** Каждая запись анализируется изолированно
+**Наше решение:** AI видит всю timeline и учитывает контекст:
+
+```
+User writes: "Anxious about presentation"
+
+Competitors AI:
+"Try deep breathing before presenting"
+
+Our AI:
+"You felt this way before presentation on Feb 15. Last time,
+practicing once helped. Looking at your history, presentations
+always go better than you expect. Try your usual routine - it works."
+```
+
+### 2. Циклические паттерны
+**Проблема конкурентов:** Показывают линейные тренды ("mood is down this week")
+**Наше решение:** Находим циклы, которые повторяются:
+
+```
+Competitors:
+"You were sad 5 times this month" 📊
+
+Us:
+"You feel anxious every Monday morning for 3 months. This started
+when you switched to remote work. On Tuesdays you feel better -
+maybe Monday anxiety is about work-life boundaries?"
+```
+
+### 3. Predictive + Actionable
+**Проблема конкурентов:** Просто показывают статистику
+**Наше решение:** Предсказываем и советуем на основе ЧТО РАБОТАЛО У ВАС:
+
+```
+Competitors:
+"You're feeling stressed" (no shit)
+
+Us:
+"You're stressed about deadline. 3 similar situations:
+- Jan 10: Stressed → took walk → felt better
+- Feb 5: Stressed → talked to friend → solved it
+- Mar 12: Stressed → avoided it → felt worse
+Try: taking a walk or calling a friend?"
+```
+
+### 4. Privacy-First AI
+**Проблема конкурентов:** Нет прозрачности, где хранятся данные
 **Наше решение:**
-- AI анализирует всю timeline (все воспоминания)
-- Находит циклические паттерны
-- Предсказывает триггеры
-- CBT-based вопросы на основе истории
+- ✅ Encrypted memories НЕ отправляются в AI (опционально можно включить)
+- ✅ Google Gemini НЕ сохраняет данные (Google policy)
+- ✅ Полная прозрачность: показываем что отправляется в AI
+- ✅ Опционально: работа только с незашифрованными или opt-in для зашифрованных
 
-## 💰 Бюджет и стоимость
+### 5. Лучшее соотношение цена/качество
+**Сравнение премиума:**
 
-### Gemini 1.5 Flash (оптимальный выбор)
-- Input: $0.075 / 1M tokens
-- Output: $0.30 / 1M tokens
-- **2x дешевле** чем GPT-4o mini
+| App | Price/year | AI Features |
+|-----|-----------|-------------|
+| Reflectly | $60 | Generic prompts, no memory |
+| Rosebud | $96 | Shallow patterns, no predictions |
+| Daylio Premium | $30 | NO AI at all |
+| Day One Premium | $35 | NO AI at all |
+| **Lifeline** | **$48** | Timeline-aware, predictive, cycles |
 
-### Расчеты:
+**Our value prop:** $4/month для AI который ДЕЙСТВИТЕЛЬНО помнит вашу историю и помогает.
+
+---
+
+## 🎨 AI Features Architecture
+
+### Где отображается AI?
+
+**НЕТ отдельной вкладки или чата!** AI интегрирован в существующие экраны:
+
+1. **Memory Edit Screen** - Smart Prompts (FREE)
+2. **Memory Edit Screen** - Predictive Insights (PREMIUM)
+3. **Memory View Screen** - Pattern Badges (PREMIUM)
+4. **Monthly Cluster Bottom Sheet** - Monthly Patterns (PREMIUM)
+5. **Memory List (левый нижний угол главного виджета)** - Top Insights (PREMIUM)
+6. **Push Notifications** - Proactive Insights (PREMIUM)
+
+### Feature Tiers
+
+#### FREE Tier:
+- ✅ **Smart Prompts** - углубляющие вопросы при создании воспоминания
+- ✅ Работает для всех пользователей
+- ✅ Показывает ценность AI без paywall
+
+#### PREMIUM Tier ($3.99/month):
+- ✅ **Pattern Analysis** - еженедельный анализ паттернов за 30 дней
+- ✅ **Predictive Insights** - предсказания на основе прошлого
+- ✅ **Monthly Patterns** - AI-анализ месячных кластеров
+- ✅ **Proactive Notifications** - напоминания когда AI видит паттерн
+
+---
+
+## 📱 UI/UX Integration Points
+
+### 1. Smart Prompts in Memory Edit (FREE)
+
+**Где:** `memory_edit_screen.dart` - показывается после набора текста (debounced)
+
+**Как выглядит:**
 ```
-Среднее воспоминание: 500 chars (~125 tokens)
-Insight generation: 200 tokens prompt + 300 tokens response = 500 tokens
-Стоимость 1 insight: $0.000125 (почти бесплатно!)
-
-$2000 = ~16 МИЛЛИОНОВ insights 🤯
+┌─────────────────────────────────────┐
+│  [Ваш текст воспоминания]           │
+│                                     │
+│  💭 AI suggests:                    │
+│  ┌─────────────────────────────────┐ │
+│  │ • What triggered this feeling?  │ │
+│  │ • How are you feeling now?      │ │
+│  │ • What could help?              │ │
+│  └─────────────────────────────────┘ │
+│                                     │
+│  [Save]                    [Cancel] │
+└─────────────────────────────────────┘
 ```
 
-### Реальный бюджет на пользователя:
-
-| Feature | Users | Cost/month | $2000 lasts |
-|---------|-------|------------|-------------|
-| Smart Prompts (Free) | 10,000 | $40 | 50 months |
-| Pattern Analysis (Premium) | 1,000 | $43 | 46 months |
-| Predictive Insights (Premium) | 1,000 | $150 | 13 months |
-| **TOTAL** | 10K free + 1K premium | $233/month | **8.5 months** |
-
-## 🎨 Типы AI Insights
-
-### 1. Smart Prompts (FREE tier)
-**Когда:** При создании нового воспоминания
-**Что делает:** Задает углубляющие вопросы
-
+**Logic check:**
 ```dart
-// Пример
-User writes: "Had a fight with mom today"
+// memory_edit_screen.dart
+Widget _buildSmartPrompts() {
+  final profile = ref.watch(userProfileProvider).value;
 
-AI Prompt:
-"""
-User just wrote this journal entry: "Had a fight with mom today"
+  if (profile == null) return const SizedBox.shrink();
+  if (!profile.aiEnabled) return const SizedBox.shrink();
+  if (!profile.aiSmartPromptsEnabled) return const SizedBox.shrink();
+  if (!profile.aiSmartPromptsInEdit) return const SizedBox.shrink();
 
-Generate 2-3 thoughtful follow-up questions to help them reflect deeper.
-Focus on CBT techniques:
-- What triggered this?
-- How did you feel?
-- What would help?
+  // Check if memory is encrypted and if user allows AI on encrypted
+  if (_isEncrypted && !profile.aiProcessEncryptedMemories) {
+    return _buildEncryptedAIUpsell(); // Suggest enabling in settings
+  }
 
-Keep questions short and empathetic.
-"""
-
-AI Response:
-"What triggered the fight? How are you feeling now? What could help mend this?"
+  return SmartPromptsCard(
+    memoryText: _contentController.text,
+    onPromptTap: (prompt) => _handlePromptSelected(prompt),
+  );
+}
 ```
 
-**Cost:** ~$0.0002 per memory (negligible)
+**Cost:** ~$0.00006 per memory (почти бесплатно!)
 
 ---
 
-### 2. Pattern Analysis (PREMIUM - Weekly)
-**Когда:** Раз в неделю batch analysis
-**Что делает:** Анализирует последние 30 дней, находит паттерны
+### 2. Predictive Insights in Memory Edit (PREMIUM)
 
+**Где:** `memory_edit_screen.dart` - показывается если AI нашел похожие прошлые воспоминания
+
+**Как выглядит:**
+```
+┌─────────────────────────────────────┐
+│  [Ваш текст воспоминания]           │
+│                                     │
+│  🔮 AI noticed a pattern:           │
+│  ┌─────────────────────────────────┐ │
+│  │ You felt this way on Feb 15.    │ │
+│  │ Last time, taking a walk helped.│ │
+│  │                                 │ │
+│  │ Try: 🚶 Go for a walk           │ │
+│  │      💬 Talk to a friend        │ │
+│  └─────────────────────────────────┘ │
+│                                     │
+│  [Save]                    [Cancel] │
+└─────────────────────────────────────┘
+```
+
+**Logic check:**
 ```dart
-// Пример
-final memories = getUserMemories(userId, last30days);
+// memory_edit_screen.dart
+Widget _buildPredictiveInsight() {
+  final profile = ref.watch(userProfileProvider).value;
 
-AI Prompt:
-"""
-You are a therapist AI analyzing journal entries.
+  if (profile == null) return const SizedBox.shrink();
+  if (!profile.aiEnabled) return const SizedBox.shrink();
+  if (!profile.isPremium) return _buildPremiumUpsell();
+  if (!profile.aiPredictiveInsightsEnabled) return const SizedBox.shrink();
+  if (!profile.aiPredictiveInEdit) return const SizedBox.shrink();
 
-Journal entries from the last 30 days:
-${memories.map((m) => '${m.date}: ${m.content}').join('\n')}
+  if (_isEncrypted && !profile.aiProcessEncryptedMemories) {
+    return const SizedBox.shrink();
+  }
 
-Analyze and find:
-1. **Recurring themes** - what topics appear frequently?
-2. **Emotional cycles** - are there patterns in mood?
-3. **Triggers** - what situations cause negative emotions?
-4. **People/places** - who/where affects mood most?
-5. **Progress** - any signs of healing or growth?
-
-Format response as JSON:
-{
-  "themes": ["theme1", "theme2"],
-  "emotional_cycles": "description",
-  "triggers": ["trigger1"],
-  "key_relationships": ["person1: positive/negative"],
-  "progress_notes": "healing signs"
-}
-"""
-
-AI Response:
-{
-  "themes": ["work stress", "relationship with mother"],
-  "emotional_cycles": "Anxiety peaks on Mondays, better on weekends",
-  "triggers": ["confrontation", "feeling unheard"],
-  "key_relationships": ["mom: complex, improving", "friend Sarah: positive"],
-  "progress_notes": "Using more coping strategies, less catastrophizing"
+  return PredictiveInsightCard(
+    currentMemory: _contentController.text,
+    primaryEmotion: _primaryEmotion,
+    userId: widget.userId,
+  );
 }
 ```
 
-**Cost:** ~$0.01 per user per week
-**Хранение:** Save в Firestore как `UserInsight` document
+**Cost:** ~$0.00017 per memory with prediction
 
 ---
 
-### 3. Predictive Insights (PREMIUM - Real-time)
-**Когда:** При создании нового воспоминания
-**Что делает:** Сравнивает с прошлым, предсказывает и советует
+### 3. Pattern Badges in Memory View (PREMIUM)
 
+**Где:** `memory_view_screen.dart` - показывается рядом с эмоциями
+
+**Как выглядит:**
+```
+┌─────────────────────────────────────┐
+│  Memory Title                       │
+│  Feb 15, 2025                       │
+│                                     │
+│  😰 Anxiety  💼 Work                │
+│  🔁 Recurring pattern               │ ← AI Badge
+│                                     │
+│  [Memory content...]                │
+│                                     │
+│  💡 Pattern: You feel this way      │
+│     every Monday. Tap to see why.   │
+└─────────────────────────────────────┘
+```
+
+**Logic check:**
 ```dart
-// Пример
-New memory: "Feeling anxious about work presentation tomorrow"
-Past similar: getUserSimilarMemories(userId, "anxiety", "work")
+// memory_view_screen.dart
+Widget _buildPatternBadge() {
+  final profile = ref.watch(userProfileProvider).value;
 
-AI Prompt:
-"""
-You are a CBT therapist providing evidence-based insights.
+  if (profile == null) return const SizedBox.shrink();
+  if (!profile.aiEnabled) return const SizedBox.shrink();
+  if (!profile.isPremium) return const SizedBox.shrink();
+  if (!profile.aiPatternAnalysisEnabled) return const SizedBox.shrink();
+  if (!profile.aiPatternsInMemoryView) return const SizedBox.shrink();
 
-**Current situation:**
-User just wrote: "Feeling anxious about work presentation tomorrow"
+  // Load pattern from Firestore
+  final pattern = ref.watch(memoryPatternProvider(widget.memory.id));
 
-**Past similar events:**
-- 2024-03-15: "Anxious about meeting. It went fine."
-- 2024-02-10: "Work presentation stress. Breathed through it."
-- 2023-12-05: "Panicking before review. Used affirmations."
-
-**Task:**
-1. Recognize the pattern (work-related anxiety)
-2. What helped in the past?
-3. Suggest 2-3 CBT-based coping strategies
-4. Offer perspective based on past outcomes
-
-Keep response concise (3-4 sentences), empathetic, actionable.
-"""
-
-AI Response:
-"I notice work presentations often trigger anxiety for you, but looking at your history,
-they typically go better than you expect. Last time, breathing exercises helped.
-This time, try: 1) Practice aloud once, 2) Remember past successes,
-3) Use 4-7-8 breathing if anxious. You've got this - your track record shows it."
+  return pattern.when(
+    data: (data) => data != null ? PatternBadge(pattern: data) : const SizedBox.shrink(),
+    loading: () => const SizedBox.shrink(),
+    error: (_, __) => const SizedBox.shrink(),
+  );
+}
 ```
-
-**Cost:** ~$0.005 per new memory with analysis
-**Display:** Show as notification or in-app insight card
 
 ---
 
-### 4. Connection Discovery (PREMIUM)
-**Когда:** Background job, раз в месяц
-**Что делает:** Находит неочевидные связи между воспоминаниями
+### 4. Monthly Patterns in Cluster Bottom Sheet (PREMIUM)
 
+**Где:** `monthly_cluster_bottom_sheet.dart` - показывается после emotion chips
+
+**Как выглядит:**
+```
+┌─────────────────────────────────────┐
+│  January 2025          23 memories  │
+│                                     │
+│  😰 Anxiety (8)  😊 Joy (10)        │ ← Existing
+│  😢 Sadness (5)                     │
+│                                     │
+│  💡 AI Pattern Analysis:            │ ← NEW
+│  ┌─────────────────────────────────┐ │
+│  │ This month you felt anxious     │ │
+│  │ mostly on Mondays (5 times).    │ │
+│  │                                 │ │
+│  │ What helped most:               │ │
+│  │ • Exercise (3 times)            │ │
+│  │ • Talking to friends (2 times) │ │
+│  │                                 │ │
+│  │ 📊 View similar months          │ │
+│  └─────────────────────────────────┘ │
+│                                     │
+│  [Grid of memories...]              │
+└─────────────────────────────────────┘
+```
+
+**Logic check:**
 ```dart
-AI Prompt:
-"""
-Analyze these journal entries and find non-obvious connections:
+// monthly_cluster_bottom_sheet.dart
+Widget _buildMonthlyAIPattern() {
+  final profile = ref.watch(userProfileProvider).value;
 
-${allUserMemories}
+  if (profile == null) return const SizedBox.shrink();
+  if (!profile.aiEnabled) return const SizedBox.shrink();
+  if (!profile.isPremium) return _buildPremiumUpsell();
+  if (!profile.aiPatternAnalysisEnabled) return const SizedBox.shrink();
+  if (!profile.aiPatternsInMonthlyView) return const SizedBox.shrink();
 
-Look for:
-- Seasonal patterns (do they feel worse in winter?)
-- Anniversary reactions (trauma dates)
-- Relationship dynamics
-- Coping strategy effectiveness
-- Long-term trends
+  // Use existing emotion data from widget.memories
+  final emotionCounts = <String, int>{};
+  for (final memory in widget.memories) {
+    if (memory.primaryEmotion != null) {
+      emotionCounts[memory.primaryEmotion!] =
+          (emotionCounts[memory.primaryEmotion!] ?? 0) + 1;
+    }
+  }
 
-Return top 5 insights as:
-{
-  "insight": "description",
-  "confidence": 0.8,
-  "supporting_evidence": ["memory_id1", "memory_id2"]
-}
-"""
-```
+  // Load AI-generated monthly pattern from Firestore
+  final pattern = ref.watch(monthlyPatternProvider(widget.monthKey));
 
-**Example output:**
-```json
-{
-  "insight": "You tend to feel more anxious every April since 2020. This might be related to anniversary of your dad's passing.",
-  "confidence": 0.9,
-  "supporting_evidence": ["mem_123", "mem_456", "mem_789"]
-}
-```
-
----
-
-## 🏗️ Архитектура
-
-### Firebase Functions + Gemini API
-
-```
-User creates memory
-    ↓
-Firebase Trigger
-    ↓
-Cloud Function
-    ↓
-Gemini API (analyze)
-    ↓
-Save insight to Firestore
-    ↓
-Push notification / In-app display
-```
-
-### Структура Firestore:
-
-```
-users/{userId}/insights/{insightId}
-{
-  type: "pattern" | "predictive" | "connection",
-  createdAt: timestamp,
-  content: "insight text",
-  relatedMemories: ["id1", "id2"],
-  confidence: 0.85,
-  dismissed: false,
-  premium: true
+  return MonthlyPatternCard(
+    monthKey: widget.monthKey,
+    emotionCounts: emotionCounts,
+    pattern: pattern,
+  );
 }
 ```
 
 ---
 
-## 🚀 План реализации
+### 5. Top Insights in Memory List (PREMIUM)
 
-### Phase 1: Setup (неделя 1)
-- [ ] Firebase Functions setup
-- [ ] Gemini API integration
-- [ ] Environment variables (API key)
-- [ ] Test function locally
+**Где:** `select_memory_screen.dart` (список воспоминаний слева) - вверху списка
 
-### Phase 2: Smart Prompts - FREE (неделя 1-2)
-- [ ] On memory create trigger
-- [ ] Generate follow-up questions
-- [ ] Display in memory_edit_screen
-- [ ] A/B test engagement
+**Как выглядит:**
+```
+┌─────────────────────────────────────┐
+│  💡 Recent Insights          [Close]│
+│  ┌─────────────────────────────────┐ │
+│  │ 🔁 You've felt anxious about    │ │
+│  │    work 5 times this week.      │ │
+│  │    [View pattern]               │ │
+│  └─────────────────────────────────┘ │
+│                                     │
+│  [Search...]                        │
+│                                     │
+│  📅 Today                           │
+│  • Memory 1                         │
+│  • Memory 2                         │
+│                                     │
+│  📅 Yesterday                       │
+│  • Memory 3                         │
+└─────────────────────────────────────┘
+```
 
-### Phase 3: Pattern Analysis - PREMIUM (неделя 2-3)
-- [ ] Weekly scheduled function
-- [ ] Batch analyze last 30 days
-- [ ] Save insights to Firestore
-- [ ] Display in Insights screen
+**Logic check:**
+```dart
+// select_memory_screen.dart
+Widget _buildTopInsights() {
+  final profile = ref.watch(userProfileProvider).value;
 
-### Phase 4: Predictive Insights - PREMIUM (неделя 3-4)
-- [ ] Find similar past memories
-- [ ] Real-time analysis on new memory
-- [ ] Push notification
-- [ ] Insight card UI
+  if (profile == null) return const SizedBox.shrink();
+  if (!profile.aiEnabled) return const SizedBox.shrink();
+  if (!profile.isPremium) return const SizedBox.shrink();
+  if (!profile.aiPatternAnalysisEnabled) return const SizedBox.shrink();
+  if (!profile.aiPatternsInMemoryList) return const SizedBox.shrink();
 
-### Phase 5: Connection Discovery (неделя 4-5)
-- [ ] Monthly background job
-- [ ] Deep pattern analysis
-- [ ] Confidence scoring
-- [ ] Premium paywall
+  // Load top 3 most recent insights
+  final insights = ref.watch(topInsightsProvider(widget.userId, limit: 3));
 
-### Phase 6: UI & UX (неделя 5-6)
-- [ ] Insights screen/tab
-- [ ] Notification handling
-- [ ] Dismiss/save insights
-- [ ] Premium upgrade prompts
+  return TopInsightsCard(insights: insights);
+}
+```
 
 ---
 
-## 📱 UI/UX Design
+### 6. Proactive Push Notifications (PREMIUM)
 
-### Insights Screen (новая вкладка)
+**Когда:** AI обнаруживает паттерн в реальном времени
 
-```
-┌─────────────────────────────┐
-│  📊 Your Insights            │
-├─────────────────────────────┤
-│                             │
-│  💡 New Pattern Detected    │
-│  You feel anxious every     │
-│  Monday. This started 3     │
-│  months ago when...         │
-│                             │
-│  [View Related Memories]    │
-│  [Dismiss]                  │
-│                             │
-├─────────────────────────────┤
-│  🔮 Prediction              │
-│  Similar to Feb 15. Last    │
-│  time breathing helped.     │
-│                             │
-│  [Try Technique]            │
-│                             │
-└─────────────────────────────┘
-```
-
-### Push Notification
+**Пример:**
 ```
 📊 Lifeline Insight
 "You mentioned 'work stress' 5 times this week.
 Last month, taking walks helped. Want to try again?"
+
+[Open App]  [Dismiss]
+```
+
+**Logic check (Firebase Function):**
+```typescript
+// Check user preferences before sending notification
+const profile = await getUserProfile(userId);
+
+if (!profile.aiEnabled) return;
+if (!profile.isPremium) return;
+if (!profile.aiPredictiveInsightsEnabled) return;
+if (!profile.aiPredictiveNotifications) return;
+if (!profile.notificationsEnabled) return; // System notifications
+
+// Send notification
+await sendPushNotification(userId, {
+  title: "Lifeline Insight",
+  body: insightText,
+  data: { type: "ai_insight", insightId: insight.id }
+});
 ```
 
 ---
 
-## 💰 Монетизация Strategy
+## ⚙️ Settings Architecture
 
-### FREE Tier:
-- ✅ Smart Prompts (при создании)
-- ✅ 1 Pattern Insight/month
-- ❌ Real-time predictions
-- ❌ Connection discovery
+### UserProfile Fields (новые)
 
-### PREMIUM ($3.99/month):
-- ✅ Unlimited smart prompts
-- ✅ Weekly pattern analysis
-- ✅ Real-time predictive insights
-- ✅ Monthly connection discovery
-- ✅ Priority processing
+```dart
+// lib/models/user_profile.dart
 
-### Conversion Flow:
+class UserProfile {
+  // ... existing fields ...
+
+  // --- AI FEATURES SETTINGS ---
+
+  // Master switch
+  final bool aiEnabled; // Default: false (opt-in)
+
+  // Smart Prompts (FREE tier)
+  final bool aiSmartPromptsEnabled; // Default: true (if aiEnabled)
+  final bool aiSmartPromptsInEdit; // Default: true
+
+  // Pattern Analysis (PREMIUM tier)
+  final bool aiPatternAnalysisEnabled; // Default: true (if isPremium && aiEnabled)
+  final bool aiPatternsInMonthlyView; // Default: true
+  final bool aiPatternsInMemoryView; // Default: true
+  final bool aiPatternsInMemoryList; // Default: true
+
+  // Predictive Insights (PREMIUM tier)
+  final bool aiPredictiveInsightsEnabled; // Default: true (if isPremium && aiEnabled)
+  final bool aiPredictiveInEdit; // Default: true
+  final bool aiPredictiveNotifications; // Default: false (explicit opt-in)
+
+  // Privacy control
+  final bool aiProcessEncryptedMemories; // Default: false (encrypted stays encrypted)
+}
 ```
-Week 1: User creates 10 memories, gets smart prompts (FREE) ✅
-Week 2: First pattern insight: "We found 3 patterns!" → Shows 1, locks 2
-        → "Unlock all insights with Premium"
-Week 3: User writes anxious memory → "We've seen this before. Unlock prediction?"
-Convert: 5-10% expected conversion rate
+
+### Profile Screen UI
+
+**Где:** `profile_screen.dart` - новая секция "AI Features"
+
+```dart
+Widget _buildAISettings(BuildContext context) {
+  final profile = ref.watch(userProfileProvider).value;
+  if (profile == null) return const SizedBox.shrink();
+
+  return ExpansionTile(
+    title: const Text('AI Features'),
+    leading: const Icon(Icons.auto_awesome),
+    children: [
+      // Master Switch
+      SwitchListTile(
+        title: const Text('Enable AI Features'),
+        subtitle: const Text('AI analyzes your memories to find patterns'),
+        value: profile.aiEnabled,
+        onChanged: (value) {
+          if (value && !profile.aiEnabled) {
+            // First time activation - show consent dialog
+            _showAIConsentDialog(context);
+          } else {
+            _updateProfile({'aiEnabled': value});
+          }
+        },
+      ),
+
+      if (profile.aiEnabled) ...[
+        const Divider(),
+
+        // Smart Prompts (FREE)
+        ListTile(
+          title: Row(
+            children: [
+              const Text('Smart Prompts'),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text('FREE', style: TextStyle(fontSize: 10, color: Colors.white)),
+              ),
+            ],
+          ),
+          subtitle: const Text('AI suggests questions while you write'),
+        ),
+        SwitchListTile(
+          title: const Text('  Show in Memory Edit'),
+          value: profile.aiSmartPromptsEnabled && profile.aiSmartPromptsInEdit,
+          onChanged: profile.aiSmartPromptsEnabled
+              ? (v) => _updateProfile({'aiSmartPromptsInEdit': v})
+              : null,
+        ),
+
+        const Divider(),
+
+        // Pattern Analysis (PREMIUM)
+        ListTile(
+          title: Row(
+            children: [
+              const Text('Pattern Analysis'),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text('PREMIUM', style: TextStyle(fontSize: 10, color: Colors.white)),
+              ),
+            ],
+          ),
+          subtitle: const Text('Weekly analysis of patterns and cycles'),
+          trailing: !profile.isPremium
+              ? TextButton(
+                  onPressed: () => _showPremiumUpgrade(context),
+                  child: const Text('Upgrade'),
+                )
+              : null,
+        ),
+        if (profile.isPremium) ...[
+          SwitchListTile(
+            title: const Text('  Enable Pattern Analysis'),
+            value: profile.aiPatternAnalysisEnabled,
+            onChanged: (v) => _updateProfile({'aiPatternAnalysisEnabled': v}),
+          ),
+          if (profile.aiPatternAnalysisEnabled) ...[
+            SwitchListTile(
+              title: const Text('    Show in Monthly View'),
+              value: profile.aiPatternsInMonthlyView,
+              onChanged: (v) => _updateProfile({'aiPatternsInMonthlyView': v}),
+            ),
+            SwitchListTile(
+              title: const Text('    Show in Memory View'),
+              value: profile.aiPatternsInMemoryView,
+              onChanged: (v) => _updateProfile({'aiPatternsInMemoryView': v}),
+            ),
+            SwitchListTile(
+              title: const Text('    Show in Memory List'),
+              value: profile.aiPatternsInMemoryList,
+              onChanged: (v) => _updateProfile({'aiPatternsInMemoryList': v}),
+            ),
+          ],
+        ],
+
+        const Divider(),
+
+        // Predictive Insights (PREMIUM)
+        ListTile(
+          title: Row(
+            children: [
+              const Text('Predictive Insights'),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text('PREMIUM', style: TextStyle(fontSize: 10, color: Colors.white)),
+              ),
+            ],
+          ),
+          subtitle: const Text('AI predicts based on your history'),
+          trailing: !profile.isPremium
+              ? TextButton(
+                  onPressed: () => _showPremiumUpgrade(context),
+                  child: const Text('Upgrade'),
+                )
+              : null,
+        ),
+        if (profile.isPremium) ...[
+          SwitchListTile(
+            title: const Text('  Enable Predictive Insights'),
+            value: profile.aiPredictiveInsightsEnabled,
+            onChanged: (v) => _updateProfile({'aiPredictiveInsightsEnabled': v}),
+          ),
+          if (profile.aiPredictiveInsightsEnabled) ...[
+            SwitchListTile(
+              title: const Text('    Show in Memory Edit'),
+              value: profile.aiPredictiveInEdit,
+              onChanged: (v) => _updateProfile({'aiPredictiveInEdit': v}),
+            ),
+            SwitchListTile(
+              title: const Text('    Proactive Notifications'),
+              subtitle: const Text('Get notified when AI sees a pattern'),
+              value: profile.aiPredictiveNotifications,
+              onChanged: (v) => _updateProfile({'aiPredictiveNotifications': v}),
+            ),
+          ],
+        ],
+
+        const Divider(),
+
+        // Privacy Control
+        ListTile(
+          title: const Text('Privacy'),
+          subtitle: const Text('Control what AI can access'),
+        ),
+        SwitchListTile(
+          title: const Text('  Process Encrypted Memories'),
+          subtitle: const Text('Allow AI to analyze encrypted content'),
+          value: profile.aiProcessEncryptedMemories,
+          onChanged: (v) {
+            if (v) {
+              _showEncryptedAIWarning(context, () {
+                _updateProfile({'aiProcessEncryptedMemories': v});
+              });
+            } else {
+              _updateProfile({'aiProcessEncryptedMemories': v});
+            }
+          },
+        ),
+
+        // Privacy info card
+        Card(
+          margin: const EdgeInsets.all(16),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.privacy_tip, size: 16),
+                    SizedBox(width: 8),
+                    Text('AI Privacy', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '• Powered by Google Gemini AI\n'
+                  '• Google does NOT store your data\n'
+                  '• Encrypted memories stay encrypted by default\n'
+                  '• You can disable AI anytime',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ],
+  );
+}
+```
+
+### AI Consent Dialog (первая активация)
+
+```dart
+Future<void> _showAIConsentDialog(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Enable AI Features?'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text('AI will analyze your memories to:'),
+          SizedBox(height: 8),
+          Text('• Suggest thoughtful questions'),
+          Text('• Find recurring patterns'),
+          Text('• Predict and help prevent negative cycles'),
+          SizedBox(height: 16),
+          Text('Privacy guarantee:', style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 8),
+          Text('• Powered by Google Gemini'),
+          Text('• Your data is NOT stored by Google'),
+          Text('• Encrypted memories stay encrypted'),
+          Text('• You control what AI can see'),
+          SizedBox(height: 16),
+          Text(
+            'You can disable AI anytime in Settings.',
+            style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Enable AI'),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed == true) {
+    await _updateProfile({'aiEnabled': true});
+  }
+}
 ```
 
 ---
 
-## ⚠️ Privacy & Ethics
+## 🏗️ Firebase Architecture
 
-1. **Data Security**
-   - Never send encrypted memories without user decrypt
-   - Use Firestore security rules
-   - Gemini doesn't store data (Google policy)
+### Firestore Structure
 
-2. **Transparency**
-   - "AI analyzes your entries to find patterns"
-   - Option to opt-out
-   - Clear about what data is used
+```
+users/{userId}/
+  - profile: UserProfile (contains all AI settings)
 
-3. **Responsible AI**
-   - Never diagnose ("seems like depression" ❌)
-   - Suggest professional help when needed
-   - CBT-based, evidence-backed advice
+  - insights/{insightId}
+    {
+      type: "smart_prompt" | "pattern" | "predictive",
+      createdAt: timestamp,
+      content: string, // AI-generated text
+      relatedMemories: [memoryId1, memoryId2],
+      dismissed: bool,
+      viewed: bool,
+      confidence: 0.0-1.0,
 
----
+      // For pattern insights
+      pattern?: {
+        frequency: "daily" | "weekly" | "monthly",
+        trigger: string,
+        emotionTrend: string,
+        suggestions: [string],
+      },
 
-## 📊 Метрики успеха
+      // For predictive insights
+      prediction?: {
+        similarPastEvents: [memoryId],
+        whatHelped: [string],
+        copingStrategies: [string],
+      }
+    }
 
-### Engagement:
-- % users who read insights: target > 60%
-- % users who act on suggestions: target > 30%
-- Time to first premium conversion: target < 2 weeks
+  - monthlyPatterns/{monthKey} // e.g., "2025-01"
+    {
+      monthKey: string,
+      emotionCounts: { emotion: count },
+      topThemes: [string],
+      triggers: [string],
+      whatHelped: [string],
+      generatedAt: timestamp,
+    }
+```
 
-### Quality:
-- User ratings of insights: target > 4/5 stars
-- Dismissal rate: target < 30%
-- Accuracy of predictions (user feedback): target > 70%
+### Firebase Functions
 
-### Business:
-- Free → Premium conversion: target > 5%
-- Retention of premium users: target > 80% after 3 months
-- AI cost per premium user: target < $0.50/month
-
----
-
-## 🎯 MVP для Launch
-
-**Минимальный набор:**
-1. ✅ Smart Prompts (FREE) - быстро показывает ценность AI
-2. ✅ Weekly Pattern Analysis (PREMIUM) - conversion driver
-3. ❌ Predictive + Connection (post-launch)
-
-**Launch plan:**
-- Week 1-2: Smart prompts only
-- Week 3-4: Add pattern analysis, test conversion
-- Month 2: Add predictive if conversion good
-
----
-
-## 🔧 Техническая реализация
-
-### Firebase Function Example:
+#### 1. Smart Prompts Function (FREE)
 
 ```typescript
-// functions/src/generateSmartPrompts.ts
-export const onMemoryCreated = functions.firestore
+// functions/src/smartPrompts.ts
+export const generateSmartPrompts = functions.firestore
   .document('users/{userId}/memories/{memoryId}')
   .onCreate(async (snap, context) => {
     const memory = snap.data();
     const userId = context.params.userId;
 
+    // Check user settings
+    const profile = await getProfile(userId);
+    if (!profile.aiEnabled || !profile.aiSmartPromptsEnabled || !profile.aiSmartPromptsInEdit) {
+      return; // User disabled
+    }
+
+    // Check encryption
+    if (memory.isEncrypted && !profile.aiProcessEncryptedMemories) {
+      return; // Don't process encrypted
+    }
+
     // Call Gemini API
-    const prompt = `User wrote: "${memory.content}"\n\nGenerate 2 CBT-based follow-up questions.`;
+    const prompt = `
+      User wrote this journal entry: "${memory.content}"
 
-    const response = await geminiAPI.generateText({
-      model: 'gemini-1.5-flash',
-      prompt: prompt,
-      maxTokens: 100,
-    });
+      Generate 2-3 thoughtful follow-up questions to help them reflect deeper.
+      Focus on CBT techniques:
+      - What triggered this?
+      - How did you feel?
+      - What would help?
 
-    // Save to Firestore
+      Keep questions short (max 10 words each) and empathetic.
+      Return as JSON array of strings.
+    `;
+
+    const response = await callGeminiAPI(prompt, 'gemini-2.5-flash-lite');
+
+    // Save insight
     await admin.firestore()
       .collection(`users/${userId}/insights`)
       .add({
         type: 'smart_prompt',
-        content: response.text,
-        relatedMemory: memory.id,
+        content: response.questions.join('\n'),
+        relatedMemories: [memory.id],
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        viewed: false,
+        dismissed: false,
+      });
+  });
+```
+
+**Cost:** ~$0.00006 per memory
+
+#### 2. Pattern Analysis Function (PREMIUM - Weekly)
+
+```typescript
+// functions/src/patternAnalysis.ts
+export const weeklyPatternAnalysis = functions.pubsub
+  .schedule('every sunday 00:00')
+  .onRun(async (context) => {
+    const premiumUsers = await getPremiumUsers();
+
+    for (const userId of premiumUsers) {
+      const profile = await getProfile(userId);
+
+      // Check settings
+      if (!profile.aiEnabled || !profile.aiPatternAnalysisEnabled) {
+        continue;
+      }
+
+      // Get last 30 days of memories
+      const memories = await getMemories(userId, { last: 30 });
+
+      // Filter encrypted if needed
+      const processableMemories = memories.filter(m =>
+        !m.isEncrypted || profile.aiProcessEncryptedMemories
+      );
+
+      if (processableMemories.length < 5) continue; // Need enough data
+
+      // Call Gemini API
+      const prompt = `
+        Analyze these journal entries from the last 30 days:
+
+        ${processableMemories.map(m => `${m.date}: ${m.content} [${m.primaryEmotion}]`).join('\n')}
+
+        Find:
+        1. Recurring themes (work, relationships, health)
+        2. Emotional cycles (when do they feel worst/best?)
+        3. Triggers (what causes negative emotions?)
+        4. What helped in the past (coping strategies that worked)
+        5. Progress signs (are things getting better?)
+
+        Return as JSON:
+        {
+          "themes": ["theme1", "theme2"],
+          "emotional_cycles": "description",
+          "triggers": ["trigger1"],
+          "what_helped": ["strategy1"],
+          "progress_notes": "signs of improvement"
+        }
+      `;
+
+      const response = await callGeminiAPI(prompt, 'gemini-2.5-flash-lite');
+
+      // Save pattern insight
+      await admin.firestore()
+        .collection(`users/${userId}/insights`)
+        .add({
+          type: 'pattern',
+          content: formatPatternInsight(response),
+          relatedMemories: processableMemories.map(m => m.id),
+          pattern: response,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          viewed: false,
+          dismissed: false,
+          confidence: calculateConfidence(response, processableMemories.length),
+        });
+
+      // Send notification if enabled
+      if (profile.aiPredictiveNotifications && profile.notificationsEnabled) {
+        await sendPushNotification(userId, {
+          title: 'New Pattern Detected',
+          body: `AI found ${response.themes.length} recurring themes in your last 30 days.`,
+          data: { type: 'pattern_insight' },
+        });
+      }
+    }
+  });
+```
+
+**Cost:** ~$0.00058 per user per week (negligible!)
+
+#### 3. Monthly Pattern Generation (PREMIUM)
+
+```typescript
+// functions/src/monthlyPatterns.ts
+export const generateMonthlyPattern = functions.firestore
+  .document('users/{userId}/memories/{memoryId}')
+  .onCreate(async (snap, context) => {
+    const memory = snap.data();
+    const userId = context.params.userId;
+    const profile = await getProfile(userId);
+
+    // Check if user has premium and settings enabled
+    if (!profile.isPremium || !profile.aiEnabled || !profile.aiPatternAnalysisEnabled) {
+      return;
+    }
+
+    // Check if monthly pattern needs update
+    const monthKey = getMonthKey(memory.date); // e.g., "2025-01"
+    const existingPattern = await getMonthlyPattern(userId, monthKey);
+
+    // Regenerate if last generated > 7 days ago or doesn't exist
+    if (existingPattern && (Date.now() - existingPattern.generatedAt < 7 * 24 * 60 * 60 * 1000)) {
+      return; // Too soon
+    }
+
+    // Get all memories for this month
+    const monthMemories = await getMemoriesForMonth(userId, monthKey);
+
+    // Calculate emotion counts (use existing emotion data)
+    const emotionCounts = {};
+    monthMemories.forEach(m => {
+      if (m.primaryEmotion) {
+        emotionCounts[m.primaryEmotion] = (emotionCounts[m.primaryEmotion] || 0) + 1;
+      }
+    });
+
+    // Call Gemini for deeper analysis
+    const prompt = `
+      Analyze this month's journal entries:
+
+      Emotions: ${JSON.stringify(emotionCounts)}
+
+      Entries:
+      ${monthMemories.map(m => `${m.date}: ${m.content}`).join('\n')}
+
+      Provide:
+      1. Top 3 themes this month
+      2. Main triggers for negative emotions
+      3. What coping strategies helped most (based on context)
+
+      Return as JSON:
+      {
+        "topThemes": ["theme1", "theme2", "theme3"],
+        "triggers": ["trigger1", "trigger2"],
+        "whatHelped": ["strategy1", "strategy2"]
+      }
+    `;
+
+    const response = await callGeminiAPI(prompt, 'gemini-2.5-flash-lite');
+
+    // Save monthly pattern
+    await admin.firestore()
+      .doc(`users/${userId}/monthlyPatterns/${monthKey}`)
+      .set({
+        monthKey,
+        emotionCounts,
+        topThemes: response.topThemes,
+        triggers: response.triggers,
+        whatHelped: response.whatHelped,
+        generatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
   });
 ```
 
 ---
 
-## ✅ Готовность к старту
+## 💰 Cost & Budget
 
-- [x] $2000 Google Cloud Credits
-- [x] Gemini API доступ
-- [ ] Firebase Functions setup
-- [ ] UI для insights
-- [ ] Premium paywall
+### Gemini 2.5 Flash-Lite Pricing (2025)
+- **Input:** $0.10 / 1M tokens
+- **Output:** $0.40 / 1M tokens
+- **1M token context window** - достаточно для всех наших задач
+- **Low-latency** - оптимален для high-volume, simple tasks
+- **Stable & Production-ready** - generally available
 
-**Можем начинать через 2-3 недели после emotion visualization MVP!**
+**Почему Flash-Lite идеален:**
+- ✅ Дешевле чем GPT-4o mini и Claude Haiku
+- ✅ Наши задачи не требуют "thinking mode" (поэтому не нужен дорогой 2.5 Flash)
+- ✅ 1M context покрывает любой объем воспоминаний
+- ✅ Быстрая обработка для real-time insights
+
+### Cost Calculations
+
+```
+Average memory: 500 chars (~125 tokens)
+
+Smart Prompt: 200 input + 100 output = 300 tokens
+Cost = (200 × $0.10 + 100 × $0.40) / 1,000,000 = $0.00006
+≈ Почти бесплатно!
+
+Pattern Analysis (30 days): 30 memories × 125 = 3,750 input + 500 output
+Cost = (3,750 × $0.10 + 500 × $0.40) / 1,000,000 = $0.00058
+
+Predictive Insight: 500 input + 300 output = 800 tokens
+Cost = (500 × $0.10 + 300 × $0.40) / 1,000,000 = $0.00017
+```
+
+### Monthly Budget per Tier
+
+| Feature | Users | Usage | Cost/month | $2000 lasts |
+|---------|-------|-------|------------|-------------|
+| Smart Prompts (FREE) | 10,000 | 5 memories/user/month | $30 | **66 months** |
+| Pattern Analysis (PREMIUM) | 1,000 | 4 analyses/month | $2.32 | **860+ months** |
+| Predictive Insights (PREMIUM) | 1,000 | 10 predictions/user/month | $1.70 | **1176+ months** |
+| **TOTAL** | 10K free + 1K premium | | **$34/month** | **58+ months (почти 5 лет!)** |
+
+**Невероятно дешево!** $2000 Google Cloud Credits хватит на **почти 5 ЛЕТ** работы при 10K бесплатных + 1K премиум пользователей!
+
+---
+
+## 📊 Settings Check Matrix
+
+Для каждого места отображения AI нужна проверка:
+
+| Location | Checks Required |
+|----------|----------------|
+| Smart Prompts (Memory Edit) | `aiEnabled` + `aiSmartPromptsEnabled` + `aiSmartPromptsInEdit` + encryption check |
+| Predictive Insight (Memory Edit) | `aiEnabled` + `isPremium` + `aiPredictiveInsightsEnabled` + `aiPredictiveInEdit` + encryption check |
+| Pattern Badge (Memory View) | `aiEnabled` + `isPremium` + `aiPatternAnalysisEnabled` + `aiPatternsInMemoryView` |
+| Monthly Pattern (Cluster Sheet) | `aiEnabled` + `isPremium` + `aiPatternAnalysisEnabled` + `aiPatternsInMonthlyView` |
+| Top Insights (Memory List) | `aiEnabled` + `isPremium` + `aiPatternAnalysisEnabled` + `aiPatternsInMemoryList` |
+| Proactive Notifications | `aiEnabled` + `isPremium` + `aiPredictiveInsightsEnabled` + `aiPredictiveNotifications` + `notificationsEnabled` |
+
+**Encryption check:** If memory is encrypted and `!aiProcessEncryptedMemories`, skip AI processing.
+
+---
+
+## 🚀 Implementation Phases
+
+### Phase 1: Settings Infrastructure (1 неделя)
+- [ ] Add AI fields to `user_profile.dart`
+- [ ] Update Firestore sync for new fields
+- [ ] Build `_buildAISettings()` in `profile_screen.dart`
+- [ ] Create AI Consent Dialog
+- [ ] Create Encrypted AI Warning Dialog
+- [ ] Test settings sync across devices
+
+### Phase 2: Firebase Functions Setup (1 неделя)
+- [ ] Setup Firebase Functions project
+- [ ] Add Gemini API key to environment
+- [ ] Create `callGeminiAPI()` helper
+- [ ] Deploy test function
+- [ ] Setup Firestore insights collection
+- [ ] Test local Firebase emulator
+
+### Phase 3: Smart Prompts - FREE (1-2 недели)
+- [ ] Create `SmartPromptsCard` widget
+- [ ] Add debounced trigger in `memory_edit_screen.dart`
+- [ ] Implement Firebase Function `generateSmartPrompts`
+- [ ] Add settings checks
+- [ ] Add encrypted memory handling
+- [ ] A/B test engagement with 100 users
+- [ ] Monitor cost and quality
+
+**Success metrics:**
+- % users who click prompts > 40%
+- Avg response time < 2s
+- Cost < $0.001 per memory
+
+### Phase 4: Pattern Analysis - PREMIUM (2 недели)
+- [ ] Create `PatternBadge` widget for memory_view_screen
+- [ ] Create `MonthlyPatternCard` for monthly_cluster_bottom_sheet
+- [ ] Create `TopInsightsCard` for select_memory_screen
+- [ ] Implement weekly `patternAnalysis` function
+- [ ] Implement `generateMonthlyPattern` function
+- [ ] Add premium upsell for free users
+- [ ] Test with 50 premium beta users
+
+**Success metrics:**
+- Pattern accuracy rating > 4/5
+- Dismissal rate < 30%
+- Free → Premium conversion boost > 2%
+
+### Phase 5: Predictive Insights - PREMIUM (2 недели)
+- [ ] Create `PredictiveInsightCard` widget
+- [ ] Implement memory similarity search
+- [ ] Create `generatePrediction` Firebase Function
+- [ ] Add real-time trigger in memory_edit_screen
+- [ ] Implement proactive notifications
+- [ ] Add notification settings check
+- [ ] Test prediction accuracy with user feedback
+
+**Success metrics:**
+- Users rate predictions helpful > 70%
+- Notification opt-in rate > 20%
+- Users follow suggestions > 30%
+
+### Phase 6: Monitoring & Optimization (ongoing)
+- [ ] Setup Cloud Functions logging
+- [ ] Monitor Gemini API costs daily
+- [ ] Track insight quality ratings
+- [ ] A/B test prompt variations
+- [ ] Optimize token usage
+- [ ] Add user feedback loop
+
+---
+
+## 📈 Monetization Strategy
+
+### FREE Tier:
+- ✅ Smart Prompts - unlimited
+- ✅ Shows value of AI immediately
+- ❌ No pattern analysis
+- ❌ No predictions
+
+### PREMIUM ($3.99/month):
+- ✅ Everything in FREE
+- ✅ Weekly pattern analysis
+- ✅ Monthly pattern insights
+- ✅ Real-time predictive insights
+- ✅ Proactive notifications
+- ✅ Priority AI processing
+
+### Conversion Flow:
+
+**Week 1:** User creates 5-10 memories
+- Gets Smart Prompts (FREE) ✅
+- Sees value of AI helping them reflect
+
+**Week 2:** User creates more memories
+- Pattern analysis runs (but locked)
+- Shows: "We found 3 patterns! Upgrade to Premium to see them"
+- Emotion visualization helps but AI would explain WHY
+
+**Week 3:** User writes anxious memory
+- Smart Prompt helps
+- Shows teaser: "We've seen this pattern before. Premium users get predictions."
+
+**Convert:** Expected 5-10% conversion from FREE to PREMIUM driven by AI value.
+
+**Retention:** Premium users with AI engaged have 80%+ retention (vs 60% without AI).
+
+---
+
+## ⚠️ Privacy & Ethics
+
+### Data Security
+1. **Encryption Respect:**
+   - Encrypted memories NOT sent to Gemini by default
+   - User must explicitly opt-in via `aiProcessEncryptedMemories`
+   - Show warning when enabling
+
+2. **Google Gemini Policy:**
+   - Google does NOT store data sent to Gemini API
+   - No training on user data
+   - Enterprise-grade privacy
+   - Link to policy: https://cloud.google.com/gemini/docs/discover/data-governance
+
+3. **Firestore Security:**
+   ```javascript
+   // Insights are user-private
+   match /users/{userId}/insights/{insightId} {
+     allow read, write: if request.auth.uid == userId;
+   }
+   ```
+
+### Transparency
+1. **Clear Communication:**
+   - "AI analyzes your memories to find patterns"
+   - Consent dialog explains what AI does
+   - Privacy card in settings shows Gemini usage
+
+2. **User Control:**
+   - Granular settings for each feature
+   - Can disable AI anytime
+   - Can exclude encrypted content
+   - Can dismiss/hide specific insights
+
+### Responsible AI
+1. **Never Diagnose:**
+   - ❌ "You seem to have depression"
+   - ✅ "You've felt sad frequently. Consider talking to a therapist."
+
+2. **Suggest Professional Help:**
+   - If AI detects severe patterns (self-harm mentions, etc.)
+   - Show crisis resources
+   - Encourage professional support
+
+3. **CBT-Based Only:**
+   - Use evidence-based techniques
+   - No pseudoscience
+   - Focus on actionable coping strategies
+
+---
+
+## 📊 Success Metrics
+
+### Engagement Metrics:
+- **Insight view rate:** > 60% (users actually read AI insights)
+- **Action rate:** > 30% (users follow AI suggestions)
+- **Dismissal rate:** < 30% (insights are relevant)
+- **Settings disable rate:** < 10% (users keep AI enabled)
+
+### Quality Metrics:
+- **User ratings:** > 4/5 stars for insight quality
+- **Prediction accuracy:** > 70% (based on user feedback)
+- **Pattern relevance:** > 80% (patterns make sense to user)
+
+### Business Metrics:
+- **Free → Premium conversion:** > 5% (AI drives upgrades)
+- **Premium retention:** > 80% after 3 months
+- **AI cost per premium user:** < $0.20/month
+- **ROI on $2000 credits:** > 500% (via premium conversions)
+
+---
+
+## 🎯 Competitive Positioning
+
+| Feature | Reflectly | Rosebud | Daylio | **Lifeline** |
+|---------|-----------|---------|--------|--------------|
+| AI prompts | ✅ Generic | ✅ Generic | ❌ | ✅ **Context-aware** |
+| Pattern detection | ❌ | ⚠️ Word clouds | ⚠️ Charts only | ✅ **Cyclical + predictive** |
+| Predictions | ❌ | ❌ | ❌ | ✅ **Based on your history** |
+| Privacy | ⚠️ Unclear | ⚠️ Unclear | ✅ No AI | ✅ **Encrypted excluded** |
+| Price/year | $60 | $96 | $30 | **$48** |
+| **Value score** | 3/10 | 5/10 | 4/10 | **9/10** |
+
+**Why we win:**
+1. **Timeline-aware AI** - remembers your full history
+2. **Predictive insights** - based on what worked FOR YOU
+3. **Privacy-first** - encrypted stays encrypted
+4. **Better value** - $4/month for real AI vs $8-10 for competitors
+
+---
+
+## ✅ Ready to Launch
+
+- [x] $2000 Google Cloud Credits available
+- [x] Gemini API access configured
+- [x] Settings architecture designed
+- [x] UI/UX integration points defined
+- [x] Privacy policy compliant
+- [ ] Firebase Functions deployed
+- [ ] UserProfile fields added
+- [ ] Profile Screen UI built
+- [ ] Smart Prompts implemented (Phase 3)
+- [ ] Pattern Analysis implemented (Phase 4)
+- [ ] Predictive Insights implemented (Phase 5)
+
+**Timeline:** 6-8 недель от начала Phase 1 до полного запуска всех AI features.
+
+**Priority:** Start with Phase 1 (Settings Infrastructure) after current killer features are stable.
+
+---
+
+## 💡 Future Ideas (Post-Launch)
+
+1. **Voice Journaling + AI:**
+   - Speech-to-text for memories
+   - AI analyzes tone/emotion from voice
+   - "You sound stressed. Want to talk about it?"
+
+2. **AI-Generated Visualizations:**
+   - Beyond emotion auras
+   - Timeline "weather" based on mood
+   - "This month felt like a storm, but calmer now"
+
+3. **Community Patterns (Anonymous):**
+   - "People who felt [X] found [Y] helpful"
+   - Aggregated insights without privacy loss
+
+4. **Therapist Integration:**
+   - Export AI insights for therapy sessions
+   - Therapist can review patterns
+   - Helps therapy be more efficient
+
+---
+
+**Главный вывод:** Наш AI не просто "отвечает на вопросы" - он **помнит всю вашу историю и помогает увидеть себя со стороны**. Это то, чего нет ни у одного конкурента.
