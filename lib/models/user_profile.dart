@@ -32,6 +32,28 @@ class UserProfile {
   final DateTime? premiumUntil;
   final DateTime? trialStartedAt;
 
+  // --- AI FEATURES SETTINGS ---
+  // Master switch
+  final bool aiEnabled; // Default: false (opt-in)
+
+  // Smart Prompts (FREE tier)
+  final bool aiSmartPromptsEnabled; // Default: true (if aiEnabled)
+  final bool aiSmartPromptsInEdit; // Default: true
+
+  // Pattern Analysis (PREMIUM tier)
+  final bool aiPatternAnalysisEnabled; // Default: true (if isPremium && aiEnabled)
+  final bool aiPatternsInMonthlyView; // Default: true
+  final bool aiPatternsInMemoryView; // Default: true
+  final bool aiPatternsInMemoryList; // Default: true
+
+  // Predictive Insights (PREMIUM tier)
+  final bool aiPredictiveInsightsEnabled; // Default: true (if isPremium && aiEnabled)
+  final bool aiPredictiveInEdit; // Default: true
+  final bool aiPredictiveNotifications; // Default: false (explicit opt-in)
+
+  // Privacy control
+  final bool aiProcessEncryptedMemories; // Default: false (encrypted stays encrypted)
+
   // --- NEW VISUAL SETTINGS ---
   final double visualSpeed;
   final double visualAmplitude;
@@ -95,6 +117,18 @@ class UserProfile {
     this.isPremium = false,
     this.premiumUntil,
     this.trialStartedAt,
+    // --- AI FEATURES CONSTRUCTOR PARAMS with defaults ---
+    this.aiEnabled = false, // Opt-in by default
+    this.aiSmartPromptsEnabled = true,
+    this.aiSmartPromptsInEdit = true,
+    this.aiPatternAnalysisEnabled = true,
+    this.aiPatternsInMonthlyView = true,
+    this.aiPatternsInMemoryView = true,
+    this.aiPatternsInMemoryList = true,
+    this.aiPredictiveInsightsEnabled = true,
+    this.aiPredictiveInEdit = true,
+    this.aiPredictiveNotifications = false, // Explicit opt-in
+    this.aiProcessEncryptedMemories = false, // Encrypted stays encrypted
     // --- NEW CONSTRUCTOR PARAMS with defaults ---
     this.visualSpeed = 2.0,
     this.visualAmplitude = 10.0,
@@ -150,6 +184,18 @@ class UserProfile {
     bool? isPremium,
     DateTime? premiumUntil,
     DateTime? trialStartedAt,
+    // --- AI FEATURES copyWith PARAMS ---
+    bool? aiEnabled,
+    bool? aiSmartPromptsEnabled,
+    bool? aiSmartPromptsInEdit,
+    bool? aiPatternAnalysisEnabled,
+    bool? aiPatternsInMonthlyView,
+    bool? aiPatternsInMemoryView,
+    bool? aiPatternsInMemoryList,
+    bool? aiPredictiveInsightsEnabled,
+    bool? aiPredictiveInEdit,
+    bool? aiPredictiveNotifications,
+    bool? aiProcessEncryptedMemories,
     // --- NEW copyWith PARAMS ---
     double? visualSpeed,
     double? visualAmplitude,
@@ -216,6 +262,18 @@ class UserProfile {
       isPremium: isPremium ?? this.isPremium,
       premiumUntil: premiumUntil ?? this.premiumUntil,
       trialStartedAt: trialStartedAt ?? this.trialStartedAt,
+      // --- AI FEATURES copyWith ASSIGNMENTS ---
+      aiEnabled: aiEnabled ?? this.aiEnabled,
+      aiSmartPromptsEnabled: aiSmartPromptsEnabled ?? this.aiSmartPromptsEnabled,
+      aiSmartPromptsInEdit: aiSmartPromptsInEdit ?? this.aiSmartPromptsInEdit,
+      aiPatternAnalysisEnabled: aiPatternAnalysisEnabled ?? this.aiPatternAnalysisEnabled,
+      aiPatternsInMonthlyView: aiPatternsInMonthlyView ?? this.aiPatternsInMonthlyView,
+      aiPatternsInMemoryView: aiPatternsInMemoryView ?? this.aiPatternsInMemoryView,
+      aiPatternsInMemoryList: aiPatternsInMemoryList ?? this.aiPatternsInMemoryList,
+      aiPredictiveInsightsEnabled: aiPredictiveInsightsEnabled ?? this.aiPredictiveInsightsEnabled,
+      aiPredictiveInEdit: aiPredictiveInEdit ?? this.aiPredictiveInEdit,
+      aiPredictiveNotifications: aiPredictiveNotifications ?? this.aiPredictiveNotifications,
+      aiProcessEncryptedMemories: aiProcessEncryptedMemories ?? this.aiProcessEncryptedMemories,
       // --- NEW copyWith ASSIGNMENTS ---
       visualSpeed: visualSpeed ?? this.visualSpeed,
       visualAmplitude: visualAmplitude ?? this.visualAmplitude,
@@ -279,6 +337,18 @@ class UserProfile {
           premiumUntil != null ? Timestamp.fromDate(premiumUntil!) : null,
       'trialStartedAt':
           trialStartedAt != null ? Timestamp.fromDate(trialStartedAt!) : null,
+      // --- AI FEATURES toJson FIELDS ---
+      'aiEnabled': aiEnabled,
+      'aiSmartPromptsEnabled': aiSmartPromptsEnabled,
+      'aiSmartPromptsInEdit': aiSmartPromptsInEdit,
+      'aiPatternAnalysisEnabled': aiPatternAnalysisEnabled,
+      'aiPatternsInMonthlyView': aiPatternsInMonthlyView,
+      'aiPatternsInMemoryView': aiPatternsInMemoryView,
+      'aiPatternsInMemoryList': aiPatternsInMemoryList,
+      'aiPredictiveInsightsEnabled': aiPredictiveInsightsEnabled,
+      'aiPredictiveInEdit': aiPredictiveInEdit,
+      'aiPredictiveNotifications': aiPredictiveNotifications,
+      'aiProcessEncryptedMemories': aiProcessEncryptedMemories,
       // --- NEW toJson FIELDS ---
       'visualSpeed': visualSpeed,
       'visualAmplitude': visualAmplitude,
@@ -339,6 +409,18 @@ class UserProfile {
       isPremium: json['isPremium'] as bool? ?? false,
       premiumUntil: (json['premiumUntil'] as Timestamp?)?.toDate(),
       trialStartedAt: (json['trialStartedAt'] as Timestamp?)?.toDate(),
+      // --- AI FEATURES fromJson ASSIGNMENTS with defaults ---
+      aiEnabled: json['aiEnabled'] as bool? ?? false,
+      aiSmartPromptsEnabled: json['aiSmartPromptsEnabled'] as bool? ?? true,
+      aiSmartPromptsInEdit: json['aiSmartPromptsInEdit'] as bool? ?? true,
+      aiPatternAnalysisEnabled: json['aiPatternAnalysisEnabled'] as bool? ?? true,
+      aiPatternsInMonthlyView: json['aiPatternsInMonthlyView'] as bool? ?? true,
+      aiPatternsInMemoryView: json['aiPatternsInMemoryView'] as bool? ?? true,
+      aiPatternsInMemoryList: json['aiPatternsInMemoryList'] as bool? ?? true,
+      aiPredictiveInsightsEnabled: json['aiPredictiveInsightsEnabled'] as bool? ?? true,
+      aiPredictiveInEdit: json['aiPredictiveInEdit'] as bool? ?? true,
+      aiPredictiveNotifications: json['aiPredictiveNotifications'] as bool? ?? false,
+      aiProcessEncryptedMemories: json['aiProcessEncryptedMemories'] as bool? ?? false,
       // --- NEW fromJson ASSIGNMENTS with defaults ---
       visualSpeed: (json['visualSpeed'] as num?)?.toDouble() ?? 2.0,
       visualAmplitude: (json['visualAmplitude'] as num?)?.toDouble() ?? 10.0,

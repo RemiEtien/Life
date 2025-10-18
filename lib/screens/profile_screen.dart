@@ -14,6 +14,7 @@ import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import '../widgets/device_performance_detector.dart';
+import '../widgets/ai_settings_section.dart';
 import 'performance_debug_screen.dart';
 import 'package:collection/collection.dart';
 
@@ -1024,6 +1025,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const Divider(height: 40),
                     _buildSectionTitle(l10n.profileSectionSettings, context),
                     _buildNotificationsSetting(profile, l10n),
+                    const AISettingsSection(),
                     _buildGraphicsQualitySetting(l10n),
                     _buildEmotionVisualizationSettings(profile, l10n),
                     const Divider(height: 40),
