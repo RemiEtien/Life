@@ -1675,8 +1675,14 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
         children: [
           Row(
             children: [
+              Icon(
+                _getEmotionIcon(_primaryEmotion!),
+                size: 20,
+                color: _getEmotionColor(_primaryEmotion!),
+              ),
+              const SizedBox(width: 8),
               Text(
-                '${_getEmotionIcon(_primaryEmotion!)} ${_getTranslatedEmotion(_primaryEmotion!, l10n)}',
+                _getTranslatedEmotion(_primaryEmotion!, l10n),
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
@@ -1699,7 +1705,14 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
               padding: const EdgeInsets.only(top: 8),
               child: Row(
                 children: [
-                  Text('+ ${_getEmotionIcon(_secondaryEmotion!)} ${_getTranslatedEmotion(_secondaryEmotion!, l10n)}'),
+                  const Text('+ ', style: TextStyle(fontSize: 14)),
+                  Icon(
+                    _getEmotionIcon(_secondaryEmotion!),
+                    size: 18,
+                    color: _getEmotionColor(_secondaryEmotion!),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(_getTranslatedEmotion(_secondaryEmotion!, l10n)),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.clear, size: 18),
@@ -1766,9 +1779,10 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                   : null,
             ),
             child: Center(
-              child: Text(
+              child: Icon(
                 _getEmotionIcon(emotion),
-                style: const TextStyle(fontSize: 28),
+                size: 28,
+                color: isSelected ? _getEmotionColor(emotion) : Colors.grey,
               ),
             ),
           ),
@@ -1805,9 +1819,10 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Center(
-                      child: Text(
+                      child: Icon(
                         _getEmotionIcon(emotion),
-                        style: const TextStyle(fontSize: 28),
+                        size: 28,
+                        color: _getEmotionColor(emotion),
                       ),
                     ),
                   ),
@@ -1821,26 +1836,26 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
   }
 
   // Хелперы для эмоций
-  String _getEmotionIcon(String emotion) {
+  IconData _getEmotionIcon(String emotion) {
     switch (emotion) {
       case 'joy':
-        return '☀️';
+        return Icons.wb_sunny; // Sun icon for joy
       case 'sadness':
-        return '🌧️';
+        return Icons.sentiment_dissatisfied; // Sad face
       case 'anger':
-        return '⚡';
+        return Icons.flash_on; // Lightning bolt
       case 'fear':
-        return '🌫️';
+        return Icons.warning_amber; // Warning/concern
       case 'disgust':
-        return '🍂';
+        return Icons.block; // Blocking/rejection
       case 'surprise':
-        return '✨';
+        return Icons.auto_awesome; // Sparkles/excitement
       case 'love':
-        return '❤️';
+        return Icons.favorite; // Heart
       case 'pride':
-        return '🏆';
+        return Icons.emoji_events; // Trophy/achievement
       default:
-        return '😐';
+        return Icons.sentiment_neutral; // Neutral face
     }
   }
 

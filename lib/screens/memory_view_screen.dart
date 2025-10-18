@@ -316,8 +316,35 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
         return l10n.emotionFear;
       case 'anger':
         return l10n.emotionAnger;
+      case 'surprise':
+        return l10n.emotionSurprise;
+      case 'disgust':
+        return l10n.emotionDisgust;
       default:
         return key;
+    }
+  }
+
+  IconData _getEmotionIcon(String emotion) {
+    switch (emotion) {
+      case 'joy':
+        return Icons.wb_sunny; // Sun icon for joy
+      case 'sadness':
+        return Icons.sentiment_dissatisfied; // Sad face
+      case 'anger':
+        return Icons.flash_on; // Lightning bolt
+      case 'fear':
+        return Icons.warning_amber; // Warning/concern
+      case 'disgust':
+        return Icons.block; // Blocking/rejection
+      case 'surprise':
+        return Icons.auto_awesome; // Sparkles/excitement
+      case 'love':
+        return Icons.favorite; // Heart
+      case 'pride':
+        return Icons.emoji_events; // Trophy/achievement
+      default:
+        return Icons.sentiment_neutral; // Neutral face
     }
   }
 
@@ -1286,6 +1313,84 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                       ],
                     ),
                   ),
+                // Display emotions at the top for better visibility
+                if (_currentMemory.primaryEmotion != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: [
+                        // Primary emotion badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: EmotionColors.getColor(_currentMemory.primaryEmotion!)
+                                .withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: EmotionColors.getColor(_currentMemory.primaryEmotion!)
+                                  .withOpacity(0.6),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getEmotionIcon(_currentMemory.primaryEmotion!),
+                                size: 16,
+                                color: EmotionColors.getColor(_currentMemory.primaryEmotion!),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _getTranslatedEmotion(_currentMemory.primaryEmotion!, l10n),
+                                style: TextStyle(
+                                  color: Colors.white.withAlpha((255 * 0.95).round()),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Secondary emotion badge (if exists)
+                        if (_currentMemory.secondaryEmotion != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: EmotionColors.getColor(_currentMemory.secondaryEmotion!)
+                                  .withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: EmotionColors.getColor(_currentMemory.secondaryEmotion!)
+                                    .withOpacity(0.4),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _getEmotionIcon(_currentMemory.secondaryEmotion!),
+                                  size: 14,
+                                  color: EmotionColors.getColor(_currentMemory.secondaryEmotion!),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _getTranslatedEmotion(_currentMemory.secondaryEmotion!, l10n),
+                                  style: TextStyle(
+                                    color: Colors.white.withAlpha((255 * 0.85).round()),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 if (_needsUnlock)
                   _buildLockedContentPlaceholder()
                 else if (content != null && content.isNotEmpty) ...[
@@ -1400,7 +1505,89 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
                         title: l10n.memoryViewReflectionLesson,
                         content: lesson!),
                 ],
-                if (hasEmotions) ...[
+                // Display emotions using new system (primaryEmotion + secondaryEmotion)
+                if (_currentMemory.primaryEmotion != null) ...[
+                  const SizedBox(height: 16),
+                  Text(l10n.memoryEditEmotionsLabel,
+                      style: TextStyle(
+                          color: Colors.white.withAlpha((255 * 0.9).round()),
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: [
+                      // Primary emotion chip
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: EmotionColors.getColor(_currentMemory.primaryEmotion!)
+                              .withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: EmotionColors.getColor(_currentMemory.primaryEmotion!)
+                                .withOpacity(0.5),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getEmotionIcon(_currentMemory.primaryEmotion!),
+                              size: 18,
+                              color: EmotionColors.getColor(_currentMemory.primaryEmotion!),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _getTranslatedEmotion(_currentMemory.primaryEmotion!, l10n),
+                              style: TextStyle(
+                                color: Colors.white.withAlpha((255 * 0.95).round()),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Secondary emotion chip (if exists)
+                      if (_currentMemory.secondaryEmotion != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: EmotionColors.getColor(_currentMemory.secondaryEmotion!)
+                                .withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: EmotionColors.getColor(_currentMemory.secondaryEmotion!)
+                                  .withOpacity(0.4),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getEmotionIcon(_currentMemory.secondaryEmotion!),
+                                size: 16,
+                                color: EmotionColors.getColor(_currentMemory.secondaryEmotion!),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _getTranslatedEmotion(_currentMemory.secondaryEmotion!, l10n),
+                                style: TextStyle(
+                                  color: Colors.white.withAlpha((255 * 0.85).round()),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ]
+                // Fallback to old emotion system if no new emotions
+                else if (hasEmotions) ...[
                   const SizedBox(height: 16),
                   Text(l10n.memoryEditEmotionsLabel,
                       style: TextStyle(
