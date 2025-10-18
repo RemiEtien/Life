@@ -1381,4 +1381,158 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shareDialogErrorLoadingProfile => '加载个人资料时出错';
+
+  @override
+  String get aiSettingsTitle => 'AI 功能';
+
+  @override
+  String get aiSettingsSubtitleEnabled => 'AI 正在分析您的记忆';
+
+  @override
+  String get aiSettingsSubtitleDisabled => 'AI 功能已禁用';
+
+  @override
+  String get aiSettingsMasterSwitch => '启用 AI 功能';
+
+  @override
+  String get aiSettingsMasterSwitchSubtitle => 'AI 分析您的记忆以发现模式';
+
+  @override
+  String get aiSettingsSmartPrompts => '智能提示';
+
+  @override
+  String get aiSettingsSmartPromptsSubtitle => 'AI 在您写作时建议问题';
+
+  @override
+  String get aiSettingsSmartPromptsInEdit => '在记忆编辑中显示';
+
+  @override
+  String get aiSettingsPatternAnalysis => '模式分析';
+
+  @override
+  String get aiSettingsPatternAnalysisSubtitle => '每周模式和周期分析';
+
+  @override
+  String get aiSettingsPatternAnalysisEnable => '启用模式分析';
+
+  @override
+  String get aiSettingsPatternAnalysisMonthly => '在月视图中显示';
+
+  @override
+  String get aiSettingsPatternAnalysisMemory => '在记忆视图中显示';
+
+  @override
+  String get aiSettingsPatternAnalysisList => '在记忆列表中显示';
+
+  @override
+  String get aiSettingsPredictiveInsights => '预测性洞察';
+
+  @override
+  String get aiSettingsPredictiveInsightsSubtitle => 'AI 根据您的历史进行预测';
+
+  @override
+  String get aiSettingsPredictiveInsightsEnable => '启用预测性洞察';
+
+  @override
+  String get aiSettingsPredictiveInsightsEdit => '在记忆编辑中显示';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotifications => '主动通知';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotificationsSubtitle =>
+      '当 AI 发现模式时通知您';
+
+  @override
+  String get aiSettingsPrivacyTitle => '隐私';
+
+  @override
+  String get aiSettingsPrivacySubtitle => '控制 AI 可以访问的内容';
+
+  @override
+  String get aiSettingsPrivacyEncrypted => '处理加密的记忆';
+
+  @override
+  String get aiSettingsPrivacyEncryptedSubtitle => '允许 AI 分析加密内容';
+
+  @override
+  String get aiSettingsPrivacyInfoTitle => 'AI 隐私';
+
+  @override
+  String get aiSettingsPrivacyInfoContent =>
+      '您的记忆会发送到 Google Gemini AI 进行分析。Google 不会永久存储您的数据。所有处理都是临时的。\n\n加密的记忆不会发送到 AI，除非您在上面明确启用。\n\n您可以随时禁用 AI 功能。';
+
+  @override
+  String get aiSettingsBadgeFree => '免费';
+
+  @override
+  String get aiSettingsBadgePremium => '高级版';
+
+  @override
+  String get aiSettingsUpgradeButton => '升级';
+
+  @override
+  String get aiSettingsUpgradeDialogContent => '高级功能即将推出！';
+
+  @override
+  String get aiConsentDialogTitle => '启用 AI 功能？';
+
+  @override
+  String get aiConsentDialogBenefit1 => '建议深思熟虑的问题';
+
+  @override
+  String get aiConsentDialogBenefit2 => '发现重复出现的模式';
+
+  @override
+  String get aiConsentDialogBenefit3 => '预测并帮助防止负面循环';
+
+  @override
+  String get aiConsentDialogPrivacyTitle => '隐私保证：';
+
+  @override
+  String get aiConsentDialogPrivacy1 => '由 Google Gemini 提供支持';
+
+  @override
+  String get aiConsentDialogPrivacy2 => '您的数据不会被 Google 存储';
+
+  @override
+  String get aiConsentDialogPrivacy3 => '加密的记忆保持加密状态';
+
+  @override
+  String get aiConsentDialogPrivacy4 => '您控制 AI 可以看到的内容';
+
+  @override
+  String get aiConsentDialogPrivacyNote =>
+      '启用 AI 即表示您同意将未加密的记忆发送到 Google Gemini 进行分析。Google 以临时方式处理数据（不会永久存储）。';
+
+  @override
+  String get aiConsentDialogCancel => '取消';
+
+  @override
+  String get aiConsentDialogEnable => '启用 AI';
+
+  @override
+  String get aiEncryptedWarningTitle => '处理加密的记忆？';
+
+  @override
+  String get aiEncryptedWarningContent =>
+      '这将把您加密的记忆发送到 Google Gemini AI 进行分析。\n\n虽然 Gemini 不会永久存储数据，但在处理过程中，您的加密内容将暂时对 AI 可见。\n\n仅当您对 Google AI 查看您的加密记忆感到满意时才启用此功能。';
+
+  @override
+  String get aiEncryptedWarningCancel => '取消';
+
+  @override
+  String get aiEncryptedWarningEnable => '启用';
+
+  @override
+  String get aiNoInternetTitle => '无网络连接';
+
+  @override
+  String get aiNoInternetMessage => 'AI 功能需要网络连接才能工作。请连接到 WiFi 或移动数据，然后重试。';
+
+  @override
+  String get aiNoInternetRetry => '重试';
+
+  @override
+  String get aiNoInternetDismiss => '关闭';
 }

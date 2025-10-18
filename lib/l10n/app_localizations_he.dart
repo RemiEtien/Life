@@ -1427,4 +1427,163 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get shareDialogErrorLoadingProfile => 'שגיאה בטעינת הפרופיל';
+
+  @override
+  String get aiSettingsTitle => 'תכונות AI';
+
+  @override
+  String get aiSettingsSubtitleEnabled => 'AI מנתח את הזיכרונות שלך';
+
+  @override
+  String get aiSettingsSubtitleDisabled => 'תכונות AI מושבתות';
+
+  @override
+  String get aiSettingsMasterSwitch => 'הפעל תכונות AI';
+
+  @override
+  String get aiSettingsMasterSwitchSubtitle =>
+      'AI מנתח את הזיכרונות שלך כדי למצוא דפוסים';
+
+  @override
+  String get aiSettingsSmartPrompts => 'הנחיות חכמות';
+
+  @override
+  String get aiSettingsSmartPromptsSubtitle => 'AI מציע שאלות בזמן שאתה כותב';
+
+  @override
+  String get aiSettingsSmartPromptsInEdit => 'הצג בעריכת זיכרון';
+
+  @override
+  String get aiSettingsPatternAnalysis => 'ניתוח דפוסים';
+
+  @override
+  String get aiSettingsPatternAnalysisSubtitle =>
+      'ניתוח שבועי של דפוסים ומחזורים';
+
+  @override
+  String get aiSettingsPatternAnalysisEnable => 'הפעל ניתוח דפוסים';
+
+  @override
+  String get aiSettingsPatternAnalysisMonthly => 'הצג בתצוגה חודשית';
+
+  @override
+  String get aiSettingsPatternAnalysisMemory => 'הצג בתצוגת זיכרון';
+
+  @override
+  String get aiSettingsPatternAnalysisList => 'הצג ברשימת זיכרונות';
+
+  @override
+  String get aiSettingsPredictiveInsights => 'תובנות חזויות';
+
+  @override
+  String get aiSettingsPredictiveInsightsSubtitle =>
+      'AI חוזה על סמך ההיסטוריה שלך';
+
+  @override
+  String get aiSettingsPredictiveInsightsEnable => 'הפעל תובנות חזויות';
+
+  @override
+  String get aiSettingsPredictiveInsightsEdit => 'הצג בעריכת זיכרון';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotifications => 'התראות פרואקטיביות';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotificationsSubtitle =>
+      'קבל התראות כאשר AI רואה דפוס';
+
+  @override
+  String get aiSettingsPrivacyTitle => 'פרטיות';
+
+  @override
+  String get aiSettingsPrivacySubtitle => 'שלוט במה ש-AI יכול לגשת אליו';
+
+  @override
+  String get aiSettingsPrivacyEncrypted => 'עבד זיכרונות מוצפנים';
+
+  @override
+  String get aiSettingsPrivacyEncryptedSubtitle => 'אפשר ל-AI לנתח תוכן מוצפן';
+
+  @override
+  String get aiSettingsPrivacyInfoTitle => 'פרטיות AI';
+
+  @override
+  String get aiSettingsPrivacyInfoContent =>
+      'הזיכרונות שלך נשלחים ל-Google Gemini AI לניתוח. Google אינה שומרת את הנתונים שלך באופן קבוע. כל העיבוד הוא זמני.\n\nזיכרונות מוצפנים אינם נשלחים ל-AI אלא אם כן הפעלת זאת במפורש למעלה.\n\nאתה יכול להשבית תכונות AI בכל עת.';
+
+  @override
+  String get aiSettingsBadgeFree => 'חינם';
+
+  @override
+  String get aiSettingsBadgePremium => 'פרימיום';
+
+  @override
+  String get aiSettingsUpgradeButton => 'שדרג';
+
+  @override
+  String get aiSettingsUpgradeDialogContent => 'תכונות פרימיום בקרוב!';
+
+  @override
+  String get aiConsentDialogTitle => 'להפעיל תכונות AI?';
+
+  @override
+  String get aiConsentDialogBenefit1 => 'הצעת שאלות מעוררות מחשבה';
+
+  @override
+  String get aiConsentDialogBenefit2 => 'מצא דפוסים חוזרים';
+
+  @override
+  String get aiConsentDialogBenefit3 => 'חזה ועזור למנוע מחזורים שליליים';
+
+  @override
+  String get aiConsentDialogPrivacyTitle => 'ערבות פרטיות:';
+
+  @override
+  String get aiConsentDialogPrivacy1 => 'מופעל על ידי Google Gemini';
+
+  @override
+  String get aiConsentDialogPrivacy2 =>
+      'הנתונים שלך אינם מאוחסנים על ידי Google';
+
+  @override
+  String get aiConsentDialogPrivacy3 => 'זיכרונות מוצפנים נשארים מוצפנים';
+
+  @override
+  String get aiConsentDialogPrivacy4 => 'אתה שולט במה ש-AI יכול לראות';
+
+  @override
+  String get aiConsentDialogPrivacyNote =>
+      'על ידי הפעלת AI, אתה מסכים שהזיכרונות הלא-מוצפנים שלך יישלחו ל-Google Gemini לניתוח. Google מעבדת נתונים באופן זמני (לא שומרת אותם באופן קבוע).';
+
+  @override
+  String get aiConsentDialogCancel => 'ביטול';
+
+  @override
+  String get aiConsentDialogEnable => 'הפעל AI';
+
+  @override
+  String get aiEncryptedWarningTitle => 'לעבד זיכרונות מוצפנים?';
+
+  @override
+  String get aiEncryptedWarningContent =>
+      'זה ישלח את הזיכרונות המוצפנים שלך ל-Google Gemini AI לניתוח.\n\nלמרות ש-Gemini לא שומר נתונים באופן קבוע, התוכן המוצפן שלך יהיה גלוי זמנית ל-AI במהלך העיבוד.\n\nהפעל זאת רק אם אתה מרגיש בנוח עם העובדה ש-AI של Google רואה את הזיכרונות המוצפנים שלך.';
+
+  @override
+  String get aiEncryptedWarningCancel => 'ביטול';
+
+  @override
+  String get aiEncryptedWarningEnable => 'הפעל';
+
+  @override
+  String get aiNoInternetTitle => 'אין חיבור לאינטרנט';
+
+  @override
+  String get aiNoInternetMessage =>
+      'תכונות AI דורשות חיבור לאינטרנט כדי לפעול. אנא התחבר ל-WiFi או לנתוני סלולר ונסה שוב.';
+
+  @override
+  String get aiNoInternetRetry => 'נסה שוב';
+
+  @override
+  String get aiNoInternetDismiss => 'סגור';
 }

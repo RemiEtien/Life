@@ -2667,6 +2667,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading profile'**
   String get shareDialogErrorLoadingProfile;
+
+  /// No description provided for @aiSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Features'**
+  String get aiSettingsTitle;
+
+  /// No description provided for @aiSettingsSubtitleEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is analyzing your memories'**
+  String get aiSettingsSubtitleEnabled;
+
+  /// No description provided for @aiSettingsSubtitleDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'AI features are disabled'**
+  String get aiSettingsSubtitleDisabled;
+
+  /// No description provided for @aiSettingsMasterSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable AI Features'**
+  String get aiSettingsMasterSwitch;
+
+  /// No description provided for @aiSettingsMasterSwitchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analyzes your memories to find patterns'**
+  String get aiSettingsMasterSwitchSubtitle;
+
+  /// No description provided for @aiSettingsSmartPrompts.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Prompts'**
+  String get aiSettingsSmartPrompts;
+
+  /// No description provided for @aiSettingsSmartPromptsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI suggests questions while you write'**
+  String get aiSettingsSmartPromptsSubtitle;
+
+  /// No description provided for @aiSettingsSmartPromptsInEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Memory Edit'**
+  String get aiSettingsSmartPromptsInEdit;
+
+  /// No description provided for @aiSettingsPatternAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern Analysis'**
+  String get aiSettingsPatternAnalysis;
+
+  /// No description provided for @aiSettingsPatternAnalysisSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly analysis of patterns and cycles'**
+  String get aiSettingsPatternAnalysisSubtitle;
+
+  /// No description provided for @aiSettingsPatternAnalysisEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Pattern Analysis'**
+  String get aiSettingsPatternAnalysisEnable;
+
+  /// No description provided for @aiSettingsPatternAnalysisMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Monthly View'**
+  String get aiSettingsPatternAnalysisMonthly;
+
+  /// No description provided for @aiSettingsPatternAnalysisMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Memory View'**
+  String get aiSettingsPatternAnalysisMemory;
+
+  /// No description provided for @aiSettingsPatternAnalysisList.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Memory List'**
+  String get aiSettingsPatternAnalysisList;
+
+  /// No description provided for @aiSettingsPredictiveInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Predictive Insights'**
+  String get aiSettingsPredictiveInsights;
+
+  /// No description provided for @aiSettingsPredictiveInsightsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI predicts based on your history'**
+  String get aiSettingsPredictiveInsightsSubtitle;
+
+  /// No description provided for @aiSettingsPredictiveInsightsEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Predictive Insights'**
+  String get aiSettingsPredictiveInsightsEnable;
+
+  /// No description provided for @aiSettingsPredictiveInsightsEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Memory Edit'**
+  String get aiSettingsPredictiveInsightsEdit;
+
+  /// No description provided for @aiSettingsPredictiveInsightsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Proactive Notifications'**
+  String get aiSettingsPredictiveInsightsNotifications;
+
+  /// No description provided for @aiSettingsPredictiveInsightsNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified when AI sees a pattern'**
+  String get aiSettingsPredictiveInsightsNotificationsSubtitle;
+
+  /// No description provided for @aiSettingsPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get aiSettingsPrivacyTitle;
+
+  /// No description provided for @aiSettingsPrivacySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Control what AI can access'**
+  String get aiSettingsPrivacySubtitle;
+
+  /// No description provided for @aiSettingsPrivacyEncrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Encrypted Memories'**
+  String get aiSettingsPrivacyEncrypted;
+
+  /// No description provided for @aiSettingsPrivacyEncryptedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow AI to analyze encrypted content'**
+  String get aiSettingsPrivacyEncryptedSubtitle;
+
+  /// No description provided for @aiSettingsPrivacyInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Privacy'**
+  String get aiSettingsPrivacyInfoTitle;
+
+  /// No description provided for @aiSettingsPrivacyInfoContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your memories are sent to Google Gemini AI for analysis. Google does NOT store your data permanently. All processing is ephemeral (temporary).\n\nEncrypted memories are NOT sent to AI unless you explicitly enable it above.\n\nYou can disable AI features at any time.'**
+  String get aiSettingsPrivacyInfoContent;
+
+  /// No description provided for @aiSettingsBadgeFree.
+  ///
+  /// In en, this message translates to:
+  /// **'FREE'**
+  String get aiSettingsBadgeFree;
+
+  /// No description provided for @aiSettingsBadgePremium.
+  ///
+  /// In en, this message translates to:
+  /// **'PREMIUM'**
+  String get aiSettingsBadgePremium;
+
+  /// No description provided for @aiSettingsUpgradeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get aiSettingsUpgradeButton;
+
+  /// No description provided for @aiSettingsUpgradeDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium features coming soon!'**
+  String get aiSettingsUpgradeDialogContent;
+
+  /// No description provided for @aiConsentDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable AI Features?'**
+  String get aiConsentDialogTitle;
+
+  /// No description provided for @aiConsentDialogBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest thoughtful questions'**
+  String get aiConsentDialogBenefit1;
+
+  /// No description provided for @aiConsentDialogBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'Find recurring patterns'**
+  String get aiConsentDialogBenefit2;
+
+  /// No description provided for @aiConsentDialogBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'Predict and help prevent negative cycles'**
+  String get aiConsentDialogBenefit3;
+
+  /// No description provided for @aiConsentDialogPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy guarantee:'**
+  String get aiConsentDialogPrivacyTitle;
+
+  /// No description provided for @aiConsentDialogPrivacy1.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by Google Gemini'**
+  String get aiConsentDialogPrivacy1;
+
+  /// No description provided for @aiConsentDialogPrivacy2.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is NOT stored by Google'**
+  String get aiConsentDialogPrivacy2;
+
+  /// No description provided for @aiConsentDialogPrivacy3.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted memories stay encrypted'**
+  String get aiConsentDialogPrivacy3;
+
+  /// No description provided for @aiConsentDialogPrivacy4.
+  ///
+  /// In en, this message translates to:
+  /// **'You control what AI can see'**
+  String get aiConsentDialogPrivacy4;
+
+  /// No description provided for @aiConsentDialogPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'By enabling AI, you agree that your non-encrypted memories will be sent to Google Gemini for analysis. Google processes data ephemerally (does not store it permanently).'**
+  String get aiConsentDialogPrivacyNote;
+
+  /// No description provided for @aiConsentDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get aiConsentDialogCancel;
+
+  /// No description provided for @aiConsentDialogEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable AI'**
+  String get aiConsentDialogEnable;
+
+  /// No description provided for @aiEncryptedWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Encrypted Memories?'**
+  String get aiEncryptedWarningTitle;
+
+  /// No description provided for @aiEncryptedWarningContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will send your encrypted memories to Google Gemini AI for analysis.\n\nWhile Gemini does not store data permanently, your encrypted content will be temporarily visible to the AI during processing.\n\nOnly enable this if you\'re comfortable with Google\'s AI seeing your encrypted memories.'**
+  String get aiEncryptedWarningContent;
+
+  /// No description provided for @aiEncryptedWarningCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get aiEncryptedWarningCancel;
+
+  /// No description provided for @aiEncryptedWarningEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get aiEncryptedWarningEnable;
+
+  /// No description provided for @aiNoInternetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Internet Connection'**
+  String get aiNoInternetTitle;
+
+  /// No description provided for @aiNoInternetMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'AI features require an internet connection to work. Please connect to WiFi or mobile data and try again.'**
+  String get aiNoInternetMessage;
+
+  /// No description provided for @aiNoInternetRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get aiNoInternetRetry;
+
+  /// No description provided for @aiNoInternetDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get aiNoInternetDismiss;
 }
 
 class _AppLocalizationsDelegate

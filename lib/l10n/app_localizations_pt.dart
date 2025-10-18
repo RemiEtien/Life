@@ -1452,4 +1452,171 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get shareDialogErrorLoadingProfile => 'Erro ao carregar perfil';
+
+  @override
+  String get aiSettingsTitle => 'Recursos de AI';
+
+  @override
+  String get aiSettingsSubtitleEnabled => 'AI está analisando suas memórias';
+
+  @override
+  String get aiSettingsSubtitleDisabled =>
+      'Os recursos de AI estão desativados';
+
+  @override
+  String get aiSettingsMasterSwitch => 'Ativar recursos de AI';
+
+  @override
+  String get aiSettingsMasterSwitchSubtitle =>
+      'AI analisa suas memórias para encontrar padrões';
+
+  @override
+  String get aiSettingsSmartPrompts => 'Sugestões inteligentes';
+
+  @override
+  String get aiSettingsSmartPromptsSubtitle =>
+      'AI sugere perguntas enquanto você escreve';
+
+  @override
+  String get aiSettingsSmartPromptsInEdit => 'Mostrar na Edição de memória';
+
+  @override
+  String get aiSettingsPatternAnalysis => 'Análise de padrões';
+
+  @override
+  String get aiSettingsPatternAnalysisSubtitle =>
+      'Análise semanal de padrões e ciclos';
+
+  @override
+  String get aiSettingsPatternAnalysisEnable => 'Ativar análise de padrões';
+
+  @override
+  String get aiSettingsPatternAnalysisMonthly =>
+      'Mostrar na visualização mensal';
+
+  @override
+  String get aiSettingsPatternAnalysisMemory =>
+      'Mostrar na visualização de memória';
+
+  @override
+  String get aiSettingsPatternAnalysisList => 'Mostrar na lista de memórias';
+
+  @override
+  String get aiSettingsPredictiveInsights => 'Insights preditivos';
+
+  @override
+  String get aiSettingsPredictiveInsightsSubtitle =>
+      'AI prevê com base no seu histórico';
+
+  @override
+  String get aiSettingsPredictiveInsightsEnable => 'Ativar insights preditivos';
+
+  @override
+  String get aiSettingsPredictiveInsightsEdit => 'Mostrar na Edição de memória';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotifications =>
+      'Notificações proativas';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotificationsSubtitle =>
+      'Receba notificações quando AI detectar um padrão';
+
+  @override
+  String get aiSettingsPrivacyTitle => 'Privacidade';
+
+  @override
+  String get aiSettingsPrivacySubtitle => 'Controle o que AI pode acessar';
+
+  @override
+  String get aiSettingsPrivacyEncrypted => 'Processar memórias criptografadas';
+
+  @override
+  String get aiSettingsPrivacyEncryptedSubtitle =>
+      'Permitir que AI analise conteúdo criptografado';
+
+  @override
+  String get aiSettingsPrivacyInfoTitle => 'Privacidade de AI';
+
+  @override
+  String get aiSettingsPrivacyInfoContent =>
+      'Suas memórias são enviadas para Google Gemini AI para análise. O Google NÃO armazena seus dados permanentemente. Todo o processamento é efêmero (temporário).\n\nMemórias criptografadas NÃO são enviadas para AI a menos que você ative explicitamente acima.\n\nVocê pode desativar os recursos de AI a qualquer momento.';
+
+  @override
+  String get aiSettingsBadgeFree => 'GRÁTIS';
+
+  @override
+  String get aiSettingsBadgePremium => 'PREMIUM';
+
+  @override
+  String get aiSettingsUpgradeButton => 'Atualizar';
+
+  @override
+  String get aiSettingsUpgradeDialogContent => 'Recursos premium em breve!';
+
+  @override
+  String get aiConsentDialogTitle => 'Ativar recursos de AI?';
+
+  @override
+  String get aiConsentDialogBenefit1 => 'Sugerir perguntas reflexivas';
+
+  @override
+  String get aiConsentDialogBenefit2 => 'Encontrar padrões recorrentes';
+
+  @override
+  String get aiConsentDialogBenefit3 =>
+      'Prever e ajudar a prevenir ciclos negativos';
+
+  @override
+  String get aiConsentDialogPrivacyTitle => 'Garantia de privacidade:';
+
+  @override
+  String get aiConsentDialogPrivacy1 => 'Desenvolvido por Google Gemini';
+
+  @override
+  String get aiConsentDialogPrivacy2 =>
+      'Seus dados NÃO são armazenados pelo Google';
+
+  @override
+  String get aiConsentDialogPrivacy3 =>
+      'Memórias criptografadas permanecem criptografadas';
+
+  @override
+  String get aiConsentDialogPrivacy4 => 'Você controla o que AI pode ver';
+
+  @override
+  String get aiConsentDialogPrivacyNote =>
+      'Ao ativar AI, você concorda que suas memórias não criptografadas serão enviadas para Google Gemini para análise. O Google processa dados de forma efêmera (não os armazena permanentemente).';
+
+  @override
+  String get aiConsentDialogCancel => 'Cancelar';
+
+  @override
+  String get aiConsentDialogEnable => 'Ativar AI';
+
+  @override
+  String get aiEncryptedWarningTitle => 'Processar memórias criptografadas?';
+
+  @override
+  String get aiEncryptedWarningContent =>
+      'Isso enviará suas memórias criptografadas para Google Gemini AI para análise.\n\nEmbora o Gemini não armazene dados permanentemente, seu conteúdo criptografado ficará temporariamente visível para AI durante o processamento.\n\nAtive isso apenas se você se sentir confortável com AI do Google vendo suas memórias criptografadas.';
+
+  @override
+  String get aiEncryptedWarningCancel => 'Cancelar';
+
+  @override
+  String get aiEncryptedWarningEnable => 'Ativar';
+
+  @override
+  String get aiNoInternetTitle => 'Sem conexão com a Internet';
+
+  @override
+  String get aiNoInternetMessage =>
+      'Os recursos de AI requerem uma conexão com a internet para funcionar. Conecte-se ao WiFi ou dados móveis e tente novamente.';
+
+  @override
+  String get aiNoInternetRetry => 'Tentar novamente';
+
+  @override
+  String get aiNoInternetDismiss => 'Dispensar';
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../l10n/app_localizations.dart';
 import '../models/user_profile.dart';
 import '../providers/application_providers.dart';
 import '../services/user_service.dart';
 import '../utils/safe_logger.dart';
+import '../utils/connectivity_helper.dart';
 
 /// AI Settings Section Widget for ProfileScreen
 ///
@@ -31,10 +33,12 @@ class AISettingsSection extends ConsumerWidget {
   }
 
   Widget _buildAISettingsContent(BuildContext context, WidgetRef ref, UserProfile profile) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ExpansionTile(
-      title: const Text('AI Features'),
+      title: Text(l10n.aiSettingsTitle),
       subtitle: Text(
-        profile.aiEnabled ? 'Enabled' : 'Disabled',
+        profile.aiEnabled ? l10n.aiSettingsSubtitleEnabled : l10n.aiSettingsSubtitleDisabled,
         style: TextStyle(
           color: profile.aiEnabled ? Colors.green : Colors.grey,
           fontSize: 12,
@@ -44,13 +48,13 @@ class AISettingsSection extends ConsumerWidget {
       children: [
         // Master Switch
         SwitchListTile(
-          title: const Text('Enable AI Features'),
-          subtitle: const Text('AI analyzes your memories to find patterns'),
+          title: Text(l10n.aiSettingsMasterSwitch),
+          subtitle: Text(l10n.aiSettingsMasterSwitchSubtitle),
           value: profile.aiEnabled,
           onChanged: (value) {
             if (value && !profile.aiEnabled) {
               // First time activation - show consent dialog
-              _showAIConsentDialog(context, ref, profile);
+              _showAIConsentDialog(context, ref, profile, l10n);
             } else {
               _updateProfile(ref, profile, {'aiEnabled': value});
             }
@@ -64,7 +68,7 @@ class AISettingsSection extends ConsumerWidget {
           ListTile(
             title: Row(
               children: [
-                const Text('Smart Prompts'),
+                Text(l10n.aiSettingsSmartPrompts),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -72,14 +76,14 @@ class AISettingsSection extends ConsumerWidget {
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text('FREE', style: TextStyle(fontSize: 10, color: Colors.white)),
+                  child: Text(l10n.aiSettingsBadgeFree, style: const TextStyle(fontSize: 10, color: Colors.white)),
                 ),
               ],
             ),
-            subtitle: const Text('AI suggests questions while you write'),
+            subtitle: Text(l10n.aiSettingsSmartPromptsSubtitle),
           ),
           SwitchListTile(
-            title: const Text('  Show in Memory Edit'),
+            title: Text('  ${l10n.aiSettingsSmartPromptsInEdit}'),
             value: profile.aiSmartPromptsEnabled && profile.aiSmartPromptsInEdit,
             onChanged: profile.aiSmartPromptsEnabled
                 ? (v) => _updateProfile(ref, profile, {'aiSmartPromptsInEdit': v})
@@ -92,7 +96,7 @@ class AISettingsSection extends ConsumerWidget {
           ListTile(
             title: Row(
               children: [
-                const Text('Pattern Analysis'),
+                Text(l10n.aiSettingsPatternAnalysis),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -100,37 +104,37 @@ class AISettingsSection extends ConsumerWidget {
                     color: Colors.amber,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text('PREMIUM', style: TextStyle(fontSize: 10, color: Colors.white)),
+                  child: Text(l10n.aiSettingsBadgePremium, style: const TextStyle(fontSize: 10, color: Colors.white)),
                 ),
               ],
             ),
-            subtitle: const Text('Weekly analysis of patterns and cycles'),
+            subtitle: Text(l10n.aiSettingsPatternAnalysisSubtitle),
             trailing: !profile.isPremium
                 ? TextButton(
-                    onPressed: () => _showPremiumUpgrade(context),
-                    child: const Text('Upgrade'),
+                    onPressed: () => _showPremiumUpgrade(context, l10n),
+                    child: Text(l10n.aiSettingsUpgradeButton),
                   )
                 : null,
           ),
           if (profile.isPremium) ...[
             SwitchListTile(
-              title: const Text('  Enable Pattern Analysis'),
+              title: Text('  ${l10n.aiSettingsPatternAnalysisEnable}'),
               value: profile.aiPatternAnalysisEnabled,
               onChanged: (v) => _updateProfile(ref, profile, {'aiPatternAnalysisEnabled': v}),
             ),
             if (profile.aiPatternAnalysisEnabled) ...[
               SwitchListTile(
-                title: const Text('    Show in Monthly View'),
+                title: Text('    ${l10n.aiSettingsPatternAnalysisMonthly}'),
                 value: profile.aiPatternsInMonthlyView,
                 onChanged: (v) => _updateProfile(ref, profile, {'aiPatternsInMonthlyView': v}),
               ),
               SwitchListTile(
-                title: const Text('    Show in Memory View'),
+                title: Text('    ${l10n.aiSettingsPatternAnalysisMemory}'),
                 value: profile.aiPatternsInMemoryView,
                 onChanged: (v) => _updateProfile(ref, profile, {'aiPatternsInMemoryView': v}),
               ),
               SwitchListTile(
-                title: const Text('    Show in Memory List'),
+                title: Text('    ${l10n.aiSettingsPatternAnalysisList}'),
                 value: profile.aiPatternsInMemoryList,
                 onChanged: (v) => _updateProfile(ref, profile, {'aiPatternsInMemoryList': v}),
               ),
@@ -143,7 +147,7 @@ class AISettingsSection extends ConsumerWidget {
           ListTile(
             title: Row(
               children: [
-                const Text('Predictive Insights'),
+                Text(l10n.aiSettingsPredictiveInsights),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -151,33 +155,33 @@ class AISettingsSection extends ConsumerWidget {
                     color: Colors.amber,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text('PREMIUM', style: TextStyle(fontSize: 10, color: Colors.white)),
+                  child: Text(l10n.aiSettingsBadgePremium, style: const TextStyle(fontSize: 10, color: Colors.white)),
                 ),
               ],
             ),
-            subtitle: const Text('AI predicts based on your history'),
+            subtitle: Text(l10n.aiSettingsPredictiveInsightsSubtitle),
             trailing: !profile.isPremium
                 ? TextButton(
-                    onPressed: () => _showPremiumUpgrade(context),
-                    child: const Text('Upgrade'),
+                    onPressed: () => _showPremiumUpgrade(context, l10n),
+                    child: Text(l10n.aiSettingsUpgradeButton),
                   )
                 : null,
           ),
           if (profile.isPremium) ...[
             SwitchListTile(
-              title: const Text('  Enable Predictive Insights'),
+              title: Text('  ${l10n.aiSettingsPredictiveInsightsEnable}'),
               value: profile.aiPredictiveInsightsEnabled,
               onChanged: (v) => _updateProfile(ref, profile, {'aiPredictiveInsightsEnabled': v}),
             ),
             if (profile.aiPredictiveInsightsEnabled) ...[
               SwitchListTile(
-                title: const Text('    Show in Memory Edit'),
+                title: Text('    ${l10n.aiSettingsPredictiveInsightsEdit}'),
                 value: profile.aiPredictiveInEdit,
                 onChanged: (v) => _updateProfile(ref, profile, {'aiPredictiveInEdit': v}),
               ),
               SwitchListTile(
-                title: const Text('    Proactive Notifications'),
-                subtitle: const Text('Get notified when AI sees a pattern'),
+                title: Text('    ${l10n.aiSettingsPredictiveInsightsNotifications}'),
+                subtitle: Text(l10n.aiSettingsPredictiveInsightsNotificationsSubtitle),
                 value: profile.aiPredictiveNotifications,
                 onChanged: (v) => _updateProfile(ref, profile, {'aiPredictiveNotifications': v}),
               ),
@@ -187,17 +191,17 @@ class AISettingsSection extends ConsumerWidget {
           const Divider(),
 
           // Privacy Control
-          const ListTile(
-            title: Text('Privacy'),
-            subtitle: Text('Control what AI can access'),
+          ListTile(
+            title: Text(l10n.aiSettingsPrivacyTitle),
+            subtitle: Text(l10n.aiSettingsPrivacySubtitle),
           ),
           SwitchListTile(
-            title: const Text('  Process Encrypted Memories'),
-            subtitle: const Text('Allow AI to analyze encrypted content'),
+            title: Text('  ${l10n.aiSettingsPrivacyEncrypted}'),
+            subtitle: Text(l10n.aiSettingsPrivacyEncryptedSubtitle),
             value: profile.aiProcessEncryptedMemories,
             onChanged: (v) {
               if (v) {
-                _showEncryptedAIWarning(context, ref, profile);
+                _showEncryptedAIWarning(context, ref, profile, l10n);
               } else {
                 _updateProfile(ref, profile, {'aiProcessEncryptedMemories': v});
               }
@@ -205,27 +209,24 @@ class AISettingsSection extends ConsumerWidget {
           ),
 
           // Privacy info card
-          const Card(
-            margin: EdgeInsets.all(16),
+          Card(
+            margin: const EdgeInsets.all(16),
             child: Padding(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.privacy_tip, size: 16),
-                      SizedBox(width: 8),
-                      Text('AI Privacy', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Icon(Icons.privacy_tip, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiSettingsPrivacyInfoTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '• Powered by Google Gemini AI\n'
-                    '• Google does NOT store your data\n'
-                    '• Encrypted memories stay encrypted by default\n'
-                    '• You can disable AI anytime',
-                    style: TextStyle(fontSize: 12),
+                    l10n.aiSettingsPrivacyInfoContent,
+                    style: const TextStyle(fontSize: 12),
                   ),
                 ],
               ),
@@ -236,67 +237,64 @@ class AISettingsSection extends ConsumerWidget {
     );
   }
 
-  Future<void> _showAIConsentDialog(BuildContext context, WidgetRef ref, UserProfile profile) async {
+  Future<void> _showAIConsentDialog(BuildContext context, WidgetRef ref, UserProfile profile, AppLocalizations l10n) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Enable AI Features?'),
-        content: const Column(
+        title: Text(l10n.aiConsentDialogTitle),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('AI will analyze your memories to:'),
-            SizedBox(height: 8),
-            Text('• Suggest thoughtful questions'),
-            Text('• Find recurring patterns'),
-            Text('• Predict and help prevent negative cycles'),
-            SizedBox(height: 16),
-            Text('Privacy guarantee:', style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text('• Powered by Google Gemini'),
-            Text('• Your data is NOT stored by Google'),
-            Text('• Encrypted memories stay encrypted'),
-            Text('• You control what AI can see'),
-            SizedBox(height: 16),
+            Text('• ${l10n.aiConsentDialogBenefit1}'),
+            Text('• ${l10n.aiConsentDialogBenefit2}'),
+            Text('• ${l10n.aiConsentDialogBenefit3}'),
+            const SizedBox(height: 16),
+            Text(l10n.aiConsentDialogPrivacyTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('• ${l10n.aiConsentDialogPrivacy1}'),
+            Text('• ${l10n.aiConsentDialogPrivacy2}'),
+            Text('• ${l10n.aiConsentDialogPrivacy3}'),
+            Text('• ${l10n.aiConsentDialogPrivacy4}'),
+            const SizedBox(height: 16),
             Text(
-              'You can disable AI anytime in Settings.',
-              style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+              l10n.aiConsentDialogPrivacyNote,
+              style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.aiConsentDialogCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Enable AI'),
+            child: Text(l10n.aiConsentDialogEnable),
           ),
         ],
       ),
     );
 
     if (confirmed == true) {
-      await _updateProfile(ref, profile, {'aiEnabled': true});
+      // Check internet connection before enabling AI
+      final hasInternet = await ConnectivityHelper.checkInternetWithWarning(context);
+      if (hasInternet) {
+        await _updateProfile(ref, profile, {'aiEnabled': true});
+      }
     }
   }
 
-  void _showEncryptedAIWarning(BuildContext context, WidgetRef ref, UserProfile profile) {
+  void _showEncryptedAIWarning(BuildContext context, WidgetRef ref, UserProfile profile, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Process Encrypted Memories?'),
-        content: const Text(
-          'This will send your encrypted memories to Google Gemini AI for analysis.\n\n'
-          'While Gemini does NOT store your data, this means your encrypted content '
-          'will be temporarily processed by Google servers.\n\n'
-          'Are you sure you want to enable this?',
-        ),
+        title: Text(l10n.aiEncryptedWarningTitle),
+        content: Text(l10n.aiEncryptedWarningContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.aiEncryptedWarningCancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -304,19 +302,19 @@ class AISettingsSection extends ConsumerWidget {
               _updateProfile(ref, profile, {'aiProcessEncryptedMemories': true});
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: const Text('Enable'),
+            child: Text(l10n.aiEncryptedWarningEnable),
           ),
         ],
       ),
     );
   }
 
-  void _showPremiumUpgrade(BuildContext context) {
+  void _showPremiumUpgrade(BuildContext context, AppLocalizations l10n) {
     // TODO: Navigate to premium upgrade screen
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Premium features coming soon!'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(l10n.aiSettingsUpgradeDialogContent),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

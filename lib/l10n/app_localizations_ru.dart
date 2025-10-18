@@ -1452,4 +1452,178 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get shareDialogErrorLoadingProfile => 'Ошибка загрузки профиля';
+
+  @override
+  String get aiSettingsTitle => 'Функции AI';
+
+  @override
+  String get aiSettingsSubtitleEnabled => 'AI анализирует ваши воспоминания';
+
+  @override
+  String get aiSettingsSubtitleDisabled => 'Функции AI отключены';
+
+  @override
+  String get aiSettingsMasterSwitch => 'Включить функции AI';
+
+  @override
+  String get aiSettingsMasterSwitchSubtitle =>
+      'AI анализирует ваши воспоминания для поиска закономерностей';
+
+  @override
+  String get aiSettingsSmartPrompts => 'Умные подсказки';
+
+  @override
+  String get aiSettingsSmartPromptsSubtitle =>
+      'AI предлагает вопросы во время написания';
+
+  @override
+  String get aiSettingsSmartPromptsInEdit =>
+      'Показывать при редактировании воспоминания';
+
+  @override
+  String get aiSettingsPatternAnalysis => 'Анализ закономерностей';
+
+  @override
+  String get aiSettingsPatternAnalysisSubtitle =>
+      'Еженедельный анализ паттернов и циклов';
+
+  @override
+  String get aiSettingsPatternAnalysisEnable =>
+      'Включить анализ закономерностей';
+
+  @override
+  String get aiSettingsPatternAnalysisMonthly =>
+      'Показывать в месячном представлении';
+
+  @override
+  String get aiSettingsPatternAnalysisMemory =>
+      'Показывать при просмотре воспоминания';
+
+  @override
+  String get aiSettingsPatternAnalysisList =>
+      'Показывать в списке воспоминаний';
+
+  @override
+  String get aiSettingsPredictiveInsights => 'Прогностические инсайты';
+
+  @override
+  String get aiSettingsPredictiveInsightsSubtitle =>
+      'AI предсказывает на основе вашей истории';
+
+  @override
+  String get aiSettingsPredictiveInsightsEnable =>
+      'Включить прогностические инсайты';
+
+  @override
+  String get aiSettingsPredictiveInsightsEdit =>
+      'Показывать при редактировании воспоминания';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotifications =>
+      'Проактивные уведомления';
+
+  @override
+  String get aiSettingsPredictiveInsightsNotificationsSubtitle =>
+      'Получать уведомления, когда AI видит закономерность';
+
+  @override
+  String get aiSettingsPrivacyTitle => 'Конфиденциальность';
+
+  @override
+  String get aiSettingsPrivacySubtitle =>
+      'Контролируйте, к чему AI может получить доступ';
+
+  @override
+  String get aiSettingsPrivacyEncrypted =>
+      'Обрабатывать зашифрованные воспоминания';
+
+  @override
+  String get aiSettingsPrivacyEncryptedSubtitle =>
+      'Разрешить AI анализировать зашифрованный контент';
+
+  @override
+  String get aiSettingsPrivacyInfoTitle => 'Конфиденциальность AI';
+
+  @override
+  String get aiSettingsPrivacyInfoContent =>
+      'Ваши воспоминания отправляются в Google Gemini AI для анализа. Google НЕ хранит ваши данные постоянно. Вся обработка эфемерна (временная).\n\nЗашифрованные воспоминания НЕ отправляются в AI, если вы явно не включите это выше.\n\nВы можете отключить функции AI в любое время.';
+
+  @override
+  String get aiSettingsBadgeFree => 'БЕСПЛАТНО';
+
+  @override
+  String get aiSettingsBadgePremium => 'PREMIUM';
+
+  @override
+  String get aiSettingsUpgradeButton => 'Обновить';
+
+  @override
+  String get aiSettingsUpgradeDialogContent =>
+      'Премиум-функции скоро появятся!';
+
+  @override
+  String get aiConsentDialogTitle => 'Включить функции AI?';
+
+  @override
+  String get aiConsentDialogBenefit1 => 'Предлагать продуманные вопросы';
+
+  @override
+  String get aiConsentDialogBenefit2 => 'Находить повторяющиеся закономерности';
+
+  @override
+  String get aiConsentDialogBenefit3 =>
+      'Предсказывать и помогать предотвращать негативные циклы';
+
+  @override
+  String get aiConsentDialogPrivacyTitle => 'Гарантия конфиденциальности:';
+
+  @override
+  String get aiConsentDialogPrivacy1 => 'Работает на Google Gemini';
+
+  @override
+  String get aiConsentDialogPrivacy2 => 'Ваши данные НЕ хранятся Google';
+
+  @override
+  String get aiConsentDialogPrivacy3 =>
+      'Зашифрованные воспоминания остаются зашифрованными';
+
+  @override
+  String get aiConsentDialogPrivacy4 => 'Вы контролируете, что может видеть AI';
+
+  @override
+  String get aiConsentDialogPrivacyNote =>
+      'Включая AI, вы соглашаетесь, что ваши незашифрованные воспоминания будут отправлены в Google Gemini для анализа. Google обрабатывает данные эфемерно (не хранит их постоянно).';
+
+  @override
+  String get aiConsentDialogCancel => 'Отмена';
+
+  @override
+  String get aiConsentDialogEnable => 'Включить AI';
+
+  @override
+  String get aiEncryptedWarningTitle =>
+      'Обрабатывать зашифрованные воспоминания?';
+
+  @override
+  String get aiEncryptedWarningContent =>
+      'Это отправит ваши зашифрованные воспоминания в Google Gemini AI для анализа.\n\nХотя Gemini не хранит данные постоянно, ваш зашифрованный контент будет временно виден AI во время обработки.\n\nВключайте это только если вы готовы, чтобы AI от Google видел ваши зашифрованные воспоминания.';
+
+  @override
+  String get aiEncryptedWarningCancel => 'Отмена';
+
+  @override
+  String get aiEncryptedWarningEnable => 'Включить';
+
+  @override
+  String get aiNoInternetTitle => 'Нет подключения к Интернету';
+
+  @override
+  String get aiNoInternetMessage =>
+      'Для работы функций AI требуется подключение к Интернету. Пожалуйста, подключитесь к WiFi или мобильной сети и попробуйте снова.';
+
+  @override
+  String get aiNoInternetRetry => 'Повторить';
+
+  @override
+  String get aiNoInternetDismiss => 'Закрыть';
 }
