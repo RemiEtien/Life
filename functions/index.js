@@ -574,3 +574,11 @@ exports.cleanupOldReceipts = functions.pubsub.schedule("0 3 * * *")
       }
     });
 
+// ============================================
+// AI FUNCTIONS (Gemini 2.5 Flash-Lite)
+// ============================================
+const aiFunctions = require("./ai_functions");
+exports.generateSmartPrompts = aiFunctions.generateSmartPrompts;
+exports.weeklyPatternAnalysis = aiFunctions.weeklyPatternAnalysis;
+exports.generatePredictiveInsight = aiFunctions.generatePredictiveInsight;
+
