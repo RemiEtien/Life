@@ -21,6 +21,8 @@ import '../services/image_processing_service.dart';
 import '../services/message_service.dart';
 import '../utils/safe_logger.dart';
 import '../widgets/premium_upsell_widgets.dart';
+import '../widgets/smart_prompts_card.dart';
+import '../widgets/predictive_insight_card.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -1163,6 +1165,22 @@ class _MemoryEditScreenState extends ConsumerState<MemoryEditScreen> {
                 minLines: 3,
                 maxLines: 6,
               ),
+              const SizedBox(height: 16),
+              // AI Smart Prompts (FREE)
+              if (userProfile != null && userProfile.aiEnabled &&
+                  userProfile.aiSmartPromptsEnabled && userProfile.aiSmartPromptsInEdit)
+                SmartPromptsCard(
+                  userId: widget.userId,
+                  memoryId: widget.initial?.id.toString(),
+                ),
+              // AI Predictive Insights (PREMIUM)
+              if (userProfile != null && userProfile.aiEnabled && userProfile.isPremium &&
+                  userProfile.aiPredictiveInsightsEnabled && userProfile.aiPredictiveInEdit)
+                PredictiveInsightCard(
+                  userId: widget.userId,
+                  memoryId: widget.initial?.id.toString(),
+                  compact: true,
+                ),
               const SizedBox(height: 24),
               Text(l10n.memoryEditAmbientSoundLabel,
                   style: const TextStyle(fontSize: 16)),

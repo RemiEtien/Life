@@ -28,6 +28,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/premium_upsell_widgets.dart';
 import '../widgets/emotion_effects/advanced_emotion_effect.dart';
+import '../widgets/pattern_insight_card.dart';
 
 class MemoryViewScreen extends ConsumerStatefulWidget {
   final Memory memory;
@@ -1815,6 +1816,7 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
   }
 
   Widget _buildMemoryTab() {
+    final userProfile = ref.watch(userProfileProvider).asData?.value;
     final allMedia = [..._displayImagePaths, ..._displayVideoPaths];
     final hasMedia = allMedia.isNotEmpty;
 
@@ -1860,6 +1862,14 @@ class _MemoryViewScreenState extends ConsumerState<MemoryViewScreen> {
           _buildAudioNoteControls(),
         ],
         _buildReflectionCard(),
+        // AI Pattern Insights (PREMIUM)
+        if (userProfile != null && userProfile.aiEnabled && userProfile.isPremium &&
+            userProfile.aiPatternAnalysisEnabled && userProfile.aiPatternsInMemoryView)
+          PatternInsightCard(
+            userId: widget.userId,
+            relatedMemoryId: _currentMemory.id.toString(),
+            showDismiss: true,
+          ),
       ],
     );
   }

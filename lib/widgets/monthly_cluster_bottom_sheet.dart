@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../memory.dart';
 import '../utils/emotion_colors.dart';
 import '../screens/memory_view_screen.dart';
+import '../providers/application_providers.dart';
+import 'monthly_pattern_card.dart';
 
 /// BottomSheet для отображения информации о месячном кластере
 class MonthlyClusterBottomSheet extends ConsumerStatefulWidget {
@@ -158,6 +160,22 @@ class _MonthlyClusterBottomSheetState extends ConsumerState<MonthlyClusterBottom
             ),
             const SizedBox(height: 12),
           ],
+
+          // AI Monthly Pattern Analysis (PREMIUM)
+          Consumer(
+            builder: (context, ref, child) {
+              final userProfile = ref.watch(userProfileProvider).asData?.value;
+              if (userProfile != null && userProfile.aiEnabled && userProfile.isPremium &&
+                  userProfile.aiPatternAnalysisEnabled && userProfile.aiPatternsInMonthlyView) {
+                return MonthlyPatternCard(
+                  userId: widget.userId,
+                  monthKey: widget.monthKey,
+                  emotionCounts: emotionCounts,
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
 
           // Сетка воспоминаний
           Expanded(
